@@ -27,6 +27,7 @@ summary.gmvar <- function(object, ...) {
     qrtest <- quantile_residual_tests(gmvar, lags_ac=c(1, 5), lags_ch=c(1, 5), nsimu=1)
   }
   structure(list(gmvar=gmvar,
-                 qrtest=qrtest),
+                 qrtest=qrtest,
+                 regime_means=get_regime_means(gmvar)),
             class="gmvarsum")
 }

@@ -7,5 +7,5 @@
 #'   Most of the functions documented are not exported, but for internal use only. The vignette
 #'   is a good place to start.
 #' @docType package
-#' @name gmvarkit
+#' @name aa_gmvarkit
 NULL

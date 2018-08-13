@@ -257,7 +257,7 @@ check_data <- function(data, p) {
 #' @return Returns \code{TRUE} or \code{FALSE} accordingly.
 
 all_pos_ints <- function(x) {
-  all(unlist(lapply(x, function(x)  x %% 1 == 0 & length(x) == 1 & x >= 1)))
+  all(vapply(x, function(x)  x %% 1 == 0 & length(x) == 1 & x >= 1, logical(1)))
 }
 
 
@@ -289,5 +289,18 @@ check_pMd <- function(p, M, d) {
 #' @return Throws an error if the object doesn't have the class attribute "gmvar".
 
 check_gmvar <- function(object) {
-  if(!any(class(object) == "gmvar")) stop("The object must be created by function GMVAR() or fitGMVAR()")
+  if(!any(class(object) == "gmvar")) stop("The object has to be 'gmvar', typically created by function GMVAR() or fitGMVAR()")
 }
+
+
+#' @title Checks whether the given object contains data or not
+#'
+#' @description \code{check_null_data} checks that the gmvar-object has data
+#'
+#' @inheritParams simulateGMVAR
+#' @return Throws an error if is.null(gmvar$data)
+
+check_null_data <- function(gmvar) {
+  if(is.null(gmvar$data)) stop("The model has to contain data! Data can be added with the function 'add_data'")
+}
+

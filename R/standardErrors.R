@@ -14,8 +14,9 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
-    loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
-                      constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval)
+    tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
+                      constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval),
+             error=function(e) NA)
   }
 
   differences <- c(6e-06, 1e-04, 0.001)

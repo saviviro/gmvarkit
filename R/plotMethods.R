@@ -83,15 +83,12 @@ plot.gmvarpred <- function(x, ..., nt, add_grid=TRUE) {
 #' @export
 plot.gmvar <- function(x, ...) {
   gmvar <- x
-  if(anyNA(gmvar$data) | anyNA(gmvar$mixing_weights)) {
-    stop("Can't plot model without data and mixing weights! To add them, add data to your model with function add_data()!")
-  }
+  check_null_data(gmvar)
   data <- as.ts(gmvar$data)
   n_obs <- nrow(data)
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- ncol(data)
-  time(data)[p+1]
   ts_mw <- ts(rbind(matrix(NA, nrow=p, ncol=M), gmvar$mixing_weights),
               start=start(data), frequency=frequency(data)) # First p observations are starting values
 
@@ -110,5 +107,39 @@ plot.gmvar <- function(x, ...) {
   draw_legend(names_ts, cols=colpal_ts)
   ts.plot(ts_mw, gpars=list(main="Mixing weights", ylim=c(0, 1), col=colpal_mw, lty=2))
   draw_legend(names_mw, cols=colpal_mw)
+}
+
+
+
+#' @import graphics
+#' @describeIn quantile_residual_tests plot p-values of the autocorrelation and conditional
+#'  heteroskedasticity tests.
+#' @inheritParams print.qrtest
+#' @export
+
+plot.qrtest <- function(x, ...) {
+  old_par <- par(no.readonly=TRUE)
+  on.exit(par(old_par))
+  qrtest <- x
+  par(mfrow=c(1, 2), mar=c(5.1, 3.1, 3.1, 1.1))
+
+  plot_pvalues <- function(which_ones) { # ac_res, ch_res
+    res <- qrtest[[which(names(qrtest) == which_ones)]]
+    pvals <- res$test_results$p_val
+    seq_pvals <- seq_along(pvals)
+    plot(pvals, ylim=c(0, 1), xlim=c(min(seq_pvals) - 0.2, max(seq_pvals) + 0.2), ylab="", xlab="lags",
+         main=ifelse(which_ones == "ac_res", "Autocorrelation", "Cond. h.skedasticity"),
+         xaxt="n", yaxt="n", pch=16, col="blue")
+    axis(side=1, at=seq_pvals, labels=res$test_results$lags)
+    levels <- c(0.01, 0.05, 0.10, seq(from=0.20, to=1.00, by=0.20))
+    axis(side=2, at=levels, las=1, cex.axis=0.8)
+    abline(h=0, lwd=2)
+    abline(h=c(0.01, 0.05, 0.10, 1.00), lty=2, col="red")
+    segments(x0=seq_pvals, y0=0, y1=pvals, x1=seq_pvals, ...)
+    points(pvals)
+  }
+
+  plot_pvalues("ac_res")
+  plot_pvalues("ch_res")
 }
 

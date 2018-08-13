@@ -85,7 +85,7 @@ Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Mu
 }
 \details{
 Because of complexity and multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
-   algorithms will end up in the global maximum. It's expected that most of the estimation rounds will end up in some local maximum
+   algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in some local maximum
    point instead. Therefore a number of estimation rounds is required for reliable results. Because of the nature of the model,
    the estimation may fail especially in the cases where the number of mixture components is chosen too large.
 

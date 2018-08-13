@@ -59,7 +59,7 @@
 
 diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=10) {
   check_gmvar(gmvar)
-  stopifnot(!anyNA(gmvar$quantile_residuals))
+  check_null_data(gmvar)
   type <- match.arg(type)
   stopifnot(type %in% c("series", "ac", "ch", "norm"))
   qres <- gmvar$quantile_residuals

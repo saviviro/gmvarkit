@@ -15,7 +15,9 @@
 #' @inherit in_paramspace references
 
 random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_scale) {
-  scale_A <- 1 + log(2*mean(c((p-0.2)^(1.25), d)))
+  scale_A <- ifelse(is.null(constraints),
+                    1 + log(2*mean(c((p - 0.2)^(1.25), d))),
+                    1 + (sum(constraints)/(M*d^2))^0.85)
   if(is.null(constraints)) {
     x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
                                              random_coefmats(d=d, how_many=p, scale=scale_A),

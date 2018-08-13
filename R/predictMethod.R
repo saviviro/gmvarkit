@@ -57,9 +57,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, ci=c(0.95, 0.80), c
                           pred_type=c("mean", "median", "cond_mean"), plot_res=TRUE, nt) {
   gmvar <- object
   check_gmvar(gmvar)
-  if(anyNA(gmvar$data)) {
-    stop("Can't predict model without data! Add data to your model with function add_data()!")
-  }
+  check_null_data(gmvar)
   if(missing(n_ahead)) {
     warning("Argument n_ahead is missing. Using n_ahead = 1.")
     n_ahead <- 1
@@ -156,7 +154,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, ci=c(0.95, 0.80), c
                         pred_type=pred_type,
                         q=q_tocalc),
                    class="gmvarpred")
-  if(plot_res==TRUE) plot.gmvarpred(ret, nt=nt, ...)
+  if(plot_res == TRUE) plot.gmvarpred(x=ret, nt=nt, ...)
   ret
 }
 

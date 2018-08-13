@@ -41,6 +41,7 @@
 #' @export
 
 calc_gradient <- function(x, fn, h=6e-06, ...) {
+  fn <- match.fun(fn)
   n <- length(x)
   I <- diag(1, nrow=n, ncol=n)
   vapply(1:n, function(i1) (fn(x + h*I[i1,], ...) - fn(x - h*I[i1,], ...))/(2*h), numeric(1))
@@ -50,6 +51,7 @@ calc_gradient <- function(x, fn, h=6e-06, ...) {
 #' @rdname calc_gradient
 #' @export
 calc_hessian <- function(x, fn, h=6e-06, ...) {
+  fn <- match.fun(fn)
   n <- length(x)
   I <- diag(1, nrow=n, ncol=n)
   Hess <- matrix(ncol=n, nrow=n)

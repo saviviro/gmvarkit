@@ -18,14 +18,14 @@ knitr::opts_chunk$set(
 
 The package `gmvarkit` contains tools to estimate and work with Gaussian Mixture Vector Autoregressive (GMVAR) model (see Kalliovirta et. al. 2016). This vignette does not explain details about the model and it's assumed that the reader is familiar with the cited article(s).
 
-The GMVAR models in `gmvarkit` are defined as class `gmvar` objects, whose can be created with the estimation function `fitGMVAR()` or the constructor function `GMVAR()`. The created `gmvar` objects are then conveniently used as main arguments in many other functions and methods, that allow for example model diagnostics, simulations and forecasting. Therefore after estimating a GMVAR model it's straight forward and easy to use the other functions for further analyses. However some tasks, such as applying general linear constraints or setting up initial population for the genetic algorithm employed by the estimation function, require accurate understanding on how the parameter vectors are constructed in this package. 
+The GMVAR models in `gmvarkit` are defined as class `gmvar` objects, whose can be created with the estimation function `fitGMVAR` or the constructor function `GMVAR`. The created `gmvar` objects are then conveniently used as main arguments in many other functions and methods, that allow for example model diagnostics, simulations and forecasting. Therefore after estimating a GMVAR model it's straightforward and easy to use the other functions for further analyses. However some tasks, such as applying general linear constraints, creating GMVAR models without estimation or setting up initial population for the genetic algorithm employed by the estimation function, require accurate understanding on how the parameter vectors are constructed in this package. 
 
-The notations for (non-constrained) parameter vector are in line with the cited article by Kalliovirta et. al. (2016), but for clarity we will repeat these notations in the first section. In the second section we show how to apply general linear constraints to the autoregressive parameters of GMVAR model, and we illustrate the general formula with two examples. In the third section we have listed some useful functions and methods found in `gmvarkit` and briefly explain how they work and how to use them. 
+The notations for (non-constrained) parameter vector are in line with the cited article by Kalliovirta et. al. (2016), but for clarity we will repeat these notations in the first section. In the second section we show how to apply general linear constraints to the autoregressive parameters of GMVAR model. Two examples are presented to demonstrate how to use the general formula. In the third section we have listed some useful functions and methods found in `gmvarkit` and briefly explain how they work and how to use them. 
 
 
 ## General notations and regular models
 ### General notations
-Defining a GMVAR model requires specifying the autoregressive degree denoted by symbol _p_ and the number of mixture components _M_. The number of time series in the system is denoted by _d_, and it's assumed _d_ is larger than one.^[For univariate analysis, one may use the package `uGMAR`.] The form of the parameter vector depends on whether one is using regular or constrained model. 
+Defining a GMVAR model requires specifying the autoregressive degree denoted by symbol _p_ and the number of mixture components _M_. The number of time series in the system is denoted by _d_, and it's assumed that _d_ is larger than one.^[For univariate analysis one may use the package `uGMAR`.] The form of the parameter vector depends on whether a regular or constrained model is considered. 
 
 ### Parameter vector of non-constrained model
 The paramater vector for __regular__ model is size _((M(pd^2+d(d+1)/2+1)-1)x1)_ and has form
@@ -42,7 +42,7 @@ parametrization, where the intercept terms are simply replaced by the regimewise
 ## Models with linear constraints
 
 ### General linear constraints and parameter vector
-Employing linear constraints on the autoregressive parameters of GMVAR model is straigth forward. The constraints are expressed in a very general form allowing any arbitrary linear constraints, but one needs to take the time to construct the contraint matrix carefully for each particular case. 
+Employing linear constraints on the autoregressive parameters of GMVAR model is straightforward. The constraints are expressed in a very general form allowing any arbitrary linear constraints, but one needs to take the time to construct the constraint matrix carefully for each particular case. 
 
 We consider constraints of form 
 $$(\boldsymbol{\phi_1},...,\boldsymbol{\phi_M}) = \boldsymbol{C}\boldsymbol{\psi},\enspace \text{where}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\enspace$$
@@ -92,31 +92,31 @@ satisfies $\boldsymbol{C}\boldsymbol{\psi}=(\boldsymbol{\phi},...,\boldsymbol{\p
 ## Functions in gmvarkit
 
 ### Estimating a GMVAR model
-In the package `gmvarkit` one may use the function `fitGMVAR()` to estimate a GMVAR model. The maximum likelihood estimation is performed in two phases: in the first phase `fitGMVAR()` uses a genetic algorithm to find starting values for gradient based variable metric algorithm, which it then uses to finalize the estimation in the second phase. It's important to keep in mind that it's not guaranteed, that the numerical estimation algorithms will end up in the global maximum point rather than a local one. Because of multimodality and challenging surface of the log-likelihood function, it's actually expected that most of the estimation rounds won't find the global maximum point. For this reason one should always perform multiple estimation rounds. The number of estimation rounds can be controlled with the argument `ncalls`, but this is also done by default and it takes use of parallel computing (number of cores used can be set with the argument `ncores`). 
+In the package `gmvarkit` one may use the function `fitGMVAR` to estimate a GMVAR model. The maximum likelihood estimation is performed in two phases: in the first phase `fitGMVAR` uses a genetic algorithm to find starting values for gradient based variable metric algorithm, which it then uses to finalize the estimation in the second phase. It's important to keep in mind that it's not guaranteed, that the numerical estimation algorithms will end up in the global maximum point rather than a local one. Because of multimodality and challenging surface of the log-likelihood function, it's actually expected that most of the estimation rounds won't find the global maximum point. For this reason one should always perform multiple estimation rounds. Parallel computing is used to obtain the results faster (number of cores used can be set with the argument `ncores`) and the number of estimation rounds can be controlled with the argument `ncalls`. 
 
-If the model estimates poorly, it is often because the number of mixture components _M_ is chosen too large. One may also adjust the settings of the genetic algorithm employed, or set up an initial population with guesses for the estimates. This can by done by passing arguments in `fitGMVAR()` to the (non-exported) function `GAfit()` employing the genetic algorithm. To check the available settings, read the documentation `?GAfit`. If the iteration limit is reached when estimating the model, the function `iterate_more()` can be used to finish the estimation. 
+If the model estimates poorly, it is often because the number of mixture components _M_ is chosen too large. One may also adjust the settings of the genetic algorithm employed, or set up an initial population with guesses for the estimates. This can by done by passing arguments in `fitGMVAR` to the (non-exported) function `GAfit` employing the genetic algorithm. To check the available settings, read the documentation `?GAfit`. If the iteration limit is reached when estimating the model, the function `iterate_more` can be used to finish the estimation. 
 
-The parameters of the estimated model are printed in an illustrative and easy to read form. In order to easily compare approximate standard errors to certain estimates, one can print the approximate standard errors of the estimes in the same form with the function `print_std_errors()`. Numerical approximation of the gradient and Hessian matrix of the log-likelihood at the estimates can be obtained conveniently with the functions `get_gradient()` and `get_hessian()`.
+The parameters of the estimated model are printed in an illustrative and easy to read form. In order to easily compare approximate standard errors to certain estimates, one can print the approximate standard errors of the estimates in the same form with the function `print_std_errors`. Numerical approximation of the gradient and Hessian matrix of the log-likelihood at the estimates can be obtained conveniently with the functions `get_gradient` and `get_hessian`.
 
 The estimated objects have their own print, plot and summary methods to name a few.
 
 
 ### Model diagnostics
-The package `gmvarkit` considers model diagnostics based on multivariate extension of quantile residuals (see Kalliovirta and Saikkonen 2010), whose are under the correct model specification asymptotically multivariate standard normal distruted. The quantile residual tests introduced by Kalliovirta and Saikkonen (2010) can be performed with the function `quantile_residuals_tests()` by providing the estimated model (that is class `gmvar` object) as an argument.
+The package `gmvarkit` considers model diagnostics based on multivariate extension of quantile residuals (see Kalliovirta and Saikkonen 2010), whose are under the correct model specification asymptotically multivariate standard normal distributed. The quantile residual tests introduced by Kalliovirta and Saikkonen (2010) can be performed with the function `quantile_residual_tests` by providing the estimated model (that is class `gmvar` object) as an argument.
 
-For graphical diagnostics one may use the function `diagostic_plot()`, which enables one to plot the quantile residual time series, auto- and cross-correlation functions of quantile residuals or their squares, or quantile residual kernel destity estimates and normal QQ-plots.  
+For graphical diagnostics one may use the function `diagostic_plot`, which enables one to plot the quantile residual time series, auto- and cross-correlation functions of quantile residuals or their squares, or quantile residual kernel destity estimates and normal QQ-plots.  
 
 
 ### Constructing GMVAR model without estimation
-One may wish to construct an arbitrary GMVAR model without any estimation process, for example in order to simulate from the particular process of interest. An arbitrary model can be created with the function `GMVAR()`. If one wants to add data to the model afterwards, it's advisable to use the function `add_data()`. 
+One may wish to construct an arbitrary GMVAR model without any estimation process, for example in order to simulate from a particular process of interest. An arbitrary model can be created with the function `GMVAR`. If one wants to add or update data to the model afterwards, it's advisable to use the function `add_data`. 
 
 
 ### Simulating from GMVAR process
-The function `simulateGMVAR()` is the one for the job. As the main argument it uses a gmvar-object generated by `fitGMVAR()` or `GMVAR()`. 
+The function `simulateGMVAR` is the one for the job. As the main argument it uses a gmvar-object (typically) generated by `fitGMVAR` or `GMVAR`. 
 
 
 ### Forecasting GMVAR process
-The package `gmvarkit` contains predict method `predict.gmvar()` for forecasting GMVAR processes. For one step predictions using the exact formula for conditional mean is supported, but the forecasts further than that are based on independent simulations. The predictions are either sample means or medians and the confidence intervals are based on sample quantiles. The objects generated by `predict.gmvar()` have their own plot method. 
+The package `gmvarkit` contains predict method `predict.gmvar` for forecasting GMVAR processes. For one step predictions using the exact formula for conditional mean is supported, but the forecasts further than that are based on independent simulations. The predictions are either sample means or medians and the confidence intervals are based on sample quantiles. The objects generated by `predict.gmvar` have their own plot method. 
 
 
 ## References

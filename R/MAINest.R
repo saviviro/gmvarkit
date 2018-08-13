@@ -12,7 +12,7 @@
 #' @param ... additional settings passed to the function \code{GAfit()} employing the genetic algorithm.
 #' @details
 #'    Because of complexity and multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
-#'    algorithms will end up in the global maximum. It's expected that most of the estimation rounds will end up in some local maximum
+#'    algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in some local maximum
 #'    point instead. Therefore a number of estimation rounds is required for reliable results. Because of the nature of the model,
 #'    the estimation may fail especially in the cases where the number of mixture components is chosen too large.
 #'
@@ -131,6 +131,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   if(npars >= nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), -(10^(ceiling(log10(n_obs)) + d) - 1), dot_params$minval)
+  red_criteria <- ifelse(rep(is.null(dot_params$red_criteria), 2), c(0.05, 0.01), dot_params$red_criteria)
 
   if(ncores > parallel::detectCores()) {
     ncores <- parallel::detectCores()
@@ -170,9 +171,9 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
                                constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval), error=function(e) minval)
   }
 
+  h <- 6e-6
+  I <- diag(rep(1, npars))
   loglik_grad <- function(params) {
-    h <- 6e-6
-    I <- diag(rep(1, npars))
     vapply(1:npars, function(i1) (loglik_fn(params + I[i1,]*h) - loglik_fn(params - I[i1,]*h))/(2*h), numeric(1))
   }
 
@@ -207,50 +208,52 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
     params <- sort_components(p=p, M=M, d=d, params=params)
     all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars))
   }
-  if(best_fit$convergence==1) message("Iteration limit was reached when estimating the best fitting individual! Consider further estimations with the function 'iterate_more()'")
+  if(best_fit$convergence == 1) {
+    message("Iteration limit was reached when estimating the best fitting individual! Consider further estimations with the function 'iterate_more()'")
+  }
+  mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
+                                      parametrization=parametrization, constraints=constraints,
+                                      to_return="mw", check_params=TRUE, minval=NULL)
+  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
+    message("At least one of the mixture components in the estimated model seems to be wasted!")
+  }
+
 
   loglik <- best_fit$value
   T_obs <- n_obs - p
   obs <- ifelse(conditional, T_obs, n_obs)
   IC <- get_IC(loglik=loglik, npars=npars, obs=obs)
-  if(print_res == TRUE) {
-    cat(paste("AIC: ", round(IC$AIC)), "\n")
-    cat(paste("HQIC:", round(IC$HQIC)), "\n")
-    cat(paste("BIC: ", round(IC$BIC)), "\n")
-  }
 
   cat("Calculating approximate standard errors...\n")
   std_errors <- standard_errors(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
                                 constraints=constraints, minval=minval)
+  if(all(is.na(std_errors))) message("Unable to calculate approximate standard errors!")
 
   ### Wrap up ###
- mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
-                                     parametrization=parametrization, constraints=constraints,
-                                     to_return="mw", check_params=TRUE, minval=NULL)
- qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, conditional=conditional,
+  qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                       parametrization=parametrization, constraints=constraints)
 
- ret <- structure(list(data=data,
-                       model=list(p=p,
-                                  M=M,
-                                  d=d,
-                                  conditional=conditional,
-                                  parametrization=parametrization,
-                                  constraints=constraints),
-                       params=params,
-                       std_errors=std_errors,
-                       mixing_weights=mixing_weights,
-                       quantile_residuals=qresiduals,
-                       loglik=structure(loglik,
-                                        class="logLik",
-                                        df=npars),
-                       IC=IC,
-                       all_estimates=all_estimates,
-                       all_logliks=loks,
-                       which_converged=converged),
-                  class="gmvar")
+  ret <- structure(list(data=data,
+                        model=list(p=p,
+                                   M=M,
+                                   d=d,
+                                   conditional=conditional,
+                                   parametrization=parametrization,
+                                   constraints=constraints),
+                        params=params,
+                        std_errors=std_errors,
+                        mixing_weights=mixing_weights,
+                        quantile_residuals=qresiduals,
+                        loglik=structure(loglik,
+                                         class="logLik",
+                                         df=npars),
+                        IC=IC,
+                        all_estimates=all_estimates,
+                        all_logliks=loks,
+                        which_converged=converged),
+                   class="gmvar")
   cat("Finished!\n")
-  return(ret)
+  ret
 }
 
 

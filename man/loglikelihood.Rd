@@ -78,6 +78,14 @@ Returns log-likelihood if \code{params} is in the parameters space and \code{min
 Takes use of the function \code{dmvn()} from the package \code{mvnfast} for speed improvements.
   Values extremely close to zero are handled with the package \code{Brobdingnag}.
 }
+\examples{
+data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
+ -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
+  0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
+  9.838, 0.740)
+loglikelihood(data=data, p=2, M=2, params=params222, parametrization="mean")
+}
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.

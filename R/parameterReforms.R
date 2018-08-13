@@ -180,7 +180,6 @@ change_regime <- function(p, M, d, params, m, regime_pars) {
 #' @description \code{regime_distance} calculates "distantance" between two scaled regimes. This is used in
 #'   the genetic algorithm.
 #'
-#' @inheritParams pick_regime
 #' @param regime_pars1 a length \eqn{pd^2+d+d(d+1)/2} vector
 #'   \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.
 #' @param regime_pars2 a length \eqn{pd^2+d+d(d+1)/2} vector
@@ -191,9 +190,17 @@ change_regime <- function(p, M, d, params, m, regime_pars) {
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-regime_distance <- function(p, M, d, regime_pars1, regime_pars2) {
-  scales1 <- vapply(1:length(regime_pars1), function(i1) 10^ceiling(abs(log10(abs(regime_pars1[i1])))), numeric(1)) # Scale by order of maginitude
-  scales2 <- vapply(1:length(regime_pars2), function(i1) 10^ceiling(abs(log10(abs(regime_pars1[i1])))), numeric(1))
-  sqrt(crossprod(regime_pars1/scales1 - regime_pars2/scales2)) # Distance
+regime_distance <- function(regime_pars1, regime_pars2) {
+  dist_fun <- function(x) {
+    x <- abs(x)
+    if(x < 1) {
+      return(1)
+    } else {
+      return(10^ceiling(abs(log10(x))))
+    }
+  }
+  scales1 <- vapply(regime_pars1, dist_fun, numeric(1))
+  scales2 <- vapply(regime_pars2, dist_fun, numeric(1))
+  sqrt(crossprod(regime_pars1/scales1 - regime_pars2/scales2))
 }
 

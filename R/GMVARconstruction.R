@@ -7,8 +7,7 @@
 #'  a single times series. \code{NA} values are not supported. Ignore if defining a model without data is desired.
 #' @param d number of times series in the system, i.e. \code{ncol(data)}. This can be
 #'   used to define GMVAR models without data and can be ignored if \code{data} is provided.
-#' @param calc_std_errors should approximate standard errors be calculated? Refers to Theorem 3 in the
-#'   cited article.
+#' @param calc_std_errors should approximate standard errors be calculated?
 #' @details If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
 #'   are computed and included in the returned object.
 #' @return Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
@@ -77,7 +76,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
   if(!parametrization %in% c("intercept", "mean")) stop("Argument parametrization has to be 'intercept' or 'mean'")
   if(missing(data) & missing(d)) stop("data or d must be provided")
   if(missing(data)) {
-    data <- NA
+    data <- NULL
   } else {
     data <- check_data(data=data, p=p)
     if(missing(d)) {
@@ -91,7 +90,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
   check_parameters(p=p, M=M, d=d, params=params, constraints=constraints)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
 
-  if(anyNA(data)) {
+  if(is.null(data)) {
     lok_and_mw <- list(loglik=NA, mw=NA)
     IC <- data.frame(AIC=NA, HQIC=NA, BIC=NA)
     qresiduals <- NA
@@ -106,13 +105,16 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
   if(calc_std_errors == TRUE) {
-    if(anyNA(data)) {
+    if(is.null(data)) {
       warning("Approximate standard errors can't be calculated")
       std_errors <- rep(NA, npars)
     } else {
       std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
                                     constraints=constraints, minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1)),
-                             error=function(e) std_errors=rep(NA, npars))
+                             error=function(e) {
+                               warning("Approximate standard errors can't be calculated")
+                               std_errors=rep(NA, npars)
+                             })
     }
   } else {
     std_errors <- rep(NA, npars)
@@ -142,10 +144,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 
 #' @title Add data to object of class 'gmvar' defining a GMVAR model
 #'
-#' @description \code{add_data} adds data to object of class '\code{gmvar}' that defines a GMVAR model based
-#'   on the given object. Also calculates mixing weights and quantile residuals accordingly.
+#' @description \code{add_data} adds data to object of class '\code{gmvar}' that defines a GMVAR model.
+#'  Also calculates mixing weights and quantile residuals accordingly.
 #'
 #' @inheritParams simulateGMVAR
+#' @inheritParams GMVAR
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 #'  a single times series. \code{NA} values are not supported.
 #' @return returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
@@ -186,10 +189,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 #' mod222c_2
 #' @export
 
-add_data <- function(data, gmvar) {
+add_data <- function(data, gmvar, calc_std_errors=FALSE) {
   check_gmvar(gmvar)
   GMVAR(data=data, p=gmvar$model$p, M=gmvar$model$M, params=gmvar$params, conditional=gmvar$model$conditional,
-        parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints)
+        parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
+        calc_std_errors=calc_std_errors)
 }
 
 
@@ -242,5 +246,6 @@ swap_parametrization <- function(gmvar) {
   new_params <- change_parametrization(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
                                        constraints=gmvar$model$constraints, change_to=change_to)
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=new_params, conditional=gmvar$model$conditional,
-        parametrization=change_to, constraints=gmvar$model$constraints, calc_std_errors=TRUE)
+        parametrization=change_to, constraints=gmvar$model$constraints,
+        calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE))
 }

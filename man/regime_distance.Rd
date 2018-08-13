@@ -4,15 +4,9 @@
 \alias{regime_distance}
 \title{Calculate "distance" between two (scaled) regimes \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}}
 \usage{
-regime_distance(p, M, d, regime_pars1, regime_pars2)
+regime_distance(regime_pars1, regime_pars2)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
-
-\item{M}{a positive integer specifying the number of mixture components.}
-
-\item{d}{number of time series in the system, i.e. the dimension.}
-
 \item{regime_pars1}{a length \eqn{pd^2+d+d(d+1)/2} vector
 \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.}
 

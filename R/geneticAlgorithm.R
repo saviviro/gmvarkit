@@ -6,13 +6,13 @@
 #' @inheritParams loglikelihood_int
 #' @inheritParams random_covmat
 #' @param ngen a positive integer specifying the number of generations to be ran through in
-#'   the genetic algorithm. Default is \code{200}.
+#'   the genetic algorithm.
 #' @param popsize a positive even integer specifying the population size in the genetic algorithm.
 #'   Default is \code{10*n_params}.
 #' @param smart_mu a positive integer specifying the generation after which the random mutations
 #'   in the genetic algorithm are "smart". This means that mutating individuals will mostly mutate fairly
 #'   close (or partially close) to the best fitting individual (which has the least regimes with time varying
-#'   mixing weights practically at zero) so far. Default is \code{min(100, round(0.5*ngen))}.
+#'   mixing weights practically at zero) so far.
 #' @param initpop a list of parameter vectors from which the initial population of the genetic algorithm
 #'   will be generated from. The parameter vectors should be...
 #'   \describe{
@@ -66,6 +66,9 @@
 #'   regimes are wasted, but with too much favouring the best genes might never mix into the population and the algorithm might
 #'   converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving probabilities for individuals with no wasted
 #'   regimes compared to individuals with one wasted regime. Number \code{2} would give \eqn{3x} larger probabilities etc.
+#' @param red_criteria a length 2 numeric vector specifying the criteria that is used to determine whether a regime is redundant or not.
+#'   Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will be considered "redundant".
+#'   One should be careful when adjusting this argument.
 #' @param to_return should the genetic algorithm return the best fitting individual which has "positive enough" mixing weights
 #'   for as much regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood in general (\code{"best_ind"}), but
 #'   might have more wasted regimes? Default is \code{"alt_ind"}.
@@ -94,8 +97,9 @@
 #'  }
 
 
-GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ngen, popsize, smart_mu, initpop=NULL,
-                  mu_scale, mu_scale2, omega_scale, ar_scale=1, regime_force_scale=1, to_return=c("alt_ind", "best_ind"), minval) {
+GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ngen=200, popsize,
+                  smart_mu=min(100, round(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, ar_scale=1,
+                  regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval) {
 
   # Required values and premilinary checks
   to_return <- match.arg(to_return)
@@ -108,20 +112,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
 
   # Defaults and checks
-  if(missing(ngen)) {
-    ngen <- 200
-  } else if(ngen < 1 | ngen %% 1 != 0) {
-    stop("The number of generations ngen must be positive integer")
-  }
+  if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu has to be positive integers")
   if(missing(popsize)) {
     popsize <- 10*npars
   } else if(popsize < 2 | popsize %% 2 != 0) {
     stop("The population size popsize must be even positive integer")
-  }
-  if(missing(smart_mu)) {
-    smart_mu <- min(100, round(0.5*ngen))
-  } else if(smart_mu < 1 | smart_mu %% 1 != 0) {
-    stop("The argument smartMu must be positive integer")
   }
   if(missing(minval)) {
     minval <- -(10^(ceiling(log10(n_obs)) + d) - 1)
@@ -173,7 +168,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
   # Calculates the number of redundant regimes
   n_redundants <- function(M, mw) {
-    sum(vapply(1:M, function(m) sum(mw[,m]>0.05) < 0.01*n_obs, logical(1)))
+    sum(vapply(1:M, function(m) sum(mw[,m] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))
   }
 
   # Initial setup
@@ -181,6 +176,16 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   logliks <- matrix(minval, nrow=ngen, ncol=popsize)
   redundants <- matrix(M, nrow=ngen, ncol=popsize) # Store the number of redundant regimes of each individual
   which_redundant_alt <- 1:M
+
+  fill_lok_and_red <- function(i1, i2, lok_and_mw) {
+    if(!is.list(lok_and_mw)) {
+      logliks[i1, i2] <<- minval
+      redundants[i1, i2] <<- M
+    } else {
+      logliks[i1, i2] <<- lok_and_mw$loglik
+      redundants[i1, i2] <<- n_redundants(M=M, mw=lok_and_mw$mw) # Number of redundant regimes
+    }
+  }
 
   # Run through generations
   for(i1 in 1:ngen) {
@@ -191,13 +196,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       for(i2 in 1:popsize) {
         loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
                                          constraints=constraints, to_return="loglik_and_mw", check_params=TRUE, minval=minval)
-        if(!is.list(loks_and_mw)) {
-          logliks[i1, i2] <- minval
-          redundants[i1, i2] <- M
-        } else {
-          logliks[i1, i2] <- loks_and_mw$loglik
-          redundants[i1, i2] <- n_redundants(M=M, mw=loks_and_mw$mw) # Number of redundant regimes
-        }
+        fill_lok_and_red(i1, i2, loks_and_mw)
       }
     } else {
       # Proportional fitness inheritance: individual has 50% change to inherit fitness if it's a result of crossover
@@ -237,13 +236,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
               loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
                                                constraints=constraints, to_return="loglik_and_mw", check_params=TRUE, minval=minval)
             }
-            if(!is.list(loks_and_mw)) {
-              logliks[i1, i2] <- minval
-              redundants[i1, i2] <- M
-            } else {
-              logliks[i1, i2] <- loks_and_mw$loglik
-              redundants[i1, i2] <- n_redundants(M=M, mw=loks_and_mw$mw) # Number of redundant regimes
-            }
+            fill_lok_and_red(i1, i2, loks_and_mw)
          }
       }
     }
@@ -277,7 +270,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
     # Do the crossovers
     which_co <- rbinom(n=popsize/2, size=1, prob=co_rates)
-    I <- round(runif(n=popsize/2, min=0.51, max=npars-0.51))
+    I <- round(runif(n=popsize/2, min=0.5 + 1e-16, max=npars - 0.5 - 1e-16))
     H2 <- vapply(1:(popsize/2), function(i2) {
             i3 <- indeces[i2]
             if(which_co[i2] == 1) {
@@ -294,7 +287,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     best_ind <- generations[, best_index[2], best_index[1]]
     best_mw <- loglikelihood_int(data, p, M, params=best_ind, conditional=conditional, parametrization="mean",
                                  constraints=constraints, to_return="mw", check_params=FALSE, minval=minval)
-    which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2]>0.05)<0.01*n_obs, logical(1))) # Which regimes are wasted
+    which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1))) # Which regimes are wasted
 
     # Keep track of "alternative best individual" that has less reduntant regimes than the current one (after the algorithm finds one)
     if(length(which_redundant) <= length(which_redundant_alt)) {
@@ -314,7 +307,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     mutate <- rbinom(n=popsize, size=1, prob=mu_rates)
     which_mutate <- which(mutate == 1)
     if(i1 <= smart_mu & length(which_mutate) >= 1) { # Random mutations
-      if(!is.null(constraints) | rbinom(n=1, size=1, prob=0.5)==0.5) { # Normal
+      if(!is.null(constraints) | runif(1) > 0.5) { # Normal
         stat_mu <- FALSE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
                                                                                    mu_scale=mu_scale, mu_scale2=mu_scale2,
@@ -331,8 +324,12 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       # If redundant regimes - smart mutate more
       if(length(which_redundant) >= 1) {
         mu_rates <- vapply(1:popsize, function(i2) which_not_co[i2]*max(0.1, mu_rates[i2]), numeric(1))
-        mutate <- rbinom(n=popsize, size=1, prob=mu_rates)
-        which_mutate <- which(mutate == 1)
+        mutate0 <- rbinom(n=popsize, size=1, prob=mu_rates)
+        which_mutate0 <- which(mutate0 == 1)
+        if(length(which_mutate0) > length(which_mutate)) {
+          mutate <- mutate0
+          which_mutate <- which_mutate0
+        }
       }
 
       # Mutating accuracy
@@ -358,7 +355,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         # Calculate "distances" between the considered regimes
         dist_to_regime <- matrix(nrow=ncol(non_red_regs_best), ncol=ncol(non_red_regs_alt)) # Row for each non-red-reg-best and column for each non-red-reg-alt.
         for(i2 in 1:nrow(dist_to_regime)) {
-          dist_to_regime[i2,] <- vapply(1:ncol(non_red_regs_alt), function(i3) regime_distance(p=p, M=M, d=d, regime_pars1=non_red_regs_best[,i2],
+          dist_to_regime[i2,] <- vapply(1:ncol(non_red_regs_alt), function(i3) regime_distance(regime_pars1=non_red_regs_best[,i2],
                                                                                                regime_pars2=non_red_regs_alt[,i3]), numeric(1))
         }
 

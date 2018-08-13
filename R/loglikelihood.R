@@ -142,9 +142,9 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   }
 
   l_0 <- 0 # First term of the exact log-likelihood (Kalliovirta et al. 2016, eq.(9))
-  if(M==1) {
-    alpha_mt <- as.matrix(rep(1, T_obs))
-    if(conditional==FALSE) {
+  if(M == 1) {
+    alpha_mt <- as.matrix(rep(1, nrow(log_mvnvalues)))
+    if(conditional == FALSE) {
       l_0 <- log_mvnvalues[1,]
     }
   } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
@@ -152,7 +152,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     denominator <- Reduce('+', numerators)
     alpha_mt <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(nrow(log_mvnvalues)))
 
-    if(conditional==FALSE) {
+    if(conditional == FALSE) {
       l_0 <- log(Reduce('+', lapply(1:M, function(m) numerators[[m]][1])))
     }
   } else {
@@ -160,7 +160,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     denominator <- as.vector(mvnvalues%*%alphas)
     alpha_mt <- (mvnvalues/denominator)%*%diag(alphas)
 
-    if(conditional==FALSE) {
+    if(conditional == FALSE) {
       l_0 <- log(sum(alphas*mvnvalues[1,]))
     }
   }
@@ -201,6 +201,13 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 #' @return Returns log-likelihood if \code{params} is in the parameters space and \code{minval} if not.
 #' @inherit loglikelihood_int details references
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{calc_gradient}}
+#' @examples
+#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+#' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
+#'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
+#'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
+#'   9.838, 0.740)
+#' loglikelihood(data=data, p=2, M=2, params=params222, parametrization="mean")
 #' @export
 
 loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, minval=NA) {

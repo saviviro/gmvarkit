@@ -21,7 +21,7 @@ format_valuef <- function(digits) {
 
 print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   gmvar <- x
-  if(!all_pos_ints(digits)) stop("Argument digits must be positive integer")
+  stopifnot(digits >= 0 & digits%%1 == 0)
   format_value <- format_valuef(digits)
   p <- gmvar$model$p
   M <- gmvar$model$M
@@ -121,6 +121,7 @@ print.gmvarsum <- function(x, ...) {
     cat("Quantile residual tests based on data\n\n")
     print.qrtest(gmvarsum$qrtest)
   }
+  invisible(gmvarsum)
 }
 
 
@@ -151,7 +152,7 @@ print.gmvarsum <- function(x, ...) {
 
 print.gmvarpred <- function(x, ..., digits=2) {
   gmvarpred <- x
-  if(!all_pos_ints(digits)) stop("Argument digits must be positive integer")
+  stopifnot(digits >= 0 & digits%%1 == 0)
   format_value <- format_valuef(digits)
 
   if(gmvarpred$pred_type == "cond_mean") {
@@ -221,5 +222,6 @@ print.qrtest <- function(x, ..., digits=3) {
       cat(" ", format_lag(qrtest$ch_res$test_results$lags[i1]), "| ", format_value(qrtest$ch_res$test_results$p_val[i1]), "\n")
     }
   }
+  invisible(qrtest)
 }
 

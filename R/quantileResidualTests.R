@@ -1,5 +1,3 @@
-
-
 #' @title Quantile residual tests
 #'
 #' @description \code{quantile_residual_tests} performs quantile residual tests described
@@ -12,7 +10,7 @@
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
 #'   of simulations may result more reliable tests, but the computations become heavier.
-#' @param print_res should the test results be printed in detail while computing the tests?
+#' @param print_res should the test results be printed while computing the tests?
 #' @return Returns object of class \code{'qrtest'} which has its own print method. The returned object
 #'   is a list containing quantile residual test results for normality, autocorrelation and conditional
 #'   heteroskedasticity. The autocorrelation and conditional heteroskedasticity results also contain the
@@ -34,6 +32,7 @@
 #' fit12 <- fitGMVAR(data, p=1, M=2)
 #' qrtests12 <- quantile_residual_tests(fit12)
 #' qrtests12
+#' plot(qrtests12)
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean")
@@ -50,12 +49,10 @@
 #' }
 #' @export
 
-quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac, nsimu=2000, print_res=FALSE) {
+quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac, nsimu=2000, print_res=TRUE) {
   check_gmvar(gmvar)
+  check_null_data(gmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")
-  if(anyNA(gmvar$quantile_residuals)) {
-    stop("Can't perform tests for model without quantile residuals! To add them, add data your model with function add_data()!")
-  }
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
@@ -87,15 +84,17 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
       }
     }
     omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M, params=params, conditional=conditional,
-                            parametrization=parametrization, constraints=constraints, g=g, dim_g=dim_g),
-             error=function(e) {
-               print_message(which_test, which_lag, because_of="because of numerical problems")
-               return(NA)
-             })
+                                   parametrization=parametrization, constraints=constraints, g=g, dim_g=dim_g),
+                    error=function(e) {
+                      print_message(which_test, which_lag, because_of="because of numerical problems")
+                      return(NA)
+                    })
     if(is.matrix(omg) & anyNA(omg)) {
       print_message(which_test, which_lag, because_of="- probably because the model fits too poorly")
+    } else if(length(omg) == 1) {
+      if(is.na(omg)) return(matrix(NA, nrow=dim_g, ncol=dim_g))
     }
-    return(omg)
+    omg
   }
 
   # Function to calculate general test statistic
@@ -114,6 +113,15 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     vec(c_lag)/c_stderr # individual statistic divided by it's standard error
   }
 
+  format_value0 <- format_valuef(0)
+  format_value3 <- format_valuef(3)
+  print_resf <- function(lag, p_val) {
+    if(lag < 10) {
+      cat(" ", format_value0(lag), " | ", format_value3(p_val), "\n")
+    } else {
+      cat(" ", format_value0(lag), "| ", format_value3(p_val), "\n")
+    }
+  }
 
   ######################
   # Test for normality # (Kalliovirta and Saikkonen 2010, sec. 3.3)
@@ -130,13 +138,14 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
   N <- calc_test_stat(g=g, m_dim=1, Omega=Omega)
   p_val <- 1 - pchisq(N, df=dim_g)
 
-  if(print_res==TRUE) cat(sprintf("N: %.2f, df: %.0f, p-value: %.2f", N, dim_g, p_val), "\n")
+  if(print_res == TRUE) cat(paste0("Normality test p-value: ", format_value3(p_val)), "\n\n")
   norm_res <- data.frame(test_stat=N, df=dim_g, p_val=p_val)
 
 
   ############################
   # Test for autocorrelation # (Kalliovirta and Saikkonen 2010, sec. 3.1)
   ############################
+
   tmp <- rep(NA, length(lags_ac))
   ac_res <- list(test_results=data.frame(lags=lags_ac, test_stat=tmp, df=tmp, p_val=tmp),
                  ind_stats=data.frame(row.names=1:d^2))
@@ -144,15 +153,17 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
   # Function factory to produce function g for different lags
   get_g <- function(lag) {
     function(r) {
-      t(vapply((lag+1):nrow(r), function(t) vapply(1:lag, function(i1) tcrossprod(r[t,], r[t-i1,]), numeric(d^2)), numeric(lag*d^2)))
+      t(vapply((lag + 1):nrow(r), function(t) vapply(1:lag, function(i1) tcrossprod(r[t,], r[t - i1,]), numeric(d^2)), numeric(lag*d^2)))
     }
   } # Returns (T - lag x dim_g) matrix with values of g_t at each row, starting from t=lag+1 at the first row
+
+  if(print_res == TRUE) cat("Autocorrelation tests:\nlags | p-value\n")
 
   for(i1 in seq_along(lags_ac)) {
     lag <- lags_ac[i1]
     dim_g <- lag*d^2
     g <- get_g(lag)
-    m_dim <- lag+1
+    m_dim <- lag + 1
     Omega <- try_to_get_omega(g=g, dim_g=dim_g, which_test="ac", which_lag=lag)
     A <- calc_test_stat(g=g, m_dim=m_dim, Omega=Omega)
     p_val <- 1 - pchisq(A, df=dim_g)
@@ -161,7 +172,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     # in vectorised form and obtain their standard errors from relevant diagonal of Omega.
     ac_res$ind_stats[, paste0("lag", lag)] <- calc_ind_stats(g=g, Omega=Omega) # individual statistic divided by it's standard error
 
-    if(print_res==TRUE) cat(sprintf("A%.0f: %.2f, df: %.0f, p-value: %.2f", lag, A, dim_g, p_val), "\n")
+    if(print_res == TRUE) print_resf(lag=lag, p_val=p_val)
     ac_res$test_results[i1, 2:4] <- c(A, dim_g, p_val)
   }
 
@@ -178,15 +189,17 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
   get_g <- function(lag) {
     function(r) {
       v <- r^2 - 1
-      t(vapply((lag+1):nrow(v), function(t) vapply(1:lag, function(i1) tcrossprod(v[t,], v[t-i1,]), numeric(d^2)), numeric(lag*d^2)))
+      t(vapply((lag + 1):nrow(v), function(t) vapply(1:lag, function(i1) tcrossprod(v[t,], v[t - i1,]), numeric(d^2)), numeric(lag*d^2)))
     }
   } # Returns (T - lag x dim_g) matrix with values of g_t at each row, starting from t=lag+1 at the first row
+
+  if(print_res == TRUE) cat("\nConditional heteroskedasticity tests:\nlags | p-value\n")
 
   for(i1 in seq_along(lags_ch)) {
     lag <- lags_ch[i1]
     dim_g <- lag*d^2
     g <- get_g(lag)
-    m_dim <- lag+1
+    m_dim <- lag + 1
     Omega <- try_to_get_omega(g=g, dim_g=dim_g, which_test="ch", which_lag=lag)
     H <- calc_test_stat(g=g, m_dim=m_dim, Omega=Omega)
     p_val <- 1 - pchisq(H, df=dim_g)
@@ -195,14 +208,14 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     # in vectorised form and obtain their standard errors from relevant diagonal of Omega.
     ch_res$ind_stats[, paste0("lag", lag)] <- calc_ind_stats(g=g, Omega=Omega) # individual statistic divided by it's standard error
 
-    if(print_res==TRUE) cat(sprintf("H%.0f: %.2f, df: %.0f, p-value: %.2f", lag, H, dim_g, p_val), "\n")
+    if(print_res == TRUE) print_resf(lag=lag, p_val=p_val)
     ch_res$test_results[i1, 2:4] <- c(H, dim_g, p_val)
   }
 
   structure(list(norm_res=norm_res,
-                          ac_res=ac_res,
-                          ch_res=ch_res),
-                      class="qrtest")
+                 ac_res=ac_res,
+                 ch_res=ch_res),
+            class="qrtest")
 }
 
 

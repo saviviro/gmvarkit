@@ -5,8 +5,9 @@
 \title{Genetic algorithm for preliminary estimation of GMVAR model}
 \usage{
 GAfit(data, p, M, conditional = TRUE, parametrization = c("intercept",
-  "mean"), constraints = NULL, ngen, popsize, smart_mu, initpop = NULL,
-  mu_scale, mu_scale2, omega_scale, ar_scale = 1, regime_force_scale = 1,
+  "mean"), constraints = NULL, ngen = 200, popsize, smart_mu = min(100,
+  round(0.5 * ngen)), initpop = NULL, mu_scale, mu_scale2, omega_scale,
+  ar_scale = 1, regime_force_scale = 1, red_criteria = c(0.05, 0.01),
   to_return = c("alt_ind", "best_ind"), minval)
 }
 \arguments{
@@ -33,7 +34,7 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
 \item{ngen}{a positive integer specifying the number of generations to be ran through in
-the genetic algorithm. Default is \code{200}.}
+the genetic algorithm.}
 
 \item{popsize}{a positive even integer specifying the population size in the genetic algorithm.
 Default is \code{10*n_params}.}
@@ -41,7 +42,7 @@ Default is \code{10*n_params}.}
 \item{smart_mu}{a positive integer specifying the generation after which the random mutations
 in the genetic algorithm are "smart". This means that mutating individuals will mostly mutate fairly
 close (or partially close) to the best fitting individual (which has the least regimes with time varying
-mixing weights practically at zero) so far. Default is \code{min(100, round(0.5*ngen))}.}
+mixing weights practically at zero) so far.}
 
 \item{initpop}{a list of parameter vectors from which the initial population of the genetic algorithm
 will be generated from. The parameter vectors should be...
@@ -101,6 +102,10 @@ for heavy favouring. Without any favouring the genetic algorithm gets more often
 regimes are wasted, but with too much favouring the best genes might never mix into the population and the algorithm might
 converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving probabilities for individuals with no wasted
 regimes compared to individuals with one wasted regime. Number \code{2} would give \eqn{3x} larger probabilities etc.}
+
+\item{red_criteria}{a length 2 numeric vector specifying the criteria that is used to determine whether a regime is redundant or not.
+Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will be considered "redundant".
+One should be careful when adjusting this argument.}
 
 \item{to_return}{should the genetic algorithm return the best fitting individual which has "positive enough" mixing weights
 for as much regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood in general (\code{"best_ind"}), but
