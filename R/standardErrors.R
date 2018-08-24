@@ -19,7 +19,7 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
              error=function(e) NA)
   }
 
-  differences <- c(6e-06, 1e-04, 0.001)
+  differences <- c(6e-06, 0.001)
   npars <- length(params)
   I <- diag(1, ncol=npars, nrow=npars) # Indicates which parameter is derivated
 

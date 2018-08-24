@@ -144,7 +144,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 
 #' @title Add data to object of class 'gmvar' defining a GMVAR model
 #'
-#' @description \code{add_data} adds data to object of class '\code{gmvar}' that defines a GMVAR model.
+#' @description \code{add_data} adds or updates data to object of class '\code{gmvar}' that defines a GMVAR model.
 #'  Also calculates mixing weights and quantile residuals accordingly.
 #'
 #' @inheritParams simulateGMVAR

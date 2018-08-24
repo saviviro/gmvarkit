@@ -19,7 +19,7 @@ returns an object of class 'gmvar' defining the specified GMVAR model with the d
   If the object already contained data, the data will be updated.
 }
 \description{
-\code{add_data} adds data to object of class '\code{gmvar}' that defines a GMVAR model.
+\code{add_data} adds or updates data to object of class '\code{gmvar}' that defines a GMVAR model.
  Also calculates mixing weights and quantile residuals accordingly.
 }
 \examples{
