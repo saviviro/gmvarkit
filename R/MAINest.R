@@ -91,7 +91,7 @@
 #' colnames(data) <- colnames(eurusd)
 #'
 #' # GMVAR(1,2) model with default settings
-#' fit12 <- fitGMVAR(data, p=1, M=2)
+#' fit12 <- fitGMVAR(data, p=1, M=2, ncores=2, ncalls=4)
 #' fit12
 #'
 #' # GMVAR(2,2) model with mean parametrization
@@ -128,7 +128,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   d <- ncol(data)
   n_obs <- nrow(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
-  if(npars >= nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
+  if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), -(10^(ceiling(log10(n_obs)) + d) - 1), dot_params$minval)
   red_criteria <- ifelse(rep(is.null(dot_params$red_criteria), 2), c(0.05, 0.01), dot_params$red_criteria)

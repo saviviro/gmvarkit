@@ -96,7 +96,7 @@ print_std_errors <- function(gmvar, digits=3) {
   M <- gmvar$model$M
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints)
+  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints, change_na=TRUE)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars)

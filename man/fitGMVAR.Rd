@@ -117,7 +117,7 @@ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model with default settings
-fit12 <- fitGMVAR(data, p=1, M=2)
+fit12 <- fitGMVAR(data, p=1, M=2, ncores=2, ncalls=4)
 fit12
 
 # GMVAR(2,2) model with mean parametrization

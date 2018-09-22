@@ -1,6 +1,6 @@
 Package: gmvarkit
 Title: Estimate Gaussian Mixture Vector Autoregressive Model
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
 Description: Maximum likelihood estimation of Gaussian Mixture Vector Autoregressive (GMVAR)
     model, quantile residual tests, graphical diagnostics, forecasting and simulations. Applying
@@ -17,8 +17,8 @@ Imports: Brobdingnag (>= 1.2-5), mvnfast (>= 0.2.5), parallel (>=
 Suggests: testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2018-08-24 16:09:30 UTC; savi
+Packaged: 2018-09-22 10:42:32 UTC; savi
 Author: Savi Virolainen [aut, cre]
 Maintainer: Savi Virolainen <savi.virolainen@helsinki.fi>
 Repository: CRAN
-Date/Publication: 2018-08-24 16:42:18 UTC
+Date/Publication: 2018-09-22 11:10:03 UTC

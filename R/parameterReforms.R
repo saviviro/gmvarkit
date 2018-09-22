@@ -25,18 +25,23 @@ reform_data <- function(data, p) {
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
+#' @param change_na change NA parameter values of constrained models to -9.999?
 #' @return Returns "regular model" parameter vector corresponding to the constraints.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
 
-reform_constrained_pars <- function(p, M, d, params, constraints=NULL) {
+reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na=FALSE) {
   if(is.null(constraints)) {
     return(params)
   }
   q <- ncol(constraints)
   psi <- params[(M*d+1):(M*d+q)]
+  if(change_na==TRUE) {
+    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
+    psi[is.na(psi)] <- -9.999
+  }
   psi_expanded <- constraints%*%psi
   pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
                                               params[(M*d + q + (m-1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),

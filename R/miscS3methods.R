@@ -20,14 +20,8 @@ residuals.gmvar <- function(object, ...) {
 #' @export
 summary.gmvar <- function(object, ...) {
   gmvar <- object
-  if(anyNA(gmvar$quantile_residuals)) {
-    warning("Can't calculate all summaries without (non NA) quantile residuals! To add them, add data to your model with function add_data()!")
-    qrtest <- NULL
-  } else {
-    qrtest <- quantile_residual_tests(gmvar, lags_ac=c(1, 5), lags_ch=c(1, 5), nsimu=1)
-  }
   structure(list(gmvar=gmvar,
-                 qrtest=qrtest,
+                 abs_boldA_eigens=get_boldA_eigens(gmvar),
                  regime_means=get_regime_means(gmvar)),
             class="gmvarsum")
 }

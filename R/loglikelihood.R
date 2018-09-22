@@ -212,6 +212,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
 loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, minval=NA) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
+  parametrization <- match.arg(parametrization)
   if(!parametrization %in% c("intercept", "mean")) stop("Argument parametrization has to be 'intercept' or 'mean'")
   data <- check_data(data, p)
   d <- ncol(data)

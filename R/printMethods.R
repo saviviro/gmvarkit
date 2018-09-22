@@ -47,6 +47,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   cat("\n")
 
   if(summary_print == TRUE) {
+    all_boldA_eigens <- get_boldA_eigens(gmvar)
     cat(paste("log-likelihood:", format_value(gmvar$loglik)), "\n")
     cat(paste("AIC: ", format_value(IC$AIC)), "\n")
     cat(paste("HQIC:", format_value(IC$HQIC)), "\n")
@@ -60,6 +61,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   for(m in seq_len(M)) {
     count <- 1
     cat(paste("Regime", m), "\n")
+    if(summary_print == TRUE) cat(paste("Modulus of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[[m]]), collapse=", ")),"\n")
     cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n\n")
     df <- data.frame(Y=Y,
@@ -85,6 +87,11 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     colnames(df)[names_to_omit] <- " "
     print(df)
     cat("\n")
+    if(summary_print == TRUE) {
+      cat("Error term correlation matrix:\n")
+      print(cov2cor(all_Omega[, , m]), digits=digits)
+      cat("\n")
+    }
   }
   invisible(gmvar)
 }

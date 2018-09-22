@@ -6,7 +6,7 @@
 \alias{aa_gmvarkit-package}
 \title{gmvarkit: Estimate Gaussian Mixture Vector Autoregressive (GMVAR) model}
 \description{
-\code{gmvarkit} is a package for estimating Gaussian Mixture Vector Autoregressive (GMVAR) model-
+\code{gmvarkit} is a package for estimating Gaussian Mixture Vector Autoregressive (GMVAR) model.
   It provides functions for quantile residuals tests, graphical diagnostics, forecasting and simulations. Applying
   general linear constraints to the autoregressive parameters is supported.
 

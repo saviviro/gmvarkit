@@ -340,3 +340,32 @@ test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123c_mu, parametrization="mean", constraints=C_123),
                calc_mu(p=1, M=2, d=3, params=theta_123c, constraints=C_123))
 })
+
+
+params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
+ -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
+  0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
+  9.838, 0.740)
+mod222 <- GMVAR(d=2, p=2, M=2, params=params222, parametrization="mean")
+get_boldA_eigens(mod222)
+
+# p=2, M=2, d=2, constraint AR-parameters to be the same for all regimes
+# and constraint the of-diagonal elements of AR-matrices to be zero.
+mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
+C_222_2 <- rbind(mat0, mat0)
+A21_222_c2 <- A11_222_c2 <- matrix(c(1.26, 0, 0, 1.34), nrow=2, byrow=FALSE)
+A22_222_c2 <- A12_222_c2 <- matrix(c(-0.29, 0, 0, -0.36), nrow=2, byrow=FALSE)
+phi10_222_c2 <- c(-0.11, 2.83)
+phi20_222_c2 <- c(0.36, 3.19)
+Omega1_222_c2 <- matrix(c(0.98, -0.33, -0.33, 5.24), nrow=2, byrow=FALSE)
+Omega2_222_c2 <- matrix(c(5.60, 3.46, 3.46, 9.62), nrow=2, byrow=FALSE)
+alpha1_222_c2 <- 0.35
+theta_222_c2 <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vech(Omega1_222_c2),
+                  vech(Omega2_222_c2), alpha1_222_c2)
+mod222c <- GMVAR(d=2, p=2, M=2, params=theta_222_c2, constraints=C_222_2)
+
+
+test_that("get_boldA_eigens works correctly", {
+  expect_equal(get_boldA_eigens(mod222)[[1]], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222c)[[2]], c(0.9681610, 0.9569557, 0.3718390, 0.3030443), tolerance=1e-5)
+})

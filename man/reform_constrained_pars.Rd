@@ -4,7 +4,8 @@
 \alias{reform_constrained_pars}
 \title{Reform constrained parameter vector into the "standard" form}
 \usage{
-reform_constrained_pars(p, M, d, params, constraints = NULL)
+reform_constrained_pars(p, M, d, params, constraints = NULL,
+  change_na = FALSE)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive degree of the model.}
@@ -52,6 +53,8 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{change_na}{change NA parameter values of constrained models to -9.999?}
 }
 \value{
 Returns "regular model" parameter vector corresponding to the constraints.
