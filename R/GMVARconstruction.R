@@ -203,7 +203,7 @@ add_data <- function(data, gmvar, calc_std_errors=FALSE) {
 #'  to \code{"mean"} if the currect parametrization is \code{"intercept"}, and vice versa.
 #'
 #' @inheritParams simulateGMVAR
-#' @details \code{swap_parametrization()} is convenient tool if you have estimated the model in
+#' @details \code{swap_parametrization} is convenient tool if you have estimated the model in
 #'  "intercept"-parametrization, but wish to work with "mean"-parametrization in the future, or vice versa.
 #'  In \code{gmvarkit}, for example the approximate standard errors are only available for
 #'  parametrized parameters.

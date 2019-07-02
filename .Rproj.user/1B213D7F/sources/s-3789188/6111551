@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562056407582.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "36213148",
+    "id" : "6111551",
+    "lastKnownWriteTime" : 1562056428,
+    "last_content_update" : 1562056428091,
+    "path" : "~/gmvarkit/R/standardErrors.R",
+    "project_path" : "R/standardErrors.R",
+    "properties" : {
+        "cursorPosition" : "49,54",
+        "scrollLine" : "36"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

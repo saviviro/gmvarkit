@@ -34,7 +34,7 @@ Returns a 3D array containing the covariance matrices of the given model. Coeffi
  \eqn{\Omega_{m}} can be obtained by choosing \code{[, , m]}.
 }
 \description{
-\code{pick_Omegas()} picks the covariance matrices \eqn{\Omega_{m} (m=1,..,M)}
+\code{pick_Omegas} picks the covariance matrices \eqn{\Omega_{m} (m=1,..,M)}
  from the given parameter vector so that they are arranged in a 3D array with the third
  dimension indicating each component.
 }

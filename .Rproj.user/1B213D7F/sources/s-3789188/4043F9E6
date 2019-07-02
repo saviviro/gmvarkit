@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562056335729.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "99359818",
+    "id" : "4043F9E6",
+    "lastKnownWriteTime" : 1562056359,
+    "last_content_update" : 1562056359838,
+    "path" : "~/gmvarkit/R/quantileResiduals.R",
+    "project_path" : "R/quantileResiduals.R",
+    "properties" : {
+        "cursorPosition" : "170,94",
+        "scrollLine" : "160"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

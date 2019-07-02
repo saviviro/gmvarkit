@@ -5,10 +5,11 @@
 \title{Genetic algorithm for preliminary estimation of GMVAR model}
 \usage{
 GAfit(data, p, M, conditional = TRUE, parametrization = c("intercept",
-  "mean"), constraints = NULL, ngen = 200, popsize, smart_mu = min(100,
-  round(0.5 * ngen)), initpop = NULL, mu_scale, mu_scale2, omega_scale,
-  ar_scale = 1, regime_force_scale = 1, red_criteria = c(0.05, 0.01),
-  to_return = c("alt_ind", "best_ind"), minval)
+  "mean"), constraints = NULL, ngen = 200, popsize,
+  smart_mu = min(100, round(0.5 * ngen)), initpop = NULL, mu_scale,
+  mu_scale2, omega_scale, ar_scale = 1, regime_force_scale = 1,
+  red_criteria = c(0.05, 0.01), to_return = c("alt_ind", "best_ind"),
+  minval)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -78,7 +79,7 @@ The notations are in line with the cited article by \emph{Kalliovirta, Meitz and
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
-mean-parametrization is always used for optimization in \code{GAfit()} - even when \code{parametrization=="intercept"}, but
+mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}, but
 input (in \code{initpop}) and output (return value) parameter vectors may be intercept-parametrized.}
 
 \item{mu_scale2}{a size \eqn{(dx1)} strictly positive vector defining \strong{standard deviations} of the normal
@@ -90,11 +91,11 @@ random covariance matrices in random mutations. The covariance matrices are draw
 Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard deviations
 of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
-Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit()} is
+Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
 
 \item{ar_scale}{a positive real number adjusting how large AR-paramater values are typically generated in some random
-mutations. See function \code{random_coefmats2()} for details. This is ignored when estimating constrained models.}
+mutations. See function \code{random_coefmats2} for details. This is ignored when estimating constrained models.}
 
 \item{regime_force_scale}{a non-negative real number specifying how much should natural selection favour individuals
 with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large number
@@ -142,4 +143,5 @@ The genetic algorithm is mostly based on the description by \emph{Dorsey and May
    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
  }
+ @export
 }

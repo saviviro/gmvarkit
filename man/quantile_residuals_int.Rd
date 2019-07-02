@@ -69,7 +69,7 @@ Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residu
   \emph{Kalliovirta and Saikkonen 2010} for details.
 }
 \description{
-\code{quantile_residuals_int()} is a simple wrapper for \code{quantile_residuals()} to compute
+\code{quantile_residuals_int} is a simple wrapper for \code{quantile_residuals} to compute
   quantile residuals using parameter values instead of class \code{gmvar} object.
 }
 \section{Warning}{

@@ -30,11 +30,11 @@ of a given matrix from the principal diagonal downwards (including elements on t
 The notations are in line with the cited article by KMS (2016).}
 
 \item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
-obtained from \code{form_boldA()}. Will be computed if not given.}
+obtained from \code{form_boldA}. Will be computed if not given.}
 }
 \value{
 Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. In order to obtain numerical stability
-  \code{is_stationary()} may return \code{FALSE} when the parameter vector is in the stationarity region, but
+  \code{is_stationary} may return \code{FALSE} when the parameter vector is in the stationarity region, but
   very close to the boundary.
 }
 \description{

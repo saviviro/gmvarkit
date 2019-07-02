@@ -42,12 +42,12 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 
 #' @title Print standard errors of GMVAR model in the same form as the model estimates are printed
 #'
-#' @description \code{print_std_errors()} prints the approximate standard errors of GMVAR model in the
+#' @description \code{print_std_errors} prints the approximate standard errors of GMVAR model in the
 #'   same form as the parameters of objects of class \code{'gmvar'} are printed.
 #'
 #' @inheritParams simulateGMVAR
 #' @param digits how many digits should be printed?
-#' @details The main purpose of \code{print_std_errors()} is to provide a convenient tool to match the standard
+#' @details The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
 #'   errors to certain parameter estimates.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}}, \code{\link{swap_parametrization}}
 #' @inherit GMVAR references

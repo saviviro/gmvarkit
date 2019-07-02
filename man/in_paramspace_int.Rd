@@ -14,11 +14,11 @@ in_paramspace_int(p, M, d, all_boldA, alphas, all_Omega)
 \item{d}{number of time series in the system.}
 
 \item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
-obtained from \code{form_boldA()}. Will be computed if not given.}
+obtained from \code{form_boldA}. Will be computed if not given.}
 
-\item{alphas}{(Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas()}.}
+\item{alphas}{(Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.}
 
-\item{all_Omega}{3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas()}.}
+\item{all_Omega}{3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.}
 }
 \value{
 Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.

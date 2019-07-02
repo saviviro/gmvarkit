@@ -71,7 +71,7 @@ Returns log-likelihood if \code{params} is in the parameters space and \code{min
 \description{
 \code{loglikelihood} computes log-likelihood of GMVAR model by using parameter vector
   instead of object of class 'gmvar'. Exists for convenience if one wants to for example
-  plot profile log-likelihoods or employ other estimation algorithms than used in \code{fitGMVAR()}.
+  plot profile log-likelihoods or employ other estimation algorithms than used in \code{fitGMVAR}.
   Use \code{minval} to control what happens when the parameter vector is outside the parameter space.
 }
 \details{

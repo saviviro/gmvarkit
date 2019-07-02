@@ -60,7 +60,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 #'   VAR processess.
 #'
 #' @inheritParams pick_allA
-#' @param all_A 4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA()}.
+#' @param all_A 4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.
 #' @return Returns 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each component VAR-process.
 #'  The matrix \strong{\eqn{A_{m}}} can be obtained by choosing \code{[, , m]}
 #' @section Warning:

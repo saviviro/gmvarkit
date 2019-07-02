@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562056381451.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3194546905",
+    "id" : "FD4C99FC",
+    "lastKnownWriteTime" : 1561554446,
+    "last_content_update" : 1561554446,
+    "path" : "~/gmvarkit/R/quantileResidualTests.R",
+    "project_path" : "R/quantileResidualTests.R",
+    "properties" : {
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

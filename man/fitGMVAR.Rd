@@ -4,10 +4,10 @@
 \alias{fitGMVAR}
 \title{Two-phase maximum likelihood estimation of GMVAR model}
 \usage{
-fitGMVAR(data, p, M, conditional = TRUE, parametrization = c("intercept",
-  "mean"), constraints = NULL, ncalls = round(10 + 9 * log(M)),
-  ncores = min(ncalls, parallel::detectCores()), maxit = 300,
-  print_res = TRUE, ...)
+fitGMVAR(data, p, M, conditional = TRUE,
+  parametrization = c("intercept", "mean"), constraints = NULL,
+  ncalls = round(10 + 9 * log(M)), ncores = min(ncalls,
+  parallel::detectCores()), maxit = 300, print_res = TRUE, ...)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -40,7 +40,7 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 
 \item{print_res}{should summaries of estimation results be printed?}
 
-\item{...}{additional settings passed to the function \code{GAfit()} employing the genetic algorithm.}
+\item{...}{additional settings passed to the function \code{GAfit} employing the genetic algorithm.}
 }
 \value{
 Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Multivariate quantile residuals
@@ -91,14 +91,14 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 
    Overall the estimation process is computationally heavy and it might take considerably long time for large models with
    large number of observations. If the iteration limit \code{maxit} in the variable metric algorithm is reached, one can continue
-   the estimation by iterating more with the function \code{iterate_more()}.
+   the estimation by iterating more with the function \code{iterate_more}.
 
    The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}, but it includes some extra
    functionality designed for this particular estimation problem. The genetic algorithm uses (slightly modified) individually
    adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)} and employs (50\%) fitness
    inheritance discussed by \emph{Smith, Dike and Stegmann (1995)}.
 
-   The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim()}
+   The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
    from the package \code{stats}.
 }
 \section{S3 methods}{
@@ -112,26 +112,29 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the
-# package, but in a scaled form.
+# package, but in a scaled form (similar to Kalliovirta et al. 2016).
+data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model with default settings
-fit12 <- fitGMVAR(data, p=1, M=2, ncores=2, ncalls=4)
+fit12 <- fitGMVAR(data, p=1, M=2)
 fit12
+plot(fit12)
+summary(fit12)
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean")
 fit22
 
 # GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes
+# to be the same for both regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
 fit22c
 
 # GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes and non-diagonl elements
+# to be the same for both regimes and non-diagonl elements
 # the coefficient matrices constrained to zero. Estimation
 # with only 10 estimation rounds.
 tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),

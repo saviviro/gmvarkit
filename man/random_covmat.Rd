@@ -14,7 +14,7 @@ random covariance matrices in random mutations. The covariance matrices are draw
 Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard deviations
 of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
-Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit()} is
+Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
 }
 \value{

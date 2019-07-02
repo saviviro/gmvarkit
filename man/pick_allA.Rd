@@ -34,7 +34,7 @@ Returns a 4D array containing the coefficient matrices of the all components. Co
  \eqn{A_{m,i}} can be obtained by choosing \code{[, , i, m]}.
 }
 \description{
-\code{pick_allA()} picks all coefficient matrices \eqn{A_{m,i} (i=1,..,p, m=1,..,M)}
+\code{pick_allA} picks all coefficient matrices \eqn{A_{m,i} (i=1,..,p, m=1,..,M)}
   from the given parameter vector so that they are arranged in a 4D array with the fourth dimension
   indicating each component and third dimension indicating each lag.
 }
