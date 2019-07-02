@@ -19,3 +19,6 @@
 ~%2Fgmvarkit%2FR%2FquantileResiduals.R="3D26BC19"
 ~%2Fgmvarkit%2FR%2FsimulateGMVAR.R="84CC408"
 ~%2Fgmvarkit%2FR%2FstandardErrors.R="26933318"
+~%2Fgmvarkit%2FR%2FuncondMoments.R="7ED042C"
+~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_pickParams.R="949576E3"
+~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_uncondMoments.R="6E756EBF"

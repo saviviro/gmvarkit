@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562059391104.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1DE0FD4E",
+    "lastKnownWriteTime" : 1562059675,
+    "last_content_update" : 1562059675899,
+    "path" : "~/gmvarkit/R/pickParams.R",
+    "project_path" : "R/pickParams.R",
+    "properties" : {
+        "cursorPosition" : "165,1",
+        "scrollLine" : "163"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

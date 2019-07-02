@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562060028075.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "17CF5594",
+    "lastKnownWriteTime" : 1562060145,
+    "last_content_update" : 1562060145696,
+    "path" : "~/gmvarkit/R/loglikelihood.R",
+    "project_path" : "R/loglikelihood.R",
+    "properties" : {
+        "cursorPosition" : "125,8",
+        "scrollLine" : "101"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -58,7 +58,7 @@
 #'   value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights or
 #'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Default is
 #'   the log-likelihood value (\code{"loglik"}).
-#' @details Takes use of the function \code{dmvn()} from the package \code{mvnfast} for speed improvements.
+#' @details Takes use of the function \code{dmvn} from the package \code{mvnfast} to cut down computation time.
 #'   Values extremely close to zero are handled with the package \code{Brobdingnag}.
 #' @return
 #'  \describe{
@@ -237,7 +237,6 @@ get_IC <- function(loglik, npars, obs) {
   AIC <- -2*loglik + 2*npars
   HQIC <- -2*loglik + 2*npars*log(log(obs))
   BIC <- -2*loglik + npars*log(obs)
-  IC <- data.frame(AIC=AIC, HQIC=HQIC, BIC=BIC)
-  IC
+  data.frame(AIC=AIC, HQIC=HQIC, BIC=BIC)
 }
 

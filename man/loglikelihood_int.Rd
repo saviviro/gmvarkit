@@ -89,7 +89,7 @@ computation time if it does for sure. Default \code{TRUE}.}
 \code{loglikelihood_int} computes the log-likelihood of GMVAR model.
 }
 \details{
-Takes use of the function \code{dmvn()} from the package \code{mvnfast} for speed improvements.
+Takes use of the function \code{dmvn} from the package \code{mvnfast} to cut down computation time.
   Values extremely close to zero are handled with the package \code{Brobdingnag}.
 }
 \references{
