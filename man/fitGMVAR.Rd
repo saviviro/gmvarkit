@@ -77,6 +77,9 @@ Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Mu
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks colums
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
+
+  Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+  the second one for the lag one, etc.
 }
 \description{
 \code{fitGMVAR} estimates GMVAR model in two phases: in the first phase it uses genetic algorithm

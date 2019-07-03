@@ -99,6 +99,9 @@ will include log-likelihood and information criteria values.}
 \value{
 Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
   to work with other functions provided in \code{gmvarkit}.
+
+  Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+  the second one for the lag one, etc.
 }
 \description{
 \code{GMVAR} creates an S3 object of class \code{'gmvar'} that defines a GMVAR model

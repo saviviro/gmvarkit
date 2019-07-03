@@ -61,6 +61,9 @@
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks colums
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 #'   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
+#'
+#'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+#'   the second one for the lag one, etc.
 #' @section S3 methods:
 #'   The following S3 methods are supported for class \code{'gmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
 #'    \code{predict} and \code{plot}.

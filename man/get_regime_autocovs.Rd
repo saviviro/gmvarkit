@@ -42,3 +42,8 @@ get_regime_autocovs(mod222c)
            \emph{Springer}.
  }
 }
+\seealso{
+Other moment functions: \code{\link{get_regime_means}},
+  \code{\link{uncond_moments}}
+}
+\concept{moment functions}
