@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562151777828.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CDD67A9E",
+    "lastKnownWriteTime" : 1562153111,
+    "last_content_update" : 1562153111073,
+    "path" : "~/gmvarkit/R/uncondMoments.R",
+    "project_path" : "R/uncondMoments.R",
+    "properties" : {
+        "cursorPosition" : "190,27",
+        "scrollLine" : "184"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

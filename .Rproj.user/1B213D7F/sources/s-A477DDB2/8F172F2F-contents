@@ -23,6 +23,7 @@ summary.gmvar <- function(object, ..., digits=2) {
   gmvar <- object
   structure(list(gmvar=gmvar,
                  abs_boldA_eigens=get_boldA_eigens(gmvar),
+                 omega_eigens=get_omega_eigens(gmvar),
                  regime_means=get_regime_means(gmvar),
                  digits=digits),
             class="gmvarsum")

@@ -270,3 +270,8 @@ test_that("get_boldA_eigens works correctly", {
   expect_equal(get_boldA_eigens(mod222)[[1]], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222c)[[2]], c(0.9681610, 0.9569557, 0.3718390, 0.3030443), tolerance=1e-5)
 })
+
+test_that("get_omega_eigens works correctly", {
+  expect_equal(get_omega_eigens(mod222)[[1]], c(4.8391595, 0.9198405), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222c)[[2]], c(11.611462, 3.608538), tolerance=1e-5)
+})

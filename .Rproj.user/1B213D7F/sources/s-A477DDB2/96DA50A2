@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562152056059.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "96DA50A2",
+    "lastKnownWriteTime" : 1562153426,
+    "last_content_update" : 1562153426956,
+    "path" : "~/gmvarkit/R/printMethods.R",
+    "project_path" : "R/printMethods.R",
+    "properties" : {
+        "cursorPosition" : "100,80",
+        "scrollLine" : "80"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

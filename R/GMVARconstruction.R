@@ -12,6 +12,9 @@
 #'   are computed and included in the returned object.
 #' @return Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
 #'   to work with other functions provided in \code{gmvarkit}.
+#'
+#'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+#'   the second one for the lag one, etc.
 #' @section S3 methods:
 #'   Only the print method is available if data is not provided.
 #'   If data is provided, then the \code{predict} method is also available.

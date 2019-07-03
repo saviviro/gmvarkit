@@ -7,12 +7,12 @@
     "folds" : "",
     "hash" : "0",
     "id" : "8F172F2F",
-    "lastKnownWriteTime" : 1562056102,
-    "last_content_update" : 1562056102,
+    "lastKnownWriteTime" : 1562152047,
+    "last_content_update" : 1562152047365,
     "path" : "~/gmvarkit/R/miscS3methods.R",
     "project_path" : "R/miscS3methods.R",
     "properties" : {
-        "cursorPosition" : "2,91",
+        "cursorPosition" : "25,54",
         "scrollLine" : "0"
     },
     "read_only" : false,
