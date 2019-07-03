@@ -4,7 +4,7 @@
 \alias{is_stationary}
 \title{Check the stationary condition of given GMVAR model}
 \usage{
-is_stationary(p, M, d, params, all_boldA = NULL)
+is_stationary(p, M, d, params, all_boldA = NULL, tolerance = 0.001)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive degree of the model.}
@@ -31,11 +31,13 @@ The notations are in line with the cited article by KMS (2016).}
 
 \item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
+
+\item{tolerance}{Returns false if modulus of any eigen value is larger or equal to \code{1-tolerance}.}
 }
 \value{
-Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. In order to obtain numerical stability
+Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. Based on the argument \code{tolerance},
   \code{is_stationary} may return \code{FALSE} when the parameter vector is in the stationarity region, but
-  very close to the boundary.
+  very close to the boundary (this is used to ensure numerical stability in estimation of the model parameters).
 }
 \description{
 \code{is_stationary} checks the stationarity condition of GMVAR model.
