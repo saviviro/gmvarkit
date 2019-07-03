@@ -135,6 +135,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                                   class="logLik",
                                   df=npars),
                  IC=IC,
+                 uncond_moments=uncond_moments_int(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=constraints),
                  all_estimates=NULL,
                  all_logliks=NULL,
                  which_converged=NULL),

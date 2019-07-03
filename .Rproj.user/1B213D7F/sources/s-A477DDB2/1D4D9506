@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562060001194.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1D4D9506",
+    "lastKnownWriteTime" : 1562056170,
+    "last_content_update" : 1562056170,
+    "path" : "~/gmvarkit/R/parameterReforms.R",
+    "project_path" : "R/parameterReforms.R",
+    "properties" : {
+        "cursorPosition" : "62,105",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

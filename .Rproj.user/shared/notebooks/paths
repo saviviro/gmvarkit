@@ -1,3 +1,5 @@
+//ad.helsinki.fi/home/s/saviviro/Desktop/gmvartestailu.R="F592CB90"
+//ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/NEWS.md="680BE2AE"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/GMVARconstruction.R="CF587748"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/MAINest.R="201E9FD5"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/argumentChecks.R="DBE93E64"
@@ -18,4 +20,6 @@
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/quantileResiduals.R="6D77A8D"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/simulateGMVAR.R="427169F4"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/standardErrors.R="C2A4C381"
+//ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/R/uncondMoments.R="3046CDF3"
 //ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/tests/testthat/test_pickParams.R="D037AF35"
+//ad.helsinki.fi/home/s/saviviro/Documents/gmvarkit/tests/testthat/test_uncondMoments.R="2A8AE64F"

@@ -1,0 +1,22 @@
+save.image("\\\\ad.helsinki.fi/home/s/saviviro/Desktop/gmvartestenv")
+set.seed(1); GAresults <- GAfit(data=data, p=p, M=M, conditional=conditional, parametrization="intercept", constraints=constraints)
+mod <- GMVAR(data, p=2, M=2, d=2, params=GAresults, parametrization="intercept")
+m2 <- iterate_more(mod)
+
+mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=Sigmas[, , m], log=TRUE, ncores=1, isChol=FALSE)
+
+lapply(1:1, function(x) {for(i1 in 1:10) {
+  cat(i1)
+  if(i1 == 5) warning("should be error")
+}})
+
+mypars <- c(-4.13121231915222, 123.3874682886, 1.1447668064407, 0.0897003963189471, 0.0550140598851347, 1.31430713711194,
+            -0.145402935715534, -0.0906706060376539, -0.0668401997154909, -0.335609831780379, 2.97295400003623, 0.694212676433245,
+            6.83341787786421, 9.5733969178063, 133.953920191699, -0.530065031751842, -1.14904568358759, -0.87854988327617, 0.488948334151633,
+            -0.173743913750069, 0.371526066625332, -0.795270035122971, -0.93832566177567, 16.0053858532216, -4.8916616760301, 1.49504821559222,
+            0.926254621281772)
+mod <- GMVAR(data=data, p=2, M=2, params=mypars, conditional=TRUE, parametrization="mean", constraints=NULL)
+summary(mod, digits=5)
+
+loglikelihood_int(data=data, p=2, M=2, params=mypars, conditional=TRUE, parametrization="mean", constraints=NULL)
+iterate_more(mod)

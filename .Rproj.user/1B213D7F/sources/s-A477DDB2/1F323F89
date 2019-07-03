@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562068684166.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1F323F89",
+    "lastKnownWriteTime" : 1562142771,
+    "last_content_update" : 1562142771613,
+    "path" : "~/gmvarkit/R/GMVARconstruction.R",
+    "project_path" : "R/GMVARconstruction.R",
+    "properties" : {
+        "cursorPosition" : "38,39",
+        "scrollLine" : "28"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

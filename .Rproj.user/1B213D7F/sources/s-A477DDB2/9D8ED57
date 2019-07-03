@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562145550228.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9D8ED57",
+    "lastKnownWriteTime" : 1562148434,
+    "last_content_update" : 1562148434559,
+    "path" : "~/gmvarkit/R/argumentChecks.R",
+    "project_path" : "R/argumentChecks.R",
+    "properties" : {
+        "cursorPosition" : "26,97",
+        "scrollLine" : "16"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562076076084.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "491268E",
+    "lastKnownWriteTime" : 1562147838,
+    "last_content_update" : 1562147838454,
+    "path" : "~/gmvarkit/R/MAINest.R",
+    "project_path" : "R/MAINest.R",
+    "properties" : {
+        "cursorPosition" : "101,0",
+        "scrollLine" : "76"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
