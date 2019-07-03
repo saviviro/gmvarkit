@@ -147,7 +147,7 @@ get_regime_autocovs <- function(gmvar) {
 #'   \describe{
 #'     \item{\code{$uncond_mean}}{a length d vector containing the unconditional mean of the process.}
 #'     \item{\code{$autocovs}}{an \eqn{(d x d x p+1)} array containing the lag 0,1,...,p autocovariances of
-#'       the process. The subset \code{[, , j]} contains the lag \code{j-1} autocovariance (lag zero for the variance).}
+#'       the process. The subset \code{[, , j]} contains the lag \code{j-1} autocovariance matrix (lag zero for the variance).}
 #'     \item{\code{$autocors}}{the autocovariance matrices scaled to autocorrelation matrices.}
 #'   }
 #' @inherit loglikelihood_int references
@@ -181,7 +181,7 @@ uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "
 #' @title Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
 #'  of the GMVAR process.
 #'
-#' @description \code{uncond_moments_int} calculates the unconditional mean, variance, first p autocovariances,
+#' @description \code{uncond_moments} calculates the unconditional mean, variance, first p autocovariances,
 #'  and first p autocorrelations of the GMVAR process
 #'
 #' @inheritParams simulateGMVAR
