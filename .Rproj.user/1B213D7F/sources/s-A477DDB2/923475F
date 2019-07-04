@@ -1,19 +1,19 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1562227711023.000,
+    "created" : 1562229854868.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
-    "id" : "14B006D8",
-    "lastKnownWriteTime" : 1562227815,
-    "last_content_update" : 1562227815642,
-    "path" : "~/gmvarkit/R/plotMethods.R",
-    "project_path" : "R/plotMethods.R",
+    "id" : "923475F",
+    "lastKnownWriteTime" : 1562056359,
+    "last_content_update" : 1562056359,
+    "path" : "~/gmvarkit/R/quantileResiduals.R",
+    "project_path" : "R/quantileResiduals.R",
     "properties" : {
-        "cursorPosition" : "61,117",
-        "scrollLine" : "44"
+        "cursorPosition" : "170,94",
+        "scrollLine" : "182"
     },
     "read_only" : false,
     "read_only_alternatives" : [

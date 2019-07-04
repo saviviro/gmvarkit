@@ -211,11 +211,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 #' mod222c_2
 #' @export
 
-add_data <- function(data, gmvar, calc_std_errors=FALSE) {
+add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE) {
   check_gmvar(gmvar)
   GMVAR(data=data, p=gmvar$model$p, M=gmvar$model$M, params=gmvar$params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
-        calc_std_errors=calc_std_errors)
+        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors)
 }
 
 

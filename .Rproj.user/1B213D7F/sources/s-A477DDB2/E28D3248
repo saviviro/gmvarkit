@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562233512177.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4225654739",
+    "id" : "E28D3248",
+    "lastKnownWriteTime" : 1562233526,
+    "last_content_update" : 1562233526047,
+    "path" : "~/gmvarkit/R/simulateGMVAR.R",
+    "project_path" : "R/simulateGMVAR.R",
+    "properties" : {
+        "cursorPosition" : "6,59",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 15,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
