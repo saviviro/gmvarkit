@@ -1,27 +1,22 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
 # gmvarkit
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-The goal of gmvarkit is to provide tools to analyse the Gaussian mixture vector autoregressive (GMVAR) model. `gmvarkit` provides functions for unconstrainted and constraint maximum likelihood estimation of the model parameters, quantile residual based model diagnostics, simulation from the processes, and forecasting.
+The goal of gmvarkit is to provide tools to analyse the Gaussian mixture
+vector autoregressive (GMVAR) model. `gmvarkit` provides functions for
+unconstrainted and constraint maximum likelihood estimation of the model
+parameters, quantile residual based model diagnostics, simulation from
+the processes, and forecasting.
 
 ## Installation
 
-You can install the released version of gmvarkit from [CRAN](https://CRAN.R-project.org) with:
+You can install the released version of gmvarkit from
+[CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("gmvarkit")
@@ -33,12 +28,18 @@ And the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("cran/gmvarkit")
 ```
+
 ## Example
 
-Simple example
---------------
+## Simple example
 
-This is a basic example how to estimate a GMVAR model to data. The example data is the same that is used by Kalliovirta et al. (2016) in their paper introducing the GMVAR model. The estimation process is computationally demanding and takes advantage of parallel computing. After estimating the model, it's shown by simple examples how to conduct some further analysis.
+This is a basic example how to estimate a GMVAR model to data. The
+example data is the same that is used by Kalliovirta et al. (2016) in
+their paper introducing the GMVAR model. The estimation process is
+computationally demanding and takes advantage of parallel computing.
+After estimating the model, it’s shown by simple examples how to conduct
+some further
+analysis.
 
 ``` r
 # These examples use the data 'eurusd' which comes with the package, but in a scaled form.
@@ -73,8 +74,10 @@ sim <- simulateGMVAR(fitc, nsimu=10)
 predict(fitc, n_ahead=10)
 ```
 
-References
-----------
+## References
 
--   Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. *Journal of Econometrics*, **192**, 485-498.
--   Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for Multivariate Nonlinear Time Series Models. *Unpublished Revision of HECER Discussion Paper No. 247*.
+  - Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture
+    vector autoregression. *Journal of Econometrics*, **192**, 485-498.
+  - Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
+    Multivariate Nonlinear Time Series Models. *Unpublished Revision of
+    HECER Discussion Paper No. 247*.
