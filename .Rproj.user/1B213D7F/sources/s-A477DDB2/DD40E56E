@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "DD40E56E",
-    "lastKnownWriteTime" : 1562229760,
-    "last_content_update" : 1562229760102,
+    "lastKnownWriteTime" : 1562229820,
+    "last_content_update" : 1562229820361,
     "path" : "~/gmvarkit/R/diagnosticPlot.R",
     "project_path" : "R/diagnosticPlot.R",
     "properties" : {
-        "cursorPosition" : "54,36",
-        "scrollLine" : "19"
+        "cursorPosition" : "54,35",
+        "scrollLine" : "31"
     },
     "read_only" : false,
     "read_only_alternatives" : [

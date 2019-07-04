@@ -59,7 +59,6 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
   check_gmvar(gmvar)
   check_null_data(gmvar)
   type <- match.arg(type)
-  stopifnot(type %in% c("series", "ac", "ch", "norm"))
   qres <- gmvar$quantile_residuals
   colnames(qres) <- colnames(as.ts(gmvar$data))
   if(type == "series") {
