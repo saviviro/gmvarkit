@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562229322281.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DD40E56E",
+    "lastKnownWriteTime" : 1562229760,
+    "last_content_update" : 1562229760102,
+    "path" : "~/gmvarkit/R/diagnosticPlot.R",
+    "project_path" : "R/diagnosticPlot.R",
+    "properties" : {
+        "cursorPosition" : "54,36",
+        "scrollLine" : "19"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

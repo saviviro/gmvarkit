@@ -15,7 +15,7 @@ diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"),
   \item{\code{"series"} the quantile residual time series.}
   \item{\code{"ac"} the quantile residual autocorrelation and cross-correlation functions.}
   \item{\code{"ch"} the squared quantile residual autocorrelation and cross-correlation functions.}
-  \item{\code{"norm"} the quantile residual kernel density estimates with theoretical standard normal
+  \item{\code{"norm"} the quantile residual histogram with theoretical standard normal
     density (dashed line) and standard normal QQ-plots.}
 }}
 
@@ -28,9 +28,7 @@ diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"),
 }
 \details{
 Auto- and cross-correlations (types \code{"ac"} and \code{"ch"}) are calculated with the function
- \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is used. In
- the normality plot the kernel density estimates are calculated with function \code{density} from the
- package \code{stats} with bandwith argument \code{"SJ"} and Gaussian kernel.
+ \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is used.
 }
 \examples{
 # These examples use the data 'eurusd' which comes with the
