@@ -18,7 +18,7 @@ Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Ca
 }
 \description{
 \code{swap_parametrization} swaps the parametrization of object of class '\code{gmvar}'
- to \code{"mean"} if the currect parametrization is \code{"intercept"}, and vice versa.
+ to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 }
 \details{
 \code{swap_parametrization} is convenient tool if you have estimated the model in

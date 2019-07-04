@@ -18,7 +18,7 @@ Returns "distance" between \code{regime_pars1} and \code{regime_pars2}. Values a
   before calculating the "distance". Read the source code for more details.
 }
 \description{
-\code{regime_distance} calculates "distantance" between two scaled regimes. This is used in
+\code{regime_distance} calculates "distance" between two scaled regimes. This is used in
   the genetic algorithm.
 }
 \section{Warning}{

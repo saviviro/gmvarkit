@@ -222,7 +222,7 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 #' @title Swap the parametrization of object of class 'gmvar' defining a GMVAR model
 #'
 #' @description \code{swap_parametrization} swaps the parametrization of object of class '\code{gmvar}'
-#'  to \code{"mean"} if the currect parametrization is \code{"intercept"}, and vice versa.
+#'  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 #'
 #' @inheritParams simulateGMVAR
 #' @details \code{swap_parametrization} is convenient tool if you have estimated the model in

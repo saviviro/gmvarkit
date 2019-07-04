@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "1F323F89",
-    "lastKnownWriteTime" : 1562233750,
-    "last_content_update" : 1562233750983,
+    "lastKnownWriteTime" : 1562237608,
+    "last_content_update" : 1562237608272,
     "path" : "~/gmvarkit/R/GMVARconstruction.R",
     "project_path" : "R/GMVARconstruction.R",
     "properties" : {
-        "cursorPosition" : "211,0",
-        "scrollLine" : "183"
+        "cursorPosition" : "224,45",
+        "scrollLine" : "209"
     },
     "read_only" : false,
     "read_only_alternatives" : [

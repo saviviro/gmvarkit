@@ -9,13 +9,13 @@ unvech(d, a)
 \arguments{
 \item{d}{number of rows the square matrix to be formed.}
 
-\item{a}{a size \eqn{(d(d+1)/2x1)} vector to be unvectorized into a symmmetric \eqn{(dxd)} matrix.}
+\item{a}{a size \eqn{(d(d+1)/2x1)} vector to be unvectorized into a symmetric \eqn{(dxd)} matrix.}
 }
 \value{
 a symmetric matrix of size \eqn{(dxd)}.
 }
 \description{
-\code{unvech} creates a symmetrix matrix from the given vector by
+\code{unvech} creates a symmetric matrix from the given vector by
   copying the lower triangular part to be the upper triangular part as well.
 }
 \section{Warning}{

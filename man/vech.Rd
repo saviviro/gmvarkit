@@ -7,7 +7,7 @@
 vech(A)
 }
 \arguments{
-\item{A}{a size \eqn{(dxd)} symmmetric matrix to be vectorized parsimoniously.}
+\item{A}{a size \eqn{(dxd)} symmetric matrix to be vectorized parsimoniously.}
 }
 \value{
 a vector of size \eqn{(d(d+1)/2x1)}.

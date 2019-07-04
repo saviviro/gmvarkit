@@ -7,13 +7,13 @@
     "folds" : "",
     "hash" : "0",
     "id" : "F63F17E1",
-    "lastKnownWriteTime" : 1562237059,
-    "last_content_update" : 1562237059345,
+    "lastKnownWriteTime" : 1562237901,
+    "last_content_update" : 1562237901953,
     "path" : "~/gmvarkit/R/geneticAlgorithm.R",
     "project_path" : "R/geneticAlgorithm.R",
     "properties" : {
-        "cursorPosition" : "62,26",
-        "scrollLine" : "32"
+        "cursorPosition" : "61,16",
+        "scrollLine" : "44"
     },
     "read_only" : false,
     "read_only_alternatives" : [

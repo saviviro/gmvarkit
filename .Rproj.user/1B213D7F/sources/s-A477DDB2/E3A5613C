@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562237477415.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E3A5613C",
+    "lastKnownWriteTime" : 1562238824,
+    "last_content_update" : 1562238824773,
+    "path" : "~/gmvarkit/vignettes/intro-to-gmvarkit.Rmd",
+    "project_path" : "vignettes/intro-to-gmvarkit.Rmd",
+    "properties" : {
+        "cursorPosition" : "49,109",
+        "scrollLine" : "45"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -64,7 +64,7 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 \value{
 Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
   \eqn{j}:th column corresponds the time series in the \eqn{j}:th column of the data. The multivariate
-  quantile residuals are calculated so that the first column quantile residuals are the "uncondioned ones"
+  quantile residuals are calculated so that the first column quantile residuals are the "unconditioned ones"
   and the rest condition on all the previous ones in numerical order. Read the cited article by
   \emph{Kalliovirta and Saikkonen 2010} for details.
 }

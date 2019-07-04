@@ -23,7 +23,7 @@ get_soc(gmvar, h = 6e-06)
 
 \item{fn}{a function that takes in argument \code{x} as the \strong{first} argument.}
 
-\item{h}{difference used to approximate the derivates.}
+\item{h}{difference used to approximate the derivatives.}
 
 \item{...}{other arguments passed to \code{fn}}
 
@@ -31,7 +31,7 @@ get_soc(gmvar, h = 6e-06)
 }
 \value{
 Gradient functions return numerical approximation of the gradient, and Hessian functions return
-  numerical approximation of the Hessian. \code{get_soc} returns eigen values of the Hessian matrix.
+  numerical approximation of the Hessian. \code{get_soc} returns eigenvalues of the Hessian matrix.
 }
 \description{
 \code{calc_gradient} or \code{calc_hessian} calculates the gradient or Hessian matrix

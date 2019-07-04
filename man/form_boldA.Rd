@@ -21,7 +21,7 @@ Returns 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to e
 }
 \description{
 \code{form_boldA} creates the "bold A" coefficient matrices related to
-  VAR processess.
+  VAR processes.
 }
 \section{Warning}{
 

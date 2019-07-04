@@ -23,5 +23,5 @@ Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
  then the returned vector equals \strong{\eqn{\phi_{m}}}.
 }
 \description{
-\code{random_coefmats} generates random VAR model coefficientmatrices
+\code{random_coefmats} generates random VAR model coefficient matrices
 }

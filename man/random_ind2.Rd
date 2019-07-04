@@ -30,7 +30,7 @@ and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale
 Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
 
-\item{ar_scale}{a positive real number adjusting how large AR-paramater values are typically generated in some random
+\item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in some random
 mutations. See function \code{random_coefmats2} for details. This is ignored when estimating constrained models.}
 }
 \value{

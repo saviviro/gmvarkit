@@ -41,7 +41,7 @@
 #'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component and
 #'   \eqn{\alpha_{m}} is the mixing weight parameter.
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
-#'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks colums
+#'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 #'   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
 #' @param mu_scale a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
@@ -58,7 +58,7 @@
 #'   and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 #'   Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 #'   \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.
-#' @param ar_scale a positive real number adjusting how large AR-paramater values are typically generated in some random
+#' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in some random
 #'   mutations. See function \code{random_coefmats2} for details. This is ignored when estimating constrained models.
 #' @param regime_force_scale a non-negative real number specifying how much should natural selection favour individuals
 #'   with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large number

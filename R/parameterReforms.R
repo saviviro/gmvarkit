@@ -57,7 +57,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 #' @title Form the \eqn{((dp)x(dp))}  "bold A" matrices related to the VAR processes
 #'
 #' @description \code{form_boldA} creates the "bold A" coefficient matrices related to
-#'   VAR processess.
+#'   VAR processes.
 #'
 #' @inheritParams pick_allA
 #' @param all_A 4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.
@@ -93,7 +93,7 @@ form_boldA <- function(p, M, d, all_A) {
 #'  Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
 #'  component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component and \eqn{\alpha_{m}} is the
 #'  mixing weight parameter.
-#'  \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks colums
+#'  \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
 #'  of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
 #'  The notations are in line with the cited article by KMS (2016)
 #' @section Warning:
@@ -182,7 +182,7 @@ change_regime <- function(p, M, d, params, m, regime_pars) {
 
 #' @title Calculate "distance" between two (scaled) regimes \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
 #'
-#' @description \code{regime_distance} calculates "distantance" between two scaled regimes. This is used in
+#' @description \code{regime_distance} calculates "distance" between two scaled regimes. This is used in
 #'   the genetic algorithm.
 #'
 #' @param regime_pars1 a length \eqn{pd^2+d+d(d+1)/2} vector

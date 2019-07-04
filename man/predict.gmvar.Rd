@@ -33,7 +33,7 @@ won't be calculated if conditional mean is used.}
 along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.2)}.}
 }
 \value{
-Returns an object of class '\code{gmvarpred}' which containts the predictions and the
+Returns an object of class '\code{gmvarpred}' which contains the predictions and the
   prediction intervals. It has it's own print and plot methods \code{print.gmvarped} and \code{plot.gmvarped}.
 }
 \description{

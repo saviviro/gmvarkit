@@ -19,7 +19,7 @@ Returns \eqn{((pd^2)x1)} vector containing stationary vectorized coefficient
  matrices \eqn{(vec(A_{1}),...,vec(A_{p})}.
 }
 \description{
-\code{random_coefmats2} generates random VAR model coefficientmatrices
+\code{random_coefmats2} generates random VAR model coefficient matrices
 }
 \details{
 The coefficient matrices are generated using the algorithm described by Ansley

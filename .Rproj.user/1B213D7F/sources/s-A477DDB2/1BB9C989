@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562237576471.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "332671069",
+    "id" : "1BB9C989",
+    "lastKnownWriteTime" : 1562237584,
+    "last_content_update" : 1562237584749,
+    "path" : "~/gmvarkit/R/predictMethod.R",
+    "project_path" : "R/predictMethod.R",
+    "properties" : {
+        "cursorPosition" : "21,70",
+        "scrollLine" : "5"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
