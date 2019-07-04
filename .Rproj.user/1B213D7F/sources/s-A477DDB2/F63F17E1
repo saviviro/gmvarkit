@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562236814742.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "F63F17E1",
+    "lastKnownWriteTime" : 1562237059,
+    "last_content_update" : 1562237059345,
+    "path" : "~/gmvarkit/R/geneticAlgorithm.R",
+    "project_path" : "R/geneticAlgorithm.R",
+    "properties" : {
+        "cursorPosition" : "62,26",
+        "scrollLine" : "32"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
