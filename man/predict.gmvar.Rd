@@ -5,8 +5,8 @@
 \title{Predict method for class 'gmvar' objects}
 \usage{
 \method{predict}{gmvar}(object, ..., n_ahead, n_simu = 2000,
-  ci = c(0.95, 0.8), ci_type = c("two-sided", "upper", "lower",
-  "none"), pred_type = c("mean", "median", "cond_mean"),
+  pi = c(0.95, 0.8), pi_type = c("two-sided", "upper", "lower",
+  "none"), pred_type = c("median", "mean", "cond_mean"),
   plot_res = TRUE, nt)
 }
 \arguments{
@@ -19,12 +19,12 @@ grid to the figure.}
 
 \item{n_simu}{to how many simulations should the forecast be based on?}
 
-\item{ci}{a numeric vector specifying the confidence levels of the confidence intervals.}
+\item{pi}{a numeric vector specifying the confidence levels of the prediction intervals.}
 
-\item{ci_type}{should the confidence intervals be "two-sided", "upper" or "lower"?}
+\item{pi_type}{should the prediction intervals be "two-sided", "upper" or "lower"?}
 
-\item{pred_type}{should the prediction be based on sample "mean" or "median"? Or should it
-be one-step-ahead forecast based on conditional mean (\code{"cond_mean"})? Confidence intervals
+\item{pred_type}{should the prediction be based on sample "median" or "mean"? Or should it
+be one-step-ahead forecast based on conditional mean (\code{"cond_mean"})? Prediction intervals
 won't be calculated if conditional mean is used.}
 
 \item{plot_res}{should the results be plotted?}
@@ -34,12 +34,12 @@ along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{
 }
 \value{
 Returns an object of class '\code{gmvarpred}' which containts the predictions and the
-  confidence intervals. It has it's own print and plot methods \code{print.gmvarped} and \code{plot.gmvarped}.
+  prediction intervals. It has it's own print and plot methods \code{print.gmvarped} and \code{plot.gmvarped}.
 }
 \description{
 Forecast GMVAR process defined by object of class \code{'gmvar'}. Forecasts are
   computed by performing independent simulations and using the sample means or medians as predictions
-  and empirical quantiles as confidence intervals. For one-step-ahead predictions using the exact
+  and empirical quantiles as prediction intervals. For one-step-ahead predictions using the exact
   conditional mean is also supported.
 }
 \examples{
@@ -51,25 +51,24 @@ Forecast GMVAR process defined by object of class \code{'gmvar'}. Forecasts are
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
-# GMVAR(1,2) model
-fit12 <- fitGMVAR(data, p=1, M=2)
-p1 <- predict(fit12, n_ahead=1, pred_type="cond_mean",
-              plot_res=FALSE)
-p1
-p2 <- predict(fit12, n_ahead=10)
-p2
-p3 <- predict(fit12, n_ahead=10, ci_type="upper")
-p3
-
-
 # GMVAR(2,2) model
 fit22 <- fitGMVAR(data, p=2, M=2)
 p1 <- predict(fit22, n_ahead=20, pred_type="median")
 p1
 p2 <- predict(fit22, n_ahead=10, nt=20, lty=1)
 p2
-p3 <- predict(fit22, n_ahead=10, ci=c(0.99, 0.90, 0.80, 0.70),
+p3 <- predict(fit22, n_ahead=10, pi=c(0.99, 0.90, 0.80, 0.70),
               nt=30, lty=0)
+p3
+
+# GMVAR(1,2) model
+fit12 <- fitGMVAR(data, p=1, M=2)
+p1 <- predict(fit12, n_ahead=1, pred_type="cond_mean",
+              plot_res=FALSE)
+p1
+p2 <- predict(fit12, n_ahead=10, pred_type="mean")
+p2
+p3 <- predict(fit12, n_ahead=10, pi_type="upper")
 p3
 }
 }

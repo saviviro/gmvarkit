@@ -1,19 +1,19 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1562152056059.000,
+    "created" : 1562226507091.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
-    "id" : "96DA50A2",
-    "lastKnownWriteTime" : 1562153426,
-    "last_content_update" : 1562153426956,
-    "path" : "~/gmvarkit/R/printMethods.R",
-    "project_path" : "R/printMethods.R",
+    "id" : "8E4A0B31",
+    "lastKnownWriteTime" : 1562228495,
+    "last_content_update" : 1562228495329,
+    "path" : "~/gmvarkit/R/predictMethod.R",
+    "project_path" : "R/predictMethod.R",
     "properties" : {
-        "cursorPosition" : "100,80",
-        "scrollLine" : "80"
+        "cursorPosition" : "107,21",
+        "scrollLine" : "89"
     },
     "read_only" : false,
     "read_only_alternatives" : [

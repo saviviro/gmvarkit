@@ -30,7 +30,7 @@ get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept",
 #' @inheritParams simulateGMVAR
 #' @return Returns a \eqn{(dxM)} matrix containing regime mean \eqn{\mu_{m}} in the m:th column, \eqn{m=1,..,M}.
 #' @family moment functions
-#' @seealso \code{\link{uncond_moments}}, \code{\link{regime_autocovs}}
+#' @seealso \code{\link{uncond_moments}}, \code{\link{regime_autocovs}}, \code{\link{cond_moments}}
 #' @inherit is_stationary references
 #' @examples
 #' # These examples use the data 'eurusd' which comes with the

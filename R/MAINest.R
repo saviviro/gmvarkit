@@ -129,7 +129,6 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   on.exit(closeAllConnections())
   parametrization <- match.arg(parametrization)
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores and maxit must be positive integers")
-  if(!parametrization %in% c("intercept", "mean")) stop("Argument parametrization has to be 'intercept' or 'mean'")
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
@@ -244,6 +243,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #'
 #' @inheritParams simulateGMVAR
 #' @inheritParams fitGMVAR
+#' @inheritParams GMVAR
 #' @details The main purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
 #'   the estimation when the maximum number of iterations is reached when estimating a GMVAR model with the
 #'   main estimation function \code{fitGMVAR}. It's just a simple wrapper around function \code{optim}
@@ -293,7 +293,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' }
 #' @export
 
-iterate_more <- function(gmvar, maxit=100) {
+iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE) {
   check_gmvar(gmvar)
   stopifnot(maxit %% 1 == 0 & maxit >= 1)
   minval <- -(10^(ceiling(log10(nrow(gmvar$data))) + ncol(gmvar$data) + 1) - 1)
@@ -313,5 +313,5 @@ iterate_more <- function(gmvar, maxit=100) {
 
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=res$par,
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, calc_std_errors=TRUE)
+        constraints=gmvar$model$constraints, calc_std_errors=calc_std_errors)
 }

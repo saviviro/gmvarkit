@@ -7,6 +7,8 @@
 #'  a single times series. \code{NA} values are not supported. Ignore if defining a model without data is desired.
 #' @param d number of times series in the system, i.e. \code{ncol(data)}. This can be
 #'   used to define GMVAR models without data and can be ignored if \code{data} is provided.
+#' @param calc_cond_moments should conditional means and covariance matrices should be calculated?
+#'   Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.
 #' @param calc_std_errors should approximate standard errors be calculated?
 #' @details If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
 #'   are computed and included in the returned object.
@@ -73,10 +75,11 @@
 #' mod222c2
 #' @export
 
-GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, calc_std_errors=FALSE) {
+GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
+                  calc_cond_moments, calc_std_errors=FALSE) {
   parametrization <- match.arg(parametrization)
+  if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
-  if(!parametrization %in% c("intercept", "mean")) stop("Argument parametrization has to be 'intercept' or 'mean'")
   if(missing(data) & missing(d)) stop("data or d must be provided")
   if(missing(data)) {
     data <- NULL
@@ -122,6 +125,18 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
   } else {
     std_errors <- rep(NA, npars)
   }
+  if(calc_cond_moments == FALSE || is.null(data)) {
+    if(calc_cond_moments == TRUE) warning("Conditional moments can't be calculated without data")
+    regime_cmeans <- NA
+    total_cmeans <- NA
+    total_ccovs <- NA
+  } else {
+    get_cm <- function(to_return) loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
+                                                    constraints=constraints, check_params=TRUE, to_return=to_return, minval=NA)
+    regime_cmeans <- get_cm("regime_cmeans")
+    total_cmeans <- get_cm("total_cmeans")
+    total_ccovs <- get_cm("total_ccovs")
+  }
 
   structure(list(data=data,
                  model=list(p=p,
@@ -133,6 +148,9 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                  params=params,
                  std_errors=std_errors,
                  mixing_weights=lok_and_mw$mw,
+                 regime_cmeans=regime_cmeans,
+                 total_cmeans=total_cmeans,
+                 total_ccovs=total_ccovs,
                  quantile_residuals=qresiduals,
                  loglik=structure(lok_and_mw$loglik,
                                   class="logLik",

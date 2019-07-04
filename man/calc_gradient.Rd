@@ -5,6 +5,7 @@
 \alias{calc_hessian}
 \alias{get_gradient}
 \alias{get_hessian}
+\alias{get_soc}
 \title{Calculate gradient or Hessian matrix}
 \usage{
 calc_gradient(x, fn, h = 6e-06, ...)
@@ -14,6 +15,8 @@ calc_hessian(x, fn, h = 6e-06, ...)
 get_gradient(gmvar, h = 6e-06)
 
 get_hessian(gmvar, h = 6e-06)
+
+get_soc(gmvar, h = 6e-06)
 }
 \arguments{
 \item{x}{a numeric vector specifying the point where the gradient or Hessian should be calculated.}
@@ -28,13 +31,14 @@ get_hessian(gmvar, h = 6e-06)
 }
 \value{
 Gradient functions return numerical approximation of the gradient, and Hessian functions return
-  numerical approximation of the Hessian.
+  numerical approximation of the Hessian. \code{get_soc} returns eigen values of the Hessian matrix.
 }
 \description{
 \code{calc_gradient} or \code{calc_hessian} calculates the gradient or Hessian matrix
   of the given function at the given point using central difference numerical approximation.
   \code{get_gradient} or \code{get_hessian} calculates the gradient or Hessian matrix of the
-  log-likelihood function at the parameter estimates of class \code{'gmvar'} object.
+  log-likelihood function at the parameter estimates of class \code{'gmvar'} object. \code{get_soc}
+  returns eigenvalues of the Hessian matrix.
 }
 \details{
 Especially the functions \code{get_gradient} or \code{get_hessian} can be used to check whether
@@ -67,4 +71,5 @@ Especially the functions \code{get_gradient} or \code{get_hessian} can be used t
   mod122 <- GMVAR(data, p=1, M=2, params=params122)
   get_gradient(mod122)
   get_hessian(mod122)
+  get_soc(mod122)
 }

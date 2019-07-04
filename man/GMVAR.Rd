@@ -12,7 +12,7 @@
 \usage{
 GMVAR(data, p, M, d, params, conditional = TRUE,
   parametrization = c("intercept", "mean"), constraints = NULL,
-  calc_std_errors = FALSE)
+  calc_cond_moments, calc_std_errors = FALSE)
 
 \method{logLik}{gmvar}(object, ...)
 
@@ -80,6 +80,9 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{calc_cond_moments}{should conditional means and covariance matrices should be calculated?
+Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 

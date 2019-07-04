@@ -1,24 +1,24 @@
 {
     "collab_server" : "",
     "contents" : "",
-    "created" : 1562151777828.000,
+    "created" : 1562229022294.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
     "hash" : "0",
-    "id" : "CDD67A9E",
-    "lastKnownWriteTime" : 1562161506,
-    "last_content_update" : 1562161506571,
-    "path" : "~/gmvarkit/R/uncondMoments.R",
-    "project_path" : "R/uncondMoments.R",
+    "id" : "BD5AE329",
+    "lastKnownWriteTime" : 1562229215,
+    "last_content_update" : 1562229215725,
+    "path" : "~/gmvarkit/R/numericalDifferentiation.R",
+    "project_path" : "R/numericalDifferentiation.R",
     "properties" : {
-        "cursorPosition" : "32,97",
+        "cursorPosition" : "42,0",
         "scrollLine" : "3"
     },
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 5,
+    "relative_order" : 10,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"

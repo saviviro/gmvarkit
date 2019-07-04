@@ -56,8 +56,9 @@
 #'   (excluding the identification condition).
 #' @param to_return should the returned object be log-likelihood value, mixing weights, mixing weights including
 #'   value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights or
-#'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Default is
-#'   the log-likelihood value (\code{"loglik"}).
+#'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Or should
+#'   the regimewise conditional means, total conditional means, or total conditional covariance matrices
+#'   be returned? Default is the log-likelihood value (\code{"loglik"}).
 #' @details Takes use of the function \code{dmvn} from the package \code{mvnfast} to cut down computation time.
 #'   Values extremely close to zero are handled with the package \code{Brobdingnag}.
 #' @return
@@ -69,6 +70,12 @@
 #'   \item{If \code{to_return=="terms"}:}{a size ((n_obs-p)x1) numeric vector containing the terms \eqn{l_{t}}.}
 #'   \item{if \code{to_return=="loglik_and_mw"}:}{a list of two elements. The first element contains the log-likelihood value and the
 #'     second element contains the mixing weights.}
+#'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
+#'    (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
+#'    (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
+#'    (the first p values are used as the initial values).}
 #'  }
 #' @references
 #'  \itemize{
@@ -79,7 +86,8 @@
 #'  }
 
 loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                              to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms"), check_params=TRUE, minval=NULL) {
+                              to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans", "total_cmeans", "total_ccovs"),
+                              check_params=TRUE, minval=NULL) {
 
   # Compute required values
   epsilon <- round(log(.Machine$double.xmin) + 10) # Logarithm of the smallest value that can be handled normally
@@ -174,6 +182,20 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   Y2 <- Y[1:T_obs,] # Last row is not needed because mu_mt uses lagged values
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
 
+  if(to_return == "regime_cmeans") {
+    return(mu_mt)
+  } else if(to_return == "total_cmeans") {
+    return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
+  } else if(to_return == "total_ccovs") {
+    # array(vapply(1:nrow(alpha_mt), function(i1) rowSums(vapply(1:M, function(m) alpha_mt[i1, m]*all_Omega[, , m], numeric(d*d))),  numeric(d*d)), dim=c(d, d, T_obs))
+    first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(all_Omega[, , m]), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
+    sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
+    # array(vapply(1:nrow(alpha_mt), function(i1) rowSums(vapply(1:M, function(m) alpha_mt[i1, m]*tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]), numeric(d*d))), numeric(d*d)), dim=c(d, d, T_obs))
+    second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(vapply(1:nrow(alpha_mt), function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
+                                                                                                       numeric(d*d))), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
+    return(first_term + second_term)
+  }
+
   # Calculate the second term of the log-likelihood (Kalliovirta et al. 2016 eq.(10))
   dat <- data[(p+1):n_obs,] # Initial values are not used here
   mvn_vals <- vapply(1:M, function(m) mvnfast::dmvn(X=dat-mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
@@ -213,14 +235,61 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, minval=NA) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
-  if(!parametrization %in% c("intercept", "mean")) stop("Argument parametrization has to be 'intercept' or 'mean'")
   data <- check_data(data, p)
   d <- ncol(data)
   check_constraints(p=p, M=M, d=d, constraints=constraints)
-  parametrization <- match.arg(parametrization)
   if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints)) stop("Parameter vector has wrong dimension")
   loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
                     constraints=constraints, to_return="loglik", check_params=TRUE, minval=minval)
+}
+
+
+#' @title Compute conditional moments of a GMVAR model
+#'
+#' @description \code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices
+#'  of a GMVAR model.
+#'
+#' @inheritParams loglikelihood_int
+#' @param to_return should the regimewise conditional means, total conditional means, or total conditional covariance matrices
+#'   be returned?
+#' @details The first p values are used as the initial values, and by conditional we mean conditioning on the past. Formulas
+#'   for the conditional means and covariance matrices are given in equations (3) and (4) of Kalliovirta et al. (2016).
+#' @return
+#'  \describe{
+#'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
+#'    (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
+#'    (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
+#'    (the first p values are used as the initial values).}
+#'  }
+#' @inherit loglikelihood_int references
+#' @family moment functions
+#' @examples
+#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+#' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
+#'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
+#'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
+#'   9.838, 0.740)
+#' cond_moments(data=data, p=2, M=2, params=params222, parametrization="mean",
+#'   to_return="regime_cmeans")
+#' cond_moments(data=data, p=2, M=2, params=params222, parametrization="mean",
+#'   to_return="total_cmeans")
+#' cond_moments(data=data, p=2, M=2, params=params222, parametrization="mean",
+#'   to_return="total_ccovs")
+#' @export
+
+cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL,
+                         to_return=c("regime_cmeans", "total_cmeans", "total_ccovs")) {
+  if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
+  parametrization <- match.arg(parametrization)
+  to_return <- match.arg(to_return)
+  data <- check_data(data, p)
+  d <- ncol(data)
+  check_constraints(p=p, M=M, d=d, constraints=constraints)
+  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints)) stop("Parameter vector has wrong dimension")
+  loglikelihood_int(data, p, M, params, conditional=TRUE, parametrization=parametrization,
+                    constraints=constraints, to_return=to_return, check_params=TRUE, minval=minval)
 }
 
 

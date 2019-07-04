@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562227711023.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "14B006D8",
+    "lastKnownWriteTime" : 1562227815,
+    "last_content_update" : 1562227815642,
+    "path" : "~/gmvarkit/R/plotMethods.R",
+    "project_path" : "R/plotMethods.R",
+    "properties" : {
+        "cursorPosition" : "61,117",
+        "scrollLine" : "44"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 12,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
