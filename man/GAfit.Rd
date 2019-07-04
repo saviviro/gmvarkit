@@ -127,6 +127,10 @@ Returns estimated parameter vector which has the form described in \code{initpop
 The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
    It uses (slightly modified) individually adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)}
    and employs (50\%) fitness inheritance discussed by \emph{Smith, Dike and Stegmann (1995)}.
+
+   By "redundant" or "unidentified" regimes we mean regimes that have the time varying mixing weights basically at zero for all t.
+   The model would have the same log-likelihood value without redundant regimes and there is no purpose to have redundant regime in
+   the model.
 }
 \references{
 \itemize{
