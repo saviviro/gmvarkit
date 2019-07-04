@@ -14,7 +14,7 @@ format_valuef <- function(digits) {
 
 #' @describeIn GMVAR print method
 #' @inheritParams plot.gmvar
-#' @param digits number of digits to be printed
+#' @param digits number of digits to be printed.
 #' @param summary_print if set to \code{TRUE} then the print
 #'   will include log-likelihood and information criteria values.
 #' @export

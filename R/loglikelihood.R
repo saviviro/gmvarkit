@@ -289,7 +289,7 @@ cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mea
   check_constraints(p=p, M=M, d=d, constraints=constraints)
   if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints)) stop("Parameter vector has wrong dimension")
   loglikelihood_int(data, p, M, params, conditional=TRUE, parametrization=parametrization,
-                    constraints=constraints, to_return=to_return, check_params=TRUE, minval=minval)
+                    constraints=constraints, to_return=to_return, check_params=TRUE, minval=NA)
 }
 
 

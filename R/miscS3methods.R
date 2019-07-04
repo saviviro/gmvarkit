@@ -17,7 +17,7 @@ residuals.gmvar <- function(object, ...) {
 
 #' @describeIn GMVAR summary method
 #' @inheritParams logLik.gmvar
-#' @param digits the number of digits to be printed.
+#' @inheritParams print.gmvar
 #' @export
 summary.gmvar <- function(object, ..., digits=2) {
   gmvar <- object

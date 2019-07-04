@@ -49,7 +49,7 @@ get_regime_means(mod222)
  }
 }
 \seealso{
-\code{\link{uncond_moments}}, \code{\link{regime_autocovs}}, \code{\link{cond_moments}}
+\code{\link{uncond_moments}}, \code{\link{get_regime_autocovs}}, \code{\link{cond_moments}}
 
 Other moment functions: \code{\link{cond_moments}},
   \code{\link{get_regime_autocovs}},
