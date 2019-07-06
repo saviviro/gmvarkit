@@ -11,4 +11,4 @@
 
 # gmvarkit 1.1.1
 
-* Changed to default number of CPU cores employed by the estimation function fitGMVAR to be at most two due to CRAN policy. 
+* Changed the default number of CPU cores employed by the estimation function fitGMVAR to be at most two due to CRAN policy. 

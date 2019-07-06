@@ -5,9 +5,9 @@
 #'   phase. Parallel computing is used to perform multiple rounds of estimations in parallel.
 #'
 #' @inheritParams GAfit
-#' @param ncalls number of estimation rounds that should be performed.
-#' @param ncores number cores to be used in parallel computing.
-#' @param maxit maximum number of iterations in the variable metric algorithm.
+#' @param ncalls the number of estimation rounds that should be performed.
+#' @param ncores the number cores to be used in parallel computing.
+#' @param maxit the maximum number of iterations in the variable metric algorithm.
 #' @param print_res should summaries of estimation results be printed?
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
