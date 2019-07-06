@@ -124,7 +124,7 @@
 
 
 fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ncalls=round(10 + 9*log(M)),
-                     ncores=min(ncalls, parallel::detectCores()), maxit=300, print_res=TRUE, ...) {
+                     ncores=min(2, ncalls, parallel::detectCores()), maxit=300, print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())
   parametrization <- match.arg(parametrization)

@@ -8,3 +8,7 @@
 * Generally more functionality for conditional and unconditional moments.
 * Increased numerical tolerance for considering models to be stationary to attain better numerical stability.
 * Updates on documentation, fixed typos.
+
+# gmvarkit 1.1.1
+
+* Changed to default number of CPU cores employed by the estimation function fitGMVAR to be at most two due to CRAN policy. 
