@@ -1,7 +1,7 @@
 context("quantile residual tests")
 library(gmvarkit)
 
-# NOTE that some elements of these tests use random elements obtained from simulation algorithms
+# NOTE these tests use random elements obtained from simulation algorithms
 
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 
@@ -59,29 +59,29 @@ res_123 <- quantile_residual_tests(mod_123, lags_ac=1, lags_ch=2, nsimu=1, print
 
 test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_112$norm_res$test_stat, 340333, tolerance=1)
-  expect_equal(res_112$ac_res$test_results$test_stat, c(1150.636, 1132.002), tolerance=1e-1)
-  expect_equal(res_112$ch_res$test_results$test_stat, c(341456.8, 690667.4), tolerance=1)
+  expect_equal(res_112$ac_res$test_results$test_stat, c(1150.636, 1132.002), tolerance=1e-3)
+  expect_equal(res_112$ch_res$test_results$test_stat, c(341456.8, 690667.4), tolerance=0.1)
 
-  expect_equal(res_222$norm_res$p_val, 0.9026294, tolerance=1e-3)
-  expect_equal(res_222$ac_res$test_results$p_val, 0.3135982, tolerance=1e-3)
-  expect_equal(res_222$ch_res$test_results$test_stat, 1.767297, tolerance=1e-2)
+  expect_equal(res_222$norm_res$p_val, 0.9026294, tolerance=1e-4)
+  expect_equal(res_222$ac_res$test_results$p_val, 0.3135982, tolerance=1e-4)
+  expect_equal(res_222$ch_res$test_results$test_stat, 1.767297, tolerance=1e-4)
 
-  expect_equal(res_123$norm_res$test_stat, 5.912122, tolerance=1e-1)
-  expect_equal(res_123$ac_res$test_results$test_stat, 17.55207, tolerance=1e-1)
-  expect_equal(res_123$ch_res$test_results$test_stat, 24.99111, tolerance=1e-1)
+  expect_equal(res_123$norm_res$test_stat, 5.912122, tolerance=1e-4)
+  expect_equal(res_123$ac_res$test_results$test_stat, 17.55207, tolerance=1e-4)
+  expect_equal(res_123$ch_res$test_results$test_stat, 24.99111, tolerance=1e-4)
 })
 
 test_that("quantile_residual_tests - ind_stats - works correctly", {
-  expect_equal(res_112$ac_res$ind_stats$lag2, c(-0.04119451, -0.81216474, -0.17074733, -0.05748577), tolerance=1e-3)
-  expect_equal(res_112$ch_res$ind_stats$lag1, c(2.697579, 3.762141, 23.584075, 554.406853), tolerance=1e-3)
+  expect_equal(res_112$ac_res$ind_stats$lag2, c(-0.04119451, -0.81216474, -0.17074733, -0.05748577), tolerance=1e-4)
+  expect_equal(res_112$ch_res$ind_stats$lag1, c(2.697579, 3.762141, 23.584075, 554.406853), tolerance=1e-4)
 
-  expect_equal(res_222$ac_res$ind_stats$lag3, c(2.1920450, 0.3863022, -0.1567286, 1.2905688), tolerance=1e-3)
-  expect_equal(res_222$ch_res$ind_stats$lag1, c(0.09774581, 0.02637839, -0.93709782, 0.75117796), tolerance=1e-3)
+  expect_equal(res_222$ac_res$ind_stats$lag3, c(2.1920450, 0.3863022, -0.1567286, 1.2905688), tolerance=1e-4)
+  expect_equal(res_222$ch_res$ind_stats$lag1, c(0.09774581, 0.02637839, -0.93709782, 0.75117796), tolerance=1e-4)
 
   expect_equal(res_123$ac_res$ind_stats$lag1,
-               c(2.0089681, -0.8670114, 0.6316378, 1.1598600, -1.5442288, 2.9690730, -1.6025916, -0.1522856, -0.1156838), tolerance=1e-3)
+               c(2.0089681, -0.8670114, 0.6316378, 1.1598600, -1.5442288, 2.9690730, -1.6025916, -0.1522856, -0.1156838), tolerance=1e-4)
   expect_equal(res_123$ch_res$ind_stats$lag2,
-               c(-1.48736102, -1.00846208, 0.11090136, 1.67935179, 0.6865806, -1.49368993, -2.04132820, 0.06928959, 0.44320965), tolerance=1e-3)
+               c(-1.48736102, -1.00846208, 0.11090136, 1.67935179, 0.6865806, -1.49368993, -2.04132820, 0.06928959, 0.44320965), tolerance=1e-4)
 })
 
 
@@ -106,20 +106,20 @@ g_ac2 <- get_g(2); dim_g_ac2 <- 2*2^2 #lag*d^2
 test_that("get_test_Omega works correctly", {
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
                               constraints=NULL, g=g_norm, dim_g=dim_g_norm)[1,],
-               c(0.7057628, 2.2848667, 8.6067786, 0.9472146, -7.4855476, 42.0832749), tolerance=1e-3)
+               c(0.7057628, 2.2848667, 8.6067786, 0.9472146, -7.4855476, 42.0832749), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
                               constraints=NULL, g=g_norm, dim_g=dim_g_norm)[,6],
-               c(-0.2246738, 0.2367933, -1.3629537, 2.5325211, -7.5225937, 38.2535773), tolerance=1e-3)
+               c(-0.2246738, 0.2367933, -1.3629537, 2.5325211, -7.5225937, 38.2535773), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, g=g_norm, dim_g=dim_g_norm)[3,],
-               c(1.5549257, 4.5538484, 28.3233066, 0.4093669, -0.6562638, 0.4822259), tolerance=1e-3)
+               c(1.5549257, 4.5538484, 28.3233066, 0.4093669, -0.6562638, 0.4822259), tolerance=1e-4)
 
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
                               constraints=NULL, g=g_ac1, dim_g=dim_g_ac1)[,1],
-               c(1.0143162, -0.2785037, -0.1520407, 0.4920706), tolerance=1e-3)
+               c(1.0143162, -0.2785037, -0.1520407, 0.4920706), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
                               constraints=NULL, g=g_ac2, dim_g=dim_g_ac2)[5,],
-               c(0.26554361, -0.04612983, 0.41599389, 0.84506916, 1.18335341, 0.02087973, 0.23315441, 1.08043135), tolerance=1e-3)
+               c(0.26554361, -0.04612983, 0.41599389, 0.84506916, 1.18335341, 0.02087973, 0.23315441, 1.08043135), tolerance=1e-4)
 
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
                               constraints=NULL, g=g_ac1, dim_g=dim_g_ac1)[4,],
@@ -130,8 +130,8 @@ test_that("get_test_Omega works correctly", {
 
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, g=g_ac1, dim_g=dim_g_ac1)[2,],
-               c(0.19084136, 0.85543945, 0.09623485, -0.18203186), tolerance=1e-3)
+               c(0.19084136, 0.85543945, 0.09623485, -0.18203186), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, g=g_ac2, dim_g=dim_g_ac2)[,2],
-               c(0.19172737, 0.85825300, 0.09773145, -0.18278803, 0.03803171, -0.07227835, -0.07058063, -0.08615313), tolerance=1e-3)
+               c(0.19172737, 0.85825300, 0.09773145, -0.18278803, 0.03803171, -0.07227835, -0.07058063, -0.08615313), tolerance=1e-4)
 })
