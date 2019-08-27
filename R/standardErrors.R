@@ -19,24 +19,18 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
              error=function(e) NA)
   }
 
-  differences <- c(6e-06, 0.001)
   npars <- length(params)
   I <- diag(1, ncol=npars, nrow=npars) # Indicates which parameter is derivated
 
-  for(h in differences) {
-    Hess <- calc_hessian(x=params, fn=loglik_fn, h=h)
+  # Calculate Hessian
+  Hess <- calc_hessian(x=params, fn=loglik_fn, h=6e-6)
 
-    # Inverse of the observed information matrix
-    inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=npars, ncol=npars))
+  # Inverse of the observed information matrix
+  inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=npars, ncol=npars))
 
-    # Calculate the standard errors if possible: break loop if all calculated and change the difference if not
-    diag_inv_obs_inf <- diag(inv_obs_inf)
-    if((all(!is.na(diag_inv_obs_inf)) & all(diag_inv_obs_inf >= 0)) | h == differences[length(differences)]) {
-      std_errors <- unlist(lapply(diag_inv_obs_inf, function(x) ifelse(is.na(x) | x < 0, NA, sqrt(x))))
-      break;
-    }
-  }
-  return(std_errors)
+  # Calculate the standard errors
+  diag_inv_obs_inf <- diag(inv_obs_inf)
+  unlist(lapply(diag_inv_obs_inf, function(x) ifelse(is.na(x) | x < 0, NA, sqrt(x))))
 }
 
 
