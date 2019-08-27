@@ -7,7 +7,7 @@
 n_params(p, M, d, constraints = NULL)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 

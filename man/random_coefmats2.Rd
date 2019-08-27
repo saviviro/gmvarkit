@@ -8,7 +8,7 @@
 random_coefmats2(p, d, ar_scale = 1)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{d}{number of time series in the system.}
 

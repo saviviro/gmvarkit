@@ -6,7 +6,7 @@
 #'
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 #'  a single time series. \code{NA} values are not supported.
-#' @param p a positive integer specifying the autoregressive degree of the model.
+#' @param p a positive integer specifying the autoregressive order of the model.
 #' @param M a positive integer specifying the number of mixture components.
 #' @param params a real valued vector specifying the parameter values.
 #'   \describe{

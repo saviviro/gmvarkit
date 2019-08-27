@@ -7,7 +7,7 @@
 is_stationary(p, M, d, params, all_boldA = NULL, tolerance = 0.001)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 

@@ -7,7 +7,7 @@
 random_ind(p, M, d, constraints = NULL, mu_scale, mu_scale2, omega_scale)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 

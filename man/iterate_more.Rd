@@ -9,7 +9,7 @@ iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
 \arguments{
 \item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
-\item{maxit}{maximum number of iterations in the variable metric algorithm.}
+\item{maxit}{the maximum number of iterations in the variable metric algorithm.}
 
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 }

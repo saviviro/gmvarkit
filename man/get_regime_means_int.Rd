@@ -8,7 +8,7 @@ get_regime_means_int(p, M, d, params, parametrization = c("intercept",
   "mean"), constraints = NULL)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 

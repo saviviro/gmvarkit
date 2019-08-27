@@ -10,7 +10,7 @@ smart_ind(p, M, d, params, constraints = NULL, accuracy = 1,
   ar_scale = 1)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 

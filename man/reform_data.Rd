@@ -10,7 +10,7 @@ reform_data(data, p)
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 a single time series. \code{NA} values are not supported.}
 
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 }
 \value{
 Returns the data reformed into a \eqn{((n_obs-p+1)x(dp))} matrix. The i:th row

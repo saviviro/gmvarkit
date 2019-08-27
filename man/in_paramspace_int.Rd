@@ -7,7 +7,7 @@
 in_paramspace_int(p, M, d, all_boldA, alphas, all_Omega)
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive degree of the model.}
+\item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
