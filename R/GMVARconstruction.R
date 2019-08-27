@@ -110,7 +110,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
-  if(calc_std_errors == TRUE) {
+  if(calc_std_errors) {
     if(is.null(data)) {
       warning("Approximate standard errors can't be calculated")
       std_errors <- rep(NA, npars)
@@ -126,7 +126,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     std_errors <- rep(NA, npars)
   }
   if(calc_cond_moments == FALSE || is.null(data)) {
-    if(calc_cond_moments == TRUE) warning("Conditional moments can't be calculated without data")
+    if(calc_cond_moments) warning("Conditional moments can't be calculated without data")
     regime_cmeans <- NA
     total_cmeans <- NA
     total_ccovs <- NA

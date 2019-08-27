@@ -166,7 +166,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
                                                           parametrization=parametrization, constraints=constraints,
                                                           check_params=TRUE, to_return="loglik", minval=minval), numeric(1))
 
-  if(print_res == TRUE) {
+  if(print_res) {
     cat("Results from genetic algorithm:", "\n")
     cat(paste("lowest value: ", round(min(loks), 3)), "\n")
     cat(paste("mean value:   ", round(mean(loks), 3)), "\n")
@@ -200,7 +200,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=NEWTONresults[[i1]]$par, conditional=conditional,
                                                           constraints=constraints, parametrization=parametrization, check_params=TRUE,
                                                           to_return="loglik", minval=minval), numeric(1))
-  if(print_res == TRUE) {
+  if(print_res) {
     cat("Results from variable metric algorithm:\n")
     cat(paste("lowest value: ", round(min(loks), 3)), "\n")
     cat(paste("mean value:   ", round(mean(loks), 3)), "\n")
