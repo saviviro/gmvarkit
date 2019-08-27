@@ -9,7 +9,7 @@
 
 The goal of gmvarkit is to provide tools to analyse the Gaussian mixture
 vector autoregressive (GMVAR) model. `gmvarkit` provides functions for
-unconstrainted and constraint maximum likelihood estimation of the model
+unconstrained and constrained maximum likelihood estimation of the model
 parameters, quantile residual based model diagnostics, simulation from
 the processes, and forecasting.
 

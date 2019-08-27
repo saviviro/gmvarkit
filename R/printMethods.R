@@ -148,7 +148,7 @@ print.gmvarsum <- function(x, ..., digits) {
 #'
 #' @inheritParams plot.gmvarpred
 #' @param digits number of decimals to print
-#' @param ... currectly not used.
+#' @param ... currently not used.
 #' @examples
 #' # This example uses the data 'eurusd' which comes with the
 #' # package, but in a scaled form.
