@@ -75,6 +75,8 @@
 #' @param minval a real number defining the minimum value of the log-likelihood function that will be considered.
 #'   Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
 #'   never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.
+#' @param seed a single value, interpreted as an integer, or NULL, that sets seed for the random number generator in the beginning of
+#'   the function call. If calling \code{GAfit} from \code{fitGMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.
 #' @details
 #'    The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
 #'    It uses (slightly modified) individually adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)}
@@ -104,9 +106,10 @@
 
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ngen=200, popsize,
                   smart_mu=min(100, round(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, ar_scale=1,
-                  regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval) {
+                  regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and premilinary checks
+  set.seed(seed)
   to_return <- match.arg(to_return)
   parametrization <- match.arg(parametrization)
   check_pMd(p=p, M=M)

@@ -7,7 +7,8 @@
 fitGMVAR(data, p, M, conditional = TRUE,
   parametrization = c("intercept", "mean"), constraints = NULL,
   ncalls = round(10 + 9 * log(M)), ncores = min(2, ncalls,
-  parallel::detectCores()), maxit = 300, print_res = TRUE, ...)
+  parallel::detectCores()), maxit = 300, seeds = NULL,
+  print_res = TRUE, ...)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -37,6 +38,9 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 \item{ncores}{the number cores to be used in parallel computing.}
 
 \item{maxit}{the maximum number of iterations in the variable metric algorithm.}
+
+\item{seeds}{a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
+or \code{NULL} for not initializing the seed. Exists for creating reproducible results.}
 
 \item{print_res}{should summaries of estimation results be printed?}
 
@@ -120,8 +124,9 @@ data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
-# GMVAR(1,2) model with default settings
-fit12 <- fitGMVAR(data, p=1, M=2)
+# GMVAR(1,2) model: 10 estimation rounds with seeds set
+# for reproducibility
+fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 plot(fit12)
 summary(fit12)

@@ -9,7 +9,7 @@ GAfit(data, p, M, conditional = TRUE, parametrization = c("intercept",
   smart_mu = min(100, round(0.5 * ngen)), initpop = NULL, mu_scale,
   mu_scale2, omega_scale, ar_scale = 1, regime_force_scale = 1,
   red_criteria = c(0.05, 0.01), to_return = c("alt_ind", "best_ind"),
-  minval)
+  minval, seed = NULL)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -115,6 +115,9 @@ might have more wasted regimes? Default is \code{"alt_ind"}.}
 \item{minval}{a real number defining the minimum value of the log-likelihood function that will be considered.
 Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
 never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.}
+
+\item{seed}{a single value, interpreted as an integer, or NULL, that sets seed for the random number generator in the beginning of
+the function call. If calling \code{GAfit} from \code{fitGMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.}
 }
 \value{
 Returns estimated parameter vector which has the form described in \code{initpop}.
