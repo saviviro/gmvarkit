@@ -187,7 +187,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
     }
   }
 
-  if(ntimes == 1 & drop == TRUE) {
+  if(ntimes == 1 & drop) {
     sample <- matrix(sample, nrow=nsimu, ncol=d)
     component <- as.vector(component)
     mixing_weights <- matrix(mixing_weights, nrow=nsimu, ncol=M)

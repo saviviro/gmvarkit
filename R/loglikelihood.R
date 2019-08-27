@@ -110,7 +110,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
 
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)
-  if(check_params == TRUE) {
+  if(check_params) {
     if(!in_paramspace_int(p=p, M=M, d=d, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega)) {
       return(minval)
     }

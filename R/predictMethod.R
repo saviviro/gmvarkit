@@ -154,7 +154,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
                         pred_type=pred_type,
                         q=q_tocalc),
                    class="gmvarpred")
-  if(plot_res == TRUE) plot.gmvarpred(x=ret, nt=nt, ...)
+  if(plot_res) plot.gmvarpred(x=ret, nt=nt, ...)
   ret
 }
 

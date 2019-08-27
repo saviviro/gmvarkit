@@ -46,7 +46,7 @@ plot.gmvarpred <- function(x, ..., nt, add_grid=TRUE) {
     ts.plot(ts_dat[,j], ts_pred[,j], gpars=list(col=c("black", "blue"), lty=1:2,
                                                 ylim=c(round(min(all_val[[j]]))-1,
                                                        round(max(all_val[[j]]))+1), main=ts_names[j]))
-    if(add_grid == TRUE) grid(...)
+    if(add_grid) grid(...)
   }
 
   if(gmvarpred$pi_type == "two-sided") {

@@ -138,7 +138,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
   N <- calc_test_stat(g=g, m_dim=1, Omega=Omega)
   p_val <- 1 - pchisq(N, df=dim_g)
 
-  if(print_res == TRUE) cat(paste0("Normality test p-value: ", format_value3(p_val)), "\n\n")
+  if(print_res) cat(paste0("Normality test p-value: ", format_value3(p_val)), "\n\n")
   norm_res <- data.frame(test_stat=N, df=dim_g, p_val=p_val)
 
 
@@ -157,7 +157,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     }
   } # Returns (T - lag x dim_g) matrix with values of g_t at each row, starting from t=lag+1 at the first row
 
-  if(print_res == TRUE) cat("Autocorrelation tests:\nlags | p-value\n")
+  if(print_res) cat("Autocorrelation tests:\nlags | p-value\n")
 
   for(i1 in seq_along(lags_ac)) {
     lag <- lags_ac[i1]
@@ -172,7 +172,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     # in vectorised form and obtain their standard errors from relevant diagonal of Omega.
     ac_res$ind_stats[, paste0("lag", lag)] <- calc_ind_stats(g=g, Omega=Omega) # individual statistic divided by it's standard error
 
-    if(print_res == TRUE) print_resf(lag=lag, p_val=p_val)
+    if(print_res) print_resf(lag=lag, p_val=p_val)
     ac_res$test_results[i1, 2:4] <- c(A, dim_g, p_val)
   }
 
@@ -193,7 +193,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     }
   } # Returns (T - lag x dim_g) matrix with values of g_t at each row, starting from t=lag+1 at the first row
 
-  if(print_res == TRUE) cat("\nConditional heteroskedasticity tests:\nlags | p-value\n")
+  if(print_res) cat("\nConditional heteroskedasticity tests:\nlags | p-value\n")
 
   for(i1 in seq_along(lags_ch)) {
     lag <- lags_ch[i1]
@@ -208,7 +208,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     # in vectorised form and obtain their standard errors from relevant diagonal of Omega.
     ch_res$ind_stats[, paste0("lag", lag)] <- calc_ind_stats(g=g, Omega=Omega) # individual statistic divided by it's standard error
 
-    if(print_res == TRUE) print_resf(lag=lag, p_val=p_val)
+    if(print_res) print_resf(lag=lag, p_val=p_val)
     ch_res$test_results[i1, 2:4] <- c(H, dim_g, p_val)
   }
 

@@ -38,7 +38,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
   }
   q <- ncol(constraints)
   psi <- params[(M*d+1):(M*d+q)]
-  if(change_na==TRUE) {
+  if(change_na) {
     if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
     psi[is.na(psi)] <- -9.999
   }

@@ -46,7 +46,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
       ifelse(is.null(constraints), "no constraints", "linear constraints employed"), "\n")
   cat("\n")
 
-  if(summary_print == TRUE) {
+  if(summary_print) {
     all_boldA_eigens <- get_boldA_eigens(gmvar)
     all_omega_eigens <- get_omega_eigens(gmvar)
     cat(paste("log-likelihood:", format_value(gmvar$loglik)), "\n")
@@ -62,7 +62,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   for(m in seq_len(M)) {
     count <- 1
     cat(paste("Regime", m), "\n")
-    if(summary_print == TRUE) {
+    if(summary_print) {
       cat(paste("Modulus of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[[m]]), collapse=", ")),"\n")
       cat(paste("Cov. matrix 'Omega' eigenvalues: ", paste0(format_value(all_omega_eigens[[m]]), collapse=", ")),"\n")
     }
@@ -91,13 +91,13 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     colnames(df)[names_to_omit] <- " "
     print(df)
     cat("\n")
-    if(summary_print == TRUE) {
+    if(summary_print) {
       cat("Error term correlation matrix:\n")
       print(cov2cor(all_Omega[, , m]), digits=digits)
       cat("\n")
     }
   }
-  if(summary_print == TRUE) {
+  if(summary_print) {
     cat("Print approximate standard errors with the function 'print_std_errors'.\n")
   }
   invisible(gmvar)
