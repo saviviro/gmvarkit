@@ -15,10 +15,10 @@ unvec(d, a)
 a matrix of size \eqn{(dxd)}.
 }
 \description{
-\code{unvec} reverse operator for \code{vec()}.
+\code{unvec} reverse operator for \code{vec}.
 
 \code{unvec} forms a square matrix from a vector of
- stacked colums, stacked by \code{vec()}.
+ stacked columns, stacked by \code{vec}.
 }
 \section{Warning}{
 

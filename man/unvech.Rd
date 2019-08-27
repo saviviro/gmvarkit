@@ -2,7 +2,7 @@
 % Please edit documentation in R/matcal.R
 \name{unvech}
 \alias{unvech}
-\title{Reverse operator of the parsimonious vectorization operator \code{vech()}.}
+\title{Reverse operator of the parsimonious vectorization operator \code{vech}.}
 \usage{
 unvech(d, a)
 }

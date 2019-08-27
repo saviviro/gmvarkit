@@ -13,10 +13,10 @@ vech(A)
 a vector of size \eqn{(d(d+1)/2x1)}.
 }
 \description{
-\code{vech} stacks colums of the given matrix from main diagonal
+\code{vech} stacks columns of the given matrix from main diagonal
   downwards (including the main diagonal) to form a vector.
 
-\code{vech} stacks colums of the given matrix from
+\code{vech} stacks columns of the given matrix from
   the principal diagonal downwards (including elements on the diagonal) to form a vector.
 }
 \section{Warning}{
