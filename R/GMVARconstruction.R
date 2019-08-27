@@ -298,7 +298,7 @@ swap_parametrization <- function(gmvar) {
 #' }
 #' @export
 
-alt_gmvar <- function(gmvar, which_round=1, calc_qresiduals=TRUE, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
+alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
   stopifnot(!is.null(gmvar$all_estimates))
   stopifnot(which_round >= 1 || which_round <= length(gmvar$all_estimates))
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
