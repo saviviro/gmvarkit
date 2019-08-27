@@ -277,8 +277,8 @@ swap_parametrization <- function(gmvar) {
 #'
 #' @description \code{alt_gmvar} constructs a GMVAR model based on results from an arbitrary estimation round of \code{fitGMVAR}.
 #'
-#' @inheritParams simulateGSMAR
-#' @inheritParams GVMAR
+#' @inheritParams simulateGMVAR
+#' @inheritParams GMVAR
 #' @param which_round based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.
 #' @details It's sometimes useful to examine other estimates than the one with the highest log-likelihood value. This function
 #'   is just a simple wrapper to \code{GMVAR} that picks the correct estimates from an returned by \code{fitGMVAR}.
