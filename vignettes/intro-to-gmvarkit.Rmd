@@ -30,7 +30,7 @@ Let $y_t=(y_{1t},...,y_{dt})$, $t=1,2,...$ be the $d$-dimensional vector valued 
 $$
 y_t = \sum_{m=1}^M s_{t,m}(\mu_{m,t}+\Omega_{m}^{1/2}\varepsilon_t), \quad \varepsilon_t\sim\text{NID}(0,I_d),
 $$
-where $\Omega_{m}$ is a conditional positive definite covariance matrix, NID stands for "normally and identically distributed", and 
+where $\Omega_{m}$ is a conditional positive definite covariance matrix, NID stands for "normally and independently distributed", and 
 $$
 \mu_{m,t} = \varphi_{m,0} + \sum_{i=1}^p A_{m,i}y_{t-i}
 $$
