@@ -140,7 +140,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   parametrization <- match.arg(parametrization)
   data <- check_data(data=data, p=p)
   d <- ncol(data)
-  nobs <- nrow(data)
+  n_obs <- nrow(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
@@ -229,7 +229,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                       parametrization=parametrization, constraints=constraints,
                                       to_return="mw", check_params=TRUE, minval=NULL)
-  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*nobs, logical(1)))) {
+  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
     message("At least one of the mixture components in the estimated model seems to be wasted!")
   }
 

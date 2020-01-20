@@ -1,7 +1,7 @@
-#' @title Genetic algorithm for preliminary estimation of GMVAR model
+#' @title Genetic algorithm for preliminary estimation of a GMVAR model
 #'
-#' @description \code{GAfit} estimates specified GMVAR model using genetic algorithm. It's designed to find
-#'   starting values for gradient based methods.
+#' @description \code{GAfit} estimates the specified GMVAR model using a genetic algorithm.
+#'   It's designed to find starting values for gradient based methods.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams random_covmat
@@ -37,55 +37,61 @@
 #'       }
 #'     }
 #'   }
-#'   Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component and
-#'   \eqn{\alpha_{m}} is the mixing weight parameter.
-#'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
+#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
+#'   the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
+#'   mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
+#'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with the regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
+#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} which introduces
+#'   the GMVAR model.
 #' @param mu_scale a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 #'   mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
-#'   mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}, but
-#'   input (in \code{initpop}) and output (return value) parameter vectors may be intercept-parametrized.
+#'   mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}.
+#'   However, input (in \code{initpop}) and output (return value) parameter vectors can be intercept-parametrized.
 #' @param mu_scale2 a size \eqn{(dx1)} strictly positive vector defining \strong{standard deviations} of the normal
 #'   distributions from which each mean parameter \eqn{\mu_{m}} is drawn from in random mutations.
 #'   Default is \code{2*sd(data[,i]), i=1,..,d}.
 #' @param omega_scale a size \eqn{(dx1)} strictly positive vector specifying the scale and variability of the
-#'   random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart distribution.
-#'   Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard deviations
-#'   of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
+#'   random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart
+#'   distribution. Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard
+#'   deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 #'   and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 #'   Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 #'   \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.
-#' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in some random
-#'   mutations. See function \code{random_coefmats2} for details. This is ignored when estimating constrained models.
+#' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in
+#'   some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
+#'   constrained models.
 #' @param regime_force_scale a non-negative real number specifying how much should natural selection favour individuals
-#'   with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large number
-#'   for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the parameter space where some
-#'   regimes are wasted, but with too much favouring the best genes might never mix into the population and the algorithm might
-#'   converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving probabilities for individuals with no wasted
-#'   regimes compared to individuals with one wasted regime. Number \code{2} would give \eqn{3x} larger probabilities etc.
-#' @param red_criteria a length 2 numeric vector specifying the criteria that is used to determine whether a regime is redundant or not.
-#'   Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will be considered "redundant".
-#'   One should be careful when adjusting this argument.
-#' @param to_return should the genetic algorithm return the best fitting individual which has "positive enough" mixing weights
-#'   for as much regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood in general (\code{"best_ind"}), but
-#'   might have more wasted regimes? Default is \code{"alt_ind"}.
+#'   with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large
+#'   number for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the
+#'   parameter space where some regimes are wasted, but with too much favouring the best genes might never mix into
+#'   the population and the algorithm might converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving
+#'   probability weights for individuals with no wasted regimes compared to individuals with one wasted regime.
+#'   Number \code{2} would give \eqn{3x} larger probability weights etc.
+#' @param red_criteria a length 2 numeric vector specifying the criteria that is used to determine whether a regime is
+#'   redundant (or "wasted") or not.
+#'   Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will
+#'   be considered "redundant". One should be careful when adjusting this argument (set \code{c(0, 0)} to fully disable
+#'   the 'redundant regime' features from the algorithm).
+#' @param to_return should the genetic algorithm return the best fitting individual which has "positive enough" mixing
+#'   weights for as many regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood
+#'   in general (\code{"best_ind"}) but might have more wasted regimes?
 #' @param minval a real number defining the minimum value of the log-likelihood function that will be considered.
 #'   Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
 #'   never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.
 #' @param seed a single value, interpreted as an integer, or NULL, that sets seed for the random number generator in the beginning of
 #'   the function call. If calling \code{GAfit} from \code{fitGMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.
 #' @details
-#'    The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
-#'    It uses (slightly modified) individually adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)}
-#'    and employs (50\%) fitness inheritance discussed by \emph{Smith, Dike and Stegmann (1995)}.
+#'  The core of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
+#'  It utilizes a slightly modified version of the individually adaptive crossover and mutation rates described
+#'  by \emph{Patnaik and Srinivas (1994)} and employs (50\%) fitness inheritance discussed by
+#'  \emph{Smith, Dike and Stegmann (1995)}.
 #'
-#'    By "redundant" or "unidentified" regimes we mean regimes that have the time varying mixing weights basically at zero for all t.
-#'    The model would have the same log-likelihood value without redundant regimes and there is no purpose to have redundant regime in
-#'    the model.
-#' @return Returns estimated parameter vector which has the form described in \code{initpop}.
+#'  By "redundant" or "wasted" regimes we mean regimes that have the time varying mixing weights practically at
+#'  zero for almost all t. A model including redundant regimes would have about the same log-likelihood value without
+#'  the redundant regimes and there is no purpose to have redundant regimes in a model.
+#' @return Returns the estimated parameter vector which has the form described in \code{initpop}.
 #' @references
 #'  \itemize{
 #'    \item Ansley C.F., Kohn R. 1986. A note on reparameterizing a vector autoregressive
@@ -127,7 +133,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     stop("The population size popsize must be even positive integer")
   }
   if(missing(minval)) {
-    minval <- -(10^(ceiling(log10(n_obs)) + d) - 1)
+    minval <- get_minval(data)
   } else if(!is.numeric(minval)) {
     stop("Argument minval must be numeric")
   }
@@ -153,14 +159,32 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     stop("regime_force_scale should be non-negative real number")
   }
 
-  # Initial population
+  # The initial population
   if(is.null(initpop)) {
-    if(is.null(constraints)) {
-      G <- replicate(popsize, random_ind2(p=p, M=M, d=d, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale, ar_scale=ar_scale))
-    } else {
-      G <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale))
+    nattempts <- 20
+    G <- numeric(0)
+    for(i1 in 1:nattempts) {
+      if(is.null(constraints)) {
+        inds <- replicate(popsize, random_ind2(p=p, M=M, d=d, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale, ar_scale=ar_scale))
+      } else {
+        inds <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale))
+      }
+      ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2], condition=conditional,
+                                                                   parametrization="mean", constraints=constraints,
+                                                                   check_params=TRUE, to_return="loglik", minval=minval),numeric(1))
+      G <- cbind(G, inds[, ind_loks > minval]) # Take good enough individuals
+      if(ncol(G) >= popsize) {
+        G <- G[, 1:popsize]
+        break
+      } else if(i1 == nattempts) {
+        if(length(G) == 0) {
+          stop("Failed to create initial population with good enough individuals. Consider setting up the initial population by hand using the argument 'initpop' of the function 'GAfit'.")
+        } else {
+          G <- G[sample.int(ncol(G), size=popsize, replace=TRUE)]
+        }
+      }
     }
-  } else {
+  } else { # Initial population set by the user
     stopifnot(is.list(initpop))
     for(i1 in 1:length(initpop)) {
       ind <- initpop[[i1]]
@@ -217,7 +241,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         which_inherit <- numeric(0)
       }
       # survivor_liks holds the parent loglikelihood values: for odd number they are (index, index+1) and for even (index-1, index)
-      if(length(which_inherit) > 0 & abs(max_lik - avg_lik) > abs(0.03*avg_lik)) { # No inheritance if massive mutations
+      if(length(which_inherit) > 0 & abs(max_lik - mean_lik) > abs(0.03*mean_lik)) { # No inheritance if massive mutations
         for(i2 in which_inherit) {
           if(i2 %% 2 == 0) {
             logliks[i1, i2] <- ((npars - I2[i2])/npars)*survivor_liks[i2-1] + (I2[i2]/npars)*survivor_liks[i2]
@@ -248,37 +272,42 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
          }
       }
     }
+
+    # Take care of individuals that are not good enough + calculate the numbers redudant regimes
     logliks[i1, which(logliks[i1,] < minval)] <- minval
     redundants[i1, which(logliks[i1,] <= minval)] <- M
 
-    # Calculate choosing probabilities
+
+    ## Natural selection and the reproduction pool ##
     if(length(unique(logliks[i1,])) == 1) {
-      choosing_probs <- rep(1, popsize)
+      choosing_probs <- rep(1, popsize) # If all individuals are the same, the surviving probability weight is 1.
     } else {
       T_values <- logliks[i1,] + abs(min(logliks[i1,])) # Function T as described by Dorsey R. E. ja Mayer W. J., 1995
       T_values <- T_values/(1 + regime_force_scale*redundants[i1,]) # Favor individuals with least number of redundant regimes
-      choosing_probs <- T_values/sum(T_values)
+      choosing_probs <- T_values/sum(T_values) # The surviving probability weights
     }
 
-    # Draw popsize individuals "with put back" and form the reproduction pool+
+    # Draw popsize individuals "with put back" and form the reproduction pool H.
     survivors <- sample(1:popsize, size=popsize, replace=TRUE, prob=choosing_probs)
     H <- G[,survivors]
 
-    # Calculate avg and max log-likelihood of the survivors
+    # Calculate mean and max log-likelihood of the survivors
     survivor_liks <- logliks[i1, survivors]
     survivor_redundants <- redundants[i1, survivors]
     max_lik <- max(survivor_liks)
-    avg_lik <- mean(survivor_liks)
-    if(max_lik == avg_lik) avg_lik <- avg_lik + 0.5
+    mean_lik <- mean(survivor_liks)
+    if(max_lik == mean_lik) mean_lik <- mean_lik + 0.1 # We avoid dividing by zero when all the individuals are the same
 
-    # Individually adaptive cross-over rates, Patnaik and Srinivas (1994) * "extra CO" 0.4
-    indeces <- seq(1, popsize-1, by=2)
+    ## Cross-overs ##
+    # Individually adaptive cross-over rates as described by Patnaik and Srinivas (1994) with the modification of
+    # setting the crossover rate to be at least 0.4 for all individuals (so that the best genes mix in the population too).
+    indeces <- seq(1, popsize - 1, by=2)
     parent_max <- vapply(indeces, function(i2) max(survivor_liks[i2], survivor_liks[i2+1]), numeric(1))
-    co_rates <- vapply(1:length(indeces), function(i2) max(min((max_lik - parent_max[i2])/(max_lik - avg_lik), 1), 0.4), numeric(1))
+    co_rates <- vapply(1:length(indeces), function(i2) max(min((max_lik - parent_max[i2])/(max_lik - mean_lik), 1), 0.4), numeric(1))
 
     # Do the crossovers
     which_co <- rbinom(n=popsize/2, size=1, prob=co_rates)
-    I <- round(runif(n=popsize/2, min=0.5 + 1e-16, max=npars - 0.5 - 1e-16))
+    I <- round(runif(n=popsize/2, min=0.5 + 1e-16, max=npars - 0.5 - 1e-16)) # Break points
     H2 <- vapply(1:(popsize/2), function(i2) {
             i3 <- indeces[i2]
             if(which_co[i2] == 1) {
@@ -297,30 +326,32 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                                  constraints=constraints, to_return="mw", check_params=FALSE, minval=minval)
     which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1))) # Which regimes are wasted
 
-    # Keep track of "alternative best individual" that has less reduntant regimes than the current one (after the algorithm finds one)
+    # Keep track of "the alternative best individual" that has (weakly) less reduntant regimes than the current best one.
     if(length(which_redundant) <= length(which_redundant_alt)) {
       alt_ind <- best_ind
       which_redundant_alt <- which_redundant
     }
 
-    # Individually adaptive mutation rates, Patnaik and Srinivas (1994)
+
+    ## Mutations ##
     which_not_co <- rep(1 - which_co, each=2)
-    if(abs(max_lik - avg_lik) <= abs(0.03*avg_lik)) {
+    if(abs(max_lik - mean_lik) <= abs(0.03*mean_lik)) {
       mu_rates <- rep(0.7, popsize) # Massive mutations if converging
     } else {
-      mu_rates <- 0.5*vapply(1:popsize, function(i2) min(which_not_co[i2], (max_lik - survivor_liks[i2])/(max_lik - avg_lik)), numeric(1))
+      # Individually adaptive mutation rates, Patnaik and Srinivas (1994); we only mutate those who did not crossover.
+      mu_rates <- 0.5*vapply(1:popsize, function(i2) min(which_not_co[i2], (max_lik - survivor_liks[i2])/(max_lik - mean_lik)), numeric(1))
     }
 
     # Do mutations and keep track if they are stationary for sure
     mutate <- rbinom(n=popsize, size=1, prob=mu_rates)
     which_mutate <- which(mutate == 1)
     if(i1 <= smart_mu & length(which_mutate) >= 1) { # Random mutations
-      if(!is.null(constraints) | runif(1) > 0.5) { # Normal
+      if(!is.null(constraints) | runif(1) > 0.5) { # Regular, can be nonstationary
         stat_mu <- FALSE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
                                                                                    mu_scale=mu_scale, mu_scale2=mu_scale2,
                                                                                    omega_scale=omega_scale), numeric(npars))
-      } else { # Stationary by algorithm (slower), Ansley and Kohn (1986)
+      } else { # For stationarity with algorithm (slower), Ansley and Kohn (1986)
         stat_mu <- TRUE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M, d=d, mu_scale=mu_scale,
                                                                                     mu_scale2=mu_scale2, omega_scale=omega_scale,
@@ -343,38 +374,52 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       # Mutating accuracy
       accuracy <- abs(rnorm(length(which_mutate), mean=10, sd=15))
 
-      if(!is.null(constraints) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) { # No regime combining with constrained models
-        # Smart mutations close to alt_ind
+      ## 'Smart mutation': mutate close to a well fitting individual. We obviously don't mutate close to
+      # redundant regimes but draw them at random ('rand_to_use' in what follows).
+      if(!is.null(constraints) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) {
+        # The first option for smart mutations: smart mutate to 'alt_ind' which is the best fitting individual
+        # with least redundant regimes.
+        # Note that best_ind == alt_ind when length(which_redundant) <= length(which_redundant_alt).
         ind_to_use <- alt_ind
         rand_to_use <- which_redundant_alt
       } else {
-        # Change redundant regime of best_ind to be non-redundant regime of alt_ind to form the individual used in smart mutations
+        # Alternatively, if there exists an alternative individual with strictly less redundant regimes
+        # than in the best_ind, a "regime combining procedure" might take place: take a redundant regime
+        # of the best_ind and replace it with a nonredundant regime taken from alt_ind. Then do smart
+        # mutation close to this new individual. For simplicity, regime combining is not considered for
+        # models imposing linear constraints.
+
+        # We want to take such nonredundant regime from alt_ind that is not similar to the nonredundant
+        # regimes of best_ind. In order to choose such regime, we compare all nonredundant regimes of
+        # best_ind to all nonredundant regimes of alt_ind. Then, we choose the nonredundant regime of
+        # alt_ind which has the largest "distance" to the closest regime of best_ind.
+
         # Choose regime of best_ind to be changed
         which_to_change <- which_redundant[1]
 
-        # Pick non_redundant regimes of best_ind and of alt_ind
+        # Pick the nonredundant regimes of best_ind and alt_ind
         non_red_regs_best <- vapply((1:M)[-which_redundant], function(i2) pick_regime(p=p, M=M, d=d, params=best_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
-        if(length(which_redundant_alt) == 0) {
+        if(length(which_redundant_alt) == 0) { # Special case for techinal reasons
           non_red_regs_alt <- vapply(1:M, function(i2) pick_regime(p=p, M=M, d=d, params=alt_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
         } else {
           non_red_regs_alt <- vapply((1:M)[-which_redundant_alt], function(i2) pick_regime(p=p, M=M, d=d, params=alt_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
         }
 
-        # Calculate "distances" between the considered regimes
+        # Calculate the "distances" between the nonredundant regimes
         dist_to_regime <- matrix(nrow=ncol(non_red_regs_best), ncol=ncol(non_red_regs_alt)) # Row for each non-red-reg-best and column for each non-red-reg-alt.
         for(i2 in 1:nrow(dist_to_regime)) {
           dist_to_regime[i2,] <- vapply(1:ncol(non_red_regs_alt), function(i3) regime_distance(regime_pars1=non_red_regs_best[,i2],
                                                                                                regime_pars2=non_red_regs_alt[,i3]), numeric(1))
         }
 
-        # Which alt_ind regime, i.e. column should be used? Choose the one that with largest distance to avoid dublicating similar regimes
-        reg_to_use <- non_red_regs_alt[,which(colMeans(dist_to_regime) == max(colMeans(dist_to_regime)))]
+        # Which alt_ind regime, i.e. column should be used? Choose the one that with largest distance to the closest regime avoid dublicating similar regimes
+        reg_to_use <- non_red_regs_alt[,which(apply(dist_to_regime, 2, min) == max(apply(dist_to_regime, 2, min)))[1]]
 
         # Change the chosen regime of best_ind to be the one chosen from alt_ind
         ind_to_use <- change_regime(p=p, M=M, d=d, params=best_ind, m=which_to_change, regime_pars=reg_to_use)
 
         # Should some regimes still be random?
-        rand_to_use <- which_redundant[-which_to_change]
+        rand_to_use <- which_redundant[which_redundant != which_to_change]
       }
 
       # Smart mutations
@@ -384,7 +429,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                                                                                  omega_scale=omega_scale, ar_scale=ar_scale), numeric(npars))
     }
 
-    # Sort components by mixing weight parameters. No sorting if constraints are employed.
+    # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
     if(is.null(constraints)) {
       H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M, d=d, params=H2[,i2]), numeric(npars))
     }
