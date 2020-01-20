@@ -1,4 +1,0 @@
-# gmvarkit 1.1.0
-
-* Added a `NEWS.md` file to track changes to the package.
-* Increased numerical tolerance for considering models to be stationary
