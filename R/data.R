@@ -3,7 +3,7 @@
 #' A dataset containing time series of the difference between the monthly Euro area and U.S.
 #' long-term government bond yields and monthly average Euro - U.S. dollar exchange rate. The data
 #' covers the time period January 1989 - December 2009 with monthly frequency. This is the same data
-#' (in non-scaled form) that was used by Kalliovirta et. al. (2016).
+#' (in non-scaled form) that is used by Kalliovirta et. al. (2016).
 #'
 #' @format A numeric matrix of class \code{'ts'} with 252 rows and 2 columns with one time series in each column:
 #' \describe{

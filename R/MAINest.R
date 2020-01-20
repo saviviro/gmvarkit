@@ -38,7 +38,7 @@
 #'   The estimated parameter vector can be obtained at \code{gmvar$params} (and corresponding approximate standard errors
 #'   at \code{gmvar$std_errors}) and it is...
 #'   \describe{
-#'     \item{\strong{Regular models:}}{
+#'     \item{\strong{Unconstrained models:}}{
 #'       a size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} vector that has form
 #'       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
 #'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
@@ -73,7 +73,7 @@
 #' @section S3 methods:
 #'   The following S3 methods are supported for class \code{'gmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
 #'    \code{predict} and \code{plot}.
-#' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}},
+#' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
 #'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}
 #' @references
@@ -125,7 +125,7 @@
 #' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
 #'  nrow=2*2^2, byrow=FALSE)
 #' C_mat2 <- rbind(tmp, tmp)
-#' fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2, ncalls=10)
+#' fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2)
 #' fit22c2
 #' }
 #' @export
@@ -261,7 +261,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #'   around the function \code{optim} from the package \code{stats} and \code{GMVAR} from the package
 #'   \code{gmvarkit}.
 #' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}, \code{\link{profile_logliks}}
 #' @inherit GMVAR references
 #' @examples
 #' \donttest{

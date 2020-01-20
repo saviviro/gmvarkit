@@ -16,7 +16,7 @@
 #' @param initpop a list of parameter vectors from which the initial population of the genetic algorithm
 #'   will be generated from. The parameter vectors should be...
 #'   \describe{
-#'     \item{\strong{For regular models:}}{
+#'     \item{\strong{For unconstrained models:}}{
 #'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form
 #'       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
 #'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:

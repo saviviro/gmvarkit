@@ -15,6 +15,7 @@
 #'   the found estimates denote a (local) maximum point, a saddle point or something else.
 #' @return Gradient functions return numerical approximation of the gradient, and Hessian functions return
 #'   numerical approximation of the Hessian. \code{get_soc} returns eigenvalues of the Hessian matrix.
+#' @seealso \code{\link{profile_logliks}}
 #' @section Warning:
 #'   No argument checks!
 #' @examples
