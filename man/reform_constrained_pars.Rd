@@ -4,15 +4,14 @@
 \alias{reform_constrained_pars}
 \title{Reform constrained parameter vector into the "standard" form}
 \usage{
-reform_constrained_pars(p, M, d, params, constraints = NULL,
-  change_na = FALSE)
+reform_constrained_pars(p, M, d, params, constraints = NULL, change_na = FALSE)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
 \describe{

@@ -11,7 +11,7 @@ form_boldA(p, M, d, all_A)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{all_A}{4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.}
 }

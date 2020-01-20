@@ -4,9 +4,15 @@
 \alias{cond_moments}
 \title{Compute conditional moments of a GMVAR model}
 \usage{
-cond_moments(data, p, M, params, parametrization = c("intercept",
-  "mean"), constraints = NULL, to_return = c("regime_cmeans",
-  "total_cmeans", "total_ccovs"))
+cond_moments(
+  data,
+  p,
+  M,
+  params,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  to_return = c("regime_cmeans", "total_cmeans", "total_ccovs")
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -102,8 +108,9 @@ cond_moments(data=data, p=2, M=2, params=params222, parametrization="mean",
  }
 }
 \seealso{
-Other moment functions: \code{\link{get_regime_autocovs}},
-  \code{\link{get_regime_means}},
-  \code{\link{uncond_moments}}
+Other moment functions: 
+\code{\link{get_regime_autocovs}()},
+\code{\link{get_regime_means}()},
+\code{\link{uncond_moments}()}
 }
 \concept{moment functions}

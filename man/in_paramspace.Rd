@@ -11,7 +11,7 @@ in_paramspace(p, M, d, params, constraints = NULL)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
 \describe{
@@ -54,10 +54,11 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 }
 \value{
-Returns \code{TRUE} if the given parameter vector lies in the parameter space and \code{FALSE} otherwise.
+Returns \code{TRUE} if the given parameter vector lies in the parameter space
+ and \code{FALSE} otherwise.
 }
 \description{
-\code{in_paramspace} checks whether the given parameter vector belongs to
+\code{in_paramspace} checks whether the given parameter vector lies in
   the parameter space or not. Does NOT consider the identifiability condition!
 }
 \examples{

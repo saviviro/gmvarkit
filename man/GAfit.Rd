@@ -4,12 +4,27 @@
 \alias{GAfit}
 \title{Genetic algorithm for preliminary estimation of GMVAR model}
 \usage{
-GAfit(data, p, M, conditional = TRUE, parametrization = c("intercept",
-  "mean"), constraints = NULL, ngen = 200, popsize,
-  smart_mu = min(100, round(0.5 * ngen)), initpop = NULL, mu_scale,
-  mu_scale2, omega_scale, ar_scale = 1, regime_force_scale = 1,
-  red_criteria = c(0.05, 0.01), to_return = c("alt_ind", "best_ind"),
-  minval, seed = NULL)
+GAfit(
+  data,
+  p,
+  M,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  ngen = 200,
+  popsize,
+  smart_mu = min(100, round(0.5 * ngen)),
+  initpop = NULL,
+  mu_scale,
+  mu_scale2,
+  omega_scale,
+  ar_scale = 1,
+  regime_force_scale = 1,
+  red_criteria = c(0.05, 0.01),
+  to_return = c("alt_ind", "best_ind"),
+  minval,
+  seed = NULL
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

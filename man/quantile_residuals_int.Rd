@@ -4,8 +4,15 @@
 \alias{quantile_residuals_int}
 \title{Calculate multivariate quantile residuals of GMVAR model}
 \usage{
-quantile_residuals_int(data, p, M, params, conditional, parametrization,
-  constraints)
+quantile_residuals_int(
+  data,
+  p,
+  M,
+  params,
+  conditional,
+  parametrization,
+  constraints
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

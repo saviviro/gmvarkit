@@ -4,8 +4,17 @@
 \alias{get_test_Omega}
 \title{Compute covariance matrix Omega used in quantile residual tests}
 \usage{
-get_test_Omega(data, p, M, params, conditional, parametrization,
-  constraints, g, dim_g)
+get_test_Omega(
+  data,
+  p,
+  M,
+  params,
+  conditional,
+  parametrization,
+  constraints,
+  g,
+  dim_g
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

@@ -11,7 +11,7 @@ check_constraints(p, M, d, constraints = NULL)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form
@@ -27,7 +27,7 @@ Checks the constraint matrix \strong{C} and throws an error
   if something is wrong.
 }
 \description{
-\code{check_constraints} checks that the constraints are correctly set
+\code{check_constraints} checks that the constraints are correctly set.
 }
 \details{
 If \code{is.null(constraints)}, then this function doesn't do anything.

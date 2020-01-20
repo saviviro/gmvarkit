@@ -11,7 +11,7 @@ random_ind2(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale = 1)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that

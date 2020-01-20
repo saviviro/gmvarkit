@@ -1,9 +1,9 @@
-#' @title Check the stationary condition of given GMVAR model
+#' @title Check the stationary condition of a given GMVAR model
 #'
-#' @description \code{is_stationary} checks the stationarity condition of GMVAR model.
+#' @description \code{is_stationary} checks the stationarity condition of a GMVAR model.
 #'
 #' @inheritParams loglikelihood_int
-#' @param d number of time series in the system.
+#' @param d the number of time series in the system.
 #' @param params  a real valued vector specifying the parameter values. Should be size
 #'   \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
 #'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
@@ -12,16 +12,17 @@
 #'         \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
 #'         \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
 #'       }
-#'   Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component and \eqn{\alpha_{m}} is the
-#'   mixing weight parameter.
+#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
+#'   the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
+#'   mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
+#'
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notations are in line with the cited article by KMS (2016).
+#'   The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
 #' @param all_boldA 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
 #'   obtained from \code{form_boldA}. Will be computed if not given.
-#' @param tolerance Returns false if modulus of any eigenvalue is larger or equal to \code{1-tolerance}.
+#' @param tolerance Returns \code{FALSE} if modulus of any eigenvalue is larger or equal to \code{1-tolerance}.
 #' @return Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. Based on the argument \code{tolerance},
 #'   \code{is_stationary} may return \code{FALSE} when the parameter vector is in the stationarity region, but
 #'   very close to the boundary (this is used to ensure numerical stability in estimation of the model parameters).
@@ -59,7 +60,7 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, tolerance=1e-3) {
 #' @param alphas (Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
 #' @param all_Omega 3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.
 #' @return Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.
-#'   Does NOT consider the identifiability condition!
+#'   This function does NOT consider the identifiability condition!
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -85,12 +86,13 @@ in_paramspace_int <- function(p, M, d, all_boldA, alphas, all_Omega) {
 
 #' @title Determine whether the parameter vector lies in the parameter space or not
 #'
-#' @description \code{in_paramspace} checks whether the given parameter vector belongs to
+#' @description \code{in_paramspace} checks whether the given parameter vector lies in
 #'   the parameter space or not. Does NOT consider the identifiability condition!
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
-#' @return Returns \code{TRUE} if the given parameter vector lies in the parameter space and \code{FALSE} otherwise.
+#' @return Returns \code{TRUE} if the given parameter vector lies in the parameter space
+#'  and \code{FALSE} otherwise.
 #' @inherit in_paramspace_int references
 #' @examples
 #' # GMVAR(1,1), d=2 model:
@@ -126,10 +128,10 @@ in_paramspace <- function(p, M, d, params, constraints=NULL) {
 }
 
 
-#' @title Check that the given parameter vector satisfies model assumptions
+#' @title Check that the given parameter vector satisfies the model assumptions
 #'
 #' @description \code{check_parameters} checks whether the given parameter vector satisfies
-#'   the model assumptions or not. Does NOT consider the identifiability condition!
+#'   the model assumptions. Does NOT consider the identifiability condition!
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
@@ -187,7 +189,7 @@ check_parameters <- function(p, M, d, params, constraints=NULL) {
 
 #' @title Check the constraint matrix has the correct form
 #'
-#' @description \code{check_constraints} checks that the constraints are correctly set
+#' @description \code{check_constraints} checks that the constraints are correctly set.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
@@ -212,7 +214,7 @@ check_constraints <- function(p, M, d, constraints=NULL) {
 
 #' @title Calculate the number of parameters in GMVAR model parameter vector
 #'
-#' @description \code{n_params} calculates the number of parameters in the model
+#' @description \code{n_params} calculates the number of parameters in the model.
 #'
 #' @inheritParams check_parameters
 #' @return Returns the number of parameters in parameter vector of the specified GMVAR model.
@@ -227,7 +229,7 @@ n_params <- function(p, M, d, constraints=NULL) {
 
 #' @title Check the data is in the correct form
 #'
-#' @description \code{check_data} checks the data
+#' @description \code{check_data} checks the data.
 #'
 #' @inheritParams loglikelihood_int
 #' @return Checks the data and tries to correct it. Throws an error if something is wrong and
@@ -243,13 +245,13 @@ check_data <- function(data, p) {
     if(anyNA(data)) stop("The data contains NA values!")
     if(!is.numeric(data)) stop("The data must be numeric!")
     if(ncol(data) < 2) stop("The data matrix must contain at least two columns! For univariate analysis use the package 'uGMAR'.")
-    if(nrow(data) < p+1) stop("The data must contain at least p+1 observations!")
+    if(nrow(data) < p + 1) stop("The data must contain at least p+1 observations!")
   }
   data
 }
 
 
-#' @title Check whether all arguments are positive scalar whole numbers
+#' @title Check whether all arguments are positive integers
 #'
 #' @description \code{all_pos_ints} checks whether all the elements in a vector
 #'   are positive integers.
@@ -262,9 +264,9 @@ all_pos_ints <- function(x) {
 }
 
 
-#' @title Check that p, M and d are correctly set
+#' @title Check that p, M, and d are correctly set
 #'
-#' @description \code{check_pMd} checks the arguments p, M and d.
+#' @description \code{check_pMd} checks the arguments p, M, and d.
 #'
 #' @inheritParams is_stationary
 #' @return Throws an error if something is wrong.
@@ -290,16 +292,16 @@ check_pMd <- function(p, M, d) {
 #' @return Throws an error if the object doesn't have the class attribute "gmvar".
 
 check_gmvar <- function(object) {
-  if(!any(class(object) == "gmvar")) stop("The object has to be 'gmvar', typically created by function GMVAR() or fitGMVAR()")
+  if(!any(class(object) == "gmvar")) stop("The object has to be of class 'gmvar', typically created with function 'GMVAR' or 'fitGMVAR'")
 }
 
 
 #' @title Checks whether the given object contains data or not
 #'
-#' @description \code{check_null_data} checks that the gmvar-object has data
+#' @description \code{check_null_data} checks that the gmvar object has data.
 #'
 #' @inheritParams simulateGMVAR
-#' @return Throws an error if is.null(gmvar$data)
+#' @return Throws an error if is.null(gmvar$data).
 
 check_null_data <- function(gmvar) {
   if(is.null(gmvar$data)) stop("The model has to contain data! Data can be added with the function 'add_data'")

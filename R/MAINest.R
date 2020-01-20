@@ -1,34 +1,37 @@
-#' @title Two-phase maximum likelihood estimation of GMVAR model
+#' @title Two-phase maximum likelihood estimation of a GMVAR model
 #'
-#' @description \code{fitGMVAR} estimates GMVAR model in two phases: in the first phase it uses genetic algorithm
-#'   to find starting values for gradient based variable metric algorithm, which it then uses to finalize the estimation in the second
-#'   phase. Parallel computing is used to perform multiple rounds of estimations in parallel.
+#' @description \code{fitGMVAR} estimates a GMVAR model in two phases: in the first phase it uses a genetic algorithm
+#'   to find starting values for a gradient based variable metric algorithm, which it then uses to finalize the
+#'   estimation in the second phase. Parallel computing is utilized to perform multiple rounds of estimations in parallel.
 #'
 #' @inheritParams GAfit
 #' @param ncalls the number of estimation rounds that should be performed.
-#' @param ncores the number cores to be used in parallel computing.
+#' @param ncores the number CPU cores to be used in parallel computing.
 #' @param maxit the maximum number of iterations in the variable metric algorithm.
 #' @param seeds a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
-#'   or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
+#'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
 #' @param print_res should summaries of estimation results be printed?
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
-#'    Because of complexity and multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
-#'    algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in some local maximum
-#'    point instead. Therefore a number of estimation rounds is required for reliable results. Because of the nature of the model,
-#'    the estimation may fail especially in the cases where the number of mixture components is chosen too large.
+#'  Because of complexity and multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
+#'  algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in
+#'  some local maximum point instead. Therefore a number of estimation rounds is required for reliable results. Because
+#'  of the nature of the model, the estimation may fail especially in the cases where the number of mixture components
+#'  is chosen too large.
 #'
-#'    Overall the estimation process is computationally heavy and it might take considerably long time for large models with
-#'    large number of observations. If the iteration limit \code{maxit} in the variable metric algorithm is reached, one can continue
-#'    the estimation by iterating more with the function \code{iterate_more}.
+#'  The estimation process is computationally heavy and it might take considerably long time for large models with
+#'  large number of observations. If the iteration limit \code{maxit} in the variable metric algorithm is reached,
+#'  one can continue the estimation by iterating more with the function \code{iterate_more}. Alternatively, one may
+#'  use the found estimates as starting values for the genetic algorithm and and employ another round of estimation.
 #'
-#'    The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}, but it includes some extra
-#'    functionality designed for this particular estimation problem. The genetic algorithm uses (slightly modified) individually
-#'    adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)} and employs (50\%) fitness
-#'    inheritance discussed by \emph{Smith, Dike and Stegmann (1995)}.
+#'  The code of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)} but it
+#'  includes some extra features that were found useful for this particular estimation problem. For instance,
+#'  the genetic algorithm uses a slightly modified version of the individually adaptive crossover and mutation
+#'  rates descriped by \emph{Patnaik and Srinivas (1994)} and employs (50\%) fitness inheritance discussed
+#'  by \emph{Smith, Dike and Stegmann (1995)}.
 #'
-#'    The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
-#'    from the package \code{stats}.
+#'  The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
+#'  from the package \code{stats}.
 #' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Multivariate quantile residuals
 #'   (Kalliovirta and Saikkonen 2010) are also computed and included in the returned object. In addition, the returned
 #'   object contains the estimates and log-likelihood values from all the estimation rounds performed.
@@ -56,13 +59,14 @@
 #'       }
 #'     }
 #'   }
-#'   Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component and
-#'   \eqn{\alpha_{m}} is the mixing weight parameter.
+#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
+#'   the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
+#'   mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
-#'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
-#'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
+#'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks
+#'   columns of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
+#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} which introduces
+#'   the GMVAR model.
 #'
 #'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
@@ -104,7 +108,8 @@
 #' summary(fit12)
 #'
 #' # GMVAR(2,2) model with mean parametrization
-#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean")
+#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+#'                   ncalls=16, seeds=11:26)
 #' fit22
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
@@ -130,16 +135,16 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
                      ncores=min(2, ncalls, parallel::detectCores()), maxit=300, seeds=NULL, print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())
+  if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
   if(!is.null(seeds) && length(seeds) != ncalls) stop("The argument 'seeds' needs be NULL or a vector of length 'ncalls'")
   parametrization <- match.arg(parametrization)
-  if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores and maxit must be positive integers")
   data <- check_data(data=data, p=p)
   d <- ncol(data)
-  n_obs <- nrow(data)
+  nobs <- nrow(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
-  minval <- ifelse(is.null(dot_params$minval), -(10^(ceiling(log10(n_obs)) + d) - 1), dot_params$minval)
+  minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
   red_criteria <- ifelse(rep(is.null(dot_params$red_criteria), 2), c(0.05, 0.01), dot_params$red_criteria)
 
   if(ncores > parallel::detectCores()) {
@@ -152,12 +157,12 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   }
   cat(paste("Using", ncores, "cores for", ncalls, "estimations rounds..."), "\n")
 
-  ### Genetic algorithm optimization ###
+  ### Optimization with the genetic algorithm ###
   cl <- parallel::makeCluster(ncores)
   parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
-  cat("Optimizing with genetic algorithm...", "\n")
+  cat("Optimizing with the genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
                                                               constraints=constraints, seed=seeds[i1], ...), cl=cl)
   parallel::stopCluster(cl=cl)
@@ -167,14 +172,18 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
                                                           check_params=TRUE, to_return="loglik", minval=minval), numeric(1))
 
   if(print_res) {
-    cat("Results from genetic algorithm:", "\n")
-    cat(paste("lowest value: ", round(min(loks), 3)), "\n")
-    cat(paste("mean value:   ", round(mean(loks), 3)), "\n")
-    cat(paste("largest value:", round(max(loks), 3)), "\n")
+    print_loks <- function() {
+      printfun <- function(txt, FUN) cat(paste(txt, round(FUN(loks), 3)), "\n")
+      printfun("The lowest loglik: ", min)
+      printfun("The mean loglik:   ", mean)
+      printfun("The largest loglik:", max)
+    }
+    cat("Results from genetic algorithm:\n")
+    print_loks()
   }
 
 
-  ### Variable metric algorithm optimization ###
+  ### Optimization with the variable metric algorithm###
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
                                constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval), error=function(e) minval)
@@ -192,7 +201,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   cat("Optimizing with variable metric algorithm...\n")
   NEWTONresults <- pbapply::pblapply(1:ncalls, function(i1) optim(par=GAresults[[i1]], fn=loglik_fn, gr=loglik_grad, method=c("BFGS"),
-                                                                   control=list(fnscale=-1, maxit=maxit)), cl=cl)
+                                                                  control=list(fnscale=-1, maxit=maxit)), cl=cl)
   parallel::stopCluster(cl=cl)
 
   converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1))
@@ -201,10 +210,8 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
                                                           constraints=constraints, parametrization=parametrization, check_params=TRUE,
                                                           to_return="loglik", minval=minval), numeric(1))
   if(print_res) {
-    cat("Results from variable metric algorithm:\n")
-    cat(paste("lowest value: ", round(min(loks), 3)), "\n")
-    cat(paste("mean value:   ", round(mean(loks), 3)), "\n")
-    cat(paste("largest value:", round(max(loks), 3)), "\n")
+    cat("Results from the variable metric algorithm:\n")
+    print_loks()
   }
 
 
@@ -222,7 +229,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                       parametrization=parametrization, constraints=constraints,
                                       to_return="mw", check_params=TRUE, minval=NULL)
-  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
+  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*nobs, logical(1)))) {
     message("At least one of the mixture components in the estimated model seems to be wasted!")
   }
 
@@ -240,20 +247,20 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 }
 
 
-#' @title Maximum likelihood estimation of GMVAR model with preliminary estimates
+#' @title Maximum likelihood estimation of a GMVAR model with preliminary estimates
 #'
-#' @description \code{iterate_more} uses variable metric algorithm to finalize maximum likelihood
-#'  estimation of GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
+#' @description \code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
+#'  estimation of a GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
 #'
 #' @inheritParams simulateGMVAR
 #' @inheritParams fitGMVAR
 #' @inheritParams GMVAR
-#' @details The main purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
-#'   the estimation when the maximum number of iterations is reached when estimating a GMVAR model with the
-#'   main estimation function \code{fitGMVAR}. It's just a simple wrapper around function \code{optim}
-#'   from the package \code{stats} and \code{GMVAR} from the package \code{gmvarkit}.
-#' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Can be used
-#'   to work with other functions provided in \code{gmvarkit}.
+#' @details The purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
+#'   the estimation when the maximum number of iterations is reached when estimating a GMVAR model
+#'   with the main estimation function \code{fitGMVAR}. \code{iterate_more} is essentially a wrapper
+#'   around the function \code{optim} from the package \code{stats} and \code{GMVAR} from the package
+#'   \code{gmvarkit}.
+#' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}
 #' @inherit GMVAR references
 #' @examples
@@ -300,7 +307,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE) {
   check_gmvar(gmvar)
   stopifnot(maxit %% 1 == 0 & maxit >= 1)
-  minval <- -(10^(ceiling(log10(nrow(gmvar$data))) + ncol(gmvar$data) + 1) - 1)
+  minval <- get_minval(gmvar$data)
 
   fn <- function(params) {
     tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=params,
@@ -319,3 +326,20 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE) {
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
         constraints=gmvar$model$constraints, calc_std_errors=calc_std_errors)
 }
+
+
+#' @title Returns the default smallest allowed log-likelihood for given data.
+#'
+#' @description \code{get_minval} returns the default smallest allowed log-likelihood for given data.
+#'
+#' @inheritParams GAfit
+#' @details This function exists to avoid dublication inside the package.
+#' @return Returns \code{-(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GAfit}}
+
+get_minval <- function(data) {
+  -(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)
+}
+
+
+

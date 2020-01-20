@@ -4,8 +4,16 @@
 \alias{standard_errors}
 \title{Calculate standard errors for estimates of GMVAR model}
 \usage{
-standard_errors(data, p, M, params, conditional = TRUE,
-  parametrization = c("intercept", "mean"), constraints = NULL, minval)
+standard_errors(
+  data,
+  p,
+  M,
+  params,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  minval
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

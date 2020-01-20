@@ -7,7 +7,7 @@
 random_coefmats(d, how_many, scale)
 }
 \arguments{
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{how_many}{how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?}
 

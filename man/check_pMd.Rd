@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{check_pMd}
 \alias{check_pMd}
-\title{Check that p, M and d are correctly set}
+\title{Check that p, M, and d are correctly set}
 \usage{
 check_pMd(p, M, d)
 }
@@ -11,11 +11,11 @@ check_pMd(p, M, d)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 }
 \value{
 Throws an error if something is wrong.
 }
 \description{
-\code{check_pMd} checks the arguments p, M and d.
+\code{check_pMd} checks the arguments p, M, and d.
 }

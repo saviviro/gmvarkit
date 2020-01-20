@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{all_pos_ints}
 \alias{all_pos_ints}
-\title{Check whether all arguments are positive scalar whole numbers}
+\title{Check whether all arguments are positive integers}
 \usage{
 all_pos_ints(x)
 }

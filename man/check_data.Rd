@@ -17,5 +17,5 @@ Checks the data and tries to correct it. Throws an error if something is wrong a
   returns the corrected data otherwise.
 }
 \description{
-\code{check_data} checks the data
+\code{check_data} checks the data.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{check_parameters}
 \alias{check_parameters}
-\title{Check that the given parameter vector satisfies model assumptions}
+\title{Check that the given parameter vector satisfies the model assumptions}
 \usage{
 check_parameters(p, M, d, params, constraints = NULL)
 }
@@ -11,7 +11,7 @@ check_parameters(p, M, d, params, constraints = NULL)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
 \describe{
@@ -58,7 +58,7 @@ Throws an informative error if there is something wrong with the parameter vecto
 }
 \description{
 \code{check_parameters} checks whether the given parameter vector satisfies
-  the model assumptions or not. Does NOT consider the identifiability condition!
+  the model assumptions. Does NOT consider the identifiability condition!
 }
 \examples{
 \dontrun{

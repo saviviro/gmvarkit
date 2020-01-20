@@ -2,7 +2,7 @@
 % Please edit documentation in R/MAINest.R
 \name{iterate_more}
 \alias{iterate_more}
-\title{Maximum likelihood estimation of GMVAR model with preliminary estimates}
+\title{Maximum likelihood estimation of a GMVAR model with preliminary estimates}
 \usage{
 iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
 }
@@ -14,18 +14,18 @@ iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Can be used
-  to work with other functions provided in \code{gmvarkit}.
+Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
 }
 \description{
-\code{iterate_more} uses variable metric algorithm to finalize maximum likelihood
- estimation of GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
+\code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
+ estimation of a GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
 }
 \details{
-The main purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
-  the estimation when the maximum number of iterations is reached when estimating a GMVAR model with the
-  main estimation function \code{fitGMVAR}. It's just a simple wrapper around function \code{optim}
-  from the package \code{stats} and \code{GMVAR} from the package \code{gmvarkit}.
+The purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
+  the estimation when the maximum number of iterations is reached when estimating a GMVAR model
+  with the main estimation function \code{fitGMVAR}. \code{iterate_more} is essentially a wrapper
+  around the function \code{optim} from the package \code{stats} and \code{GMVAR} from the package
+  \code{gmvarkit}.
 }
 \examples{
 \donttest{

@@ -11,7 +11,7 @@ n_params(p, M, d, constraints = NULL)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form
@@ -26,7 +26,7 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 Returns the number of parameters in parameter vector of the specified GMVAR model.
 }
 \description{
-\code{n_params} calculates the number of parameters in the model
+\code{n_params} calculates the number of parameters in the model.
 }
 \section{Warning}{
 

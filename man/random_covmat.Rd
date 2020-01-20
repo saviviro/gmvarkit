@@ -7,7 +7,7 @@
 random_covmat(d, omega_scale)
 }
 \arguments{
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{omega_scale}{a size \eqn{(dx1)} strictly positive vector specifying the scale and variability of the
 random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart distribution.

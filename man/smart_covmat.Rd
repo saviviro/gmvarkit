@@ -8,7 +8,7 @@
 smart_covmat(d, Omega, accuracy)
 }
 \arguments{
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{Omega}{a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
 expected value of the matrix to be generated.}

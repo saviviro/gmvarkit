@@ -11,7 +11,7 @@ get_regime_autocovs_int(p, M, d, params, constraints = NULL)
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
 \describe{

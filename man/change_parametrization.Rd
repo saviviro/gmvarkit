@@ -4,15 +4,21 @@
 \alias{change_parametrization}
 \title{Change parametrization of the parameter vector}
 \usage{
-change_parametrization(p, M, d, params, constraints = NULL,
-  change_to = c("intercept", "mean"))
+change_parametrization(
+  p,
+  M,
+  d,
+  params,
+  constraints = NULL,
+  change_to = c("intercept", "mean")
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{d}{number of time series in the system.}
+\item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
 \describe{
