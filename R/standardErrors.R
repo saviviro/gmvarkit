@@ -43,7 +43,8 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 #' @param digits how many digits should be printed?
 #' @details The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
 #'   errors to certain parameter estimates.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}}, \code{\link{swap_parametrization}}
+#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}},
+#'  \code{\link{swap_parametrization}}
 #' @inherit GMVAR references
 #' @examples
 #' \donttest{
