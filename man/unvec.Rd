@@ -2,12 +2,12 @@
 % Please edit documentation in R/matcal.R
 \name{unvec}
 \alias{unvec}
-\title{Reverse vectorization operator.}
+\title{Reverse vectorization operator}
 \usage{
 unvec(d, a)
 }
 \arguments{
-\item{d}{number of rows the square matrix to be formed.}
+\item{d}{the number of rows in the square matrix to be formed.}
 
 \item{a}{a size \eqn{(d^2x1)} vector to be unvectorized into a \eqn{(dxd)} matrix.}
 }
@@ -15,8 +15,6 @@ unvec(d, a)
 a matrix of size \eqn{(dxd)}.
 }
 \description{
-\code{unvec} reverse operator for \code{vec}.
-
 \code{unvec} forms a square matrix from a vector of
  stacked columns, stacked by \code{vec}.
 }

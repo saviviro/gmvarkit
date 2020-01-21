@@ -3,7 +3,7 @@
 \name{change_regime}
 \alias{change_regime}
 \title{Change regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-  of the given parameter vector.}
+  of the given parameter vector}
 \usage{
 change_regime(p, M, d, params, m, regime_pars)
 }
@@ -54,8 +54,8 @@ The notation is in line with the cited article by \emph{Kalliovirta, Meitz and S
 Returns parameter vector with \code{m}:th regime changed to \code{regime_pars}.
 }
 \description{
-\code{change_regime} changes the given regime parameters (excluding mixing weights parameter)
-  to the given new parameters.
+\code{change_regime} changes the regime parameters (excluding mixing weights parameter)
+  of the pointed regime to the new given parameters.
 }
 \section{Warning}{
 

@@ -47,8 +47,8 @@ The notation is in line with the cited article by \emph{Kalliovirta, Meitz and S
 \item{m}{which component?}
 }
 \value{
-Returns a 3D array containing the coefficient matrices of the given component. Coefficient matrix
- \eqn{A_{m,i}} can be obtained by choosing \code{[, , i]}.
+Returns a 3D array containing the coefficient matrices of the given component.
+ A coefficient matrix \eqn{A_{m,i}} can be obtained by choosing \code{[, , i]}.
 }
 \description{
 \code{pick_Am} picks the coefficient matrices \eqn{A_{m,i} (i=1,..,p)}

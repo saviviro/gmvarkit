@@ -2,7 +2,8 @@
 % Please edit documentation in R/parameterReforms.R
 \name{regime_distance}
 \alias{regime_distance}
-\title{Calculate "distance" between two (scaled) regimes \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}}
+\title{Calculate "distance" between two (scaled) regimes
+ \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}}
 \usage{
 regime_distance(regime_pars1, regime_pars2)
 }

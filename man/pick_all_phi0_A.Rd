@@ -2,7 +2,7 @@
 % Please edit documentation in R/pickParams.R
 \name{pick_all_phi0_A}
 \alias{pick_all_phi0_A}
-\title{Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{A_{m}} parameter values from the given parameter vector.}
+\title{Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{A_{m}} parameter values}
 \usage{
 pick_all_phi0_A(p, M, d, params)
 }

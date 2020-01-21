@@ -21,7 +21,7 @@ reform_data <- function(data, p) {
 #' @title Reform constrained parameter vector into the "standard" form
 #'
 #' @description \code{reform_constrained_pars} reforms constrained parameter vector
-#'   into the form that corresponds to unconstrained "regular" parameter vectors.
+#'   into the form that corresponds to unconstrained parameter vectors.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
@@ -31,20 +31,19 @@ reform_data <- function(data, p) {
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-
 reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na=FALSE) {
   if(is.null(constraints)) {
     return(params)
   }
   q <- ncol(constraints)
   psi <- params[(M*d + 1):(M*d + q)]
-#  if(change_na) {
-#    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
-#    psi[is.na(psi)] <- -9.999
-#  }
+  if(change_na) {
+    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
+    psi[is.na(psi)] <- -9.999
+  }
   psi_expanded <- constraints%*%psi
   pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
-                                              params[(M*d + q + (m-1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
+                                              params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
                     numeric(p*d^2 + d + d*(d + 1)/2)))
   if(M == 1) {
     return(pars)
@@ -54,7 +53,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 }
 
 
-#' @title Form the \eqn{((dp)x(dp))}  "bold A" matrices related to the VAR processes
+#' @title Form the \eqn{((dp)x(dp))} "bold A" matrices related to the VAR processes
 #'
 #' @description \code{form_boldA} creates the "bold A" coefficient matrices related to
 #'   VAR processes.
@@ -62,7 +61,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 #' @inheritParams pick_allA
 #' @param all_A 4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.
 #' @return Returns 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each component VAR-process.
-#'  The matrix \strong{\eqn{A_{m}}} can be obtained by choosing \code{[, , m]}
+#'  The matrix \strong{\eqn{A_{m}}} can be obtained by choosing \code{[, , m]}.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
@@ -75,10 +74,10 @@ form_boldA <- function(p, M, d, all_A) {
 
 
 
-#' @title Sort components in parameter vector by mixing weights into a decreasing order
+#' @title Sort components in parameter vector according to mixing weights into a decreasing order
 #'
-#' @description \code{sort_components} sorts mixture components in the parameter vector by
-#'   by mixing weights into a decreasing order.
+#' @description \code{sort_components} sorts mixture components in the parameter vector according
+#'   to mixing weights into a decreasing order.
 #'
 #' @inheritParams is_stationary
 #' @details Constrained parameter vectors are not supported!
@@ -90,12 +89,12 @@ form_boldA <- function(p, M, d, all_A) {
 #'    \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
 #'    \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
 #'  }
-#'  Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'  component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component and \eqn{\alpha_{m}} is the
+#'  Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
+#'  component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component, and \eqn{\alpha_{m}} is the
 #'  mixing weight parameter.
 #'  \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
 #'  of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
-#'  The notations are in line with the cited article by KMS (2016)
+#'  The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
@@ -107,17 +106,17 @@ sort_components <- function(p, M, d, params) {
     return(params)
   } else {
     q <- d + p*d^2 + d*(d + 1)/2
-    qm1 <- (1:M-1)*q
+    qm1 <- (1:M - 1)*q
     qm <- qm1[ord]
-    pars <- vapply(1:M, function(m) params[(qm[m]+1):(qm[m]+q)], numeric(q))
+    pars <- vapply(1:M, function(m) params[(qm[m] + 1):(qm[m] + q)], numeric(q))
     c(pars, alphas[ord][-M])
   }
 }
 
 
-#' @title Change parametrization of the parameter vector
+#' @title Change parametrization of a parameter vector
 #'
-#' @description \code{change_parametrization()} changes the parametrization of the given parameter
+#' @description \code{change_parametrization} changes the parametrization of the given parameter
 #'   vector to \code{change_to}.
 #'
 #' @inheritParams loglikelihood_int
@@ -159,10 +158,10 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, change_to=
 
 
 #' @title Change regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-#'   of the given parameter vector.
+#'   of the given parameter vector
 #'
-#' @description \code{change_regime} changes the given regime parameters (excluding mixing weights parameter)
-#'   to the given new parameters.
+#' @description \code{change_regime} changes the regime parameters (excluding mixing weights parameter)
+#'   of the pointed regime to the new given parameters.
 #'
 #' @inheritParams pick_regime
 #' @param regime_pars a size \eqn{((pd^2+d+d(d+1)/2)x1)} vector
@@ -180,7 +179,8 @@ change_regime <- function(p, M, d, params, m, regime_pars) {
 }
 
 
-#' @title Calculate "distance" between two (scaled) regimes \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
+#' @title Calculate "distance" between two (scaled) regimes
+#'  \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
 #'
 #' @description \code{regime_distance} calculates "distance" between two scaled regimes. This is used in
 #'   the genetic algorithm.

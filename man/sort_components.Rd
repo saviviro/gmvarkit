@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameterReforms.R
 \name{sort_components}
 \alias{sort_components}
-\title{Sort components in parameter vector by mixing weights into a decreasing order}
+\title{Sort components in parameter vector according to mixing weights into a decreasing order}
 \usage{
 sort_components(p, M, d, params)
 }
@@ -39,16 +39,16 @@ Returns sorted parameter vector with \eqn{\alpha_{1}>...>\alpha_{m}}, that has f
    \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
    \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
  }
- Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
- component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component and \eqn{\alpha_{m}} is the
+ Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
+ component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component, and \eqn{\alpha_{m}} is the
  mixing weight parameter.
  \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
  of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
- The notations are in line with the cited article by KMS (2016)
+ The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
 }
 \description{
-\code{sort_components} sorts mixture components in the parameter vector by
-  by mixing weights into a decreasing order.
+\code{sort_components} sorts mixture components in the parameter vector according
+  to mixing weights into a decreasing order.
 }
 \details{
 Constrained parameter vectors are not supported!

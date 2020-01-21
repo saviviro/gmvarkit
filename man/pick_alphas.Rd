@@ -2,7 +2,7 @@
 % Please edit documentation in R/pickParams.R
 \name{pick_alphas}
 \alias{pick_alphas}
-\title{Pick mixing weight parameters \eqn{\alpha_{m}, m=1,...,M} from the given parameter vector.}
+\title{Pick mixing weight parameters \eqn{\alpha_{m}, m=1,...,M}}
 \usage{
 pick_alphas(p, M, d, params)
 }
@@ -31,7 +31,7 @@ pick_alphas(p, M, d, params)
   The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.}
 }
 \value{
-Returns length M vector containing the mixing weight parameters \eqn{alpha_{m}, m=1,...,M},
+Returns a length M vector containing the mixing weight parameters \eqn{alpha_{m}, m=1,...,M},
   including non-parametrized \eqn{alpha_{M}}.
 }
 \description{

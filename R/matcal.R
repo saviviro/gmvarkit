@@ -1,5 +1,5 @@
 
-#' @title Vectorization operator.
+#' @title Vectorization operator
 #'
 #' @description \code{vec} stacks columns of the given matrix to form a vector.
 #'
@@ -13,15 +13,13 @@ vec <- function(A) {
 }
 
 
-#' @title Reverse vectorization operator.
-#'
-#' @description \code{unvec} reverse operator for \code{vec}.
+#' @title Reverse vectorization operator
 #'
 #' @description \code{unvec} forms a square matrix from a vector of
 #'  stacked columns, stacked by \code{vec}.
 #'
 #' @param a a size \eqn{(d^2x1)} vector to be unvectorized into a \eqn{(dxd)} matrix.
-#' @param d number of rows the square matrix to be formed.
+#' @param d the number of rows in the square matrix to be formed.
 #' @return a matrix of size \eqn{(dxd)}.
 #' @section Warning:
 #'  No argument checks!
@@ -31,10 +29,7 @@ unvec <- function(d, a) {
 }
 
 
-#' @title Parsimonious vectorization operator for symmetric matrices.
-#'
-#' @description \code{vech} stacks columns of the given matrix from main diagonal
-#'   downwards (including the main diagonal) to form a vector.
+#' @title Parsimonious vectorization operator for symmetric matrices
 #'
 #' @description \code{vech} stacks columns of the given matrix from
 #'   the principal diagonal downwards (including elements on the diagonal) to form a vector.
@@ -49,7 +44,7 @@ vech <- function(A) {
 }
 
 
-#' @title Reverse operator of the parsimonious vectorization operator \code{vech}.
+#' @title Reverse operator of the parsimonious vectorization operator \code{vech}
 #'
 #' @description \code{unvech} creates a symmetric matrix from the given vector by
 #'   copying the lower triangular part to be the upper triangular part as well.
@@ -58,7 +53,7 @@ vech <- function(A) {
 #' @param d number of rows the square matrix to be formed.
 #' @return a symmetric matrix of size \eqn{(dxd)}.
 #' @section Warning:
-#'  no argument checks!
+#'  No argument checks!
 
 unvech <- function(d, a) {
   A <- matrix(nrow=d, ncol=d)

@@ -2,8 +2,7 @@
 % Please edit documentation in R/pickParams.R
 \name{pick_regime}
 \alias{pick_regime}
-\title{Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-  from the given parameter vector.}
+\title{Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}}
 \usage{
 pick_regime(p, M, d, params, m)
 }

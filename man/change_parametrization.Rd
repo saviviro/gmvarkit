@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameterReforms.R
 \name{change_parametrization}
 \alias{change_parametrization}
-\title{Change parametrization of the parameter vector}
+\title{Change parametrization of a parameter vector}
 \usage{
 change_parametrization(
   p,
@@ -69,7 +69,7 @@ Returns parameter vector described in \code{params}, but with parametrization ch
   (when \code{change_to==mean}) or from mean to intercept (when \code{change_to==intercept}).
 }
 \description{
-\code{change_parametrization()} changes the parametrization of the given parameter
+\code{change_parametrization} changes the parametrization of the given parameter
   vector to \code{change_to}.
 }
 \section{Warning}{

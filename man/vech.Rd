@@ -2,7 +2,7 @@
 % Please edit documentation in R/matcal.R
 \name{vech}
 \alias{vech}
-\title{Parsimonious vectorization operator for symmetric matrices.}
+\title{Parsimonious vectorization operator for symmetric matrices}
 \usage{
 vech(A)
 }
@@ -13,9 +13,6 @@ vech(A)
 a vector of size \eqn{(d(d+1)/2x1)}.
 }
 \description{
-\code{vech} stacks columns of the given matrix from main diagonal
-  downwards (including the main diagonal) to form a vector.
-
 \code{vech} stacks columns of the given matrix from
   the principal diagonal downwards (including elements on the diagonal) to form a vector.
 }

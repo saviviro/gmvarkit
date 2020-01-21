@@ -2,7 +2,7 @@
 % Please edit documentation in R/matcal.R
 \name{vec}
 \alias{vec}
-\title{Vectorization operator.}
+\title{Vectorization operator}
 \usage{
 vec(A)
 }

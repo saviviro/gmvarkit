@@ -1,7 +1,7 @@
 
 #' @title Pick coefficient matrix
 #'
-#' @description \code{pick_Ami} picks the coefficient matrix \eqn{A_{m,i}} from the given parameter vector
+#' @description \code{pick_Ami} picks the coefficient matrix \eqn{A_{m,i}} from the given parameter vector.
 #'
 #' @param d number of time series in the system, i.e. the dimension.
 #' @param m which component?
@@ -15,9 +15,9 @@
 #' @inherit is_stationary references
 
 pick_Ami <- function(p, M, d, params, m, i, unvec=TRUE) {
-  qm1 <- (m-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
   Ami <- params[(qm1 + d + (i - 1)*d^2 + 1):(qm1 + d + i*d^2)]
-  if(unvec==TRUE) {
+  if(unvec == TRUE) {
     return(unvec(d=d, a=Ami))
   } else {
     return(Ami)
@@ -32,14 +32,14 @@ pick_Ami <- function(p, M, d, params, m, i, unvec=TRUE) {
 #'   third dimension indicating each lag.
 #'
 #' @inheritParams pick_Ami
-#' @return Returns a 3D array containing the coefficient matrices of the given component. Coefficient matrix
-#'  \eqn{A_{m,i}} can be obtained by choosing \code{[, , i]}.
+#' @return Returns a 3D array containing the coefficient matrices of the given component.
+#'  A coefficient matrix \eqn{A_{m,i}} can be obtained by choosing \code{[, , i]}.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
 
 pick_Am <- function(p, M, d, params, m) {
-  qm1 <- (m-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
   array(vapply(1:p, function(i1) params[(qm1 + d + (i1 - 1)*d^2 + 1):(qm1 + d + i1*d^2)], numeric(d^2)), dim=c(d, d, p))
 }
 
@@ -58,7 +58,7 @@ pick_Am <- function(p, M, d, params, m) {
 #' @inherit is_stationary references
 
 pick_allA <- function(p, M, d, params) {
-  qm1 <- (1:M-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   tmp <- vapply(1:M, function(m) {
     vapply(1:p, function(i1) params[(qm1[m] + d + (i1 - 1)*d^2 + 1):(qm1[m] + d + i1*d^2)], numeric(d^2))
   }, numeric(p*d^2))
@@ -66,7 +66,7 @@ pick_allA <- function(p, M, d, params) {
 }
 
 
-#' @title Pick \eqn{\phi_{m,0}} or \eqn{\mu_{m}}, m=1,..,M vectors from the given parameter vector
+#' @title Pick \eqn{\phi_{m,0}} or \eqn{\mu_{m}}, m=1,..,M vectors
 #'
 #' @description \code{pick_phi0} picks the intercept or mean parameters from the given parameter vector.
 #'
@@ -78,12 +78,12 @@ pick_allA <- function(p, M, d, params) {
 #' @inherit is_stationary references
 
 pick_phi0 <- function(p, M, d, params) {
-  qm1 <- (1:M-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   vapply(1:M, function(m) params[(qm1[m] + 1):(qm1[m] + d)], numeric(d))
 }
 
 
-#' @title Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{A_{m}} parameter values from the given parameter vector.
+#' @title Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{A_{m}} parameter values
 #'
 #' @description \code{pick_all_phi0_A} picks the intercept or mean parameters and vectorized coefficient
 #'   matrices from the given parameter vector.
@@ -97,7 +97,7 @@ pick_phi0 <- function(p, M, d, params) {
 
 pick_all_phi0_A <- function(p, M, d, params) {
   q0 <- d + p*d^2
-  qm1 <- (1:M-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   vapply(1:M, function(m) params[(qm1[m] + 1):(qm1[m] + q0)], numeric(q0))
 }
 
@@ -117,18 +117,18 @@ pick_all_phi0_A <- function(p, M, d, params) {
 #' @inherit in_paramspace_int references
 
 pick_Omegas <- function(p, M, d, params) {
-  qm1 <- (1:M-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   tmp <- vapply(1:M, function(m) unvech(d=d, a=params[(qm1[m] + d + p*d^2 + 1):(qm1[m] + d + p*d^2 + d*(d + 1)/2)]), numeric(d^2))
   array(tmp, dim=c(d, d, M))
 }
 
 
-#' @title Pick mixing weight parameters \eqn{\alpha_{m}, m=1,...,M} from the given parameter vector.
+#' @title Pick mixing weight parameters \eqn{\alpha_{m}, m=1,...,M}
 #'
 #' @description \code{pick_alphas} picks the mixing weight parameters from the given parameter vector.
 #'
 #' @inheritParams is_stationary
-#' @return Returns length M vector containing the mixing weight parameters \eqn{alpha_{m}, m=1,...,M},
+#' @return Returns a length M vector containing the mixing weight parameters \eqn{alpha_{m}, m=1,...,M},
 #'   including non-parametrized \eqn{alpha_{M}}.
 #' @section Warning:
 #'  No argument checks!
@@ -136,19 +136,18 @@ pick_Omegas <- function(p, M, d, params) {
 
 
 pick_alphas <- function(p, M, d, params) {
-  if(M==1) {
+  if(M == 1) {
     return(1)
   } else {
     qM <- M*(d + p*d^2 + d*(d + 1)/2)
     alphas <- params[(qM + 1):(qM + M - 1)]
-    return(c(alphas, 1-sum(alphas)))
+    return(c(alphas, 1 - sum(alphas)))
   }
 }
 
 
 
 #' @title Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-#'   from the given parameter vector.
 #'
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
@@ -161,7 +160,7 @@ pick_alphas <- function(p, M, d, params) {
 #' @inherit is_stationary references
 
 pick_regime <- function(p, M, d, params, m) {
-  qm1 <- (m-1)*(d + p*d^2 + d*(d + 1)/2)
+  qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
   params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)]
 }
 
@@ -169,7 +168,7 @@ pick_regime <- function(p, M, d, params, m) {
 #' @title Calculate absolute values of the eigenvalues of the "bold A" matrices containing the AR coefficients
 #'
 #' @description \code{get_boldA_eigens} calculates absolute values of the eigenvalues of
-#'   the "bold A" matrices containing the AR coefficients for each mixture component
+#'   the "bold A" matrices containing the AR coefficients for each mixture component.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns a list with \eqn{M} elements - one for each regime. Each element contains
@@ -199,8 +198,8 @@ get_boldA_eigens <- function(gmvar) {
 
 #' @title Calculate the eigenvalues of the "Omega" error term covariance matrices
 #'
-#' @description \code{get_omega_eigens} the eigenvalues of the "Omega" error term covariance matrices
-#'   for each mixture component
+#' @description \code{get_omega_eigens} calculates the eigenvalues of the "Omega" error
+#'  term covariance matrices for each mixture component.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns a list with \eqn{M} elements - one for each regime. Each element contains

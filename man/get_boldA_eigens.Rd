@@ -16,7 +16,7 @@ Returns a list with \eqn{M} elements - one for each regime. Each element contain
 }
 \description{
 \code{get_boldA_eigens} calculates absolute values of the eigenvalues of
-  the "bold A" matrices containing the AR coefficients for each mixture component
+  the "bold A" matrices containing the AR coefficients for each mixture component.
 }
 \examples{
 params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,

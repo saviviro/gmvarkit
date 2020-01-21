@@ -55,7 +55,7 @@ Default if \code{TRUE}.}
 Returns the i:th lag coefficient matrix of m:th component, \eqn{A_{m,i}}.
 }
 \description{
-\code{pick_Ami} picks the coefficient matrix \eqn{A_{m,i}} from the given parameter vector
+\code{pick_Ami} picks the coefficient matrix \eqn{A_{m,i}} from the given parameter vector.
 }
 \section{Warning}{
 

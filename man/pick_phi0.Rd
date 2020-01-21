@@ -2,7 +2,7 @@
 % Please edit documentation in R/pickParams.R
 \name{pick_phi0}
 \alias{pick_phi0}
-\title{Pick \eqn{\phi_{m,0}} or \eqn{\mu_{m}}, m=1,..,M vectors from the given parameter vector}
+\title{Pick \eqn{\phi_{m,0}} or \eqn{\mu_{m}}, m=1,..,M vectors}
 \usage{
 pick_phi0(p, M, d, params)
 }

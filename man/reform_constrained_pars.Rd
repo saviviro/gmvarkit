@@ -60,7 +60,7 @@ Returns "regular model" parameter vector corresponding to the constraints.
 }
 \description{
 \code{reform_constrained_pars} reforms constrained parameter vector
-  into the form that corresponds to unconstrained "regular" parameter vectors.
+  into the form that corresponds to unconstrained parameter vectors.
 }
 \section{Warning}{
 
