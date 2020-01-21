@@ -2,7 +2,7 @@
 % Please edit documentation in R/printMethods.R
 \name{print.gmvarpred}
 \alias{print.gmvarpred}
-\title{print method for class 'gmvarpred' objects}
+\title{Print method for class 'gmvarpred' objects}
 \usage{
 \method{print}{gmvarpred}(x, ..., digits = 2)
 }
@@ -14,7 +14,7 @@
 \item{digits}{number of decimals to print}
 }
 \description{
-\code{print.gmvarpred} is print method for object generated
+\code{print.gmvarpred} is a print method for object generated
  by \code{predict.gmvar}.
 }
 \examples{

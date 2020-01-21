@@ -10,7 +10,7 @@ format_valuef(digits)
 \item{digits}{number of digits to use}
 }
 \value{
-returns a function that takes an atomic vector as argument
+Returns a function that takes an atomic vector as argument
   and returns it formatted to character with \code{digits} decimals.
 }
 \description{

@@ -17,7 +17,7 @@ along with the prediction. Default is \code{round(nrow(data)*0.2)}.}
 \item{add_grid}{should grid be added to the plots?}
 }
 \description{
-\code{plot.gmvarpred} is plot method for gmvarpred objects
+\code{plot.gmvarpred} is plot method for gmvarpred objects.
 }
 \details{
 This method is used plot forecasts of GMVAR processes
