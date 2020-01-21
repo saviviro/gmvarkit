@@ -107,7 +107,7 @@ print_std_errors <- function(gmvar, digits=3) {
   if(!is.null(constraints)) {
     # The constrained AR parameter standard errors multiplied open in 'pars' are valid only
     # iff the constraint matrix contains zeros and ones only, and there is at most one one
-    # in each row (no multiplications or sums).
+    # in each row (no multiplications or summations).
     if(any(constraints != 1 & constraints != 0) | any(rowSums(constraints) > 1)) {
       sep_AR <- TRUE # The AR parameter std errors must be printed separately
       all_A <- array(NA, dim=c(d, d, p, M))
