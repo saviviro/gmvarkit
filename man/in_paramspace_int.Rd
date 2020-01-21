@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{in_paramspace_int}
 \alias{in_paramspace_int}
-\title{Determine whether the parameter vector lies in the parameter space or not}
+\title{Determine whether the parameter vector lies in the parameter space}
 \usage{
 in_paramspace_int(p, M, d, all_boldA, alphas, all_Omega)
 }
@@ -26,7 +26,7 @@ Returns \code{TRUE} if the given parameter values are in the parameter space and
 }
 \description{
 \code{in_paramspace_int} checks whether the parameter vector lies in the parameter
-  space or not.
+  space.
 }
 \references{
 \itemize{

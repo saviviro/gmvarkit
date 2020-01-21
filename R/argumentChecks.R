@@ -51,10 +51,10 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, tolerance=1e-3) {
 
 
 
-#' @title Determine whether the parameter vector lies in the parameter space or not
+#' @title Determine whether the parameter vector lies in the parameter space
 #'
 #' @description \code{in_paramspace_int} checks whether the parameter vector lies in the parameter
-#'   space or not.
+#'   space.
 #'
 #' @inheritParams is_stationary
 #' @param alphas (Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
@@ -84,10 +84,10 @@ in_paramspace_int <- function(p, M, d, all_boldA, alphas, all_Omega) {
 }
 
 
-#' @title Determine whether the parameter vector lies in the parameter space or not
+#' @title Determine whether the parameter vector lies in the parameter space
 #'
 #' @description \code{in_paramspace} checks whether the given parameter vector lies in
-#'   the parameter space or not. Does NOT consider the identifiability condition!
+#'   the parameter space. Does NOT consider the identifiability condition!
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
@@ -296,7 +296,7 @@ check_gmvar <- function(object) {
 }
 
 
-#' @title Checks whether the given object contains data or not
+#' @title Checks whether the given object contains data
 #'
 #' @description \code{check_null_data} checks that the gmvar object has data.
 #'

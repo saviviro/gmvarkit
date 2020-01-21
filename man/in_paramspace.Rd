@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{in_paramspace}
 \alias{in_paramspace}
-\title{Determine whether the parameter vector lies in the parameter space or not}
+\title{Determine whether the parameter vector lies in the parameter space}
 \usage{
 in_paramspace(p, M, d, params, constraints = NULL)
 }
@@ -59,7 +59,7 @@ Returns \code{TRUE} if the given parameter vector lies in the parameter space
 }
 \description{
 \code{in_paramspace} checks whether the given parameter vector lies in
-  the parameter space or not. Does NOT consider the identifiability condition!
+  the parameter space. Does NOT consider the identifiability condition!
 }
 \examples{
 # GMVAR(1,1), d=2 model:

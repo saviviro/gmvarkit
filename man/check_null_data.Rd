@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{check_null_data}
 \alias{check_null_data}
-\title{Checks whether the given object contains data or not}
+\title{Checks whether the given object contains data}
 \usage{
 check_null_data(gmvar)
 }
