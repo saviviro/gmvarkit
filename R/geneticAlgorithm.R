@@ -169,7 +169,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       } else {
         inds <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale))
       }
-      ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2], condition=conditional,
+      ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2], conditional=conditional,
                                                                    parametrization="mean", constraints=constraints,
                                                                    check_params=TRUE, to_return="loglik", minval=minval),numeric(1))
       G <- cbind(G, inds[, ind_loks > minval]) # Take good enough individuals

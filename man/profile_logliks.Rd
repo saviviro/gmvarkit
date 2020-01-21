@@ -4,14 +4,8 @@
 \alias{profile_logliks}
 \title{Plot profile log-likehoods around the estimates}
 \usage{
-profile_logliks(
-  gmvar,
-  which_pars,
-  scale = 0.02,
-  nrows,
-  ncols,
-  precission = 200
-)
+profile_logliks(gmvar, which_pars, scale = 0.02, nrows, ncols,
+  precission = 200)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}

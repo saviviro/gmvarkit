@@ -31,7 +31,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("cran/gmvarkit")
+devtools::install_github("saviviro/gmvarkit")
 ```
 ## Example
 
