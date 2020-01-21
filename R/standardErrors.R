@@ -103,6 +103,20 @@ print_std_errors <- function(gmvar, digits=3) {
     all_mu <- matrix(NA, nrow=d, ncol=M)
     all_phi0 <- all_phi0_or_mu
   }
+  if(!is.null(constraints)) {
+    # The constrained AR parameter standard errors multiplied open in 'pars' are valid only
+    # iff the constraint matrix contains zeros and ones only, and there is at most one one
+    # in each row (no multiplications or sums).
+    if(any(constraints != 1 & constraints != 0) | any(rowSums(constraints) > 1)) {
+      sep_AR <- TRUE # The AR parameter std errors must be printed separately
+      all_A <- array(NA, dim=c(d, d, p, M))
+      AR_stds <- gmvar$std_errors[(M*d + 1):(M*d + ncol(constraints))] # Constrained AR param std errors
+    } else {
+      sep_AR <- FALSE
+    }
+  } else {
+    sep_AR <- FALSE # No constraints imposed
+  }
 
   cat("Model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
@@ -132,7 +146,7 @@ print_std_errors <- function(gmvar, digits=3) {
       df[, tmp_names[count]] <- rep("[", d); count <- count + 1
       df[, Amp_colnames] <- format_value(all_A[, ,i1 , m])
       df[, tmp_names[count]] <- rep("]", d); count <- count + 1
-      df[, tmp_names[count]] <- paste0(Y, ".l", i1); count <- count + 1
+      df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
     df[, tmp_names[p*(d + 2) + 1]] <- rep("[", d)
@@ -145,6 +159,7 @@ print_std_errors <- function(gmvar, digits=3) {
     print(df)
     cat("\n")
   }
+  if(sep_AR) cat(paste0("AR parameters: ", paste0(format_value(AR_stds), collapse=", ")), "\n\n")
   invisible(gmvar)
 }
 

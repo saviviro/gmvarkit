@@ -2,7 +2,7 @@
 % Please edit documentation in R/geneticAlgorithm.R
 \name{GAfit}
 \alias{GAfit}
-\title{Genetic algorithm for preliminary estimation of GMVAR model}
+\title{Genetic algorithm for preliminary estimation of a GMVAR model}
 \usage{
 GAfit(
   data,
@@ -63,7 +63,7 @@ mixing weights practically at zero) so far.}
 \item{initpop}{a list of parameter vectors from which the initial population of the genetic algorithm
 will be generated from. The parameter vectors should be...
 \describe{
-  \item{\strong{For regular models:}}{
+  \item{\strong{For unconstrained models:}}{
     Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form
     \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
     ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
@@ -84,48 +84,53 @@ will be generated from. The parameter vectors should be...
     }
   }
 }
-Above \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component and
-\eqn{\alpha_{m}} is the mixing weight parameter.
-If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
+Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
+the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
+mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
+If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with the regimewise mean \eqn{\mu_{m}}.
 \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.}
+The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} which introduces
+the GMVAR model.}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
-mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}, but
-input (in \code{initpop}) and output (return value) parameter vectors may be intercept-parametrized.}
+mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}.
+However, input (in \code{initpop}) and output (return value) parameter vectors can be intercept-parametrized.}
 
 \item{mu_scale2}{a size \eqn{(dx1)} strictly positive vector defining \strong{standard deviations} of the normal
 distributions from which each mean parameter \eqn{\mu_{m}} is drawn from in random mutations.
 Default is \code{2*sd(data[,i]), i=1,..,d}.}
 
 \item{omega_scale}{a size \eqn{(dx1)} strictly positive vector specifying the scale and variability of the
-random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart distribution.
-Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard deviations
-of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
+random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart
+distribution. Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard
+deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
 
-\item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in some random
-mutations. See function \code{random_coefmats2} for details. This is ignored when estimating constrained models.}
+\item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
+some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
+constrained models.}
 
 \item{regime_force_scale}{a non-negative real number specifying how much should natural selection favour individuals
-with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large number
-for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the parameter space where some
-regimes are wasted, but with too much favouring the best genes might never mix into the population and the algorithm might
-converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving probabilities for individuals with no wasted
-regimes compared to individuals with one wasted regime. Number \code{2} would give \eqn{3x} larger probabilities etc.}
+with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large
+number for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the
+parameter space where some regimes are wasted, but with too much favouring the best genes might never mix into
+the population and the algorithm might converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving
+probability weights for individuals with no wasted regimes compared to individuals with one wasted regime.
+Number \code{2} would give \eqn{3x} larger probability weights etc.}
 
-\item{red_criteria}{a length 2 numeric vector specifying the criteria that is used to determine whether a regime is redundant or not.
-Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will be considered "redundant".
-One should be careful when adjusting this argument.}
+\item{red_criteria}{a length 2 numeric vector specifying the criteria that is used to determine whether a regime is
+redundant (or "wasted") or not.
+Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will
+be considered "redundant". One should be careful when adjusting this argument (set \code{c(0, 0)} to fully disable
+the 'redundant regime' features from the algorithm).}
 
-\item{to_return}{should the genetic algorithm return the best fitting individual which has "positive enough" mixing weights
-for as much regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood in general (\code{"best_ind"}), but
-might have more wasted regimes? Default is \code{"alt_ind"}.}
+\item{to_return}{should the genetic algorithm return the best fitting individual which has "positive enough" mixing
+weights for as many regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood
+in general (\code{"best_ind"}) but might have more wasted regimes?}
 
 \item{minval}{a real number defining the minimum value of the log-likelihood function that will be considered.
 Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
@@ -135,20 +140,21 @@ never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.}
 the function call. If calling \code{GAfit} from \code{fitGMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.}
 }
 \value{
-Returns estimated parameter vector which has the form described in \code{initpop}.
+Returns the estimated parameter vector which has the form described in \code{initpop}.
 }
 \description{
-\code{GAfit} estimates specified GMVAR model using genetic algorithm. It's designed to find
-  starting values for gradient based methods.
+\code{GAfit} estimates the specified GMVAR model using a genetic algorithm.
+  It's designed to find starting values for gradient based methods.
 }
 \details{
-The genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
-   It uses (slightly modified) individually adaptive crossover and mutation rates described by \emph{Patnaik and Srinivas (1994)}
-   and employs (50\%) fitness inheritance discussed by \emph{Smith, Dike and Stegmann (1995)}.
+The core of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
+ It utilizes a slightly modified version of the individually adaptive crossover and mutation rates described
+ by \emph{Patnaik and Srinivas (1994)} and employs (50\%) fitness inheritance discussed by
+ \emph{Smith, Dike and Stegmann (1995)}.
 
-   By "redundant" or "unidentified" regimes we mean regimes that have the time varying mixing weights basically at zero for all t.
-   The model would have the same log-likelihood value without redundant regimes and there is no purpose to have redundant regime in
-   the model.
+ By "redundant" or "wasted" regimes we mean regimes that have the time varying mixing weights practically at
+ zero for almost all t. A model including redundant regimes would have about the same log-likelihood value without
+ the redundant regimes and there is no purpose to have redundant regimes in a model.
 }
 \references{
 \itemize{

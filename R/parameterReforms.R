@@ -37,16 +37,16 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
     return(params)
   }
   q <- ncol(constraints)
-  psi <- params[(M*d+1):(M*d+q)]
-  if(change_na) {
-    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
-    psi[is.na(psi)] <- -9.999
-  }
+  psi <- params[(M*d + 1):(M*d + q)]
+#  if(change_na) {
+#    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
+#    psi[is.na(psi)] <- -9.999
+#  }
   psi_expanded <- constraints%*%psi
   pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
                                               params[(M*d + q + (m-1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
                     numeric(p*d^2 + d + d*(d + 1)/2)))
-  if(M==1) {
+  if(M == 1) {
     return(pars)
   } else {
     return(c(pars, params[(M*d + q + M*d*(d + 1)/2 + 1):(M*d + q + M*d*(d + 1)/2 + M - 1)]))
@@ -68,8 +68,8 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 #' @inherit is_stationary references
 
 form_boldA <- function(p, M, d, all_A) {
-  I_all <- diag(nrow=d*(p-1))
-  ZER_all <- matrix(0, nrow=d*(p-1), ncol=d)
+  I_all <- diag(nrow=d*(p - 1))
+  ZER_all <- matrix(0, nrow=d*(p - 1), ncol=d)
   array(vapply(1:M, function(m) rbind(matrix(all_A[, , 1:p, m], nrow=d, byrow=FALSE), cbind(I_all, ZER_all)), numeric((d*p)^2)), dim=c(d*p, d*p, M))
 }
 
@@ -140,9 +140,9 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, change_to=
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=params)
 
   if(is.null(constraints)) {
-    qm1 <- (1:M-1)*(d + p*d^2 + d*(d + 1)/2)
+    qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   } else {
-    qm1 <- (1:M-1)*d
+    qm1 <- (1:M - 1)*d
   }
 
   if(change_to == "mean") { # params has original parametrization with intercept

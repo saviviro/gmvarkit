@@ -24,17 +24,17 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
-mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}, but
-input (in \code{initpop}) and output (return value) parameter vectors may be intercept-parametrized.}
+mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}.
+However, input (in \code{initpop}) and output (return value) parameter vectors can be intercept-parametrized.}
 
 \item{mu_scale2}{a size \eqn{(dx1)} strictly positive vector defining \strong{standard deviations} of the normal
 distributions from which each mean parameter \eqn{\mu_{m}} is drawn from in random mutations.
 Default is \code{2*sd(data[,i]), i=1,..,d}.}
 
 \item{omega_scale}{a size \eqn{(dx1)} strictly positive vector specifying the scale and variability of the
-random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart distribution.
-Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard deviations
-of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
+random covariance matrices in random mutations. The covariance matrices are drawn from (scaled) Wishart
+distribution. Expected values of the random covariance matrices are \code{diag(omega_scale)}. Standard
+deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}

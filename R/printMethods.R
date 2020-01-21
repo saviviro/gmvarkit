@@ -42,7 +42,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   cat("Model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
       ifelse(gmvar$model$conditional, "conditional,", "exact,"),
-      ifelse(gmvar$model$parametrization=="mean", "mean parametrization,", "intercept parametrization,"),
+      ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
       ifelse(is.null(constraints), "no constraints", "linear constraints employed"), "\n")
   cat("\n")
 
