@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{smart_ind}
 \alias{smart_ind}
-\title{Create somewhat random parameter vector of GMVAR model fairly close to a given
+\title{Create random parameter vector of a GMVAR model fairly close to a given
   parameter vector}
 \usage{
 smart_ind(
@@ -56,7 +56,7 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 Larger number means larger accuracy. Read the source code for details.}
 
 \item{which_random}{a vector with length between 1 and M specifying the mixture components that should be random instead of
-close to the given parameter vector. If constraints are employed, then this does not consider AR-coefficients. Default is \code{NULL}.}
+close to the given parameter vector. If constraints are employed, then this does not consider AR coefficients. Default is \code{NULL}.}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
@@ -80,7 +80,7 @@ some random mutations. See the function \code{random_coefmats2} for details. Thi
 constrained models.}
 }
 \value{
-Returns somewhat random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
+Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
  ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
  \itemize{
    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
@@ -89,8 +89,8 @@ Returns somewhat random mean-parametrized parameter vector that has form \strong
  }
 }
 \description{
-\code{smart_ind} creates a somewhat random mean-parametrized parameter vector of GMVAR model fairly close to a given
-  parameter vector. The result may not be stationary.
+\code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR model fairly
+ close to a given parameter vector. The result may not be stationary.
 }
 \section{Warning}{
 

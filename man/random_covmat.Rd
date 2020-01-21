@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{random_covmat}
 \alias{random_covmat}
-\title{Create somewhat random VAR model error term covariance matrix}
+\title{Create random VAR model error term covariance matrix}
 \usage{
 random_covmat(d, omega_scale)
 }

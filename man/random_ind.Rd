@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{random_ind}
 \alias{random_ind}
-\title{Create somewhat random mean-parametrized parameter vector of GMVAR model, that may not be stationary!}
+\title{Create random mean-parametrized parameter vector of a GMVAR model that may not be stationary}
 \usage{
 random_ind(p, M, d, constraints = NULL, mu_scale, mu_scale2, omega_scale)
 }
@@ -40,7 +40,7 @@ Note that for \code{d>4} this scale may need to be chosen carefully. Default in 
 \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
 }
 \value{
-Returns somewhat random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
+Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
  ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
  \itemize{
    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
@@ -49,7 +49,7 @@ Returns somewhat random mean-parametrized parameter vector that has form \strong
  }
 }
 \description{
-\code{random_ind} generates random mean-parametrized parameter vector that may not be stationary
+\code{random_ind} generates random mean-parametrized parameter vector that may not be stationary.
 }
 \references{
 \itemize{

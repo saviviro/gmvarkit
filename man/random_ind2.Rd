@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{random_ind2}
 \alias{random_ind2}
-\title{Create somewhat random parameter vector of GMVAR model that is always stationary}
+\title{Create somewhat random parameter vector of a GMVAR model that is always stationary}
 \usage{
 random_ind2(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale = 1)
 }
@@ -35,7 +35,7 @@ some random mutations. See the function \code{random_coefmats2} for details. Thi
 constrained models.}
 }
 \value{
-Returns somewhat random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
+Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
  ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
  \itemize{
    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
@@ -45,13 +45,14 @@ Returns somewhat random mean-parametrized parameter vector that has form \strong
 }
 \description{
 \code{random_ind2} generates random mean-parametrized parameter vector
- that is always stationary
+ that is always stationary.
 }
 \details{
-The coefficient matrices are generated using the algorithm described by Ansley
-  and Kohn (1986), which forces stationarity. It's not clear in detail how \code{ar_scale}
-  affects the coefficient matrices. Read the cited article by Ansley and Kohn (1986) AND
-  the source code for more information.
+The coefficient matrices are generated using the algorithm proposed by Ansley
+  and Kohn (1986) which forces stationarity. It's not clear in detail how \code{ar_scale}
+  affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
+  AR coefficients. Read the cited article by Ansley and Kohn (1986) and the source code
+  for more information.
 
   The covariance matrices are generated from (scaled) Wishart distribution.
 
@@ -61,7 +62,7 @@ The coefficient matrices are generated using the algorithm described by Ansley
 \itemize{
    \item Ansley C.F., Kohn R. 1986. A note on reparameterizing a vector autoregressive
       moving average model to enforce stationarity.
-      \emph{Journal of statistical computation and simulation}, \strong{24}:2,  99-106.
+      \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
  }

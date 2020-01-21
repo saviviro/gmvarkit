@@ -1,11 +1,11 @@
 
-#' @title Create somewhat random mean-parametrized parameter vector of GMVAR model, that may not be stationary!
+#' @title Create random mean-parametrized parameter vector of a GMVAR model that may not be stationary
 #'
-#' @description \code{random_ind} generates random mean-parametrized parameter vector that may not be stationary
+#' @description \code{random_ind} generates random mean-parametrized parameter vector that may not be stationary.
 #'
 #' @inheritParams GAfit
 #' @inheritParams is_stationary
-#' @return Returns somewhat random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
+#' @return Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
 #'  ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
 #'  \itemize{
 #'    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
@@ -37,11 +37,11 @@ random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_sca
 }
 
 
-#' @title Create somewhat random parameter vector of GMVAR model fairly close to a given
+#' @title Create random parameter vector of a GMVAR model fairly close to a given
 #'   parameter vector
 #'
-#' @description \code{smart_ind} creates a somewhat random mean-parametrized parameter vector of GMVAR model fairly close to a given
-#'   parameter vector. The result may not be stationary.
+#' @description \code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR model fairly
+#'  close to a given parameter vector. The result may not be stationary.
 #'
 #' @inheritParams is_stationary
 #' @inheritParams GAfit
@@ -49,7 +49,7 @@ random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_sca
 #' @param accuracy a positive real number adjusting how close to the given parameter vector the returned individual should be.
 #'   Larger number means larger accuracy. Read the source code for details.
 #' @param which_random a vector with length between 1 and M specifying the mixture components that should be random instead of
-#'   close to the given parameter vector. If constraints are employed, then this does not consider AR-coefficients. Default is \code{NULL}.
+#'   close to the given parameter vector. If constraints are employed, then this does not consider AR coefficients. Default is \code{NULL}.
 #' @section Warning:
 #'   No argument checks!
 #' @inherit random_ind return references
@@ -64,21 +64,20 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
       all_phi0_A <- pick_all_phi0_A(p=p, M=M, d=d, params=params_std) # or all_mu
       pars <- vapply(1:M, function(m) {
         if(any(which_random == m)) {
-          if(runif(1) > 0.5) { # Use algorithm for coefficient matrices
-            c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-              random_coefmats2(p=p, d=d, ar_scale=ar_scale),
-              random_covmat(d=d, omega_scale=omega_scale))
+          if(runif(1) > 0.5) { # Use algorithm to force stationarity for coefficient matrices
+            coefmats <- random_coefmats2(p=p, d=d, ar_scale=ar_scale)
           } else {
-            c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-              random_coefmats(d=d, how_many=p, scale=scale_A),
-              random_covmat(d=d, omega_scale=omega_scale))
+            coefmats <- random_coefmats(d=d, how_many=p, scale=scale_A)
           }
+          c(rnorm(d, mean=mu_scale, sd=mu_scale2),
+            coefmats,
+            random_covmat(d=d, omega_scale=omega_scale))
         } else {
           c(rnorm(length(all_phi0_A[,m]), mean=all_phi0_A[,m], sd=pmax(0.2, abs(all_phi0_A[,m]))/accuracy),
             smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy))
         }
       }, numeric(d + p*d^2 + d*(d + 1)/2))
-    } else { # If general linear constraints are employed
+    } else { # If linear constraints are employed
       all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params_std) # or all_mu
       q <- ncol(constraints)
       psi <- params[(M*d + 1):(M*d + q)]
@@ -108,17 +107,18 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
   }
 
 
-#' @title Create somewhat random parameter vector of GMVAR model that is always stationary
+#' @title Create somewhat random parameter vector of a GMVAR model that is always stationary
 #'
 #' @description \code{random_ind2} generates random mean-parametrized parameter vector
-#'  that is always stationary
+#'  that is always stationary.
 #'
 #' @inheritParams GAfit
 #' @inheritParams is_stationary
-#' @details The coefficient matrices are generated using the algorithm described by Ansley
-#'   and Kohn (1986), which forces stationarity. It's not clear in detail how \code{ar_scale}
-#'   affects the coefficient matrices. Read the cited article by Ansley and Kohn (1986) AND
-#'   the source code for more information.
+#' @details The coefficient matrices are generated using the algorithm proposed by Ansley
+#'   and Kohn (1986) which forces stationarity. It's not clear in detail how \code{ar_scale}
+#'   affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
+#'   AR coefficients. Read the cited article by Ansley and Kohn (1986) and the source code
+#'   for more information.
 #'
 #'   The covariance matrices are generated from (scaled) Wishart distribution.
 #'
@@ -128,7 +128,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
 #'  \itemize{
 #'    \item Ansley C.F., Kohn R. 1986. A note on reparameterizing a vector autoregressive
 #'       moving average model to enforce stationarity.
-#'       \emph{Journal of statistical computation and simulation}, \strong{24}:2,  99-106.
+#'       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'  }
@@ -147,16 +147,15 @@ random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1) {
 
 
 
-#' @title Create somewhat random stationary VAR model \eqn{(dxd)}
-#'  coefficient matrices \eqn{A}.
+#' @title Create random stationary VAR model \eqn{(dxd)} coefficient matrices \eqn{A}.
 #'
-#' @description \code{random_coefmats2} generates random VAR model coefficient matrices
+#' @description \code{random_coefmats2} generates random VAR model coefficient matrices.
 #'
 #' @inheritParams is_stationary
-#' @param ar_scale a positive real number. Larger values will likely result larger AR-coefficients.
-#' @details The coefficient matrices are generated using the algorithm described by Ansley
-#'   and Kohn (1986), which forces stationarity. It's not clear in detail how \code{ar_scale}
-#'   affects the coefficient matrices. Read the cited article by Ansley and Kohn (1986) AND
+#' @param ar_scale a positive real number. Larger values will typically result larger AR coefficients.
+#' @details The coefficient matrices are generated using the algorithm proposed by Ansley
+#'   and Kohn (1986) which forces stationarity. It's not clear in detail how \code{ar_scale}
+#'   affects the coefficient matrices. Read the cited article by Ansley and Kohn (1986) and
 #'   the source code for more information.
 #' @return Returns \eqn{((pd^2)x1)} vector containing stationary vectorized coefficient
 #'  matrices \eqn{(vec(A_{1}),...,vec(A_{p})}.
@@ -164,7 +163,7 @@ random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1) {
 #'  \itemize{
 #'    \item Ansley C.F., Kohn R. 1986. A note on reparameterizing a vector autoregressive
 #'       moving average model to enforce stationarity.
-#'       \emph{Journal of statistical computation and simulation}, \strong{24}:2,  99-106.
+#'       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
 #'  }
 
 random_coefmats2 <- function(p, d, ar_scale=1) {
@@ -185,7 +184,7 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
   L <- L_star <- Sigma <- Sigma_star <- Gamma <- Id
 
   # Recursion algorithm (Ansley and Kohn 1986, lemma 2.1)
-  for(s in 0:(p-1)) {
+  for(s in 0:(p - 1)) {
     all_phi[, , s+1, s+1] <- L%*%all_P[, , s+1]%*%solve(L_star)
     all_phi_star[, , s+1, s+1] <- tcrossprod(L_star, all_P[, , s+1])%*%solve(L)
 
@@ -196,9 +195,9 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
       }
     }
 
-    if(s < p-1) { # These are not needed in the last round because only coefficient matrices will be returned.
+    if(s < p - 1) { # These are not needed in the last round because only coefficient matrices will be returned.
       Sigma_next <- Sigma - all_phi[, , s+1, s+1]%*%tcrossprod(Sigma_star, all_phi[, , s+1, s+1])
-      if(s < p+1) {
+      if(s < p + 1) {
         Sigma_star <- Sigma_star - all_phi_star[, , s+1, s+1]%*%tcrossprod(Sigma, all_phi_star[, , s+1, s+1])
         L_star <- t(chol(Sigma_star))
       }
@@ -207,14 +206,14 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
     }
   }
   all_A <- all_phi[, , p, 1:p]
-  return(as.vector(all_A))
+  as.vector(all_A)
 }
 
 
 
 #' @title Create random VAR-model \eqn{(dxd)} coefficient matrices \eqn{A}.
 #'
-#' @description \code{random_coefmats} generates random VAR model coefficient matrices
+#' @description \code{random_coefmats} generates random VAR model coefficient matrices.
 #'
 #' @inheritParams is_stationary
 #' @param how_many how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?
@@ -236,7 +235,7 @@ random_coefmats <- function(d, how_many, scale) {
 }
 
 
-#' @title Create somewhat random VAR model error term covariance matrix
+#' @title Create random VAR model error term covariance matrix
 #'
 #' @description \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
 #'   from (scaled) Wishart distribution.
@@ -250,11 +249,12 @@ random_covmat <- function(d, omega_scale) {
 }
 
 
-#' @title Create somewhat random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
-#'   fairly close to a given \strong{positive definite} covariance matrix using (scaled) Wishart distribution.
+#' @title Create random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
+#'   fairly close to a given \strong{positive definite} covariance matrix using (scaled)
+#'   Wishart distribution
 #'
 #' @description \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
-#'   from (scaled) Wishart distribution, that is fairly close to the given matrix.
+#'   from (scaled) Wishart distribution that is fairly close to the given matrix.
 #'
 #' @inheritParams is_stationary
 #' @param Omega a symmetric positive definite \eqn{(dxd)} covariance matrix specifying

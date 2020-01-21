@@ -2,8 +2,9 @@
 % Please edit documentation in R/generateParams.R
 \name{smart_covmat}
 \alias{smart_covmat}
-\title{Create somewhat random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
-  fairly close to a given \strong{positive definite} covariance matrix using (scaled) Wishart distribution.}
+\title{Create random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
+  fairly close to a given \strong{positive definite} covariance matrix using (scaled)
+  Wishart distribution}
 \usage{
 smart_covmat(d, Omega, accuracy)
 }
@@ -26,5 +27,5 @@ Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \
 }
 \description{
 \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
-  from (scaled) Wishart distribution, that is fairly close to the given matrix.
+  from (scaled) Wishart distribution that is fairly close to the given matrix.
 }
