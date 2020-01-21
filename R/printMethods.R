@@ -49,10 +49,12 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   if(summary_print) {
     all_boldA_eigens <- get_boldA_eigens(gmvar)
     all_omega_eigens <- get_omega_eigens(gmvar)
-    cat(paste("log-likelihood:", format_value(gmvar$loglik)), "\n")
-    cat(paste("AIC: ", format_value(IC$AIC)), "\n")
-    cat(paste("HQIC:", format_value(IC$HQIC)), "\n")
-    cat(paste("BIC: ", format_value(IC$BIC)), "\n\n")
+    form_val2 <- function(txt, val) paste(txt, format_value(val))
+    cat(paste(form_val2("log-likelihood:", gmvar$loglik),
+                    form_val2("AIC:", IC$AIC),
+                    form_val2("HQIC:", IC$HQIC),
+                    form_val2("BIC:", IC$BIC),
+                    sep=", "), "\n\n")
   }
 
   plus <- c("+", rep(" ", d-1))
@@ -79,7 +81,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
       df[, tmp_names[count]] <- rep("[", d); count <- count + 1
       df[, Amp_colnames] <- format_value(all_A[, ,i1 , m])
       df[, tmp_names[count]] <- rep("]", d); count <- count + 1
-      df[, tmp_names[count]] <- paste0(Y, ".l", i1); count <- count + 1
+      df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
     df[, tmp_names[p*(d + 2) + 1]] <- rep("[", d)

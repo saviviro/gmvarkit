@@ -180,7 +180,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         if(length(G) == 0) {
           stop("Failed to create initial population with good enough individuals. Consider setting up the initial population by hand using the argument 'initpop' of the function 'GAfit'.")
         } else {
-          G <- G[sample.int(ncol(G), size=popsize, replace=TRUE)]
+          G <- G[,sample.int(ncol(G), size=popsize, replace=TRUE)]
         }
       }
     }

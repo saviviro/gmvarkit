@@ -132,16 +132,18 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
   ZER_right <- matrix(0, nrow=d, ncol=d*(p-1))
   Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
+  chol_Sigmas <- array(NA, dim=c(d*p, d*p, M))
   for(m in 1:M) {
     kronmat <- I_dp2 - kronecker(all_boldA[, , m], all_boldA[, , m])
     sigma_epsm <- rbind(cbind(all_Omega[, , m], ZER_right), ZER_lower)
     Sigma_m <- solve(kronmat, vec(sigma_epsm))
     Sigmas[, , m] <- Sigma_m
+    chol_Sigmas[, , m] <- chol(Sigmas[, , m]) # Take Cholesky here to avoid unnecessary warnings from mvnfast::dmvn
   }
 
   # Calculate the dp-dimensional multinormal densities (Kalliovirta ym. 2016, eq.(6)), i:th row for index i-1 etc, m:th column for m:th component
   # Calculated in logarithm because same values may be too close to zero for machine accuracy
-  log_mvnvalues <- vapply(1:M, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=Sigmas[, , m], log=TRUE, ncores=1, isChol=FALSE), numeric(T_obs+1))
+  log_mvnvalues <- vapply(1:M, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
 
 
   # Calculate the mixing weights alpha_{m,t} (Kalliovirta et al. 2016, eq.(7))
