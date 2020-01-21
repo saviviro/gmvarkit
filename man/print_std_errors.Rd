@@ -65,5 +65,6 @@ print_std_errors(fit22c2)
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}}, \code{\link{swap_parametrization}}
+\code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}},
+ \code{\link{swap_parametrization}}
 }
