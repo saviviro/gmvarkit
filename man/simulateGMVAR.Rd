@@ -7,14 +7,14 @@
 simulateGMVAR(gmvar, nsimu, init_values = NULL, ntimes = 1, drop = TRUE)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{nsimu}{number of observations to be simulated.}
 
 \item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values to be used in the simulation, where
 d is the number of time series in the system.
 The \strong{last} row will be used as initial values for the first lag, the second last row for second lag etc. If not
-specified, initial values will be generated from the stationary distribution.}
+specified, initial values will be drawn from the stationary distribution.}
 
 \item{ntimes}{how many sets of simulations should be performed?}
 
@@ -39,7 +39,7 @@ If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$comp
 \code{simulateGMVAR} simulates observations from a GMVAR process.
 }
 \details{
-The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating it's possible future values.
+The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
  intervals (see the forecasting example).
 }

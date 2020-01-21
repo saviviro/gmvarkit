@@ -135,7 +135,7 @@ plot.qrtest <- function(x, ...) {
     levels <- c(0.01, 0.05, 0.10, seq(from=0.20, to=1.00, by=0.20))
     axis(side=2, at=levels, las=1, cex.axis=0.8)
     abline(h=0, lwd=2)
-    abline(h=c(0.01, 0.05, 0.10, 1.00), lty=2, col="red")
+    abline(h=c(0.01, 0.05, 0.10, 1.00), lty=2, col=c(rep("red", 3), "green4"))
     segments(x0=seq_pvals, y0=0, y1=pvals, x1=seq_pvals, ...)
     points(pvals)
   }

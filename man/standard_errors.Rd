@@ -76,7 +76,7 @@ Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be empl
 a vector containing the approximate standard errors of the estimates
 }
 \description{
-\code{standard_errors} numerically approximates standard errors for the given estimates of GMVAR model using square
+\code{standard_errors} numerically calculates approximate standard errors for the GMVAR model using square
   roots of the diagonal of inverse of observed information matrix.
 }
 \references{

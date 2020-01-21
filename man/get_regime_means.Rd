@@ -7,14 +7,14 @@
 get_regime_means(gmvar)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
 Returns a \eqn{(dxM)} matrix containing regime mean \eqn{\mu_{m}} in the m:th column, \eqn{m=1,..,M}.
 }
 \description{
 \code{get_regime_means} calculates regime means \eqn{\mu_{m} = (I - \sum A_{m,i})^(-1))}
-  for the given GMVAR model
+  for the given GMVAR model.
 }
 \examples{
 # These examples use the data 'eurusd' which comes with the

@@ -1,7 +1,7 @@
 #' @title Quantile residual tests
 #'
 #' @description \code{quantile_residual_tests} performs quantile residual tests described
-#'  by \emph{Kalliovirta and Saikkonen 2010} for autocorrelation, conditional heteroskedasticity
+#'  by \emph{Kalliovirta and Saikkonen 2010}, testing autocorrelation, conditional heteroskedasticity,
 #'  and normality.
 #'
 #' @inheritParams quantile_residuals
@@ -9,10 +9,10 @@
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-#'   of simulations may result more reliable tests, but the computations become heavier.
+#'   of simulations may yield more reliable results but the computations become heavier.
 #' @param print_res should the test results be printed while computing the tests?
-#' @return Returns object of class \code{'qrtest'} which has its own print method. The returned object
-#'   is a list containing quantile residual test results for normality, autocorrelation and conditional
+#' @return Returns an object of class \code{'qrtest'} which has its own print method. The returned object
+#'   is a list containing the quantile residual test results for normality, autocorrelation, and conditional
 #'   heteroskedasticity. The autocorrelation and conditional heteroskedasticity results also contain the
 #'   associated (vectorized) individual statistics divided by their standard errors
 #'   (see \emph{Kalliovirta and Saikkonen 2010}, s.17-20) under the label \code{$ind_stats}.
@@ -30,12 +30,13 @@
 #'
 #' # GMVAR(1,2) model with default settings
 #' fit12 <- fitGMVAR(data, p=1, M=2)
-#' qrtests12 <- quantile_residual_tests(fit12)
+#' qrtests12 <- quantile_residual_tests(fit12, nsimu=1)
 #' qrtests12
 #' plot(qrtests12)
 #'
 #' # GMVAR(2,2) model with mean parametrization
-#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean")
+#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+#'   ncalls=1, seeds=20)
 #' qrtests22 <- quantile_residual_tests(fit22, nsimu=1)
 #' qrtests22
 #'
@@ -236,7 +237,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   n_obs <- nrow(data)
   T_obs <- n_obs - p
   d <- ncol(data)
-  minval <- -(10^(ceiling(log10(n_obs)) + d + 1) - 1)
+  minval <- get_minval(data)
 
   # Function used to to calculate gradient for function g
   g_fn <- function(pars) {
@@ -272,7 +273,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   # Approximate Fisher information matrix, calculate Psi matrix and H matrix
   diff0 <- nrow(dl) - T0
   Fish_inf <- crossprod(dl, dl)/nrow(dl)
-  Psi <- crossprod(g_qres, dl[(1+diff0):nrow(dl),])/nrow(g_qres)
+  Psi <- crossprod(g_qres, dl[(1 + diff0):nrow(dl),])/nrow(g_qres)
   H <- crossprod(g_qres, g_qres)/nrow(g_qres)
 
   inv_Fish <- solve(Fish_inf) # Can cause error sometimes since this is not always (numerically) invertible

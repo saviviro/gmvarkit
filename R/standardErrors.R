@@ -1,8 +1,7 @@
 
-
 #' @title Calculate standard errors for estimates of GMVAR model
 #'
-#' @description \code{standard_errors} numerically approximates standard errors for the given estimates of GMVAR model using square
+#' @description \code{standard_errors} numerically calculates approximate standard errors for the GMVAR model using square
 #'   roots of the diagonal of inverse of observed information matrix.
 #'
 #' @inheritParams loglikelihood_int
@@ -43,6 +42,10 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 #' @param digits how many digits should be printed?
 #' @details The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
 #'   errors to certain parameter estimates.
+#'
+#'   Note that if linear constraints are imposed and they involve summations or multiplications, then the AR
+#'   parameter standard errors are printed separately as they don't correspond one-to-one to the model parameter
+#'   standard errors.
 #' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}},
 #'  \code{\link{swap_parametrization}}
 #' @inherit GMVAR references

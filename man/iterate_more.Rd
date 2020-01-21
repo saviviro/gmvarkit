@@ -7,7 +7,7 @@
 iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{maxit}{the maximum number of iterations in the variable metric algorithm.}
 

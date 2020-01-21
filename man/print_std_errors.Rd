@@ -7,7 +7,7 @@
 print_std_errors(gmvar, digits = 3)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{digits}{how many digits should be printed?}
 }
@@ -18,6 +18,10 @@ print_std_errors(gmvar, digits = 3)
 \details{
 The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
   errors to certain parameter estimates.
+
+  Note that if linear constraints are imposed and they involve summations or multiplications, then the AR
+  parameter standard errors are printed separately as they don't correspond one-to-one to the model parameter
+  standard errors.
 }
 \examples{
 \donttest{

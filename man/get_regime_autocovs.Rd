@@ -7,15 +7,15 @@
 get_regime_autocovs(gmvar)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
 Returns an \eqn{(d x d x p+1 x M)} array containing the first p regimewise autocovariance matrices.
   The subset \code{[, , j, m]} contains the j-1:th lag autocovariance matrix of the m:th regime.
 }
 \description{
-\code{get_regime_autocovs} calculates first p regimewise autocovariance matrices \eqn{\Gamma_{m}(j)}
-  for the given GMVAR model
+\code{get_regime_autocovs} calculates the first p regimewise autocovariance
+ matrices \eqn{\Gamma_{m}(j)} for the given GMVAR model.
 }
 \examples{
 # GMVAR(1,2), d=2 model:

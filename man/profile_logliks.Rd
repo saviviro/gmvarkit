@@ -14,7 +14,7 @@ profile_logliks(
 )
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{which_pars}{the profile log-likelihood function of which parameters should be plotted? An integer
  vector specifying the positions of the parameters in the parameter vector. The parameter vector has the

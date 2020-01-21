@@ -7,7 +7,7 @@
 get_omega_eigens(gmvar)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
 Returns a list with \eqn{M} elements - one for each regime. Each element contains

@@ -16,7 +16,7 @@ random vector in corresponding row of \code{y}.}
 \item{Omega}{the \eqn{(k x k)} covariance matrix Omega.}
 }
 \value{
-size \eqn{(T x 1)} vector containing the multinormal densities in logarithm
+Returns a size \eqn{(T x 1)} vector containing the multinormal densities in logarithm.
 }
 \description{
 \code{dlogmultinorm} calculates logarithms of multiple multivariate normal

@@ -7,7 +7,7 @@
 diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"), maxlag = 10)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{type}{which type of diagnostic plot should be plotted?
 \itemize{

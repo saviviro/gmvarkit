@@ -59,7 +59,7 @@ Returns an \eqn{(d x d x p+1 x M)} array containing the first p regimewise autoc
 }
 \description{
 \code{get_regime_autocovs_int} calculates the regimewise autocovariance matrices \eqn{\Gamma_{m}(j)}
- \eqn{j=0,1,...,p} for the given GMVAR model
+ \eqn{j=0,1,...,p} for the given GMVAR model.
 }
 \references{
 \itemize{

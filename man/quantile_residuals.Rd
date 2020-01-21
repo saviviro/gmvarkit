@@ -7,11 +7,11 @@
 quantile_residuals(gmvar)
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
 Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
-  \eqn{j}:th column corresponds the time series in the \eqn{j}:th column of the data. The multivariate
+  \eqn{j}:th column corresponds to the time series in the \eqn{j}:th column of the data. The multivariate
   quantile residuals are calculated so that the first column quantile residuals are the "unconditioned ones"
   and the rest condition on all the previous ones in numerical order. Read the cited article by
   \emph{Kalliovirta and Saikkonen 2010} for details.
@@ -72,5 +72,5 @@ quantile_residuals(mod222c)
 }
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
-  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}
+  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
 }

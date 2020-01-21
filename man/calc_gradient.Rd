@@ -30,7 +30,7 @@ get_foc(gmvar, h = 6e-06)
 
 \item{...}{other arguments passed to \code{fn}}
 
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
 Gradient functions return numerical approximation of the gradient and Hessian functions return

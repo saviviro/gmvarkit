@@ -25,7 +25,7 @@ get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept",
 #' @title Calculate regime means \eqn{\mu_{m}}
 #'
 #' @description \code{get_regime_means} calculates regime means \eqn{\mu_{m} = (I - \sum A_{m,i})^(-1))}
-#'   for the given GMVAR model
+#'   for the given GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns a \eqn{(dxM)} matrix containing regime mean \eqn{\mu_{m}} in the m:th column, \eqn{m=1,..,M}.
@@ -68,7 +68,7 @@ get_regime_means <- function(gmvar) {
 #' @title Calculate regimewise autocovariance matrices
 #'
 #' @description \code{get_regime_autocovs_int} calculates the regimewise autocovariance matrices \eqn{\Gamma_{m}(j)}
-#'  \eqn{j=0,1,...,p} for the given GMVAR model
+#'  \eqn{j=0,1,...,p} for the given GMVAR model.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams reform_constrained_pars
@@ -85,7 +85,7 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL) {
 
   I_dp2 <- diag(nrow=(d*p)^2)
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
-  ZER_right <- matrix(0, nrow=d, ncol=d*(p-1))
+  ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
   all_Gammas <- array(NA, dim=c(d, d, p + 1, M)) # For each m=1,..,M, store the (dxd) covariance matrices Gamma_{y,m}(0),...,Gamma{y,m}(p-1),,Gamma{y,m}(p)
   for(m in 1:M) {
     # Calculate the (dpxdp) Gamma_{Y,m}(0) covariance matrix (Lutkepohl 2005, eq. (2.1.39))
@@ -105,8 +105,8 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL) {
 
 #' @title Calculate regimewise autocovariance matrices
 #'
-#' @description \code{get_regime_autocovs} calculates first p regimewise autocovariance matrices \eqn{\Gamma_{m}(j)}
-#'   for the given GMVAR model
+#' @description \code{get_regime_autocovs} calculates the first p regimewise autocovariance
+#'  matrices \eqn{\Gamma_{m}(j)} for the given GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @family moment functions
@@ -138,10 +138,10 @@ get_regime_autocovs <- function(gmvar) {
 
 
 #' @title Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
-#'  of the GMVAR process.
+#'  of a GMVAR process
 #'
-#' @description \code{uncond_moments_int} calculates the unconditional mean, variance, first p autocovariances,
-#'  and first p autocorrelations of the GMVAR process
+#' @description \code{uncond_moments_int} calculates the unconditional mean, variance, the first p autocovariances,
+#'  and the first p autocorrelations of the specified GMVAR process.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams reform_constrained_pars
@@ -182,10 +182,10 @@ uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "
 
 
 #' @title Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
-#'  of the GMVAR process.
+#'  of a GMVAR process
 #'
-#' @description \code{uncond_moments} calculates the unconditional mean, variance, first p autocovariances,
-#'  and first p autocorrelations of the GMVAR process
+#' @description \code{uncond_moments} calculates the unconditional mean, variance, the first p autocovariances,
+#'  and the first p autocorrelations of the given GMVAR process.
 #'
 #' @inheritParams simulateGMVAR
 #' @family moment functions

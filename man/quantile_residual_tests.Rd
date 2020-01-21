@@ -26,7 +26,7 @@ quantile_residual_tests(
 
 \item{digits}{number of decimals to print}
 
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{lags_ac}{a positive integer vector specifying the lags used to test autocorrelation.}
 
@@ -34,20 +34,20 @@ quantile_residual_tests(
 
 \item{nsimu}{to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-of simulations may result more reliable tests, but the computations become heavier.}
+of simulations may yield more reliable results but the computations become heavier.}
 
 \item{print_res}{should the test results be printed while computing the tests?}
 }
 \value{
-Returns object of class \code{'qrtest'} which has its own print method. The returned object
-  is a list containing quantile residual test results for normality, autocorrelation and conditional
+Returns an object of class \code{'qrtest'} which has its own print method. The returned object
+  is a list containing the quantile residual test results for normality, autocorrelation, and conditional
   heteroskedasticity. The autocorrelation and conditional heteroskedasticity results also contain the
   associated (vectorized) individual statistics divided by their standard errors
   (see \emph{Kalliovirta and Saikkonen 2010}, s.17-20) under the label \code{$ind_stats}.
 }
 \description{
 \code{quantile_residual_tests} performs quantile residual tests described
- by \emph{Kalliovirta and Saikkonen 2010} for autocorrelation, conditional heteroskedasticity
+ by \emph{Kalliovirta and Saikkonen 2010}, testing autocorrelation, conditional heteroskedasticity,
  and normality.
 }
 \section{Methods (by generic)}{
@@ -69,12 +69,13 @@ colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model with default settings
 fit12 <- fitGMVAR(data, p=1, M=2)
-qrtests12 <- quantile_residual_tests(fit12)
+qrtests12 <- quantile_residual_tests(fit12, nsimu=1)
 qrtests12
 plot(qrtests12)
 
 # GMVAR(2,2) model with mean parametrization
-fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean")
+fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+  ncalls=1, seeds=20)
 qrtests22 <- quantile_residual_tests(fit22, nsimu=1)
 qrtests22
 

@@ -3,7 +3,7 @@
 \name{uncond_moments_int}
 \alias{uncond_moments_int}
 \title{Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
- of the GMVAR process.}
+ of a GMVAR process}
 \usage{
 uncond_moments_int(
   p,
@@ -74,8 +74,8 @@ Returns a list with three components:
   }
 }
 \description{
-\code{uncond_moments_int} calculates the unconditional mean, variance, first p autocovariances,
- and first p autocorrelations of the GMVAR process
+\code{uncond_moments_int} calculates the unconditional mean, variance, the first p autocovariances,
+ and the first p autocorrelations of the specified GMVAR process.
 }
 \details{
 The unconditional moments are based on the stationary distribution of the process.

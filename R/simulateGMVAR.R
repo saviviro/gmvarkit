@@ -4,16 +4,16 @@
 #'
 #' @description \code{simulateGMVAR} simulates observations from a GMVAR process.
 #'
-#' @param gmvar object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.
+#' @param gmvar an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.
 #' @param nsimu number of observations to be simulated.
 #' @param init_values a size \eqn{(pxd)} matrix specifying the initial values to be used in the simulation, where
 #'   d is the number of time series in the system.
 #'   The \strong{last} row will be used as initial values for the first lag, the second last row for second lag etc. If not
-#'   specified, initial values will be generated from the stationary distribution.
+#'   specified, initial values will be drawn from the stationary distribution.
 #' @param ntimes how many sets of simulations should be performed?
 #' @param drop if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 #'   \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.
-#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating it's possible future values.
+#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
 #'  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
 #'  intervals (see the forecasting example).
 #' @return If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
@@ -128,7 +128,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
 
   # Set/generate initial values
   if(is.null(init_values)) {
-    m <- sample.int(n=M, size=1, replace=TRUE, prob=alphas)
+    m <- sample.int(n=M, size=1, replace=TRUE, prob=alphas) # From which mixture component the initial values are drawn from?
     mu <- rep(all_mu[, m], p)
     L <- t(chol(Sigmas[, , m]))
     init_values <- matrix(mu + L%*%rnorm(d*p), nrow=p, ncol=d, byrow=TRUE)
@@ -147,7 +147,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
 
   for(j1 in seq_len(ntimes)) {
     for(i1 in seq_len(nsimu)) {
-      # Calculate the dp-dimensional multinormal densities (Kalliovirta ym. 2016, eq.(6)).
+      # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)).
       # Calculated in logarithm because same values may be too close to zero for machine accuracy.
       matprods <- vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
       log_mvnvalues <- vapply(1:M, function(m) -0.5*d*p*log(2*pi) - 0.5*log(det_Sigmas[m]) - 0.5*matprods[m], numeric(1))

@@ -12,7 +12,7 @@ alt_gmvar(
 )
 }
 \arguments{
-\item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{which_round}{based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.}
 
