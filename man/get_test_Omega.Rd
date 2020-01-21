@@ -53,13 +53,13 @@ mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of 
 If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.}
+The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function
-should be used. Default is \code{TRUE}.}
+should be used.}
 
 \item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-intercept parameters \eqn{\phi_{m,0}}, m=1,...,M. Default is \code{"intercept"}.}
+intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

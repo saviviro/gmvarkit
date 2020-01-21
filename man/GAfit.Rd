@@ -35,10 +35,10 @@ a single time series. \code{NA} values are not supported.}
 \item{M}{a positive integer specifying the number of mixture components.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function
-should be used. Default is \code{TRUE}.}
+should be used.}
 
 \item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-intercept parameters \eqn{\phi_{m,0}}, m=1,...,M. Default is \code{"intercept"}.}
+intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

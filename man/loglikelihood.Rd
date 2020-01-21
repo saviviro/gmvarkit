@@ -2,7 +2,7 @@
 % Please edit documentation in R/loglikelihood.R
 \name{loglikelihood}
 \alias{loglikelihood}
-\title{Compute log-likelihood of GMVAR model using parameter vector}
+\title{Compute log-likelihood of a GMVAR model using parameter vector}
 \usage{
 loglikelihood(
   data,
@@ -52,13 +52,13 @@ mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of 
 If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.}
+The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function
-should be used. Default is \code{TRUE}.}
+should be used.}
 
 \item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-intercept parameters \eqn{\phi_{m,0}}, m=1,...,M. Default is \code{"intercept"}.}
+intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form
@@ -69,21 +69,21 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
-\item{minval}{value that will be returned if the parameter vector does not lie in the parameter space
+\item{minval}{the value that will be returned if the parameter vector does not lie in the parameter space
 (excluding the identification condition).}
 }
 \value{
 Returns log-likelihood if \code{params} is in the parameters space and \code{minval} if not.
 }
 \description{
-\code{loglikelihood} computes log-likelihood of GMVAR model by using parameter vector
-  instead of object of class 'gmvar'. Exists for convenience if one wants to for example
-  plot profile log-likelihoods or employ other estimation algorithms than used in \code{fitGMVAR}.
-  Use \code{minval} to control what happens when the parameter vector is outside the parameter space.
+\code{loglikelihood} computes log-likelihood of a GMVAR model using parameter vector
+  instead of an object of class 'gmvar'. Exists for convenience if one wants to for example
+  employ other estimation algorithms than the ones used in \code{fitGMVAR}. Use \code{minval} to
+  control what happens when the parameter vector is outside the parameter space.
 }
 \details{
-Takes use of the function \code{dmvn} from the package \code{mvnfast} to cut down computation time.
-  Values extremely close to zero are handled with the package \code{Brobdingnag}.
+\code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}
+  to cut down computation time. Values extremely close to zero are handled with the package \code{Brobdingnag}.
 }
 \examples{
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])

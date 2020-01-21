@@ -2,7 +2,7 @@
 % Please edit documentation in R/loglikelihood.R
 \name{get_IC}
 \alias{get_IC}
-\title{Calculate AIC, HQIC and BIC}
+\title{Calculate AIC, HQIC, and BIC}
 \usage{
 get_IC(loglik, npars, obs)
 }
@@ -17,5 +17,9 @@ get_IC(loglik, npars, obs)
 Returns a data frame containing the information criteria values.
 }
 \description{
-\code{get_IC} calculates information criteria values AIC, HQIC and BIC.
+\code{get_IC} calculates the information criteria values AIC, HQIC, and BIC.
+}
+\details{
+Note that for conditional models with different autoregressive order p the
+ information criteria values are \strong{NOT} comparable.
 }

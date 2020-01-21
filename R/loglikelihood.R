@@ -1,8 +1,8 @@
 #' @import stats
 #'
-#' @title Compute the log-likelihood of Gaussian Mixture Vector Autoregressive model
+#' @title Compute log-likelihood of a Gaussian Mixture Vector Autoregressive model
 #'
-#' @description \code{loglikelihood_int} computes the log-likelihood of GMVAR model.
+#' @description \code{loglikelihood_int} computes log-likelihood of a GMVAR model.
 #'
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 #'  a single time series. \code{NA} values are not supported.
@@ -37,11 +37,11 @@
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notations are in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)}.
+#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.
 #' @param conditional a logical argument specifying whether the conditional or exact log-likelihood function
-#'  should be used. Default is \code{TRUE}.
+#'  should be used.
 #' @param parametrization \code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-#'   intercept parameters \eqn{\phi_{m,0}}, m=1,...,M. Default is \code{"intercept"}.
+#'   intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.
 #' @param constraints a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 #'   to the autoregressive parameters. We consider constraints of form
 #'   (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M}) = }\strong{\eqn{C \psi}},
@@ -51,16 +51,16 @@
 #'   [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 #'   Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.
 #' @param check_params should it be checked that the parameter vector satisfies the model assumptions? Can be skipped to save
-#'   computation time if it does for sure. Default \code{TRUE}.
-#' @param minval value that will be returned if the parameter vector does not lie in the parameter space
+#'   computation time if it does for sure.
+#' @param minval the value that will be returned if the parameter vector does not lie in the parameter space
 #'   (excluding the identification condition).
-#' @param to_return should the returned object be log-likelihood value, mixing weights, mixing weights including
-#'   value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights or
+#' @param to_return should the returned object be the log-likelihood value, mixing weights, mixing weights including
+#'   value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights, or
 #'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Or should
 #'   the regimewise conditional means, total conditional means, or total conditional covariance matrices
 #'   be returned? Default is the log-likelihood value (\code{"loglik"}).
-#' @details Takes use of the function \code{dmvn} from the package \code{mvnfast} to cut down computation time.
-#'   Values extremely close to zero are handled with the package \code{Brobdingnag}.
+#' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}
+#'   to cut down computation time. Values extremely close to zero are handled with the package \code{Brobdingnag}.
 #' @return
 #'  \describe{
 #'   \item{By default:}{log-likelihood value of the specified GMVAR model,}
@@ -99,15 +99,15 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   # Collect parameter values
   parametrization <- match.arg(parametrization)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
-  if(parametrization=="intercept") {
+  if(parametrization == "intercept") {
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params)
   } else {
     mu <- pick_phi0(p=p, M=M, d=d, params=params) # mean parameters instead of phi0
   }
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params)
-  all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params) # A_{m,i}, m=1,...,M, i=1,..,p
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params) # Omega_m
+  all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A) # The 'bold A' for each m=1,..,M, Lutkepohl 2005, eq.(2.1.8)
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params) # Mixing weight parameters
 
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)
   if(check_params) {
@@ -116,7 +116,8 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     }
   }
 
-  # An i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1}',...,y_{i-p}') (dpx1), assuming the observed data is y_{-p+1},...,y_0,y_1,...,y_{T}
+  # An i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1}',...,y_{i-p}') (dpx1),
+  # assuming the observed data is y_{-p+1},...,y_0,y_1,...,y_{T}
   Y <- reform_data(data, p)
 
   # Calculate expected values (column per component) or phi0-parameters if using mean-parametrization
@@ -141,12 +142,12 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     chol_Sigmas[, , m] <- chol(Sigmas[, , m]) # Take Cholesky here to avoid unnecessary warnings from mvnfast::dmvn
   }
 
-  # Calculate the dp-dimensional multinormal densities (Kalliovirta ym. 2016, eq.(6)), i:th row for index i-1 etc, m:th column for m:th component
+  # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)), i:th row for index i-1 etc, m:th column for m:th component
   # Calculated in logarithm because same values may be too close to zero for machine accuracy
   log_mvnvalues <- vapply(1:M, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
 
 
-  # Calculate the mixing weights alpha_{m,t} (Kalliovirta et al. 2016, eq.(7))
+  ## Calculate the mixing weights alpha_{m,t} (KMS 2016, eq.(7))
   if(to_return != "mw_tplus1") {
     log_mvnvalues <- log_mvnvalues[1:T_obs, , drop=FALSE] # alpha_mt uses y_{t-1} so the last row is not needed
   }
@@ -178,17 +179,17 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     return(alpha_mt)
   }
 
-  # Calculate the conditional means mu_{m,t} (Kalliovirta et al. 2016, Condition 1 (a)).
-  # Map to dimensions of mu_mt: [t, p, m]
+  # Calculate the conditional means mu_{m,t} (KMS 2016, Condition 1 (a)).
+  # The dimensions of mu_mt will be: [t, p, m]
   all_A2 <- array(all_A, dim=c(d, d*p, M)) # cbind coefficient matrices of each component: m:th component is obtained at [, , m]
   Y2 <- Y[1:T_obs,] # Last row is not needed because mu_mt uses lagged values
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
 
   if(to_return == "regime_cmeans") {
     return(mu_mt)
-  } else if(to_return == "total_cmeans") {
+  } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
-  } else if(to_return == "total_ccovs") {
+  } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
     # array(vapply(1:nrow(alpha_mt), function(i1) rowSums(vapply(1:M, function(m) alpha_mt[i1, m]*all_Omega[, , m], numeric(d*d))),  numeric(d*d)), dim=c(d, d, T_obs))
     first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(all_Omega[, , m]), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
@@ -198,9 +199,9 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     return(first_term + second_term)
   }
 
-  # Calculate the second term of the log-likelihood (Kalliovirta et al. 2016 eq.(10))
-  dat <- data[(p+1):n_obs,] # Initial values are not used here
-  mvn_vals <- vapply(1:M, function(m) mvnfast::dmvn(X=dat-mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
+  # Calculate the second term of the log-likelihood (KMS 2016 eq.(10))
+  dat <- data[(p + 1):n_obs,] # Initial values are not used here
+  mvn_vals <- vapply(1:M, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
   l_t <- log(rowSums(alpha_mt*mvn_vals))
 
   if(to_return == "terms") {
@@ -214,12 +215,12 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
 
 
-#' @title Compute log-likelihood of GMVAR model using parameter vector
+#' @title Compute log-likelihood of a GMVAR model using parameter vector
 #'
-#' @description \code{loglikelihood} computes log-likelihood of GMVAR model by using parameter vector
-#'   instead of object of class 'gmvar'. Exists for convenience if one wants to for example
-#'   plot profile log-likelihoods or employ other estimation algorithms than used in \code{fitGMVAR}.
-#'   Use \code{minval} to control what happens when the parameter vector is outside the parameter space.
+#' @description \code{loglikelihood} computes log-likelihood of a GMVAR model using parameter vector
+#'   instead of an object of class 'gmvar'. Exists for convenience if one wants to for example
+#'   employ other estimation algorithms than the ones used in \code{fitGMVAR}. Use \code{minval} to
+#'   control what happens when the parameter vector is outside the parameter space.
 #'
 #' @inheritParams loglikelihood_int
 #' @return Returns log-likelihood if \code{params} is in the parameters space and \code{minval} if not.
@@ -255,7 +256,7 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
 #' @param to_return should the regimewise conditional means, total conditional means, or total conditional covariance matrices
 #'   be returned?
 #' @details The first p values are used as the initial values, and by conditional we mean conditioning on the past. Formulas
-#'   for the conditional means and covariance matrices are given in equations (3) and (4) of Kalliovirta et al. (2016).
+#'   for the conditional means and covariance matrices are given in equations (3) and (4) of KMS (2016).
 #' @return
 #'  \describe{
 #'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
@@ -295,13 +296,15 @@ cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mea
 }
 
 
-#' @title Calculate AIC, HQIC and BIC
+#' @title Calculate AIC, HQIC, and BIC
 #'
-#' @description \code{get_IC} calculates information criteria values AIC, HQIC and BIC.
+#' @description \code{get_IC} calculates the information criteria values AIC, HQIC, and BIC.
 #'
 #' @param loglik log-likelihood value
 #' @param npars number of (freely estimated) parameters in the model
 #' @param obs numbers of observations with starting values excluded for conditional models.
+#' @details Note that for conditional models with different autoregressive order p the
+#'  information criteria values are \strong{NOT} comparable.
 #' @return Returns a data frame containing the information criteria values.
 
 get_IC <- function(loglik, npars, obs) {
