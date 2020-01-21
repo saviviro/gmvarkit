@@ -123,7 +123,7 @@ print_std_errors <- function(gmvar, digits=3) {
   cat(paste0("p = ", p, ", M = ", M, ","),
       ifelse(gmvar$model$conditional, "conditional,", "exact,"),
       ifelse(gmvar$model$parametrization=="mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(constraints), "no constraints", "linear constraints employed"), "\n")
+      ifelse(is.null(constraints), "no constraints", "linear constraints imposed"), "\n")
   cat("\n")
   cat("APPROXIMATE STANDARD ERRORS\n\n")
 

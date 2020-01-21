@@ -1,6 +1,6 @@
-#' @title Create object of class 'gmvar' defining a GMVAR model
+#' @title Create a class 'gmvar' object defining a GMVAR model
 #'
-#' @description \code{GMVAR} creates an S3 object of class \code{'gmvar'} that defines a GMVAR model
+#' @description \code{GMVAR} creates a class \code{'gmvar'} object that defines a GMVAR model
 #'
 #' @inheritParams loglikelihood_int
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -18,8 +18,8 @@
 #'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
 #' @section S3 methods:
-#'   Only the print method is available if data is not provided.
-#'   If data is provided, then the \code{predict} method is also available.
+#'   Only the \code{print} method is available if data is not provided.
+#'   If data is provided, then \code{summary}, \code{predict}, and \code{plot} methods are also available.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}
 #' @references
 #'  \itemize{
@@ -164,16 +164,15 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 }
 
 
-#' @title Add data to object of class 'gmvar' defining a GMVAR model
+#' @title Add data to an object of class 'gmvar' defining a GMVAR model
 #'
 #' @description \code{add_data} adds or updates data to object of class '\code{gmvar}' that defines a GMVAR model.
 #'  Also calculates mixing weights and quantile residuals accordingly.
 #'
+#' @inheritParams loglikelihood_int
 #' @inheritParams simulateGMVAR
 #' @inheritParams GMVAR
-#' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-#'  a single times series. \code{NA} values are not supported.
-#' @return returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
+#' @return Returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
 #'   If the object already contained data, the data will be updated.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}
 #' @references
@@ -219,16 +218,15 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 }
 
 
-#' @title Swap the parametrization of object of class 'gmvar' defining a GMVAR model
+#' @title Swap the parametrization of a GMVAR model
 #'
-#' @description \code{swap_parametrization} swaps the parametrization of object of class '\code{gmvar}'
+#' @description \code{swap_parametrization} swaps the parametrization of a GMVAR model
 #'  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 #'
 #' @inheritParams simulateGMVAR
-#' @details \code{swap_parametrization} is convenient tool if you have estimated the model in
+#' @details \code{swap_parametrization} is a convenient tool if you have estimated the model in
 #'  "intercept"-parametrization, but wish to work with "mean"-parametrization in the future, or vice versa.
-#'  In \code{gmvarkit}, for example the approximate standard errors are only available for
-#'  parametrized parameters.
+#'  In \code{gmvarkit}, the approximate standard errors are only available for parametrized parameters.
 #' @inherit GMVAR references return
 #' @inherit add_data seealso
 #' @examples
@@ -280,8 +278,8 @@ swap_parametrization <- function(gmvar) {
 #' @inheritParams simulateGMVAR
 #' @inheritParams GMVAR
 #' @param which_round based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.
-#' @details It's sometimes useful to examine other estimates than the one with the highest log-likelihood value. This function
-#'   is just a simple wrapper to \code{GMVAR} that picks the correct estimates from an returned by \code{fitGMVAR}.
+#' @details It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
+#'   is wrapper around \code{GMVAR} that picks the correct estimates from an object returned by \code{fitGMVAR}.
 #' @inherit GMVAR references return
 #' @inherit add_data seealso
 #' @examples
@@ -291,7 +289,7 @@ swap_parametrization <- function(gmvar) {
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #'  colnames(data) <- colnames(eurusd)
 #'
-#'  fit12 <- fitGMVAR(data, 1, 2, ncalls=2, seeds=5:6)
+#'  fit12 <- fitGMVAR(data, 1, 2, ncalls=2, seeds=7:8)
 #'  fit12
 #'  fit12_2 <- alt_gmvar(fit12, which_round=1)
 #'  fit12_2

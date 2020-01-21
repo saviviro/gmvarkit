@@ -32,8 +32,8 @@ Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Ca
 \code{alt_gmvar} constructs a GMVAR model based on results from an arbitrary estimation round of \code{fitGMVAR}.
 }
 \details{
-It's sometimes useful to examine other estimates than the one with the highest log-likelihood value. This function
-  is just a simple wrapper to \code{GMVAR} that picks the correct estimates from an returned by \code{fitGMVAR}.
+It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
+  is wrapper around \code{GMVAR} that picks the correct estimates from an object returned by \code{fitGMVAR}.
 }
 \examples{
 \donttest{
@@ -42,7 +42,7 @@ It's sometimes useful to examine other estimates than the one with the highest l
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
  colnames(data) <- colnames(eurusd)
 
- fit12 <- fitGMVAR(data, 1, 2, ncalls=2, seeds=5:6)
+ fit12 <- fitGMVAR(data, 1, 2, ncalls=2, seeds=7:8)
  fit12
  fit12_2 <- alt_gmvar(fit12, which_round=1)
  fit12_2

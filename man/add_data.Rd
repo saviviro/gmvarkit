@@ -2,13 +2,13 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{add_data}
 \alias{add_data}
-\title{Add data to object of class 'gmvar' defining a GMVAR model}
+\title{Add data to an object of class 'gmvar' defining a GMVAR model}
 \usage{
 add_data(data, gmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-a single times series. \code{NA} values are not supported.}
+a single time series. \code{NA} values are not supported.}
 
 \item{gmvar}{object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
@@ -18,7 +18,7 @@ Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 }
 \value{
-returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
+Returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
   If the object already contained data, the data will be updated.
 }
 \description{

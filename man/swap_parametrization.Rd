@@ -2,7 +2,7 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{swap_parametrization}
 \alias{swap_parametrization}
-\title{Swap the parametrization of object of class 'gmvar' defining a GMVAR model}
+\title{Swap the parametrization of a GMVAR model}
 \usage{
 swap_parametrization(gmvar)
 }
@@ -17,14 +17,13 @@ Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Ca
   the second one for the lag one, etc.
 }
 \description{
-\code{swap_parametrization} swaps the parametrization of object of class '\code{gmvar}'
+\code{swap_parametrization} swaps the parametrization of a GMVAR model
  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 }
 \details{
-\code{swap_parametrization} is convenient tool if you have estimated the model in
+\code{swap_parametrization} is a convenient tool if you have estimated the model in
  "intercept"-parametrization, but wish to work with "mean"-parametrization in the future, or vice versa.
- In \code{gmvarkit}, for example the approximate standard errors are only available for
- parametrized parameters.
+ In \code{gmvarkit}, the approximate standard errors are only available for parametrized parameters.
 }
 \examples{
 \donttest{

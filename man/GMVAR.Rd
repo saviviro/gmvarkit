@@ -8,7 +8,7 @@
 \alias{summary.gmvar}
 \alias{plot.gmvar}
 \alias{print.gmvar}
-\title{Create object of class 'gmvar' defining a GMVAR model}
+\title{Create a class 'gmvar' object defining a GMVAR model}
 \usage{
 GMVAR(
   data,
@@ -114,7 +114,7 @@ Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Ca
   the second one for the lag one, etc.
 }
 \description{
-\code{GMVAR} creates an S3 object of class \code{'gmvar'} that defines a GMVAR model
+\code{GMVAR} creates a class \code{'gmvar'} object that defines a GMVAR model
 }
 \details{
 If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
@@ -135,8 +135,8 @@ If data is provided, then also multivariate quantile residuals (\emph{Kalliovirt
 
 \section{S3 methods}{
 
-  Only the print method is available if data is not provided.
-  If data is provided, then the \code{predict} method is also available.
+  Only the \code{print} method is available if data is not provided.
+  If data is provided, then \code{summary}, \code{predict}, and \code{plot} methods are also available.
 }
 
 \examples{
