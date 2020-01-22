@@ -4,8 +4,7 @@
 \alias{reform_constrained_pars}
 \title{Reform constrained parameter vector into the "standard" form}
 \usage{
-reform_constrained_pars(p, M, d, params, constraints = NULL,
-  change_na = FALSE)
+reform_constrained_pars(p, M, d, params, constraints = NULL, change_na = FALSE)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

@@ -4,8 +4,7 @@
 \alias{diagnostic_plot}
 \title{Quantile residual diagnostic plot for a GMVAR model}
 \usage{
-diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"),
-  maxlag = 10)
+diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"), maxlag = 10)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}

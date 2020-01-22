@@ -4,8 +4,7 @@
 \alias{simulateGMVAR}
 \title{Simulate from GMVAR process}
 \usage{
-simulateGMVAR(gmvar, nsimu, init_values = NULL, ntimes = 1,
-  drop = TRUE)
+simulateGMVAR(gmvar, nsimu, init_values = NULL, ntimes = 1, drop = TRUE)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}

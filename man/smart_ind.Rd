@@ -5,9 +5,19 @@
 \title{Create random parameter vector of a GMVAR model fairly close to a given
   parameter vector}
 \usage{
-smart_ind(p, M, d, params, constraints = NULL, accuracy = 1,
-  which_random = numeric(0), mu_scale, mu_scale2, omega_scale,
-  ar_scale = 1)
+smart_ind(
+  p,
+  M,
+  d,
+  params,
+  constraints = NULL,
+  accuracy = 1,
+  which_random = numeric(0),
+  mu_scale,
+  mu_scale2,
+  omega_scale,
+  ar_scale = 1
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

@@ -4,8 +4,12 @@
 \alias{alt_gmvar}
 \title{Construct a GMVAR model based on results from an arbitrary estimation round of \code{fitGMVAR}}
 \usage{
-alt_gmvar(gmvar, which_round = 1, calc_cond_moments = TRUE,
-  calc_std_errors = TRUE)
+alt_gmvar(
+  gmvar,
+  which_round = 1,
+  calc_cond_moments = TRUE,
+  calc_std_errors = TRUE
+)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}

@@ -4,11 +4,20 @@
 \alias{fitGMVAR}
 \title{Two-phase maximum likelihood estimation of a GMVAR model}
 \usage{
-fitGMVAR(data, p, M, conditional = TRUE,
-  parametrization = c("intercept", "mean"), constraints = NULL,
-  ncalls = round(10 + 9 * log(M)), ncores = min(2, ncalls,
-  parallel::detectCores()), maxit = 300, seeds = NULL,
-  print_res = TRUE, ...)
+fitGMVAR(
+  data,
+  p,
+  M,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  ncalls = round(10 + 9 * log(M)),
+  ncores = min(2, ncalls, parallel::detectCores()),
+  maxit = 300,
+  seeds = NULL,
+  print_res = TRUE,
+  ...
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

@@ -4,11 +4,19 @@
 \alias{loglikelihood_int}
 \title{Compute log-likelihood of a Gaussian Mixture Vector Autoregressive model}
 \usage{
-loglikelihood_int(data, p, M, params, conditional = TRUE,
-  parametrization = c("intercept", "mean"), constraints = NULL,
-  to_return = c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
-  "regime_cmeans", "total_cmeans", "total_ccovs"), check_params = TRUE,
-  minval = NULL)
+loglikelihood_int(
+  data,
+  p,
+  M,
+  params,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  to_return = c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans",
+    "total_cmeans", "total_ccovs"),
+  check_params = TRUE,
+  minval = NULL
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

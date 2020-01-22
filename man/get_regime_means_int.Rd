@@ -4,8 +4,14 @@
 \alias{get_regime_means_int}
 \title{Calculate regime means \eqn{\mu_{m}}}
 \usage{
-get_regime_means_int(p, M, d, params, parametrization = c("intercept",
-  "mean"), constraints = NULL)
+get_regime_means_int(
+  p,
+  M,
+  d,
+  params,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -14,22 +20,36 @@ get_regime_means_int(p, M, d, params, parametrization = c("intercept",
 
 \item{d}{the number of time series in the system.}
 
-\item{params}{a real valued vector specifying the parameter values. Should be size
-  \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
-      ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
-      \itemize{
-        \item \strong{\eqn{\upsilon}}\eqn{_{m}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi}}\eqn{_{m}}\eqn{,\sigma_{m})}
-        \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
-        \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
-      }
-  Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
-  the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
-  mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
-
-  If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
-  \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
-  of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-  The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.}
+\item{params}{a real valued vector specifying the parameter values.
+\describe{
+  \item{\strong{For unconstrained models:}}{
+    Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form
+    \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
+    ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
+    \itemize{
+      \item \strong{\eqn{\upsilon}}\eqn{_{m}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi}}\eqn{_{m}}\eqn{,\sigma_{m})}
+      \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
+      \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
+    }
+  }
+  \item{\strong{For constrained models:}}{
+    Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have form
+    \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi}}
+    \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where:
+    \itemize{
+      \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+      \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}. Here \strong{\eqn{C}} is \eqn{(Mpd^2xq)}
+      constraint matrix.
+    }
+  }
+}
+Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
+mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
+\eqn{\alpha_{m}} is the mixing weight parameter.
+If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
+\eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
+of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
+The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
 
 \item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
 intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}

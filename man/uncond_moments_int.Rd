@@ -5,8 +5,14 @@
 \title{Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
  of a GMVAR process}
 \usage{
-uncond_moments_int(p, M, d, params, parametrization = c("intercept",
-  "mean"), constraints = NULL)
+uncond_moments_int(
+  p,
+  M,
+  d,
+  params,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

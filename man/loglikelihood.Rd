@@ -4,9 +4,16 @@
 \alias{loglikelihood}
 \title{Compute log-likelihood of a GMVAR model using parameter vector}
 \usage{
-loglikelihood(data, p, M, params, conditional = TRUE,
-  parametrization = c("intercept", "mean"), constraints = NULL,
-  minval = NA)
+loglikelihood(
+  data,
+  p,
+  M,
+  params,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  minval = NA
+)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

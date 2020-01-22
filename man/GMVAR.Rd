@@ -10,9 +10,18 @@
 \alias{print.gmvar}
 \title{Create a class 'gmvar' object defining a GMVAR model}
 \usage{
-GMVAR(data, p, M, d, params, conditional = TRUE,
-  parametrization = c("intercept", "mean"), constraints = NULL,
-  calc_cond_moments, calc_std_errors = FALSE)
+GMVAR(
+  data,
+  p,
+  M,
+  d,
+  params,
+  conditional = TRUE,
+  parametrization = c("intercept", "mean"),
+  constraints = NULL,
+  calc_cond_moments,
+  calc_std_errors = FALSE
+)
 
 \method{logLik}{gmvar}(object, ...)
 

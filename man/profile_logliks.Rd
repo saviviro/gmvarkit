@@ -4,8 +4,14 @@
 \alias{profile_logliks}
 \title{Plot profile log-likehoods around the estimates}
 \usage{
-profile_logliks(gmvar, which_pars, scale = 0.02, nrows, ncols,
-  precission = 200)
+profile_logliks(
+  gmvar,
+  which_pars,
+  scale = 0.02,
+  nrows,
+  ncols,
+  precission = 200
+)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
@@ -39,7 +45,7 @@ profile_logliks(gmvar, which_pars, scale = 0.02, nrows, ncols,
   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
   \eqn{\alpha_{m}} is the mixing weight parameter.
 
-  The default is that all the para}
+  The default is that profile log-likelihood functions for all parameters are plotted.}
 
 \item{scale}{a numeric scalar specifying the interval plotted for each estimate:
 the estimate plus-minus \code{abs(scale*estimate)}.}

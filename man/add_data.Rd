@@ -4,8 +4,7 @@
 \alias{add_data}
 \title{Add data to an object of class 'gmvar' defining a GMVAR model}
 \usage{
-add_data(data, gmvar, calc_cond_moments = TRUE,
-  calc_std_errors = FALSE)
+add_data(data, gmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent

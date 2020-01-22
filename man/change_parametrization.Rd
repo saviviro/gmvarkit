@@ -4,8 +4,14 @@
 \alias{change_parametrization}
 \title{Change parametrization of a parameter vector}
 \usage{
-change_parametrization(p, M, d, params, constraints = NULL,
-  change_to = c("intercept", "mean"))
+change_parametrization(
+  p,
+  M,
+  d,
+  params,
+  constraints = NULL,
+  change_to = c("intercept", "mean")
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
