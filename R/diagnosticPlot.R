@@ -120,7 +120,7 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
 #'   \eqn{\alpha_{m}} is the mixing weight parameter.
 #'
-#'   The default is that all the para
+#'   The default is that profile log-likelihood functions for all parameters are plotted.
 #' @param scale a numeric scalar specifying the interval plotted for each estimate:
 #'  the estimate plus-minus \code{abs(scale*estimate)}.
 #' @param nrows how many rows should be in the plot-matrix? The default is \code{max(ceiling(log2(length(which_pars)) - 1), 1)}.
@@ -177,6 +177,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
   M <- gmvar$model$M
   d <- gmvar$model$d
   params <- gmvar$params
+  parametrization <- gmvar$model$parametrization
   if(missing(which_pars)) which_pars <- 1:length(params)
   if(!all_pos_ints(which_pars) || any(which_pars > length(params))) {
     stop("The argument 'which_pars' should contain strictly positive integers not larger than length of the parameter vector.")
@@ -213,7 +214,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
       new_pars <- pars
       new_pars[i1] <- val # Change the single parameter value
       loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars, constraints=constraints,
-                        conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
+                        conditional=gmvar$model$conditional, parametrization=parametrization,
                         check_params=TRUE, minval=NA)
     }, numeric(1))
 
@@ -232,7 +233,12 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
         } else if(i1 <= max(cum_q)) { # The phi parameters (or mean + AR parameters)
           if(i1 > cum_q[m] && i1 <= cum_q[m] + d) { # phi_{m,0} or mean parameters
             pos <- i1 - cum_q[m] # Which time series? 1,..,d
-            main <- substitute(phi[foo](foo2), list(foo=paste0(m, ",0"), foo2=pos))
+            mylist <- list(foo=paste0(m, ",0"), foo2=pos)
+            if(parametrization == "intercept") {
+              main <- substitute(phi[foo](foo2), mylist)
+            } else {
+              main <- substitute(mu[foo](foo2), mylist)
+            }
           } else {  # The elements of A_m1,...,A_mp
             pos1 <- i1 - (cum_q[m] + d) # Position in vec(A_m1),...,vec(A_mp)
             cum_a <- c(0, cumsum(rep(d^2, times=p))) # the index after which new matrix A_m,p starts
@@ -255,7 +261,12 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
           cum_d <- c(0, cumsum(rep(d, M))) # The index after which regime changes
           m <- sum(i1 > cum_d)
           pos <- i1 - cum_d[m] # Which Time series?
-          main <- substitute(phi[foo](foo2), list(foo=paste0(m, ",0"), foo2=pos))
+          mylist <- list(foo=paste0(m, ",0"), foo2=pos)
+          if(parametrization == "intercept") {
+            main <- substitute(phi[foo](foo2), mylist)
+          } else {
+            main <- substitute(mu[foo](foo2), mylist)
+          }
         } else { # The AR parameters
           pos <- i1 - M*d
           main <- substitute(AR(foo), list(foo=pos))

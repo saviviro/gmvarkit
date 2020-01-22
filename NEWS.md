@@ -23,3 +23,7 @@
 * Minor update on the genetic algorithm.
 * Minor update on the print and summary-print methods. 
 * Improvements on the comments and documentation.
+
+# gmvarkit 1.1.3
+
+* The headlines in 'profile_logliks' are now correct for the mean-parametrized models (there was phi parameter instread on mu).
