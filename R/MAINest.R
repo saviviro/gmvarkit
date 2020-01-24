@@ -109,7 +109,7 @@
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
-#'                   ncalls=16, seeds=11:26)
+#'                   ncalls=16, seeds=1:16)
 #' fit22
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
