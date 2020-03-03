@@ -9,7 +9,7 @@
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-#'   of simulations may yield more reliable results but the computations become heavier.
+#'   of simulations might improve the tests size properties but increase the computation time.
 #' @param print_res should the test results be printed while computing the tests?
 #' @return Returns an object of class \code{'qrtest'} which has its own print method. The returned object
 #'   is a list containing the quantile residual test results for normality, autocorrelation, and conditional
@@ -50,7 +50,7 @@
 #' }
 #' @export
 
-quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac, nsimu=2000, print_res=TRUE) {
+quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac, nsimu=1, print_res=TRUE) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")

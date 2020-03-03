@@ -13,7 +13,7 @@ GAfit(
   constraints = NULL,
   ngen = 200,
   popsize,
-  smart_mu = min(100, round(0.5 * ngen)),
+  smart_mu = min(100, ceiling(0.5 * ngen)),
   initpop = NULL,
   mu_scale,
   mu_scale2,

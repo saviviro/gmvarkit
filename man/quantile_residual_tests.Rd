@@ -15,7 +15,7 @@ quantile_residual_tests(
   gmvar,
   lags_ac = c(1:2, 4, 8),
   lags_ch = lags_ac,
-  nsimu = 2000,
+  nsimu = 1,
   print_res = TRUE
 )
 }
@@ -34,7 +34,7 @@ quantile_residual_tests(
 
 \item{nsimu}{to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-of simulations may yield more reliable results but the computations become heavier.}
+of simulations might improve the tests size properties but increase the computation time.}
 
 \item{print_res}{should the test results be printed while computing the tests?}
 }
