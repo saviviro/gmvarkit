@@ -47,13 +47,13 @@ data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
-# Estimate a GMVAR(2,2) model: 20 estimation rounds and seeds for reproducible results
-fit <- fitGMVAR(data, p=2, M=2, ncalls=20, seeds=1:20)
+# Estimate a GMVAR(2,2) model: 16 estimation rounds and seeds for reproducible results
+fit <- fitGMVAR(data, p=2, M=2, ncalls=16, seeds=1:16)
 fit
 
 # Estimate a GMVAR(2,2) model with autoregressive parameters restricted to be the same for all regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=20, seeds=21:40)
+fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=16, seeds=1:16)
 fitc
 
 # Further information on the estimated model:
