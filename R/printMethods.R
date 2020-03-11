@@ -189,12 +189,14 @@ print.gmvarpred <- function(x, ..., digits=2) {
 
     cat("\n")
     q <- gmvarpred$q
+ #   pred_ints <- lapply(1:attributes(gmvarpred$pred_ints)$dim[2], function(i1) gmvarpred$pred_ints[, i1, ]) # gmvarpred$pred_ints #aperm(gmvarpred$pred_ints, c(1, 3, 2))
     pred_ints <- gmvarpred$pred_ints
     pred <- gmvarpred$pred
     pred_type <- gmvarpred$pred_type
     for(i1 in seq_len(gmvarpred$gmvar$model$d)) {
       cat(paste0("Component ", i1, ":"), "\n")
-      df <- as.data.frame(lapply(1:length(pred_ints), function(i2) format_value(pred_ints[[i2]][,i1])))
+   #   df <- as.data.frame(lapply(1:length(pred_ints), function(i2) format_value(pred_ints[[i2]][,i1]))) #
+      df <- as.data.frame(lapply(1:length(gmvarpred$q), function(i2) format_value(pred_ints[, i2, i1])))
       names(df) <- q
       df[, pred_type] <- format_value(pred[,i1])
       if(gmvarpred$pi_type == "two-sided") {
@@ -206,6 +208,9 @@ print.gmvarpred <- function(x, ..., digits=2) {
       }
       print(df[, new_order])
       cat("\n")
+    }
+    if(gmvarpred$pred_type != "cond_mean") {
+      cat("\n Point forecasts and prediction intervals for mixing weights can be obtained with $mix_pred and $mix_pred_ints, respectively.\n")
     }
   }
   invisible(gmvarpred)

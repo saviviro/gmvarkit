@@ -13,6 +13,7 @@
   pi_type = c("two-sided", "upper", "lower", "none"),
   pred_type = c("median", "mean", "cond_mean"),
   plot_res = TRUE,
+  mix_weights = TRUE,
   nt
 )
 }
@@ -36,12 +37,20 @@ Prediction intervals won't be calculated if the exact conditional mean is used.}
 
 \item{plot_res}{should the results be plotted?}
 
+\item{mix_weights}{\code{TRUE} if forecasts for mixing weights should be plotted,
+\code{FALSE} in not.}
+
 \item{nt}{a positive integer specifying the number of observations to be plotted
 along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.2)}.}
 }
 \value{
-Returns an object of class '\code{gmvarpred}' which contains the predictions and the
-  prediction intervals. The returned object has it's own print and plot methods.
+Returns a class '\code{gmvarpred}' object containing, among the specifications,...
+ \describe{
+   \item{$pred}{Point forecasts}
+   \item{$pred_int}{Prediction intervals, as \code{[, , d]}.}
+   \item{$mix_pred}{Point forecasts for the mixing weights}
+   \item{mix_pred_int}{Individual prediction intervals for mixing weights, as \code{[, , m]}, m=1,..,M.}
+ }
 }
 \description{
 Forecast GMVAR process defined as a class \code{'gmvar'} object. The forecasts are

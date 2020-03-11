@@ -14,12 +14,19 @@
 #'   be one-step-ahead forecast based on the exact conditional mean (\code{"cond_mean"})?
 #'   Prediction intervals won't be calculated if the exact conditional mean is used.
 #' @param plot_res should the results be plotted?
+#' @param mix_weights \code{TRUE} if forecasts for mixing weights should be plotted,
+#'   \code{FALSE} in not.
 #' @param nt a positive integer specifying the number of observations to be plotted
 #'   along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.2)}.
 #' @param ... additional arguments passed to \code{grid} (ignored if \code{plot_res==FALSE}) which plots
 #'   grid to the figure.
-#' @return Returns an object of class '\code{gmvarpred}' which contains the predictions and the
-#'   prediction intervals. The returned object has it's own print and plot methods.
+#' @return Returns a class '\code{gmvarpred}' object containing, among the specifications,...
+#'  \describe{
+#'    \item{$pred}{Point forecasts}
+#'    \item{$pred_int}{Prediction intervals, as \code{[, , d]}.}
+#'    \item{$mix_pred}{Point forecasts for the mixing weights}
+#'    \item{mix_pred_int}{Individual prediction intervals for mixing weights, as \code{[, , m]}, m=1,..,M.}
+#'  }
 #' @inherit in_paramspace_int references
 #' @examples
 #' \donttest{
@@ -53,10 +60,14 @@
 #' @export
 
 predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), pi_type=c("two-sided", "upper", "lower", "none"),
-                          pred_type=c("median", "mean", "cond_mean"), plot_res=TRUE, nt) {
+                          pred_type=c("median", "mean", "cond_mean"), plot_res=TRUE, mix_weights=TRUE, nt) {
   gmvar <- object
   check_gmvar(gmvar)
   check_null_data(gmvar)
+  if(is.null(gmvar$data)) {
+    stop("The model needs to contain data as forecasting requires initial values. Data can be added to the model with the function 'add_data'.")
+  }
+  data <- gmvar$data
   if(missing(n_ahead)) {
     warning("Argument n_ahead is missing. Using n_ahead = 1.")
     n_ahead <- 1
@@ -84,7 +95,6 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     d <- gmvar$model$d
     constraints <- gmvar$model$constraints
     params <- gmvar$params
-    data <- gmvar$data
     n_obs <- nrow(data)
     mw <- loglikelihood_int(data, p, M, params=params, conditional=gmvar$model$conditional,
                             constraints=constraints, to_return="mw_tplus1")
@@ -106,10 +116,17 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     pi_type <- "none"
     pred_ints <- NULL
     q_tocalc <- numeric(0)
-  } else {
+    mix_weights <- FALSE
+    mix_pred <- NULL
+    mix_pred_ints <- NULL
+  } else { # pred_type != cond_mean
 
     # Simulations
-    simulations <- simulateGMVAR(gmvar, nsimu=n_ahead, init_values=gmvar$data, ntimes=n_simu)$sample
+    simulations <- simulateGMVAR(gmvar, nsimu=n_ahead, init_values=gmvar$data, ntimes=n_simu)
+    sample <- simulations$sample
+    alpha_mt <- simulations$mixing_weights
+    colnames(sample) <- colnames(data)
+    colnames(alpha_mt) <- vapply(1:gmvar$model$M, function(m) paste("regime", m), character(1))
 
     # Calculate quantiles from the third dimension of 3D simulation array
     dim3_quantiles <- function(x, q) {
@@ -118,11 +135,12 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
 
     # Predictions
     if(pred_type == "mean") {
-      pred <- rowMeans(simulations, dims=2)
+      pred <- rowMeans(sample, dims=2)
+      mix_pred <- rowMeans(alpha_mt, dims=2)
     } else {
-      pred <- dim3_quantiles(simulations, q=0.5)
+      pred <- dim3_quantiles(sample, q=0.5)
+      mix_pred <- dim3_quantiles(alpha_mt, q=0.5)
     }
-    colnames(pred) <- colnames(gmvar$data)
 
     # Prediction intervals
     if(pi_type == "upper") {
@@ -139,13 +157,16 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     }
     q_tocalc <- sort(q_tocalc, decreasing=FALSE)
 
-    pred_ints <- lapply(q_tocalc, function(q) dim3_quantiles(simulations, q)) # aperm(dim3_quantiles(simulations, q=q_tocalc), perm=c(2, 3, 1))
-    names(pred_ints) <- q_tocalc
+    pred_ints <- aperm(dim3_quantiles(sample, q_tocalc), perm=c(2, 1, 3))
+    mix_pred_ints <- aperm(dim3_quantiles(alpha_mt, q_tocalc), perm=c(2, 1, 3))
+    colnames(pred_ints) <- colnames(mix_pred_ints) <- q_tocalc
   }
 
   ret <- structure(list(gmvar=gmvar,
                         pred=pred,
                         pred_ints=pred_ints,
+                        mix_pred=mix_pred,
+                        mix_pred_ints=mix_pred_ints,
                         n_ahead=n_ahead,
                         n_simu=n_simu,
                         pi=pi,
@@ -153,7 +174,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
                         pred_type=pred_type,
                         q=q_tocalc),
                    class="gmvarpred")
-  if(plot_res) plot.gmvarpred(x=ret, nt=nt, ...)
+  if(plot_res) plot.gmvarpred(x=ret, nt=nt, mix_weights=mix_weights, ...)
   ret
 }
 

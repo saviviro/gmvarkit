@@ -13,7 +13,7 @@
 #' @inherit in_paramspace_int references
 #' @export
 
-plot.gmvarpred <- function(x, ..., nt, add_grid=TRUE) {
+plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
   gmvarpred <- x
@@ -21,6 +21,10 @@ plot.gmvarpred <- function(x, ..., nt, add_grid=TRUE) {
   n_obs <- nrow(data)
   d <- ncol(data)
   q <- gmvarpred$q
+  M <- gmvarpred$gmvar$model$M
+  mixing_weights <- gmvarpred$gmvar$mixing_weights
+  n_mix <- nrow(mixing_weights)
+  mix_weights <- mix_weights & M > 1 # Don't plot mixing weights if M == 1
   if(missing(nt)) {
     nt <- round(nrow(data)*0.2)
   } else {
@@ -30,49 +34,110 @@ plot.gmvarpred <- function(x, ..., nt, add_grid=TRUE) {
       nt <- nrow(data)
     }
   }
-  par(mfrow=c(d, 1), mar=c(2.5, 2.5, 2.1, 1))
-  make_ts <- function(x) ts(rbind(data[n_obs,], x), start=time(data)[n_obs], frequency=frequency(data))
+  if(mix_weights) {
+    par(mfrow=c(d + 1, 1), mar=c(2.5, 2.5, 2.1, 1))
+  } else {
+    par(mfrow=c(d, 1), mar=c(2.5, 2.5, 2.1, 1))
+  }
+  make_ts <- function(x, mix=FALSE) { # Make ts that has the first value the same as the last value of the observed series/estim. m.weights.
+    if(mix) {
+      last_obs <- mixing_weights[n_mix,]
+    } else {
+      last_obs <- data[n_obs,]
+    }
+    ts(rbind(last_obs, x), start=time(data)[n_obs], frequency=frequency(data))
+  }
   ts_pred <- make_ts(gmvarpred$pred)
+  ts_mix_pred <- make_ts(gmvarpred$mix_pred, mix=TRUE)
   ts_dat <- ts(data[(n_obs - nt + 1):n_obs,], start=time(data)[n_obs - nt + 1], frequency=frequency(data))
+  ts_mix <- ts(mixing_weights[(n_mix - nt + 1):n_mix,], start=time(data)[n_obs - nt + 1], frequency=frequency(data))
   t0 <- time(ts_pred)
   ts_names <- attributes(data)$dimnames[[2]]
+  reg_names <- attributes(gmvarpred$mix_pred)$dimnames[[2]]
+  pred_ints <- aperm(gmvarpred$pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
+  mix_pred_ints <- aperm(gmvarpred$mix_pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
 
+  # All values to indicate ylims
   if(gmvarpred$pi_type == "none") {
     all_val <- lapply(1:d, function(j) c(ts_dat[,j], ts_pred[,j]))
   } else {
-    all_val <- lapply(1:d, function(j) c(ts_dat[,j], ts_pred[,j], simplify2array(gmvarpred$pred_ints, higher=TRUE)[, j, ]))
-  }
-  plot_pred <- function(j) {
-    ts.plot(ts_dat[,j], ts_pred[,j], gpars=list(col=c("black", "blue"), lty=1:2,
-                                                ylim=c(round(min(all_val[[j]])) - 1,
-                                                       round(max(all_val[[j]])) + 1), main=ts_names[j]))
-    if(add_grid) grid(...)
+    all_val <- lapply(1:d, function(j) c(ts_dat[,j], ts_pred[,j], simplify2array(pred_ints, higher=TRUE)[, j, ]))
   }
 
+  # Prediction intervals, we lapply through quantiles [, , q]
+  ts_fun_fact <- function(inds) function(pred_ints, mix=FALSE) lapply(inds, function(i1) make_ts(pred_ints[, , i1], mix))
   if(gmvarpred$pi_type == "two-sided") {
-    ts_lowers <- lapply(1:(length(q)/2), function(i1) make_ts(gmvarpred$pred_ints[[i1]]))
-    ts_uppers <- lapply((length(q)/2 + 1):length(q), function(i1) make_ts(gmvarpred$pred_ints[[i1]]))
+    ts1_lapply <- ts_fun_fact(1:(length(q)/2)) #function(pred_ints, mix=FALSE) lapply(1:(length(q)/2), function(i1) make_ts(pred_ints[,i1], mix)) # Lower bounds
+    ts2_lapply <- ts_fun_fact((length(q)/2 + 1):length(q)) #function(pred_ints, mix=FALSE) lapply((length(q)/2 + 1):length(q), function(i1) make_ts(pred_ints[,i1], mix)) # Upper bounds
 
-  } else if(gmvarpred$pi_type == "upper") {
-    ts_min <- vapply(1:d, function(j) rep(round(min(all_val[[j]])) - 3, times=nrow(ts_pred)), numeric(nrow(ts_pred)))
-    ts_lowers <- lapply(1:length(q), function(i1) make_ts(ts_min)[-1,])
-    ts_uppers <- lapply(1:length(q), function(i1) make_ts(gmvarpred$pred_ints[[i1]]))
+    ints1 <- pred_ints
+    ints1_mix <- mix_pred_ints
 
-  } else if(gmvarpred$pi_type == "lower") {
-    ts_max <- vapply(1:d, function(j) rep(round(max(all_val[[j]])) + 3, times=nrow(ts_pred)), numeric(nrow(ts_pred)))
-    ts_lowers <- lapply(1:length(q), function(i1) make_ts(gmvarpred$pred_ints[[i1]]))
-    ts_uppers <- lapply(1:length(q), function(i1) make_ts(ts_max)[-1,])
+  } else { # Lower or upper
+    ts1_lapply <- function(pred_ints, mix=FALSE) lapply(1:length(q), function(i1) make_ts(pred_ints, mix)[-1,]) # Lower or upper bound (dummy)
+    #ts1_lapply <-
+    ts2_lapply <- ts_fun_fact(seq_along(q))
+ #   ts1_lapply <- function(pred_ints, mix=FALSE) lapply(1:length(q), function(i1) make_ts(pred_ints[,i1], mix)[-1,]) # Lower or upper bound (dummy)
+#    ts2_lapply <- function(pred_ints, mix=FALSE) lapply(1:length(q), function(i1) make_ts(pred_ints[,i1], mix)) # Upper or lower bound
+
+   # ints1_0 <- rep(vapply(1:d, function(j) rep(ifelse(gmvarpred$pi_type == "upper", floor(min(all_val[[j]])) - 3, ceiling(max(all_val[[j]])) + 3), times=n_ahead), numeric(n_ahead)), times=length(q))
+   #  ints1 <- array(ints1_0, dim=c(n_ahead, d, length(q)))
+    if(gmvarpred$pi_type == "upper") {
+      ints1 <-  vapply(1:d, function(j) rep(round(min(all_val[[j]])) - 3, times=nrow(ts_pred)), numeric(nrow(ts_pred)))
+    } else { # lower
+      ints1 <- vapply(1:d, function(j) rep(round(max(all_val[[j]])) + 3, times=nrow(ts_pred)), numeric(nrow(ts_pred)))
+    }
+    ints1_mix <- matrix(ifelse(gmvarpred$pi_type == "upper", 0, 1), nrow=nrow(ts_pred), ncol=M)
+
+   # ints1_mix <- array(rep(ifelse(gmvarpred$pi_type == "upper", 0, 1), times=n_ahead*length(q)*M), dim=c(n_ahead, M, length(q)))
   }
 
-  for(i1 in 1:d) {
-    plot_pred(i1)
+  ts1 <- ts1_lapply(ints1)
+  ts2 <- ts2_lapply(pred_ints)
+
+  if(mix_weights) {
+    ts1_mix <- ts1_lapply(ints1_mix, mix=TRUE)
+    ts2_mix <- ts2_lapply(mix_pred_ints, mix=TRUE)
+  }
+
+  # Plot forecasts for the series
+  draw_poly <- function(ts1_or_ts2, pred_ts, col) polygon(x=c(t0, rev(t0)), y=c(ts1_or_ts2, rev(pred_ts)), col=col, border=NA)
+  col_pred <- grDevices::rgb(0, 0, 1, 0.2)
+    for(i1 in 1:d) {
+    ts.plot(ts_dat[,i1], ts_pred[,i1], gpars=list(col=c("black", "blue"), lty=1:2, ylim=c(floor(min(all_val[[i1]])), ceiling(max(all_val[[i1]]))), main=ts_names[i1]))
+    if(add_grid) grid(...)
     if(gmvarpred$pi_type %in% c("two-sided", "upper", "lower")) {
       for(i2 in 1:length(gmvarpred$pi)) {
-        polygon(x=c(t0, rev(t0)), y=c(ts_lowers[[i2]][,i1], rev(ts_pred[,i1])), col=grDevices::rgb(0, 0, 1, 0.2), border=NA)
-        polygon(x=c(t0, rev(t0)), y=c(ts_uppers[[i2]][,i1], rev(ts_pred[,i1])), col=grDevices::rgb(0, 0, 1, 0.2), border=NA)
+        draw_poly(ts1[[i2]][,i1], ts_pred[,i1], col=col_pred)
+        draw_poly(ts2[[i2]][,i1], ts_pred[,i1], col=col_pred)
       }
     }
   }
+
+  # Plot forecasts for the mixing weights
+  if(mix_weights) {
+
+    # Point forecasts
+    colpal_mw <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
+    colpal_mw2 <- grDevices::adjustcolor(colpal_mw, alpha.f=0.5)
+    ts.plot(ts_mix, ts_mix_pred, gpars=list(col=c(colpal_mw2, colpal_mw), ylim=c(0, 1), lty=c(rep(1, M), rep(2, M)), main="Mixing weights"))
+    legend("topleft", legend=paste0("regime ", 1:M), bty="n", col=colpal_mw, lty=1, lwd=2,
+           text.font=2, cex=0.9, x.intersp=0.5, y.intersp=1)
+    if(add_grid) grid(...)
+
+    # Individual prediction intervals as for the mixing weights
+    colpal_mw3 <- grDevices::adjustcolor(colpal_mw, alpha.f=0.2)
+    if(gmvarpred$pi_type %in% c("two-sided", "upper", "lower")) {
+      for(m in 1:M) { # Go through regimes
+        for(i2 in 1:length(gmvarpred$pi)) { # Go through the prediction intervals
+          draw_poly(ts1_mix[[i2]][,m], ts_mix_pred[,m], col=colpal_mw3[m])
+          draw_poly(ts2_mix[[i2]][,m], ts_mix_pred[,m], col=colpal_mw3[m])
+        }
+      }
+    }
+
+  }
+
   invisible(gmvarpred)
 }
 

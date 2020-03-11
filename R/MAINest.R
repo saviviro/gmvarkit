@@ -97,25 +97,25 @@
 #' # These examples use the data 'eurusd' which comes with the
 #' # package, but in a scaled form (similar to Kalliovirta et al. 2016).
 #' data(eurusd, package="gmvarkit")
-#' dat <- cbind(10*eurusd[,1], 100*eurusd[,2])
+#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #' colnames(dat) <- colnames(eurusd)
 #'
 #' # GMVAR(1,2) model: 10 estimation rounds with seeds set
 #' # for reproducibility
-#' fit12 <- fitGMVAR(dat, p=1, M=2, ncalls=10, seeds=1:10)
+#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
 #'
 #' # GMVAR(2,2) model with mean parametrization
-#' fit22 <- fitGMVAR(dat, p=2, M=2, parametrization="mean",
+#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
 #'                   ncalls=16, seeds=1:16)
 #' fit22
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' fit22c <- fitGMVAR(dat, p=2, M=2, constraints=C_mat)
+#' fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
 #' fit22c
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
@@ -125,7 +125,7 @@
 #' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
 #'  nrow=2*2^2, byrow=FALSE)
 #' C_mat2 <- rbind(tmp, tmp)
-#' fit22c2 <- fitGMVAR(dat, p=2, M=2, constraints=C_mat2)
+#' fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2)
 #' fit22c2
 #' }
 #' @export
