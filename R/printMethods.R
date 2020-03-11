@@ -210,7 +210,7 @@ print.gmvarpred <- function(x, ..., digits=2) {
       cat("\n")
     }
     if(gmvarpred$pred_type != "cond_mean") {
-      cat("\n Point forecasts and prediction intervals for mixing weights can be obtained with $mix_pred and $mix_pred_ints, respectively.\n")
+      cat("Point forecasts and prediction intervals for mixing weights can be obtained with $mix_pred and $mix_pred_ints, respectively.\n")
     }
   }
   invisible(gmvarpred)
