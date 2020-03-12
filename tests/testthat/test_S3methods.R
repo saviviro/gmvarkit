@@ -51,8 +51,8 @@ theta_123 <- c(-9.432281193, -0.505061517, 10.439237825, -0.007153524, 0.6116008
 mod_123 <- GMVAR(data_123, p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
 
 set.seed(1)
-pred222 <- predict.gmvar(mod_222, n_ahead=2, n_simu=10, ci=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
-pred123 <- predict.gmvar(mod_123, n_ahead=1, n_simu=10, ci=0.99, ci_type="upper", pred_type="median", plot_res=FALSE)
+pred222 <- predict.gmvar(mod_222, n_ahead=2, n_simu=10, pi=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
+pred123 <- predict.gmvar(mod_123, n_ahead=1, n_simu=10, pi=0.99, pi_type="upper", pred_type="median", plot_res=FALSE)
 tmp222 <- unname(pred222$pred[2,])
 
 test_that("predict works correctly", {
@@ -60,10 +60,13 @@ test_that("predict works correctly", {
    expect_equal(predict.gmvar(mod_222c, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(2.643673, 144.594839), tolerance=1e-5)
 
    expect_equal(tmp222, c(2.176329, 144.342199), tolerance=1e-5)
-   expect_equal(pred222$pred_ints[[1]][2,], c(-4.774, 138.032), tolerance=1e-3)
-   expect_equal(pred222$pred_ints[[4]][1,], c(5.028166, 147.636413), tolerance=1e-3)
+   expect_equal(pred222$pred_ints[, 1, 1], c(-0.9990109, -4.7740002), tolerance=1e-3)
+   expect_equal(pred222$pred_ints[, 3, 2], c(146.1007, 149.1014), tolerance=1e-3)
+   expect_equal(pred222$mix_pred_ints[, 1, 1], c(0.005081765, 0.001111207), tolerance=1e-3)
 
-   expect_equal(pred123$pred[1,], c(-9.3293117, -0.4367334, 10.6762769), tolerance=1e-5)
-   expect_equal(pred123$pred_ints[[1]][1,], c(-11.433423, -1.198168, 9.138782), tolerance=1e-5)
 
+   expect_equal(unname(pred123$pred[1,]), c(-9.3293117, -0.4367334, 10.6762769), tolerance=1e-5)
+   expect_equal(pred123$pred_ints[ , 1, ], c(-7.976158,  1.307586, 11.744568), tolerance=1e-5)
+   expect_equal(unname(pred123$mix_pred[1 ,]), c(9.999964e-01, 3.617052e-06), tolerance=1e-5)
+   expect_equal(pred123$mix_pred_ints[1 , 1, 1], c(-7.976158), tolerance=1e-5)
 })

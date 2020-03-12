@@ -41,7 +41,7 @@ Prediction intervals won't be calculated if the exact conditional mean is used.}
 \code{FALSE} in not.}
 
 \item{nt}{a positive integer specifying the number of observations to be plotted
-along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.2)}.}
+along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.15)}.}
 }
 \value{
 Returns a class '\code{gmvarpred}' object containing, among the specifications,...

@@ -12,7 +12,10 @@
 \item{...}{arguments passed to \code{grid} which plots grid to the figure.}
 
 \item{nt}{a positive integer specifying the number of observations to be plotted
-along with the prediction. Default is \code{round(nrow(data)*0.2)}.}
+along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.15)}.}
+
+\item{mix_weights}{\code{TRUE} if forecasts for mixing weights should be plotted,
+\code{FALSE} in not.}
 
 \item{add_grid}{should grid be added to the plots?}
 }

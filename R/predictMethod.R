@@ -17,7 +17,7 @@
 #' @param mix_weights \code{TRUE} if forecasts for mixing weights should be plotted,
 #'   \code{FALSE} in not.
 #' @param nt a positive integer specifying the number of observations to be plotted
-#'   along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.2)}.
+#'   along with the prediction (ignored if \code{plot_res==FALSE}). Default is \code{round(nrow(data)*0.15)}.
 #' @param ... additional arguments passed to \code{grid} (ignored if \code{plot_res==FALSE}) which plots
 #'   grid to the figure.
 #' @return Returns a class '\code{gmvarpred}' object containing, among the specifications,...
@@ -79,7 +79,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
   stopifnot(pi_type %in% c("two-sided", "upper", "lower", "none"))
   stopifnot(pred_type %in% c("mean", "median", "cond_mean"))
   if(missing(nt)) {
-    nt <- round(nrow(data)*0.2)
+    nt <- round(nrow(data)*0.15)
   } else {
     stopifnot(nt > 0 & nt %% 1 == 0)
     if(nt > nrow(data)) {
@@ -141,6 +141,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
       pred <- dim3_quantiles(sample, q=0.5)
       mix_pred <- dim3_quantiles(alpha_mt, q=0.5)
     }
+    if(is.null(colnames(pred))) colnames(pred) <- vapply(1:gmvar$model$d, function(m) paste("Comp.", m), character(1))
 
     # Prediction intervals
     if(pi_type == "upper") {
@@ -161,8 +162,15 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     mix_pred_ints <- dim3_quantiles(alpha_mt, q_tocalc)
 
     if(pi_type != "none") {
-      pred_ints <- aperm(pred_ints, perm=c(2, 1, 3))
-      mix_pred_ints <- aperm(mix_pred_ints, perm=c(2, 1, 3))
+      if(length(q_tocalc) == 1) {
+        pred_ints <- array(pred_ints, dim=c(n_ahead, ncol(data), length(q_tocalc)), dimnames=list(NULL, colnames(sample), q_tocalc)) # Make it an array with length(q_tocalc) slices
+        mix_pred_ints <- array(pred_ints, dim=c(n_ahead, gmvar$model$M, length(q_tocalc)), dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
+        pred_ints <- aperm(pred_ints, perm=c(1, 3, 2))
+        mix_pred_ints <- aperm(mix_pred_ints, perm=c(1, 3, 2))
+      } else {
+        pred_ints <- aperm(pred_ints, perm=c(2, 1, 3))
+        mix_pred_ints <- aperm(mix_pred_ints, perm=c(2, 1, 3))
+      }
       colnames(pred_ints) <- colnames(mix_pred_ints) <- q_tocalc
     }
   }
