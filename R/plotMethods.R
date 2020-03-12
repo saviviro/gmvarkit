@@ -54,8 +54,10 @@ plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
   t0 <- time(ts_pred)
   ts_names <- attributes(data)$dimnames[[2]]
   reg_names <- attributes(gmvarpred$mix_pred)$dimnames[[2]]
-  pred_ints <- aperm(gmvarpred$pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
-  mix_pred_ints <- aperm(gmvarpred$mix_pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
+  if(gmvarpred$pi_type != "none") {
+    pred_ints <- aperm(gmvarpred$pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
+    mix_pred_ints <- aperm(gmvarpred$mix_pred_ints, perm=c(1, 3, 2)) # [step, series, quantiles]
+  }
 
   # All values to indicate ylims
   if(gmvarpred$pi_type == "none") {
@@ -65,7 +67,7 @@ plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
   }
 
   # Prediction intervals, we lapply through quantiles [, , q]
-  ts_fun_fact <- function(inds) function(pred_ints, mix=FALSE) lapply(inds, function(i1) make_ts(pred_ints[, , i1], mix))
+  ts_lapply <- function(inds, pred_ints, mix=FALSE) lapply(inds, function(i1) make_ts(pred_ints[, , i1], mix))
   if(gmvarpred$pi_type == "two-sided") {
     ts1_lapply <- ts_fun_fact(1:(length(q)/2)) #function(pred_ints, mix=FALSE) lapply(1:(length(q)/2), function(i1) make_ts(pred_ints[,i1], mix)) # Lower bounds
     ts2_lapply <- ts_fun_fact((length(q)/2 + 1):length(q)) #function(pred_ints, mix=FALSE) lapply((length(q)/2 + 1):length(q), function(i1) make_ts(pred_ints[,i1], mix)) # Upper bounds

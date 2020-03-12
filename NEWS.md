@@ -29,6 +29,6 @@
 * Updated the predict method to include forecasts for the mixing weights. Also updated the return value.
 * The headlines in 'profile_logliks' are now correct for the mean-parametrized models (there was phi parameter instread on mu).
 * Improved the vignette. 
-* The default population size in the genetic algorithm is now 50*ceiling(sqrt(npars)), was 10*naprs.
+* The default population size in the genetic algorithm is now 50*ceiling(sqrt(npars)), was 10*npars.
 * In the function quantile_residual_tests the default argument 'nsimu' is now 1 so that the tests are based on the given data only (and not on simulation).
 * Corrected an error-causing bug in the predict method when the argument 'nt' was not specified.

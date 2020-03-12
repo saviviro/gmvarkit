@@ -155,11 +155,16 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
       q_tocalc <- numeric(0)
       pi <- NULL
     }
-    q_tocalc <- sort(q_tocalc, decreasing=FALSE)
 
-    pred_ints <- aperm(dim3_quantiles(sample, q_tocalc), perm=c(2, 1, 3))
-    mix_pred_ints <- aperm(dim3_quantiles(alpha_mt, q_tocalc), perm=c(2, 1, 3))
-    colnames(pred_ints) <- colnames(mix_pred_ints) <- q_tocalc
+    q_tocalc <- sort(q_tocalc, decreasing=FALSE)
+    pred_ints <- dim3_quantiles(sample, q_tocalc)
+    mix_pred_ints <- dim3_quantiles(alpha_mt, q_tocalc)
+
+    if(pi_type != "none") {
+      pred_ints <- aperm(pred_ints, perm=c(2, 1, 3))
+      mix_pred_ints <- aperm(mix_pred_ints, perm=c(2, 1, 3))
+      colnames(pred_ints) <- colnames(mix_pred_ints) <- q_tocalc
+    }
   }
 
   ret <- structure(list(gmvar=gmvar,
