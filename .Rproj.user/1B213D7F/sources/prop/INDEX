@@ -31,6 +31,8 @@
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_MAINest.R="AC653B61"
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_S3methods.R="13B1B4AE"
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_argumentChecks.R="981D9EE4"
+~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_generateParams.R="82A171C3"
+~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_gmvarConstruction.R="88EE29CA"
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_loglikelihood.R="EC11C478"
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_matcal.R="E060A716"
 ~%2Fgmvarkit%2Ftests%2Ftestthat%2Ftest_numericalDifferentiation.R="D8B1455B"

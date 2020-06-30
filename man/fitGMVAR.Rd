@@ -143,6 +143,8 @@ fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 plot(fit12)
 summary(fit12)
+print_std_errors(fit12)
+profile_logliks(fit12)
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",

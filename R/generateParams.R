@@ -60,11 +60,11 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
     alphas <- pick_alphas(p=p, M=M, d=d, params=params_std)
     all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params_std)
 
-    if(is.null(constraints)) { # If there are no contraints
+    if(is.null(constraints)) { # If there are no constraints
       all_phi0_A <- pick_all_phi0_A(p=p, M=M, d=d, params=params_std) # or all_mu
       pars <- vapply(1:M, function(m) {
         if(any(which_random == m)) {
-          if(runif(1) > 0.5) { # Use algorithm to force stationarity for coefficient matrices
+          if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
             coefmats <- random_coefmats2(p=p, d=d, ar_scale=ar_scale)
           } else {
             coefmats <- random_coefmats(d=d, how_many=p, scale=scale_A)
@@ -136,7 +136,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
 random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1) {
   x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
                                            random_coefmats2(p=p, d=d, ar_scale=ar_scale),
-                                           random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d +d*(d+1)/2)))
+                                           random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d + 1)/2)))
   if(M > 1) {
     alphas <- runif(n=M)
     return(c(x, (alphas[order(alphas, decreasing=TRUE, method="radix")]/sum(alphas))[-M]))
@@ -145,6 +145,30 @@ random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1) {
   }
 }
 
+
+
+#' @title Create random VAR-model \eqn{(dxd)} coefficient matrices \eqn{A}.
+#'
+#' @description \code{random_coefmats} generates random VAR model coefficient matrices.
+#'
+#' @inheritParams is_stationary
+#' @param how_many how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?
+#' @param scale non-diagonal elements will be drawn from mean zero normal distribution
+#'   with \code{sd=0.3/scale} and diagonal elements from one with \code{sd=0.6/scale}.
+#'   Larger scale will hence more likely result stationary coefficient matrices, but
+#'   will explore smaller area of the parameter space. Can be for example
+#'   \code{1 + log(2*mean(c((p-0.2)^(1.25), d)))}.
+#' @return Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
+#'  matrices \eqn{(vec(A_{1}),...,vec(A_{how_many}))}. Note that if \code{how_many==p},
+#'  then the returned vector equals \strong{\eqn{\phi_{m}}}.
+
+random_coefmats <- function(d, how_many, scale) {
+  as.vector(vapply(1:how_many, function(i1) {
+    x <- rnorm(d*d, mean=0, sd=0.3/scale)
+    x[1 + 0:(d - 1) * (d + 1)] <- rnorm(d, mean=0, sd=0.6/scale)
+    x
+  }, numeric(d*d)))
+}
 
 
 #' @title Create random stationary VAR model \eqn{(dxd)} coefficient matrices \eqn{A}.
@@ -207,31 +231,6 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
   }
   all_A <- all_phi[, , p, 1:p]
   as.vector(all_A)
-}
-
-
-
-#' @title Create random VAR-model \eqn{(dxd)} coefficient matrices \eqn{A}.
-#'
-#' @description \code{random_coefmats} generates random VAR model coefficient matrices.
-#'
-#' @inheritParams is_stationary
-#' @param how_many how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?
-#' @param scale non-diagonal elements will be drawn from mean zero normal distribution
-#'   with \code{sd=0.3/scale} and diagonal elements from one with \code{sd=0.6/scale}.
-#'   Larger scale will hence more likely result stationary coefficient matrices, but
-#'   will explore smaller area of the parameter space. Can be for example
-#'   \code{1 + log(2*mean(c((p-0.2)^(1.25), d)))}.
-#' @return Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
-#'  matrices \eqn{(vec(A_{1}),...,vec(A_{how_many}))}. Note that if \code{how_many==p},
-#'  then the returned vector equals \strong{\eqn{\phi_{m}}}.
-
-random_coefmats <- function(d, how_many, scale) {
-  as.vector(vapply(1:how_many, function(i1) {
-              x <- rnorm(d*d, mean=0, sd=0.3/scale)
-              x[1 + 0:(d - 1) * (d + 1)] <- rnorm(d, mean=0, sd=0.6/scale)
-              x
-              }, numeric(d*d)))
 }
 
 
