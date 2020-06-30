@@ -1,4 +1,4 @@
-context("calculating approximate standard errors")
+context("standard errors")
 library(gmvarkit)
 
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
