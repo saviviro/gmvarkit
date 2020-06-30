@@ -106,6 +106,8 @@
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
+#' print_std_errors(fit12)
+#' profile_logliks(fit12)
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
@@ -161,7 +163,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
-  cat("Optimizing with the genetic algorithm...\n")
+  cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
                                                               constraints=constraints, seed=seeds[i1], ...), cl=cl)
 
@@ -176,7 +178,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
       printfun("The mean loglik:   ", mean)
       printfun("The largest loglik:", max)
     }
-    cat("Results from genetic algorithm:\n")
+    cat("Results from the genetic algorithm:\n")
     print_loks()
   }
 
@@ -192,7 +194,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
     vapply(1:npars, function(i1) (loglik_fn(params + I[i1,]*h) - loglik_fn(params - I[i1,]*h))/(2*h), numeric(1))
   }
 
-  cat("Optimizing with variable metric algorithm...\n")
+  cat("Optimizing with a variable metric algorithm...\n")
   NEWTONresults <- pbapply::pblapply(1:ncalls, function(i1) optim(par=GAresults[[i1]], fn=loglik_fn, gr=loglik_grad, method="BFGS",
                                                                   control=list(fnscale=-1, maxit=maxit)), cl=cl)
   parallel::stopCluster(cl=cl)

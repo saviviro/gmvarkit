@@ -126,7 +126,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
 
   # Defaults and checks
-  if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu has to be positive integers")
+  if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu have to be positive integers")
   if(missing(popsize)) {
     popsize <- 50*ceiling(sqrt(npars))
   } else if(popsize < 2 | popsize %% 2 != 0) {
@@ -445,7 +445,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   }
 
   # GA always optimizes with mean parametrization. Return intercept-parametrized estimate if parametrization=="intercept".
-  if(parametrization=="mean") {
+  if(parametrization == "mean") {
     return(ret)
   } else {
     return(change_parametrization(p=p, M=M, d=d, params=ret, constraints=constraints, change_to="intercept"))
