@@ -142,7 +142,7 @@ If data is provided, then also multivariate quantile residuals (\emph{Kalliovirt
 \examples{
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form.
-data <- cbind(10*eurusd[,1], 100*eurusd[,2]
+data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2), d=2 model:

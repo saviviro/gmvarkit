@@ -135,7 +135,7 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 # package, but in a scaled form (similar to Kalliovirta et al. 2016).
 data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(dat) <- colnames(eurusd)
+colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model: 10 estimation rounds with seeds set
 # for reproducibility
