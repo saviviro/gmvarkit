@@ -53,6 +53,10 @@ upsilon1_122 <- c(phi10_122, vec(A11_122), vech(Omega1_122))
 upsilon2_122 <- c(phi20_122, vec(A21_122), vech(Omega2_122))
 theta_122 <- c(upsilon1_122, upsilon2_122, alpha1_122)
 
+W_122 <- matrix(c(-0.89, -0.71, 0.36, -2.10), nrow=2, ncol=2, byrow=FALSE)
+lambdas_122 <- c(7.20, 1.30)
+theta_122s <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec(W_122), lambdas_122, alpha1_122) # SGMVAR
+
 # p=2, M=2, d=2
 phi10_222 <- c(1.03, 2.36)
 A11_222 <- matrix(c(1.25, 0.06, 0.04, 1.34), nrow=2, byrow=FALSE)

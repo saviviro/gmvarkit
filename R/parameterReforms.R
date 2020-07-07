@@ -53,6 +53,49 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 }
 
 
+#' @title Reform structural parameter vector into the "standard" form
+#'
+#' @description \code{reform_structural_pars} reforms (unconstrained) structural
+#'   parameter vector into the form that corresponds to reduced form parameter vectors.
+#'
+#' @inheritParams loglikelihood_int
+#' @inheritParams is_stationary
+#' @param change_na change NA parameter values of constrained models to -9.999?
+#' @details In structural parameter vector is a constrained one, use
+#'   \code{reform_constrained_pars} first to remove the constraints.
+#' @return Returns "reduced form model" parameter vector.
+#' @section Warning:
+#'  No argument checks!
+#' @inherit in_paramspace_int references
+
+reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    return(params)
+  }
+  W <- unvec(d=2, a=params[(d*M*(1 + d*p) + 1):(d*M*(1 + d*p) + d^2)])
+  Omegas <- array(dim=c(d, d, M))
+  Omegas[, , 1] <- tcrossprod(W)
+  if(M > 1) {
+    for(m in 2:M) {
+      lambdas <- params[(d*M*(1 + d*p) + d^2 + d*(m - 2) + 1):(d*M*(1 + d*p) + d^2 + d*(m - 1))]
+      Omegas[, , m] <- W%*%tcrossprod(diag(lambdas), W)
+    }
+  }
+  # HUOM: täällä tehdään pick-paramssit joka tapauksessa, joten jos tätä kutsutaan ensin
+  # ja sitten otetaan standardi pick-paramssit, niin pick-paramssit tulee kahteen kertaan
+  # menee turhaan laskenta-aikaa.
+  # Tämän function voi jättää olemassa olemaan varmuuden vuoksi, mutta pick-paramsseihin
+  # structural-pars versiot! Pick_omegas palauttaisi siis omegat eikä pick W tai pick Lambdoja
+  # tarvita.
+
+  if(M == 1) {
+    return(pars)
+  } else {
+    return(c(pars, params[(M*d + q + M*d*(d + 1)/2 + 1):(M*d + q + M*d*(d + 1)/2 + M - 1)])) # + alphas
+  }
+}
+
+
 #' @title Form the \eqn{((dp)x(dp))} "bold A" matrices related to the VAR processes
 #'
 #' @description \code{form_boldA} creates the "bold A" coefficient matrices related to
@@ -80,7 +123,7 @@ form_boldA <- function(p, M, d, all_A) {
 #'   to mixing weights into a decreasing order.
 #'
 #' @inheritParams is_stationary
-#' @details Constrained parameter vectors are not supported!
+#' @details Constrained or structural parameter vectors are not supported!
 #' @return Returns sorted parameter vector with \eqn{\alpha_{1}>...>\alpha_{m}}, that has form
 #'   \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},...,\strong{\eqn{\upsilon_{M}}},
 #'   \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
@@ -141,7 +184,7 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, change_to=
   if(is.null(constraints)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   } else {
-    qm1 <- (1:M - 1)*d
+    qm1 <- (1:M - 1)*d # TÄMÄ VARMAAN SAMA RAKENTEELLISELLA
   }
 
   if(change_to == "mean") { # params has original parametrization with intercept

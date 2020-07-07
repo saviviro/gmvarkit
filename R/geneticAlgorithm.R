@@ -399,7 +399,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
         # Pick the nonredundant regimes of best_ind and alt_ind
         non_red_regs_best <- vapply((1:M)[-which_redundant], function(i2) pick_regime(p=p, M=M, d=d, params=best_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
-        if(length(which_redundant_alt) == 0) { # Special case for techinal reasons
+        if(length(which_redundant_alt) == 0) { # Special case for technical reasons
           non_red_regs_alt <- vapply(1:M, function(i2) pick_regime(p=p, M=M, d=d, params=alt_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
         } else {
           non_red_regs_alt <- vapply((1:M)[-which_redundant_alt], function(i2) pick_regime(p=p, M=M, d=d, params=alt_ind, m=i2), numeric(p*d^2 + d + d*(d+1)/2))
