@@ -11,6 +11,8 @@ Omega1_112 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE)
 
 theta_112 <- upsilon1_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 
+
+
 # p=1, M=2, d=2
 phi10_122 <- c(1.03, 2.36)
 A11_122 <- matrix(c(1, -0.06, -0.04, 1), nrow=2, byrow=FALSE)

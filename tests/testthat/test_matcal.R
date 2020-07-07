@@ -33,3 +33,27 @@ test_that("vech and unvech works correctly", {
   expect_equal(unvech(d=2, a=b2), B2)
   expect_equal(unvech(d=3, a=b3), B3)
 })
+
+
+Omega1_2 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE) # d=2
+Omega2_2 <- matrix(c(5.88, 3.56, 3.56, 9.80), nrow=2, byrow=FALSE)
+
+Omega1_3 <- matrix(c(1, 0.22, 0.33, 0.22, 2, 0.44, 0.33, 0.44, 3), nrow=3, byrow=FALSE)
+Omega2_3 <- matrix(c(1.1, 0.222, 0.333, 0.222, 2.2, 0.444, 0.333, 0.444, 3.3), nrow=3, byrow=FALSE)
+
+make_W <- function(x, d) matrix(x[1:(d^2)], nrow=d, ncol=d, byrow=FALSE)
+make_Lambda <- function(x, d) diag(x[(d^2 + 1):length(x)])
+
+test_that("diag_Omegas works correctly", {
+  x2 <- diag_Omegas(Omega1_2, Omega2_2)
+  W2 <- make_W(x2, d=2)
+  Lambda2 <- make_Lambda(x2, d=2)
+  expect_equal(tcrossprod(W2), Omega1_2, tol=1e-6)
+  expect_equal(W2%*%tcrossprod(Lambda2, W2), Omega2_2, tol=1e-6)
+
+  x3 <- diag_Omegas(Omega1_3, Omega2_3)
+  W3 <- make_W(x3, d=3)
+  Lambda3 <- make_Lambda(x3, d=3)
+  expect_equal(tcrossprod(W3), Omega1_3, tol=1e-6)
+  expect_equal(W3%*%tcrossprod(Lambda3, W3), Omega2_3, tol=1e-6)
+})

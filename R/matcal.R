@@ -62,3 +62,37 @@ unvech <- function(d, a) {
   A[upA] <- t(A)[upA]
   A
 }
+
+
+#' @title Simultaneously diagonalize two covariance matrices
+#'
+#' @description \code{diag_Omegas} Simultaneously diagonalizes two covariance matrices using
+#'   eigenvalue decomposition.
+#'
+#' @param Omega1 a positive definite \eqn{(dxd)} covariance matrix \eqn{(d>1)}
+#' @param Omega2 another positive definite \eqn{(dxd)} covariance matrix
+#' @details See the return value and Muirhead (1982), Theorem A9.9 for details.
+#' @return Returns a length \eqn{d^2 + d} vector where the first \eqn{d^2} elements
+#'   are \eqn{vec(W)} with the columns of \eqn{W} being (specific) eigenvectors of
+#'   the matrix \eqn{\Omega_2^\Omega_1^{-1}} and the rest \eqn{d} elements are the
+#'   corresponding eigenvalues "lambdas". The result satisfies \eqn{WW' = Omega1} and
+#'   \eqn{Wdiag(lambdas)W' = Omega2}.
+#' @section Warning:
+#'  No argument checks! Does not work with dimension \eqn{d=1}!
+#' @references
+#' \itemize{
+#'   \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
+#' }
+
+diag_Omegas <- function(Omega1, Omega2) {
+  eig1 <- eigen(Omega1, symmetric=TRUE)
+  D <- diag(eig1$values) # Pos. def.
+  H <- eig1$vectors # Orthogonal
+  sqrt_omg1 <- H%*%sqrt(D)%*%t(H) # Symmetric and pos. def.
+  inv_sqrt_omg1 <- solve(sqrt_omg1)
+  eig2 <- eigen(inv_sqrt_omg1%*%Omega2%*%inv_sqrt_omg1, symmetric=TRUE)
+  lambdas <- eig2$values
+  V <- eig2$vectors # Orthogonal
+  W <- sqrt_omg1%*%V # all.equal(W%*%t(W), Omega1); all.equal(W%*%diag(lambdas)%*%t(W), Omega2)
+  c(vec(W), lambdas)
+}
