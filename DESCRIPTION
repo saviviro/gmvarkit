@@ -5,7 +5,7 @@ Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", r
 Description: Unconstrained and constrained maximum likelihood estimation of Gaussian Mixture Vector Autoregressive (GMVAR)
     model, quantile residual tests, graphical diagnostics, simulations, and forecasting.
     Leena Kalliovirta, Mika Meitz, Pentti Saikkonen (2016) <doi:10.1016/j.jeconom.2016.02.012>.
-Depends: R (>= 3.4.0)
+Depends: R (>= 4.0.0)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

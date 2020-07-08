@@ -72,7 +72,7 @@ reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
     return(params)
   }
-  W <- unvec(d=2, a=params[(d*M*(1 + d*p) + 1):(d*M*(1 + d*p) + d^2)])
+  W <- unvec(d=d, a=params[(d*M*(1 + d*p) + 1):(d*M*(1 + d*p) + d^2)])
   Omegas <- array(dim=c(d, d, M))
   Omegas[, , 1] <- tcrossprod(W)
   if(M > 1) {

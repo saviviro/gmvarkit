@@ -2,9 +2,9 @@
 % Please edit documentation in R/pickParams.R
 \name{pick_all_phi0_A}
 \alias{pick_all_phi0_A}
-\title{Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{A_{m}} parameter values}
+\title{Pick all \eqn{\phi_{m,0}} or \eqn{\mu_{m}} and \eqn{vec(A_{m,1}),...,vec(A_{m,p})} parameter values}
 \usage{
-pick_all_phi0_A(p, M, d, params)
+pick_all_phi0_A(p, M, d, params, structural_pars = NULL)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -29,10 +29,23 @@ pick_all_phi0_A(p, M, d, params)
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
   The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns a \eqn{((pd^2+d)xM)} matrix containing \eqn{(\phi_{m,0}, vec(A_{m}))} in the m:th column,
- or \eqn{(\mu_{m}, vec(A_{m}))} if the parameter vector is mean-parametrized, m=1,..,M.
+Returns a \eqn{((pd^2+d)xM)} matrix containing \eqn{(\phi_{m,0}, vec(A_{m,1}),...,vec(A_{m,p}))} in the m:th column,
+ or \eqn{(\mu_{m}, vec(A_{m,1}),...,vec(A_{m,p}))} if the parameter vector is mean-parametrized, m=1,..,M.
 }
 \description{
 \code{pick_all_phi0_A} picks the intercept or mean parameters and vectorized coefficient

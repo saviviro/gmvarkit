@@ -4,7 +4,15 @@
 \alias{is_stationary}
 \title{Check the stationary condition of a given GMVAR model}
 \usage{
-is_stationary(p, M, d, params, all_boldA = NULL, tolerance = 0.001)
+is_stationary(
+  p,
+  M,
+  d,
+  params,
+  all_boldA = NULL,
+  structural_pars = NULL,
+  tolerance = 0.001
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -32,6 +40,19 @@ is_stationary(p, M, d, params, all_boldA = NULL, tolerance = 0.001)
 
 \item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{tolerance}{Returns \code{FALSE} if modulus of any eigenvalue is larger or equal to \code{1-tolerance}.}
 }

@@ -34,6 +34,17 @@ test_that("vech and unvech works correctly", {
   expect_equal(unvech(d=3, a=b3), B3)
 })
 
+W1 <- matrix(0:3, nrow=2, byrow=FALSE)
+W2 <- matrix(c(1, 2, 0, 3, 0, 4, 5, 6, 7), nrow=3, byrow=FALSE)
+W3 <- matrix(c(1, 0, 2, 3, 4, 0, 0, 5, 0, 6, 7, 8, 0, 9, 0, 0), nrow=4, byrow=FALSE)
+W4 <- matrix(1:25, nrow=5, byrow=FALSE)
+
+test_that("Wvec works correctly", {
+  expect_equal(Wvec(W1), 1:3)
+  expect_equal(Wvec(W2), 1:7)
+  expect_equal(Wvec(W3), 1:9)
+  expect_equal(Wvec(W4), 1:25)
+})
 
 Omega1_2 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE) # d=2
 Omega2_2 <- matrix(c(5.88, 3.56, 3.56, 9.80), nrow=2, byrow=FALSE)

@@ -13,6 +13,22 @@ vec <- function(A) {
 }
 
 
+#' @title Vectorization operator that removes zeros
+#'
+#' @description \code{vec} stacks columns of the given matrix to form a vector
+#'   and removes elements that are zeros.
+#'
+#' @param W a size \eqn{(dxd)} square matrix to be vectorized.
+#' @return a vector of length \eqn{d^2 - n_zeros} where \eqn{n_zeros} is the
+#'   number of zero entries in the matrix \code{W}.
+#' @section Warning:
+#'  No argument checks!
+
+Wvec <- function(W) {
+  W[W != 0]
+}
+
+
 #' @title Reverse vectorization operator
 #'
 #' @description \code{unvec} forms a square matrix from a vector of

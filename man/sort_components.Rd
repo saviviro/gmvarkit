@@ -51,7 +51,7 @@ Returns sorted parameter vector with \eqn{\alpha_{1}>...>\alpha_{m}}, that has f
   to mixing weights into a decreasing order.
 }
 \details{
-Constrained parameter vectors are not supported!
+Constrained or structural parameter vectors are not supported!
 }
 \section{Warning}{
 
