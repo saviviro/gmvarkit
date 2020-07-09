@@ -80,14 +80,14 @@ a time-varying diagonal matrix with positive diagonal entries).}
 \item{change_na}{change NA parameter values of constrained models to -9.999?}
 }
 \value{
-Returns "reduced form model" parameter vector.
+Returns (unconstrained) "reduced form model" parameter vector.
 }
 \description{
 \code{reform_structural_pars} reforms (unconstrained) structural
   parameter vector into the form that corresponds to reduced form parameter vectors.
 }
 \details{
-In structural parameter vector is a constrained one, use
+If the structural parameter vector is a constrained one, use
   \code{reform_constrained_pars} first to remove the constraints.
 }
 \section{Warning}{

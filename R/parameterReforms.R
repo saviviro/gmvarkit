@@ -31,24 +31,65 @@ reform_data <- function(data, p) {
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na=FALSE) {
-  if(is.null(constraints)) {
+reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, change_na=FALSE) {
+  if(is.null(constraints) && is.null(structural_pars)) {
+    return(params)
+  } else if(is.null(constraints) && !is.null(structural_pars) && !any(structural_pars$W == 0) && is.null(structural_pars$C_lambda)) {
     return(params)
   }
-  q <- ncol(constraints)
-  psi <- params[(M*d + 1):(M*d + q)]
-  if(change_na) {
-    if(length(psi[is.na(psi)]) > 0) warning("Replaced some NA values with -9.999")
-    psi[is.na(psi)] <- -9.999
+
+  # Obtain the AR coefficients from the constraints
+  if(is.null(constraints)) { # For SGMVAR model with constrained structural parameters but no AR constraints
+    q <- M*p*d^2
+    psi_expanded <- params[(d*M + 1):(d*M + d^2*p*M)] # AR coefficients (without constraints)
+  } else {
+    q <- ncol(constraints)
+    psi <- params[(M*d + 1):(M*d + q)]
+    if(change_na) {
+      if(anyNA(psi)) {
+        warning("Replaced some NA values with -9.999")
+        psiNA <- TRUE
+      } else {
+        psiNA <- FALSE
+      }
+      psi[is.na(psi)] <- -9.999
+    }
+    psi_expanded <- constraints%*%psi
   }
-  psi_expanded <- constraints%*%psi
-  pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
-                                              params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
-                    numeric(p*d^2 + d + d*(d + 1)/2)))
+
+  if(is.null(structural_pars)) { # Reduced form model
+    pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
+                                                params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
+                             numeric(p*d^2 + d + d*(d + 1)/2)))
+  } else { # Structural model
+    W <- structural_pars$W # Obtain the indices with zero constraints (the zeros don't exist in params)
+    n_zeros <- sum(W == 0)
+    new_W <- numeric(d^2)
+    W_pars <- params[(d*M + q + 1):(d*M + q + d^2 - n_zeros)]
+    new_W[W != 0] <- W_pars
+
+    if(M > 1) {
+      if(!is.null(structural_pars$C_lambda)) {
+        r <- ncol(structural_pars$C_lambda)
+        gamma <- params[(d*M + q + d^2 - n_zeros + 1):(d*M + q + d^2 - n_zeros + r)]
+        if(change_na) {
+          if(anyNA(gamma) && !psiNA) warning("Replaced some NA values with -9.999")
+          gamma[is.na(gamma)] <- -9.999
+        }
+        lambdas <- structural_pars$C_lambda%*%gamma
+      } else {
+        lambdas <- params[(d*M + q + d^2 - n_zeros + 1):(d*M + q + d^2 - n_zeros + d*(M - 1))]
+      }
+    } else {
+      lambdas <- numeric(0)
+    }
+    pars <- c(params[1:(M*d)], psi_expanded, vec(new_W), lambdas)
+  }
+
   if(M == 1) {
     return(pars)
   } else {
-    return(c(pars, params[(M*d + q + M*d*(d + 1)/2 + 1):(M*d + q + M*d*(d + 1)/2 + M - 1)]))
+    return(c(pars, params[(length(params) - M + 2):length(params)]))
   }
 }
 
@@ -61,9 +102,9 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, change_na
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
 #' @param change_na change NA parameter values of constrained models to -9.999?
-#' @details In structural parameter vector is a constrained one, use
+#' @details If the structural parameter vector is a constrained one, use
 #'   \code{reform_constrained_pars} first to remove the constraints.
-#' @return Returns "reduced form model" parameter vector.
+#' @return Returns (unconstrained) "reduced form model" parameter vector.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
@@ -72,27 +113,22 @@ reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
     return(params)
   }
-  W <- unvec(d=d, a=params[(d*M*(1 + d*p) + 1):(d*M*(1 + d*p) + d^2)])
-  Omegas <- array(dim=c(d, d, M))
-  Omegas[, , 1] <- tcrossprod(W)
-  if(M > 1) {
-    for(m in 2:M) {
-      lambdas <- params[(d*M*(1 + d*p) + d^2 + d*(m - 2) + 1):(d*M*(1 + d*p) + d^2 + d*(m - 1))]
-      Omegas[, , m] <- W%*%tcrossprod(diag(lambdas), W)
-    }
+  Omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  allA <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  make_upsilon <- function(phi0, Am, Omega) c(phi0, vec(Am), vech(Omega))
+  n_upsilon_pars <- d^2*p + d + d*(d + 1)/2
+  pars <- numeric(M*n_upsilon_pars) # no alphas
+  for(m in 1:M) {
+    pars[((m - 1)*n_upsilon_pars + 1):(m*n_upsilon_pars)] <- c(phi0[, m], as.vector(allA[, , , m]), vech(Omegas[, , m]))
   }
-  # HUOM: täällä tehdään pick-paramssit joka tapauksessa, joten jos tätä kutsutaan ensin
-  # ja sitten otetaan standardi pick-paramssit, niin pick-paramssit tulee kahteen kertaan
-  # menee turhaan laskenta-aikaa.
-  # Tämän function voi jättää olemassa olemaan varmuuden vuoksi, mutta pick-paramsseihin
-  # structural-pars versiot! Pick_omegas palauttaisi siis omegat eikä pick W tai pick Lambdoja
-  # tarvita.
-
   if(M == 1) {
-    return(pars)
+    ret <- pars
   } else {
-    return(c(pars, params[(M*d + q + M*d*(d + 1)/2 + 1):(M*d + q + M*d*(d + 1)/2 + M - 1)])) # + alphas
+    alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+    ret <- c(pars, alphas[-M]) # + alphas
   }
+  ret
 }
 
 

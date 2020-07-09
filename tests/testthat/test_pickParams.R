@@ -1,4 +1,4 @@
-context("Picking parameters from parameter vector")
+context("Pick parameters")
 library(gmvarkit)
 
 
