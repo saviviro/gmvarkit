@@ -159,36 +159,76 @@ form_boldA <- function(p, M, d, all_A) {
 #'   to mixing weights into a decreasing order.
 #'
 #' @inheritParams is_stationary
-#' @details Constrained or structural parameter vectors are not supported!
-#' @return Returns sorted parameter vector with \eqn{\alpha_{1}>...>\alpha_{m}}, that has form
-#'   \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},...,\strong{\eqn{\upsilon_{M}}},
-#'   \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
-#'  \itemize{
-#'    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-#'    \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
-#'    \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
-#'  }
-#'  Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'  component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component, and \eqn{\alpha_{m}} is the
-#'  mixing weight parameter.
-#'  \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
-#'  of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
-#'  The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
+#' @details Constrained parameter vectors are not supported (expect for constraints in W)!
+#'   For structural models, the order of the first mixture component is fixed by construction,
+#'   so the rest \eqn{m=2,...,M} mixture components are rearranged only by the mixing weight
+#'   parameters.
+#' @return Returns sorted parameter vector...
+#'   \describe{
+#'     \item{\strong{For reduced form GMVAR model:}}{
+#'        ...with \eqn{\alpha_{1}>...>\alpha_{M}}, that has form
+#'        \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},...,\strong{\eqn{\upsilon_{M}}},
+#'        \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
+#'        \itemize{
+#'          \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
+#'          \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
+#'          \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
+#'        }
+#'     }
+#'     \item{\strong{For structural GMVAR model:}}{
+#'      ...with \eqn{\alpha_{2}>...>\alpha_{M}}, that has form
+#'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \itemize{
+#'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
+#'       }
+#'     }
+#'   }
+#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
+#'   component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component, and \eqn{\alpha_{m}} is the
+#'   mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the error term covariance
+#'   matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+#'
+#'   \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
+#'   of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
+#'   The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-sort_components <- function(p, M, d, params) {
+sort_components <- function(p, M, d, params, structural_pars=NULL) {
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
-  ord <- order(alphas, decreasing=TRUE, method="radix")
-  if(all(ord == 1:M)) {
-    return(params)
-  } else {
-    q <- d + p*d^2 + d*(d + 1)/2
-    qm1 <- (1:M - 1)*q
-    qm <- qm1[ord]
-    pars <- vapply(1:M, function(m) params[(qm[m] + 1):(qm[m] + q)], numeric(q))
-    c(pars, alphas[ord][-M])
+
+  if(is.null(structural_pars)) { # Reduced form model: sort all components by mixing weights
+    ord <- order(alphas, decreasing=TRUE, method="radix")
+    if(all(ord == 1:M)) {
+      return(params)
+    } else {
+      q <- d + p*d^2 + d*(d + 1)/2
+      qm1 <- (1:M - 1)*q
+      qm <- qm1[ord]
+      pars <- vapply(1:M, function(m) params[(qm[m] + 1):(qm[m] + q)], numeric(q))
+      return(c(pars, alphas[ord][-M]))
+    }
+  } else { # Structural model: sort the component 2,...,M by mixing weights (M > 2)
+    if(M < 3) return(params)
+    ord <- order(alphas[-1], decreasing=TRUE, method="radix")
+    if(all(ord == 1:(M - 1))) {
+      return(params)
+    } else {
+      n_zeros <- sum(structural_pars$W == 0)
+      phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+      A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE)
+      lambdas <- matrix(params[(d*M + d^2*p*M + d^2 - n_zeros + 1):(d*M + d^2*p*M + d^2 - n_zeros + d*(M - 1))],
+                        nrow=d, byrow=FALSE)
+      sort_pars <- function(parmat) c(parmat[,1], as.vector(parmat[,-1][,ord]))
+      new_phi0 <- sort_pars(phi0)
+      new_allA <- sort_pars(A)
+      new_lambdas <- as.vector(lambdas[,ord])
+      new_W <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)]
+      new_alphas <- c(alphas[1], alphas[-1][ord])[-M]
+      return(c(new_phi0, new_allA, new_W, new_lambdas, new_alphas))
+    }
   }
 }
 
@@ -209,18 +249,18 @@ sort_components <- function(p, M, d, params) {
 #'  No argument checks!
 #' @inherit is_stationary references
 
-change_parametrization <- function(p, M, d, params, constraints=NULL, change_to=c("intercept", "mean")) {
+change_parametrization <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, change_to=c("intercept", "mean")) {
   re_params <- params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints) # Parameters in regular form
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars) # Parameters in regular form
   change_to <- match.arg(change_to)
   Id <- diag(nrow=d)
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
-  all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=params)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
-  if(is.null(constraints)) {
+  if(is.null(constraints) && is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
   } else {
-    qm1 <- (1:M - 1)*d # TÄMÄ VARMAAN SAMA RAKENTEELLISELLA
+    qm1 <- (1:M - 1)*d
   }
 
   if(change_to == "mean") { # params has original parametrization with intercept

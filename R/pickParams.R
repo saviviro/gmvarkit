@@ -48,12 +48,9 @@ pick_Am <- function(p, M, d, params, m, structural_pars=NULL) {
   if(is.null(structural_pars)) {
     qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
     lowers <- qm1 + d + (1:p - 1)*d^2 + 1
-    #upper1 <- qm1 + d + d^2 # The first upper bound # qm1 + d + (1:p)*d^2
-    wd <- d^2 # How many params #upper1 - lowers[1] + 1
+    wd <- d^2 # How many params
     tmp <- matrix(0:(wd - 1), nrow=wd, ncol=length(lowers), byrow=FALSE)
-    coefs <- params[tmp + matrix(rep(lowers, times=wd), nrow=wd, byrow=TRUE)] # fastest
-    # coefs <- vapply(1:p, function(i1) params[(qm1 + d + (i1 - 1)*d^2 + 1):(qm1 + d + i1*d^2)], numeric(d^2)) # slower
-    # coefs <- params[t(outer(X=lowers, Y=0:(uppers[1] - lowers[1]), FUN="+"))] # slowest
+    coefs <- params[tmp + matrix(rep(lowers, times=wd), nrow=wd, byrow=TRUE)]
   } else {
     coefs <- params[(d*M + d^2*p*(m - 1) + 1):(d*M + d^2*p*m)]
   }
@@ -80,10 +77,7 @@ pick_allA <- function(p, M, d, params, structural_pars=NULL) {
     lowers <- qm1 + d + 1
     wd <- d^2*p
     tmp <- matrix(0:(wd - 1), nrow=wd, ncol=length(lowers), byrow=FALSE)
-    coefs <- params[tmp + matrix(rep(lowers, times=wd), nrow=wd, byrow=TRUE)] # faster
-    #coefs <- vapply(1:M, function(m) {
-    #  vapply(1:p, function(i1) params[(qm1[m] + d + (i1 - 1)*d^2 + 1):(qm1[m] + d + i1*d^2)], numeric(d^2)) # slower
-    #}, numeric(p*d^2))
+    coefs <- params[tmp + matrix(rep(lowers, times=wd), nrow=wd, byrow=TRUE)]
   } else {
     coefs <- params[(d*M + 1):(d*M + d^2*p*M)]
   }
@@ -106,8 +100,7 @@ pick_phi0 <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
     tmp <- matrix(1:d, nrow=d, ncol=length(qm1), byrow=FALSE)
-    coefs <- params[tmp + matrix(rep(qm1, times=d), nrow=d, byrow=TRUE)] # faster
-    #vapply(1:M, function(m) params[(qm1[m] + 1):(qm1[m] + d)], numeric(d)) # slower
+    coefs <- params[tmp + matrix(rep(qm1, times=d), nrow=d, byrow=TRUE)]
   } else {
     coefs <- params[1:(d*M)]
   }
@@ -161,8 +154,6 @@ pick_Omegas <- function(p, M, d, params, structural_pars=NULL) {
     for(m in 1:M) {
       Omegas[, , m] <- unvech(d=d, a=params[(qm1[m] + d + p*d^2 + 1):(qm1[m] + d + p*d^2 + d*(d + 1)/2)])
     }
-    #tmp <- vapply(1:M, function(m) unvech(d=d, a=params[(qm1[m] + d + p*d^2 + 1):(qm1[m] + d + p*d^2 + d*(d + 1)/2)]), numeric(d^2)) # slower
-    #Omegas <- array(tmp, dim=c(d, d, M))
   } else {
     W <- unvec(d=d, a=params[(d*M*(1 + d*p) + 1):(d*M*(1 + d*p) + d^2)])
     Omegas[, , 1] <- tcrossprod(W)
