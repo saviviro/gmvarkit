@@ -76,5 +76,7 @@ Returns a 3D array containing the covariance matrices of the given model. Coeffi
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }

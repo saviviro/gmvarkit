@@ -113,6 +113,8 @@
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
 #'    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
 #'            \emph{Springer}.
 #'  }
@@ -131,14 +133,14 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
   # Collect parameter values
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
   if(parametrization == "intercept") {
-    all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params)
+    all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   } else {
-    mu <- pick_phi0(p=p, M=M, d=d, params=params) # mean parameters instead of phi0
+    mu <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars) # mean parameters instead of phi0
   }
-  all_A <- pick_allA(p=p, M=M, d=d, params=params) # A_{m,i}, m=1,...,M, i=1,..,p
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params) # Omega_m
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars) # A_{m,i}, m=1,...,M, i=1,..,p
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars) # Omega_m
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A) # The 'bold A' for each m=1,..,M, Lutkepohl 2005, eq.(2.1.8)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params) # Mixing weight parameters
 
@@ -223,10 +225,8 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
   } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
-    # array(vapply(1:nrow(alpha_mt), function(i1) rowSums(vapply(1:M, function(m) alpha_mt[i1, m]*all_Omega[, , m], numeric(d*d))),  numeric(d*d)), dim=c(d, d, T_obs))
     first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(all_Omega[, , m]), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
-    # array(vapply(1:nrow(alpha_mt), function(i1) rowSums(vapply(1:M, function(m) alpha_mt[i1, m]*tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]), numeric(d*d))), numeric(d*d)), dim=c(d, d, T_obs))
     second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(vapply(1:nrow(alpha_mt), function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
                                                                                                        numeric(d*d))), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     return(first_term + second_term)
@@ -261,22 +261,34 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{calc_gradient}}
 #' @examples
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+#'
+#' # GMVAR(2, 2), d=2 model;
 #' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 #'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
 #'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
 #'   9.838, 0.740)
 #' loglikelihood(data=data, p=2, M=2, params=params222, parametrization="mean")
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' loglikelihood(data=data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
 #' @export
 
-loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, minval=NA) {
+loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
+                          structural_pars=NULL, minval=NA) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
   data <- check_data(data, p)
   d <- ncol(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints)) stop("Parameter vector has wrong dimension")
+  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
+    stop("Parameter vector has wrong dimension")
+  }
   loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
-                    constraints=constraints, to_return="loglik", check_params=TRUE, minval=minval)
+                    constraints=constraints, structural_pars=structural_pars, to_return="loglik", check_params=TRUE, minval=minval)
 }
 
 
@@ -316,16 +328,18 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
 #' @export
 
 cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL,
-                         to_return=c("regime_cmeans", "total_cmeans", "total_ccovs")) {
+                         structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs")) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
   to_return <- match.arg(to_return)
   data <- check_data(data, p)
   d <- ncol(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints)) stop("Parameter vector has wrong dimension")
+  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
+    stop("Parameter vector has wrong dimension")
+  }
   loglikelihood_int(data, p, M, params, conditional=TRUE, parametrization=parametrization,
-                    constraints=constraints, to_return=to_return, check_params=TRUE, minval=NA)
+                    constraints=constraints, structural_pars=structural_pars, to_return=to_return, check_params=TRUE, minval=NA)
 }
 
 

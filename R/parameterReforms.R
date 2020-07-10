@@ -34,7 +34,7 @@ reform_data <- function(data, p) {
 reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, change_na=FALSE) {
   if(is.null(constraints) && is.null(structural_pars)) {
     return(params)
-  } else if(is.null(constraints) && !is.null(structural_pars) && !any(structural_pars$W == 0) && is.null(structural_pars$C_lambda)) {
+  } else if(is.null(constraints) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
     return(params)
   }
 
@@ -101,7 +101,6 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structura
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
-#' @param change_na change NA parameter values of constrained models to -9.999?
 #' @details If the structural parameter vector is a constrained one, use
 #'   \code{reform_constrained_pars} first to remove the constraints.
 #' @return Returns (unconstrained) "reduced form model" parameter vector.

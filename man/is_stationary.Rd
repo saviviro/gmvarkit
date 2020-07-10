@@ -80,7 +80,7 @@ Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. Based on
 \code{is_stationary} checks the stationarity condition of a GMVAR model.
 }
 \details{
-If the models constrained, remove the constraints first with the function \code{reform_constrained_pars}.
+If the model is constrained, remove the constraints first with the function \code{reform_constrained_pars}.
 }
 \section{Warning}{
 
@@ -91,6 +91,8 @@ If the models constrained, remove the constraints first with the function \code{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
            \emph{Springer}.
  }

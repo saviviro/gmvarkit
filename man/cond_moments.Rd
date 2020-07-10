@@ -11,6 +11,7 @@ cond_moments(
   params,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
+  structural_pars = NULL,
   to_return = c("regime_cmeans", "total_cmeans", "total_ccovs")
 )
 }
@@ -85,6 +86,19 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
+
 \item{to_return}{should the regimewise conditional means, total conditional means, or total conditional covariance matrices
 be returned?}
 }
@@ -123,6 +137,8 @@ cond_moments(data=data, p=2, M=2, params=params222, parametrization="mean",
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
            \emph{Springer}.
  }

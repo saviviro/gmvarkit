@@ -12,6 +12,7 @@ loglikelihood(
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
+  structural_pars = NULL,
   minval = NA
 )
 }
@@ -89,6 +90,19 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
+
 \item{minval}{the value that will be returned if the parameter vector does not lie in the parameter space
 (excluding the identification condition).}
 }
@@ -107,16 +121,27 @@ Returns log-likelihood if \code{params} is in the parameters space and \code{min
 }
 \examples{
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+
+# GMVAR(2, 2), d=2 model;
 params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
   9.838, 0.740)
 loglikelihood(data=data, p=2, M=2, params=params222, parametrization="mean")
+
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+loglikelihood(data=data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
 }
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
            \emph{Springer}.
  }

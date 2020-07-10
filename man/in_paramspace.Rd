@@ -4,7 +4,7 @@
 \alias{in_paramspace}
 \title{Determine whether the parameter vector lies in the parameter space}
 \usage{
-in_paramspace(p, M, d, params, constraints = NULL)
+in_paramspace(p, M, d, params, constraints = NULL, structural_pars = NULL)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -72,6 +72,19 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 Returns \code{TRUE} if the given parameter vector lies in the parameter space
@@ -101,10 +114,20 @@ params222c <- c(1.03, 2.36, 1.79, 3.00, 1.25, 0.06,0.04,
  1.34, -0.29, -0.08, -0.05, -0.36, 0.93, -0.15, 5.20,
  5.88, 3.56, 9.80, 0.37)
 in_paramspace(p=2, M=2, d=2, params=params222c, constraints=C_mat)
+
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+in_paramspace(p=2, M=2, d=2, params=params222s,
+  structural_pars=list(W=W_222))
 }
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }

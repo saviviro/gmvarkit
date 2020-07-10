@@ -76,8 +76,6 @@ the following elements:
 }
 See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
-
-\item{change_na}{change NA parameter values of constrained models to -9.999?}
 }
 \value{
 Returns (unconstrained) "reduced form model" parameter vector.
@@ -99,5 +97,7 @@ If the structural parameter vector is a constrained one, use
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }

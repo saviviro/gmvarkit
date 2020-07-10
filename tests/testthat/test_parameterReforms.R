@@ -259,10 +259,11 @@ theta_222_c2 <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vech(Ome
 theta_222_c2_expanded <- c(phi10_222_c2, vec(A11_222_c2), vec(A12_222_c2), vech(Omega1_222_c2),
                            phi20_222_c2, vec(A21_222_c2), vec(A22_222_c2), vech(Omega2_222_c2),
                            alpha1_222_c2)
+
 WL_222c2 <- diag_Omegas(Omega1_222_c2, Omega2_222_c2)
 W_222c2 <- matrix(WL_222c2[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222c2 <- WL_222c2[(2^2 + 1):length(WL_222c2)]
-theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2)
+theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # SGMVAR AR
 theta_222_c2s_expanded <- c(phi10_222_c2, phi20_222_c2, vec(A11_222_c2), vec(A12_222_c2), vec(A11_222_c2), vec(A12_222_c2),
                             vec(W_222c2), lambdas_222c2, alpha1_222_c2)
 
