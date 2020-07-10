@@ -10,14 +10,14 @@
 #'  No argument checks!
 #' @inherit is_stationary references
 
-get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL) {
+get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
-  if(parametrization=="mean") {
-    return(pick_phi0(p=p, M=M, d=d, params=params))
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  if(parametrization == "mean") {
+    return(pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
   } else {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL, change_to="mean")
-    return(pick_phi0(p=p, M=M, d=d, params=params))
+    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL, structural_pars=structural_pars, change_to="mean")
+    return(pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
   }
 }
 
@@ -76,11 +76,11 @@ get_regime_means <- function(gmvar) {
 #'   The subset \code{[, , j, m]} contains the j-1:th lag autocovariance matrix of the m:th regime.
 #' @inherit loglikelihood_int references
 
-get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL) {
+get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
 
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
 
   I_dp2 <- diag(nrow=(d*p)^2)
@@ -155,14 +155,14 @@ get_regime_autocovs <- function(gmvar) {
 #'   }
 #' @inherit loglikelihood_int references
 
-uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL) {
+uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints) # Remove any constraints
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars) # Remove any constraints
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
-  reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=NULL)
+  reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=NULL, structural_pars=structural_pars)
   uncond_mean <- colSums(alphas*t(reg_means))
   tmp <- rowSums(vapply(1:M, function(m) alphas[m]*tcrossprod(reg_means[,m] - uncond_mean), numeric(d*d))) # Vectorized matrix
-  reg_autocovs <- get_regime_autocovs_int(p=p, M=M, d=d, params=params, constraints=NULL)
+  reg_autocovs <- get_regime_autocovs_int(p=p, M=M, d=d, params=params, constraints=NULL, structural_pars=structural_pars)
   autocovs <- array(rowSums(vapply(1:M, function(m) alphas[m]*reg_autocovs[, , , m], numeric(d*d*(p + 1)))) + tmp, dim=c(d, d, p + 1))
   ind_vars <- diag(autocovs[, , 1])
   autocors <- array(vapply(1:(p + 1), function(i1) {

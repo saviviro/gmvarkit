@@ -200,7 +200,7 @@ theta_222csL_expanded <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec
                            vec(A22_222), vec(W_222), 0.2, 2*0.2, alpha1_222)
 theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
 theta_222csLAR_expanded <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222),
-                             vec(W_222), 0.2, 2*0.2, alpha1_222) # SGMVAR lambdas and AR
+                             vec(W_222), 0.2, 2*0.2, alpha1_222)
 
 
 # p=3, M=3, d=2
