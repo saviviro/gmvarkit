@@ -158,6 +158,7 @@ get_regime_autocovs <- function(gmvar) {
 uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars) # Remove any constraints
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
   reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=NULL, structural_pars=structural_pars)
   uncond_mean <- colSums(alphas*t(reg_means))

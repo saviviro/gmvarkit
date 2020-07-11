@@ -134,6 +134,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   # Collect parameter values
   parametrization <- match.arg(parametrization)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   } else {
