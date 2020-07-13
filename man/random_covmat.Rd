@@ -4,7 +4,7 @@
 \alias{random_covmat}
 \title{Create random VAR model error term covariance matrix}
 \usage{
-random_covmat(d, omega_scale)
+random_covmat(d, omega_scale, W_scale, lambda_scale, structural_pars = NULL)
 }
 \arguments{
 \item{d}{the number of time series in the system.}
@@ -15,7 +15,38 @@ distribution. Expected values of the random covariance matrices are \code{diag(o
 deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
-\code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
+\code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}. This argument is ignored if
+structural model is considered.}
+
+\item{W_scale}{a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
+random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently
+from such normal distributions that the expectation of the first regime's error term covariance matrix
+\eqn{\Omega_1 = WW'} equals to \code{diag(W_scale)}. The distribution of \eqn{\Omega_1} will be in some sense
+like a Wishart distribution but with the columns (elements) of \eqn{W} obeying the given constraints.
+The constraints are accounted for by setting the element to be always zero if it is subject to a zero constraint
+and for sign constraints the absolute value or negative the absolute value are taken. This argument is ignored if
+reduced form model is considered.}
+
+\item{lambda_scale}{a length \eqn{d*(M - 1)} vector specifying the \strong{degrees of freedom} of the mean zero and
+t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
+As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
+should be strictly positive real numbers with the \eqn{m}th element giving the degrees of freedom for the \eqn{m}th
+regime. The expected value of the \eqn{m}th \eqn{(m>1)} error term covariance matrix will be
+\code{diag(lambdas)} multiplied by \code{diag(W_scale)} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
+of the t-distribution. Ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=d)}.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega}.

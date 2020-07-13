@@ -107,8 +107,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   }
   if(!is.null(structural_pars)) {
     cat("Structural parameters:\n")
-    W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-    lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    W <- format_value(pick_W(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
 
     tmp <- c(rep(" ", times=d - 1), ",")
     df2 <- data.frame(left_brackets, W=W[,1])
@@ -118,6 +117,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     }
     df2 <- cbind(df2, right_brackets)
     if(M > 1) {
+      lambdas <- format_value(pick_lambdas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
       tmp <- c(rep(" ", times=d - 1), ",")
       lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE) # Column for each regime
       for(i1 in 1:(M - 1)) {
@@ -135,7 +135,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     n_free <- sum(is.na(W_orig))
     n_sign <- d^2 - n_zero - n_free
     cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
-    cat("The eigenvalue lambdas are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
+    cat("Eigenvalues lambda_{mi} are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
                                                       "subject to linear constraints."))
     cat("\n")
   }

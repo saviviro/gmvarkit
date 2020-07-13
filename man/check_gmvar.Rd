@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{check_gmvar}
 \alias{check_gmvar}
-\title{Checks whether the given object has class attribute "gmvar" or "sgmvar"}
+\title{Checks whether the given object has class attribute "gmvar"}
 \usage{
 check_gmvar(object)
 }
@@ -10,8 +10,8 @@ check_gmvar(object)
 \item{object}{S3 object to be tested}
 }
 \value{
-Throws an error if the object doesn't have the class attribute "gmvar" or "sgmvar".
+Throws an error if the object doesn't have the class attribute "gmvar".
 }
 \description{
-\code{check_gmvar} checks that the object has class attribute "gmvar" or "sgmvar".
+\code{check_gmvar} checks that the object has class attribute "gmvar".
 }

@@ -58,7 +58,23 @@
 #'   deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 #'   and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 #'   Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
-#'   \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.
+#'   \code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}. This argument is ignored if
+#'   structural model is considered.
+#' @param W_scale a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
+#'   random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently
+#'   from such normal distributions that the expectation of the first regime's error term covariance matrix
+#'   \eqn{\Omega_1 = WW'} equals to \code{diag(W_scale)}. The distribution of \eqn{\Omega_1} will be in some sense
+#'   like a Wishart distribution but with the columns (elements) of \eqn{W} obeying the given constraints.
+#'   The constraints are accounted for by setting the element to be always zero if it is subject to a zero constraint
+#'   and for sign constraints the absolute value or negative the absolute value are taken. This argument is ignored if
+#'   reduced form model is considered.
+#' @param lambda_scale a length \eqn{M - 1} vector specifying the \strong{degrees of freedom} of the mean zero and
+#'   t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
+#'   As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
+#'   should be strictly positive real numbers with the \eqn{m-1}th element giving the degrees of freedom for the \eqn{m}th
+#'   regime. The expected value of the \eqn{m}th \eqn{(m>1)} error term covariance matrix will be
+#'   \code{diag(lambdas)} multiplied by \code{diag(W_scale)} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
+#'   of the t-distribution. Ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=M-1)}.
 #' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in
 #'   some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
 #'   constrained models.
@@ -106,13 +122,15 @@
 #'          \emph{Transactions on Systems, Man and Cybernetics} \strong{24}, 656-667.
 #'    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
 #'          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
 #'  }
 #'  @export
 
 
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ngen=200, popsize,
-                  smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, ar_scale=1,
-                  regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
+                  smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale,
+                  ar_scale=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and premilinary checks
   set.seed(seed)
@@ -151,6 +169,16 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     omega_scale <- vapply(1:d, function(i1) var(stats::ar(data[,i1], order.max=10)$resid, na.rm=TRUE), numeric(1))
   } else if(!(length(omega_scale) == d & all(omega_scale > 0))) {
     stop("omega_scale must be numeric vector with length d and positive elements")
+  }
+  if(missing(W_scale)) {
+    W_scale <- omega_scale
+  } else if(!(length(W_scale) == d & all(W_scale > 0))) {
+    stop("W_scale must be numeric vector with length d and positive elements")
+  }
+  if(missing(lambda_scale)) {
+    lambda_scale <- rep(1, times=M-1)
+  } else if(!(length(lambda_scale) == M - 1 & all(lambda_scale > 0.1))) {
+    stop("lambda_scale must be numeric vector with length M-1 and elements larger than 0.1")
   }
   if(length(ar_scale) != 1 | ar_scale <= 0) {
     stop("ar_scale must be positive and have length one")

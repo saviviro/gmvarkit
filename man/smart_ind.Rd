@@ -88,20 +88,16 @@ distribution. Expected values of the random covariance matrices are \code{diag(o
 deviations of the diagonal elements are \code{sqrt(2/d)*omega_scale[i]}
 and for non-diagonal elements they are \code{sqrt(1/d*omega_scale[i]*omega_scale[j])}.
 Note that for \code{d>4} this scale may need to be chosen carefully. Default in \code{GAfit} is
-\code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}.}
+\code{var(stats::ar(data[,i], order.max=10)$resid, na.rm=TRUE), i=1,...,d}. This argument is ignored if
+structural model is considered.}
 
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
 some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
 constrained models.}
 }
 \value{
-Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
- ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
- \itemize{
-   \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-   \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
-   \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
- }
+Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}
+  in the other functions, for instance, in the function \code{loglikelihood}.
 }
 \description{
 \code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR model fairly

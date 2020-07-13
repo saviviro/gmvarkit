@@ -14,7 +14,7 @@ a vector of length \eqn{d^2 - n_zeros} where \eqn{n_zeros} is the
   number of zero entries in the matrix \code{W}.
 }
 \description{
-\code{vec} stacks columns of the given matrix to form a vector
+\code{Wvec} stacks columns of the given matrix to form a vector
   and removes elements that are zeros.
 }
 \section{Warning}{

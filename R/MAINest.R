@@ -89,6 +89,8 @@
 #'          \emph{Transactions on Systems, Man and Cybernetics} \strong{24}, 656-667.
 #'    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
 #'          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
 #' \donttest{
@@ -307,7 +309,8 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE) {
   fn <- function(params) {
     tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=params,
                                conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-                               constraints=gmvar$model$constraints, check_params=TRUE, to_return="loglik",
+                               constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
+                               check_params=TRUE, to_return="loglik",
                                minval=minval), error=function(e) minval)
   }
   gr <- function(params) {
@@ -319,7 +322,8 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE) {
 
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=res$par,
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, calc_std_errors=calc_std_errors)
+        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
+        calc_std_errors=calc_std_errors)
 }
 
 

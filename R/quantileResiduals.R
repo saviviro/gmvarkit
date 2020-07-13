@@ -34,6 +34,14 @@
 #' mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
 #' quantile_residuals(mod222)
 #'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+#' quantile_residuals(mod222s)
+#'
 #' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
 #' # the same for both regimes:
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
@@ -174,7 +182,7 @@ quantile_residuals <- function(gmvar) {
 #'   No argument checks!
 #' @inherit quantile_residuals return references
 
-quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints, structural_pars=NULL) {
+quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL, structural_pars=NULL) {
   lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                   parametrization=parametrization, constraints=constraints,
                                   structural_pars=structural_pars, to_return="loglik_and_mw",

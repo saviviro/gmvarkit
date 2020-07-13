@@ -10,8 +10,9 @@ get_omega_eigens(gmvar)
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
-Returns a list with \eqn{M} elements - one for each regime. Each element contains
- the eigenvalues of the "Omega" error term covariance matrix.
+Returns a matrix with \eqn{d} rows and \eqn{M} columns - one column for each regime.
+ The \eqn{m}th column contains the eigenvalues of the "Omega" error term covariance matrix
+ of the \eqn{m}th regime.
 }
 \description{
 \code{get_omega_eigens} calculates the eigenvalues of the "Omega" error
@@ -29,9 +30,9 @@ get_omega_eigens(mod222)
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
            \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
            \emph{Springer}.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }

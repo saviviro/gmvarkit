@@ -10,9 +10,14 @@ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 # p=1, M=1, d=2, parametrization="mean"
 phi10_112 <- c(1.07, 127.71)
 A11_112 <- matrix(c(0.99, 0.00, -0.01, 0.99), nrow=2)
-Omega1_112 <- matrix(c(4.05, 2.22, 8.87, 2.22), nrow=2)
+Omega1_112 <- matrix(c(4.05, 2.22, 2.22, 2.22), nrow=2)
 theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 mod_112 <- GMVAR(data, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
+
+W_112 <- t(chol(Omega1_112))
+theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR, W constrained by Cholesky
+mod_112s <- GMVAR(data, p=1, M=1, d=2, params=theta_112sWC, conditional=TRUE, parametrization="mean", constraints=NULL,
+                  structural_pars=list(W=W_112))
 
 # p=2, M=2, d=2, no constraints, GMVAR-paper
 phi10_222 <- c(1.03, 2.36)
@@ -31,10 +36,29 @@ upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
 mod_222 <- GMVAR(data, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", constraints=NULL)
 
-# p=2, M=2, d=2, AR paramars same, non-diagonals zero, intercept
+WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
+W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
+lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
+theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
+                vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
+mod_222s <- GMVAR(data, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", constraints=NULL,
+                 structural_pars=list(W=W_222))
+
+# p=2, M=2, d=2, SGMVAR AR params constrained to be the same in both regimes
+rbind_diags <- function(p, M, d) {
+  I <- diag(p*d^2)
+  Reduce(rbind, replicate(M, I, simplify=FALSE))
+}
+C_222 <- rbind_diags(p=2, M=2, d=2)
+C_lambda_222 <- matrix(c(7, 1), nrow=2)
+theta_222cs <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 1, alpha1_222)
+mod_222csLAR <- GMVAR(data, p=2, M=2, d=2, params=theta_222cs, conditional=TRUE, parametrization="intercept",
+                   constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222))
+
+# p=2, M=2, d=2, AR parameters same for both regimes, non-diagonals zero, intercept
 theta_222c <- c(0.3552775, 3.1929675, -0.1143198, 2.8294743, 1.2633425, 1.3375150, -0.2919742, -0.3624010,
                 5.5971764, 3.4559442, 9.6221422, 0.9820759, -0.3267521, 5.2358855, 0.6501600)
-mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE) # Laske paperilla monimutkaisemmat rajoitteet
+mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
 C_222c <- rbind(mat0, mat0)
 mod_222c <- GMVAR(data, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c)
 
@@ -50,6 +74,10 @@ res_112 <- quantile_residuals(mod_112)
 res_222 <- quantile_residuals(mod_222)
 res_222c <- quantile_residuals(mod_222c)
 res_323 <- quantile_residuals(mod_323)
+
+res_112s <- quantile_residuals(mod_112s)
+res_222s <- quantile_residuals(mod_222s)
+res_222csLAR <- quantile_residuals(mod_222csLAR)
 
 test_that("quantile_residuals works correctly", {
   expect_equal(res_112[1,], c(0.7421619, -2.3382223), tolerance=1e-6)
@@ -71,4 +99,19 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res_323[13,], c(-1.0996495, -0.4214492, -0.2435677), tolerance=1e-6)
   expect_equal(res_323[150,], c(-0.6546153, 0.9539610, 0.3529515), tolerance=1e-6)
   expect_equal(res_323[497,], c(0.6395263, 0.1111915, -0.5907638), tolerance=1e-6)
+
+  # SGMVAR
+  expect_equal(res_112s[3,], c(0.5815407, -1.0931660), tol=1e-6)
+  expect_equal(res_112s, res_112, tol=1e-6)
+  expect_equal(res_222s, res_222, tol=1e-6)
+  expect_equal(res_222csLAR[1,], c(0.1658934, -0.2827984), tol=1e-6)
+  expect_equal(res_222csLAR[250,], c(-0.7458269, -0.8943336), tol=1e-6)
+})
+
+test_that("quantile_residuals_int works correctly", {
+  qr112 <- quantile_residuals_int(data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
+  qr222csLAR <- quantile_residuals_int(data, p=2, M=2, params=theta_222cs, conditional=TRUE, parametrization="intercept",
+                                       constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222))
+  expect_equal(qr112, res_112, tol=1e-6)
+  expect_equal(qr222csLAR, res_222csLAR, tol=1e-6)
 })

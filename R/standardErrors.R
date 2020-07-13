@@ -96,10 +96,17 @@ print_std_errors <- function(gmvar, digits=3) {
   M <- gmvar$model$M
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints, change_na=TRUE)
-  all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars)
-  all_A <- pick_allA(p=p, M=M, d=d, params=pars)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars)
+  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints,
+                                  structural_pars=gmvar$model$structural_pars, change_na=TRUE)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+  all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
+  if(is.null(structural_pars)) {
+    all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
+  } else {
+    # No standard errors for cov. mats. as the model is parametrized with W and lambdas
+    all_Omega <- array(NA, dim=c(d, d, M))
+  }
   alphas <- pick_alphas(p=p, M=M, d=d, params=pars)
   alphas[M] <- NA
   if(gmvar$model$parametrization == "mean") {
@@ -110,9 +117,9 @@ print_std_errors <- function(gmvar, digits=3) {
     all_phi0 <- all_phi0_or_mu
   }
   if(!is.null(constraints)) {
-    # The constrained AR parameter standard errors multiplied open in 'pars' are valid only
-    # iff the constraint matrix contains zeros and ones only, and there is at most one one
-    # in each row (no multiplications or summations).
+    # The constrained AR parameter standard errors multiplied open in 'pars' are valid iff
+    # the constraint matrix contains zeros and ones only, and there is at most one one in
+    # each row (no multiplications or summations).
     if(any(constraints != 1 & constraints != 0) | any(rowSums(constraints) > 1)) {
       sep_AR <- TRUE # The AR parameter std errors must be printed separately
       all_A <- array(NA, dim=c(d, d, p, M))
@@ -124,15 +131,18 @@ print_std_errors <- function(gmvar, digits=3) {
     sep_AR <- FALSE # No constraints imposed
   }
 
-  cat("Model:\n")
+  cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
-      ifelse(gmvar$model$conditional, "conditional,", "exact,"),
-      ifelse(gmvar$model$parametrization=="mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(constraints), "no constraints", "linear constraints imposed"), "\n")
+      ifelse(gmvar$model$conditional, "conditional", "exact"),
+      "log-likelihood,",
+      ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
+      ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
   cat("\n")
   cat("APPROXIMATE STANDARD ERRORS\n\n")
 
-  plus <- c("+", rep(" ", d-1))
+  left_brackets <- rep("[", times=d)
+  right_brackets <- rep("]", times=d)
+  plus <- c("+", rep(" ", d - 1))
   Y <- paste0("Y", 1:d)
   tmp_names <- paste0("tmp", 1:(p*(d + 2) + d + 2))
 
@@ -142,22 +152,22 @@ print_std_errors <- function(gmvar, digits=3) {
     cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n\n")
     df <- data.frame(Y=Y,
-                     eq=c("=", rep(" ", d-1)),
-                     eq=rep("[", d),
+                     eq=c("=", rep(" ", d - 1)),
+                     eq=left_brackets,
                      phi0=format_value(all_phi0[, m, drop=FALSE]),
-                     eq=rep("]", d),
+                     eq=right_brackets,
                      plus)
     for(i1 in seq_len(p)) {
       Amp_colnames <- c(paste0("A", i1), tmp_names[count:(count + d - 1 - 1)]); count <- count + d - 1
-      df[, tmp_names[count]] <- rep("[", d); count <- count + 1
+      df[, tmp_names[count]] <- left_brackets; count <- count + 1
       df[, Amp_colnames] <- format_value(all_A[, ,i1 , m])
-      df[, tmp_names[count]] <- rep("]", d); count <- count + 1
+      df[, tmp_names[count]] <- right_brackets; count <- count + 1
       df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
-    df[, tmp_names[p*(d + 2) + 1]] <- rep("[", d)
+    df[, tmp_names[p*(d + 2) + 1]] <- left_brackets
     df[, c("Omega", tmp_names[(p*(d + 2) + 2):(p*(d + 2) + d)])] <- format_value(all_Omega[, , m])
-    df[, tmp_names[p*(d + 2) + d + 1]] <- rep("]", d)
+    df[, tmp_names[p*(d + 2) + d + 1]] <- right_brackets
     df[, "1/2"] <- rep(" ", d)
     df[, tmp_names[p*(d + 2) + d + 2]] <- paste0("eps", 1:d)
     names_to_omit <- unlist(lapply(c("plus", "eq", tmp_names), function(nam) grep(nam, colnames(df))))
@@ -166,6 +176,66 @@ print_std_errors <- function(gmvar, digits=3) {
     cat("\n")
   }
   if(sep_AR) cat(paste0("AR parameters: ", paste0(format_value(AR_stds), collapse=", ")), "\n\n")
+
+  if(!is.null(structural_pars)) {
+    cat("Structural parameters:\n")
+    W <- format_value(pick_W(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
+
+    if(M > 1) {
+      lambdas <- format_value(pick_lambdas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
+      lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE) # Column for each regime
+
+      # Similarly to the AR parameters, constrained lambda parameter standard errors multiplied open
+      # in 'pars' are valid iff the constraint matrix "C_lambda" contains zeros and ones only, and
+      # there is at most one one in each row (no multiplications or summations).
+      C_lambda <- gmvar$model$structural_pars$C_lambda
+      if(!is.null(C_lambda)) {
+        if(any(C_lambda != 1 & C_lambda != 0) | any(rowSums(C_lambda) > 1)) {
+          sep_lambda <- TRUE # The lambda parameter std errors must be printed separately
+          lambdas <- matrix(NA, nrow=d, ncol=M - 1)
+          n_zeros <- sum(W == 0)
+          lambda_stds <- gmvar$std_errors[(M*d + M*d^2*p + d^2 - n_zeros + 1):(M*d + M*d^2*p + d^2 - n_zeros + ncol(C_lambda))]
+        } else {
+          sep_lambda <- FALSE
+        }
+      } else {
+        sep_lambda <- FALSE
+      }
+    }
+
+    tmp <- c(rep(" ", times=d - 1), ",")
+    df2 <- data.frame(left_brackets, W=W[,1])
+    for(i1 in 2:d) {
+      df2 <- cbind(df2, W[, i1])
+      colnames(df2)[1 + i1] <- "tmp"
+    }
+    df2 <- cbind(df2, right_brackets)
+    if(M > 1) {
+      tmp <- c(rep(" ", times=d - 1), ",")
+      for(i1 in 1:(M - 1)) {
+        if(sep_lambda) {
+          lmb <- rep(NA, times=d)
+        } else {
+          lmb <- lambdas[,i1]
+        }
+        df2 <- cbind(df2, tmp, left_brackets, lmb, right_brackets)
+        colnames(df2)[grep("lmb", colnames(df2))] <- paste0("lamb", i1 + 1)
+      }
+    }
+    names_to_omit <- unlist(lapply(c("left_brackets", "right_brackets", "tmp"), function(nam) grep(nam, colnames(df2))))
+    colnames(df2)[names_to_omit] <- " "
+    print(df2)
+    cat("\n")
+    W_orig <- gmvar$model$structural_pars$W
+    n_zero <- sum(W_orig == 0, na.rm=TRUE)
+    n_free <- sum(is.na(W_orig))
+    n_sign <- d^2 - n_zero - n_free
+    if(sep_lambda) cat(paste0("lambda parameters: ", paste0(format_value(lambda_stds), collapse=", ")), "\n\n")
+    cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
+    cat("Eigenvalues lambda_{mi} are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
+                                             "subject to linear constraints."))
+    cat("\n")
+  }
   invisible(gmvar)
 }
 

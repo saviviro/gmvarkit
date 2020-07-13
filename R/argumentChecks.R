@@ -249,6 +249,11 @@ check_constraints <- function(p, M, d, constraints=NULL, structural_pars=NULL) {
     } else if(!is.matrix(structural_pars$W) || any(dim(structural_pars$W) != d)) {
       stop("The element 'W' in 'structural_pars' should be a (d x d) matrix")
     }
+    n_zeros1 <- vapply(1:d, function(i1) sum(structural_pars$W[i1,] == 0, na.rm=TRUE), numeric(1))
+    n_zeros2 <- vapply(1:d, function(i1) sum(structural_pars$W[,i1] == 0, na.rm=TRUE), numeric(1))
+    if(any(n_zeros1 == d) || any(n_zeros2 == d)) {
+      stop("The matrix 'W' is non-singular so you cannot constrain all elements in a row or in a column to be zero")
+    }
     if(!is.null(structural_pars$C_lambda)) {
       if(M < 2) stop("There are not lambdas and thus not C_lambda when M < 2")
       C_lamb <- structural_pars$C_lambda

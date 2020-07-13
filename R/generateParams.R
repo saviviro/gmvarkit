@@ -5,13 +5,8 @@
 #'
 #' @inheritParams GAfit
 #' @inheritParams is_stationary
-#' @return Returns random mean-parametrized parameter vector that has form \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},
-#'  ...,\strong{\eqn{\upsilon_{M}}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
-#'  \itemize{
-#'    \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\mu_{m},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-#'    \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
-#'    \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
-#'  }
+#' @return Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}
+#'   in the other functions, for instance, in the function \code{loglikelihood}.
 #' @inherit in_paramspace references
 
 random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_scale) {
@@ -241,10 +236,28 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 #'
 #' @inheritParams is_stationary
 #' @inheritParams GAfit
-#' @return Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega}.
+#' @return Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega} for
+#'   reduced form models and vectors of length \eqn{d^2 + d*(M - 1)} of the form
+#'   \eqn{(Wvec(W),\strong{\lambda}_2,...,\strong{\lambda}_M)} where \eqn{\strong{\lambda}_m=(\lambda_{m1},...,\lambda_{md})}
+#'   containts the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)}.
 
-random_covmat <- function(d, omega_scale) {
-  smart_covmat(d=d, Omega=diag(x=omega_scale), accuracy=1)
+random_covmat <- function(d, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    return(smart_covmat(d=d, Omega=diag(x=omega_scale), accuracy=1))
+  } else {
+    W <- structural_pars$W
+    n_zeros <- vapply(1:d, function(i1) sum(W[i1,] == 0, na.rm=TRUE), numeric(1))
+    std_devs <- sqrt(W_scale/(d - n_zeros))
+    new_W <- matrix(rnorm(n=d^2, mean=0, sd=std_devs), nrow=d, byrow=FALSE) # The standard deviations are recycled
+    new_W[W == 0 & !is.na(W)] <- 0
+    new_W[W > 0 & !is.na(W)] <- abs(new_W[W > 0 & !is.na(W)])
+    new_W[W < 0 & !is.na(W)] <- -abs(new_W[W < 0 & !is.na(W)])
+    lambdas <- abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d)))
+    lambdas[lambdas == Inf] <- 1 # If the df is very close to zero, Inf values may appear
+    return(c(Wvec(W), vec(lambdas)))
+  }
+  # HUOM! TARKISTA TÄÄLLÄ, ETTÄ w ON EI-SINGULAARINEN!? TAITAA OLLA AINA KOSKA RNORMISTA ARVOTTU
+  # HUOM! TÄNNE TARVITSEE CASEN JOSSA LAMBDAT ON RAJOITETTU!
 }
 
 
@@ -268,6 +281,7 @@ random_covmat <- function(d, omega_scale) {
 #' @return Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega}.
 
 smart_covmat <- function(d, Omega, accuracy) {
+  # Tee vanhan W:n ja lambdojen päälle smartti?
   if(accuracy <= d/2) {
     covmat <- rWishart(n=1, df=d, Sigma=Omega/d)[, , 1]
   } else {

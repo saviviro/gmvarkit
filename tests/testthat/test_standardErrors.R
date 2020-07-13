@@ -27,10 +27,15 @@ upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
 
 WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
-W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
-lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
-theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
-                vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
+#W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
+#lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
+#theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
+#                vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
+theta_222s <- c(1.386765, -0.764975, 1.00547, 5.928393, 1.314132, 0.144683, 0.093975,
+                1.292154, -0.389113, -0.069592, -0.108713, -0.281433, 1.248205, 0.076956,
+                -0.039837, 1.265769, -0.272355, -0.073872, 0.034041, -0.31349, -0.902536,
+                -0.718412, 0.324033, -2.079116, 7.001825, 1.439954, 0.739348)
+W_222 <- pick_W(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=matrix(1:4, nrow=2)))
 
 # Constraint AR-parameters to be the same for all regimes
 rbind_diags <- function(p, M, d) {
@@ -78,6 +83,11 @@ test_that("standard_errors works correctly", {
                  0.68689890, 0.72052650, 1.16661586, 0.40045562), tolerance=1e-2)
 
   # SGMVAR
+  expect_equal(standard_errors(data, p=2, M=2, params=theta_222s, conditional=FALSE, parametrization="intercept",
+                               constraints=NULL, structural_pars=list(W=W_222), minval=-99999),
+               c(0.657165, 1.435745, 1.888876, 2.323694, 0.097186, 0.23554, 0.048015, 0.102941, 0.096483, 0.225936,
+                 0.04786, 0.110421, 0.091458, 0.117798, 0.070049, 0.089094, 0.092122, 0.11891, 0.070357, 0.090593,
+                 0.088115, 0.127551, 0.142765, 0.184838, 1.40735, 0.272365, 0.223313), tolerance=1e-2)
   expect_equal(standard_errors(data, p=2, M=2, params=theta_222_c2s, conditional=TRUE, parametrization="intercept",
                                constraints=C_222_2, structural_pars=list(W=W_222c2), minval=-99999),
                c(0.058447, 0.875092, 0.204019, 0.992678, 0.057246, 0.059366, 0.058941, 0.060121, NA, 0.24881,

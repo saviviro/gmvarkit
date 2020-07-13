@@ -15,7 +15,7 @@ vec <- function(A) {
 
 #' @title Vectorization operator that removes zeros
 #'
-#' @description \code{vec} stacks columns of the given matrix to form a vector
+#' @description \code{Wvec} stacks columns of the given matrix to form a vector
 #'   and removes elements that are zeros.
 #'
 #' @param W a size \eqn{(dxd)} square matrix to be vectorized.
@@ -26,6 +26,29 @@ vec <- function(A) {
 
 Wvec <- function(W) {
   W[W != 0]
+}
+
+
+#' @title Reverse vectorization operator that restores zeros
+#'
+#' @description \code{unWvec} forms a square matrix from a vector of
+#'   stacked columns where zeros are removed according to structural
+#'   parameter constaints.
+#'
+#' @inheritParams loglikelihood_int
+#' @param Wvector a length \eqn{d^2 - n_zeros} vector where \eqn{n_zeros} is the
+#'   number of zero entries in the matrix \code{W}.
+#' @return a \eqn{(d x d)} matrix \eqn{W}.
+#' @section Warning:
+#'  No argument checks!
+
+unWvec <- function(Wvector, d, structural_pars=NULL) {
+  if(is.null(structural_pars)) stop("Structural parameters needed")
+  W <- structural_pars$W
+  n_zeros <- sum(W == 0)
+  new_W <- numeric(d^2)
+  new_W[W != 0] <- Wvector
+  matrix(new_W, nrow=d, byrow=FALSE)
 }
 
 

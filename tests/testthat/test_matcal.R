@@ -9,7 +9,7 @@ A2 <- matrix(a2, nrow=2, byrow=FALSE)
 A3 <- matrix(a3, nrow=7, byrow=FALSE)
 
 
-test_that("vec and unvec works correctly", {
+test_that("vec and unvec work correctly", {
   expect_equal(vec(A1), a1)
   expect_equal(vec(A2), a2)
   expect_equal(vec(A3), a3)
@@ -25,7 +25,7 @@ b1 <- 1
 b2 <- c(1, 0.5, 2)
 b3 <- c(1, 0.3, 0.2, 2, 0.4, 3)
 
-test_that("vech and unvech works correctly", {
+test_that("vech and unvech work correctly", {
   expect_equal(vech(B1), b1)
   expect_equal(vech(B2), b2)
   expect_equal(vech(B3), b3)
@@ -39,11 +39,16 @@ W2 <- matrix(c(1, 2, 0, 3, 0, 4, 5, 6, 7), nrow=3, byrow=FALSE)
 W3 <- matrix(c(1, 0, 2, 3, 4, 0, 0, 5, 0, 6, 7, 8, 0, 9, 0, 0), nrow=4, byrow=FALSE)
 W4 <- matrix(1:25, nrow=5, byrow=FALSE)
 
-test_that("Wvec works correctly", {
+test_that("Wvec and unWvec work correctly", {
   expect_equal(Wvec(W1), 1:3)
   expect_equal(Wvec(W2), 1:7)
   expect_equal(Wvec(W3), 1:9)
   expect_equal(Wvec(W4), 1:25)
+
+  expect_equal(unWvec(Wvector=Wvec(W1), d=2, structural_pars=list(W=W1)), W1)
+  expect_equal(unWvec(Wvector=Wvec(W2), d=3, structural_pars=list(W=W2)), W2)
+  expect_equal(unWvec(Wvector=Wvec(W3), d=4, structural_pars=list(W=W3)), W3)
+  expect_equal(unWvec(Wvector=Wvec(W4), d=5, structural_pars=list(W=W4)), W4)
 })
 
 Omega1_2 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE) # d=2
