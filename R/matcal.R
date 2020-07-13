@@ -99,6 +99,18 @@ unvech <- function(d, a) {
 #' \itemize{
 #'   \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
 #' }
+#' @examples
+#' d <- 2
+#' W0 <- matrix(1:(d^2), nrow=2)
+#' lambdas0 <- 1:d
+#' (Omg1 <- W0%*%t(W0))
+#' (Omg2 <- W0%*%diag(lambdas0)%*%t(W0))
+#' res <- diag_Omegas(Omg1, Omg2)
+#' W <- matrix(res[1:(d^2)], nrow=d, byrow=FALSE)
+#' tcrossprod(W) # == Omg1
+#' lambdas <- res[(d^2 + 1):(d^2 + d)]
+#' W%*%diag(lambdas)%*%t(W) # == Omg2
+#' @export
 
 diag_Omegas <- function(Omega1, Omega2) {
   eig1 <- eigen(Omega1, symmetric=TRUE)

@@ -28,22 +28,26 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   d <- gmvar$model$d
   IC <- gmvar$IC
   constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
   all_mu <- round(get_regime_means(gmvar), digits)
   params <- gmvar$params
   if(gmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
-                                     change_to="intercept")
+                                     structural_pars=structural_pars, change_to="intercept")
   }
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
-  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=pars)
-  all_A <- pick_allA(p=p, M=M, d=d, params=pars)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars)
+  pars <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+                                  structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
+  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=pars)
-  cat("Model:\n")
+  cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
-      ifelse(gmvar$model$conditional, "conditional,", "exact,"),
+      ifelse(gmvar$model$conditional, "conditional", "exact"),
+      "log-likelihood,",
       ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(constraints), "no constraints", "linear constraints imposed"), "\n")
+      ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
   cat("\n")
 
   if(summary_print) {
@@ -65,28 +69,30 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     count <- 1
     cat(paste("Regime", m), "\n")
     if(summary_print) {
-      cat(paste("Modulus of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[[m]]), collapse=", ")),"\n")
-      cat(paste("Cov. matrix 'Omega' eigenvalues: ", paste0(format_value(all_omega_eigens[[m]]), collapse=", ")),"\n")
+      cat(paste("Modulus of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[,m]), collapse=", ")),"\n")
+      cat(paste("Cov. matrix 'Omega' eigenvalues: ", paste0(format_value(all_omega_eigens[,m]), collapse=", ")),"\n")
     }
     cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n\n")
+    left_brackets <- rep("[", times=d)
+    right_brackets <- rep("]", times=d)
     df <- data.frame(Y=Y,
-                     eq=c("=", rep(" ", d-1)),
-                     eq=rep("[", d),
+                     eq=c("=", rep(" ", d - 1)),
+                     eq=left_brackets,
                      phi0=format_value(all_phi0[, m, drop=FALSE]),
-                     eq=rep("]", d),
+                     eq=rep("]", times=d),
                      plus)
     for(i1 in seq_len(p)) {
       Amp_colnames <- c(paste0("A", i1), tmp_names[count:(count + d - 1 - 1)]); count <- count + d - 1
-      df[, tmp_names[count]] <- rep("[", d); count <- count + 1
+      df[, tmp_names[count]] <- left_brackets; count <- count + 1
       df[, Amp_colnames] <- format_value(all_A[, ,i1 , m])
-      df[, tmp_names[count]] <- rep("]", d); count <- count + 1
+      df[, tmp_names[count]] <- rep("]", times=d); count <- count + 1
       df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
-    df[, tmp_names[p*(d + 2) + 1]] <- rep("[", d)
+    df[, tmp_names[p*(d + 2) + 1]] <- left_brackets
     df[, c("Omega", tmp_names[(p*(d + 2) + 2):(p*(d + 2) + d)])] <- format_value(all_Omega[, , m])
-    df[, tmp_names[p*(d + 2) + d + 1]] <- rep("]", d)
+    df[, tmp_names[p*(d + 2) + d + 1]] <- rep("]", times=d)
     df[, "1/2"] <- rep(" ", d)
     df[, tmp_names[p*(d + 2) + d + 2]] <- paste0("eps", 1:d)
     names_to_omit <- unlist(lapply(c("plus", "eq", tmp_names), function(nam) grep(nam, colnames(df))))
@@ -99,6 +105,41 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
       cat("\n")
     }
   }
+  if(!is.null(structural_pars)) {
+    cat("Structural parameters:\n")
+    W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+
+    tmp <- c(rep(" ", times=d - 1), ",")
+    df2 <- data.frame(left_brackets, W=W[,1])
+    for(i1 in 2:d) {
+      df2 <- cbind(df2, W[, i1])
+      colnames(df2)[1 + i1] <- "tmp"
+    }
+    df2 <- cbind(df2, right_brackets)
+    if(M > 1) {
+      tmp <- c(rep(" ", times=d - 1), ",")
+      lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE) # Column for each regime
+      for(i1 in 1:(M - 1)) {
+        lmb <- lambdas[,i1]
+        df2 <- cbind(df2, tmp, left_brackets, lmb, right_brackets)
+        colnames(df2)[grep("lmb", colnames(df2))] <- paste0("lamb", i1 + 1)
+      }
+    }
+    names_to_omit <- unlist(lapply(c("left_brackets", "right_brackets", "tmp"), function(nam) grep(nam, colnames(df2))))
+    colnames(df2)[names_to_omit] <- " "
+    print(df2)
+    cat("\n")
+    W_orig <- gmvar$model$structural_pars$W
+    n_zero <- sum(W_orig == 0, na.rm=TRUE)
+    n_free <- sum(is.na(W_orig))
+    n_sign <- d^2 - n_zero - n_free
+    cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
+    cat("The eigenvalue lambdas are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
+                                                      "subject to linear constraints."))
+    cat("\n")
+  }
+
   if(summary_print) {
     cat("Print approximate standard errors with the function 'print_std_errors'.\n")
   }

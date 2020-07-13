@@ -13,6 +13,7 @@
 get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "mean") {
     return(pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
   } else {
@@ -46,7 +47,6 @@ get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept",
 #' mod122
 #' get_regime_means(mod122)
 #'
-#'
 #' # GMVAR(2,2), d=2 model with mean-parametrization:
 #' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 #'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
@@ -55,12 +55,22 @@ get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept",
 #' mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
 #' mod222
 #' get_regime_means(mod222)
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+#' mod222s
+#' get_regime_means(mod222s)
 #' @export
 
 get_regime_means <- function(gmvar) {
   check_gmvar(gmvar)
   get_regime_means_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                       parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints)
+                       parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
+                       structural_pars=gmvar$model$structural_pars)
 }
 
 
@@ -79,6 +89,7 @@ get_regime_means <- function(gmvar) {
 get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
 
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
@@ -128,12 +139,20 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structura
 #'  3.560, 9.799, 0.368)
 #' mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 #' get_regime_autocovs(mod222c)
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+#' get_regime_autocovs(mod222s)
 #' @export
 
 get_regime_autocovs <- function(gmvar) {
   check_gmvar(gmvar)
   get_regime_autocovs_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                          constraints=gmvar$model$constraints)
+                          constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars)
 }
 
 
@@ -208,10 +227,19 @@ uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "
 #'  3.560, 9.799, 0.368)
 #' mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 #' uncond_moments(mod222c)
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+#' uncond_moments(mod222s)
 #' @export
 
 uncond_moments <- function(gmvar) {
   check_gmvar(gmvar)
   uncond_moments_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                     parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints)
+                     parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
+                     structural_pars=gmvar$model$structural_pars)
 }

@@ -10,8 +10,8 @@ swap_parametrization(gmvar)
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
-  to work with other functions provided in \code{gmvarkit}.
+Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
+  Can be used to work with other functions provided in \code{gmvarkit}.
 
   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
   the second one for the lag one, etc.
@@ -37,10 +37,10 @@ params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
  0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
  3.982, 12.135, 0.789)
 mod122 <- GMVAR(data, p=1, M=2, params=params122)
-mod122 # intercept-parametrization
+mod122 # intercept parametrization
 
 mod122_2 <- swap_parametrization(mod122)
-mod122_2 # mean-parametrization
+mod122_2 # mean parametrization
 
 
 # GMVAR(2,2), d=2 model:
@@ -49,16 +49,30 @@ params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
   9.838, 0.740)
 mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-mod222 # mean-parametrization
+mod222 # mean parametrization
 
 mod222_2 <- swap_parametrization(mod222)
-mod222_2 # intercept-parametrization
+mod222_2 # intercept parametrization
+
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrizatio="intercept",
+ structural_pars=list(W=W_222))
+mod222s # intercept parametrization
+
+mod222s_2 <- swap_parametrization(mod222s)
+mod222s_2 # mean parametrization
 }
 }
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
  }

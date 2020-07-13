@@ -30,6 +30,18 @@ See the return value and Muirhead (1982), Theorem A9.9 for details.
  No argument checks! Does not work with dimension \eqn{d=1}!
 }
 
+\examples{
+d <- 2
+W0 <- matrix(1:(d^2), nrow=2)
+lambdas0 <- 1:d
+(Omg1 <- W0\%*\%t(W0))
+(Omg2 <- W0\%*\%diag(lambdas0)\%*\%t(W0))
+res <- diag_Omegas(Omg1, Omg2)
+W <- matrix(res[1:(d^2)], nrow=d, byrow=FALSE)
+tcrossprod(W) # == Omg1
+lambdas <- res[(d^2 + 1):(d^2 + d)]
+W\%*\%diag(lambdas)\%*\%t(W) # == Omg2
+}
 \references{
 \itemize{
   \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.

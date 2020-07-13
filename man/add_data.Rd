@@ -53,11 +53,24 @@ mod222c
 
 mod222c_2 <- add_data(data, mod222c)
 mod222c_2
+
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, structural_pars=list(W=W_222))
+mod222s
+
+mod222s_2 <- add_data(data, mod222s)
+mod222s_2
 }
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }
 \seealso{

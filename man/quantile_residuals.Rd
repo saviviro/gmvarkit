@@ -2,7 +2,7 @@
 % Please edit documentation in R/quantileResiduals.R
 \name{quantile_residuals}
 \alias{quantile_residuals}
-\title{Calculate multivariate quantile residuals of GMVAR model}
+\title{Calculate multivariate quantile residuals of a GMVAR model}
 \usage{
 quantile_residuals(gmvar)
 }
@@ -18,7 +18,7 @@ Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residu
 }
 \description{
 \code{quantile_residuals} calculates multivariate quantile residuals
- (described by \emph{Kalliovirta and Saikkonen 2010}) for GMVAR model.
+ (described by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR model.
 }
 \examples{
 # These examples use the data 'eurusd' which comes with the
@@ -66,6 +66,8 @@ quantile_residuals(mod222c)
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
  }

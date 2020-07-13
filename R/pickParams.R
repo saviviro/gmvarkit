@@ -190,11 +190,50 @@ pick_alphas <- function(p, M, d, params) {
 }
 
 
+#' @title Pick the structural parameter matrix W
+#'
+#' @description \code{pick_W} picks the structural parameter matrix W from a parameter vector
+#'
+#' @inheritParams is_stationary
+#' @details Constrained parameter vectors are not supported. Not even constraints in \ewn{W}!
+#' @return Returns a \eqn{(d x d)} matrix \eqn{W} from a parameter vector of a SGMVAR model.
+#'   Returns \code{NULL} for reduced form models.
+#' @section Warning:
+#'  No argument checks!
+#' @inherit in_paramspace_int references
+
+pick_W <- function(p, M, d, params, structural_pars=NULL) {
+  if(is.null(structural_pars)) return(NULL)
+  unvec(d=d, a=params[(M*d + d^2*p*M + 1):(M*d + d^2*p*M + d^2)])
+}
+
+
+#' @title Pick the structural parameters eigenvalue 'lambdas'
+#'
+#' @description \code{pick_lambdas} picks the structural parameters eigenvalue 'lambdas from a parameter vector
+#'
+#' @inheritParams is_stationary
+#' @details Constrained parameter vectors are not supported. Not even constraints in \ewn{W}!
+#' @return Returns a length \eqn{(d*(M - 1))} vector \eqn{(\strong{\lambda_{2}},...,\strong{\lambda_{M}})}
+#'  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
+#'   Returns \code{NULL} for reduced form models or when \eqn{M=1}.
+#' @section Warning:
+#'  No argument checks!
+#' @inherit in_paramspace_int references
+
+
+pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
+  if(is.null(structural_pars) || M == 1) return(NULL)
+  params[(M*d + d^2*p*M + d^2 + 1):((M*d + d^2*p*M + d^2 + d*(M - 1)))]
+}
+
+
 #' @title Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
 #'
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
 #' @inheritParams pick_Am
+#' @details Structural models are currectly not supported.
 #' @return Returns length \eqn{pd^2+d+d(d+1)/2} vector containing
 #'  \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}, where
 #'  \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})} and \eqn{\sigma_{m} = vech(\Omega_{m})}.
@@ -214,9 +253,9 @@ pick_regime <- function(p, M, d, params, m) {
 #'   the "bold A" matrices containing the AR coefficients for each mixture component.
 #'
 #' @inheritParams simulateGMVAR
-#' @return Returns a list with \eqn{M} elements - one for each regime. Each element contains
-#'  the absolute values (or modulus) of the eigenvalues of the "bold A" matrix containing
-#'  the AR coefficients.
+#' @return Returns a matrix with \eqn{d*p} rows and \eqn{M} columns - one column for each regime.
+#'  The \eqn{m}th column contains the absolute values (or modulus) of the eigenvalues of the "bold A" matrix containing
+#'  the AR coefficients correspinding to regime \eqn{m}.
 #' @inherit is_stationary references
 #' @examples
 #' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
@@ -232,10 +271,13 @@ get_boldA_eigens <- function(gmvar) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints)
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
+                                    structural_pars=gmvar$model$structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
-  lapply(1:M, function(m) abs(eigen(all_boldA[, , m], symmetric=FALSE, only.values=TRUE)$'values'))
+  matrix(vapply(1:M, function(m) abs(eigen(all_boldA[, , m], symmetric=FALSE, only.values=TRUE)$'values'), numeric(d*p)),
+         nrow=d*p, ncol=M, byrow=FALSE)
 }
 
 
@@ -245,8 +287,9 @@ get_boldA_eigens <- function(gmvar) {
 #'  term covariance matrices for each mixture component.
 #'
 #' @inheritParams simulateGMVAR
-#' @return Returns a list with \eqn{M} elements - one for each regime. Each element contains
-#'  the eigenvalues of the "Omega" error term covariance matrix.
+#' @return Returns a matrix with \eqn{d} rows and \eqn{M} columns - one column for each regime.
+#'  The \eqn{m}th column contains the eigenvalues of the "Omega" error term covariance matrix
+#'  of the \eqn{m}th regime.
 #' @inherit is_stationary references
 #' @examples
 #' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
@@ -262,8 +305,11 @@ get_omega_eigens <- function(gmvar) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params)
-  lapply(1:M, function(m) eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$'values')
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
+                                    structural_pars=gmvar$model$structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  matrix(vapply(1:M, function(m) eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$'values', numeric(d)),
+         nrow=d, ncol=M, byrow=FALSE)
 }
 

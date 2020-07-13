@@ -388,7 +388,70 @@ test_that("uncond_moments_int works correctly", {
 
 
 test_that("non_int uncond moment functions work", {
-  # One reduced form and one structural test per each function just to
-  # make sure that there are no typos in the arguments
-  expect_true(TRUE)
+  mod122 <- GMVAR(p=1, M=2, d=2, params=theta_122)
+  mod112csWAR <- GMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
+  mod222csLAR <- GMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
+                       structural_pars=list(W=W_222, C_lambda=C_lambda_222))
+
+  unc122 <- uncond_moments(mod122)
+  unc112csWAR <- uncond_moments(mod112csWAR)
+  unc222csLAR <- uncond_moments(mod222csLAR)
+
+  expect_equal(unc122, uncond_moments_int(p=1, M=2, d=2, params=theta_122), tolerance=1e-6)
+  expect_equal(unc112csWAR, uncond_moments_int(p=1, M=1, d=2, params=theta_112csWAR,
+                                          structural_pars=list(W=W_112)), tolerance=1e-6)
+  expect_equal(unc222csLAR$autocovs[1, 2, ], c(27.91380, 27.59758, 27.16074), tolerance=1e-4)
+  expect_equal(unc222csLAR$autocors[2, , 1], c(0.2277718, 1.0000000), tolerance=1e-4)
+  expect_equal(unc222csLAR$uncond_mean, c(4.24, 133.92), tolerance=1e-4)
+
+  reg_means122 <- get_regime_means(mod122)
+  reg_means112csWAR <- get_regime_means(mod112csWAR)
+  reg_means222csLAR <- get_regime_means(mod222csLAR)
+
+  expect_equal(reg_means122[2, ], c(2.553492, 3.210253), tolerance=1e-5)
+  expect_equal(reg_means112csWAR[, 1], c(1.571661, 3.718636), tolerance=1e-5)
+  expect_equal(reg_means222csLAR[, 2], c(9.666667, 140.333333), tolerance=1e-5)
+
+  reg_autocovs122 <- get_regime_autocovs(mod122)
+  reg_autocovs112csWAR <- get_regime_autocovs(mod112csWAR)
+  reg_autocovs222csLAR <- get_regime_autocovs(mod222csLAR)
+
+  expect_equal(reg_autocovs122[2 ,2 ,1 , ], c(5.258146, 9.877770), tolerance=1e-5)
+  expect_equal(reg_autocovs112csWAR[1, ,2 , 1], c(0.2477767, 0.2201706), tolerance=1e-5)
+  expect_equal(reg_autocovs222csLAR[1, , 2, 2], c(9.302809, -21.716886), tolerance=1e-5)
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

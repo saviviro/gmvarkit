@@ -8,7 +8,7 @@
 \alias{summary.gmvar}
 \alias{plot.gmvar}
 \alias{print.gmvar}
-\title{Create a class 'gmvar' object defining a GMVAR model}
+\title{Create a class 'gmvar' object defining a reduced form or structural GMVAR model}
 \usage{
 GMVAR(
   data,
@@ -19,6 +19,7 @@ GMVAR(
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
+  structural_pars = NULL,
   calc_cond_moments,
   calc_std_errors = FALSE
 )
@@ -110,6 +111,19 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
+
 \item{calc_cond_moments}{should conditional means and covariance matrices should be calculated?
 Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 
@@ -127,14 +141,15 @@ Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 will include log-likelihood and information criteria values.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
-  to work with other functions provided in \code{gmvarkit}.
+Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
+  Can be used to work with other functions provided in \code{gmvarkit}.
 
   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
   the second one for the lag one, etc.
 }
 \description{
-\code{GMVAR} creates a class \code{'gmvar'} object that defines a GMVAR model
+\code{GMVAR} creates a class \code{'gmvar'} object that defines
+ a reduced form or structural GMVAR model
 }
 \details{
 If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
@@ -184,6 +199,14 @@ params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
 mod222
 
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+mod222s
+
 # GMVAR(2,2), d=2 model with AR-parameters restricted to be
 # the same for both regimes:
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
@@ -209,6 +232,8 @@ mod222c2
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
  }

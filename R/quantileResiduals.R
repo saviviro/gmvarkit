@@ -1,8 +1,8 @@
 
-#' @title Calculate multivariate quantile residuals of GMVAR model
+#' @title Calculate multivariate quantile residuals of a GMVAR model
 #'
 #' @description \code{quantile_residuals} calculates multivariate quantile residuals
-#'  (described by \emph{Kalliovirta and Saikkonen 2010}) for GMVAR model.
+#'  (described by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
@@ -10,13 +10,7 @@
 #'   quantile residuals are calculated so that the first column quantile residuals are the "unconditioned ones"
 #'   and the rest condition on all the previous ones in numerical order. Read the cited article by
 #'   \emph{Kalliovirta and Saikkonen 2010} for details.
-#' @references
-#'  \itemize{
-#'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
-#'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
-#'          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
-#'  }
+#' @inherit GMVAR references
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
 #'   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
 #' @examples
@@ -72,6 +66,7 @@ quantile_residuals <- function(gmvar) {
   d <- gmvar$model$d
   data <- gmvar$data
   constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
   n_obs <- nrow(data)
   T_obs <- n_obs - p
 
@@ -79,14 +74,16 @@ quantile_residuals <- function(gmvar) {
   params <- gmvar$params
   if(gmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
-                                     change_to="intercept")
+                                     structural_pars=structural_pars, change_to="intercept")
   }
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+                                    structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
 
   all_mu <- get_regime_means(gmvar)
-  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params)
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params)
+  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
 
@@ -177,10 +174,11 @@ quantile_residuals <- function(gmvar) {
 #'   No argument checks!
 #' @inherit quantile_residuals return references
 
-quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints) {
+quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints, structural_pars=NULL) {
   lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                   parametrization=parametrization, constraints=constraints,
-                                  to_return="loglik_and_mw", check_params=TRUE, minval=NA)
+                                  structural_pars=structural_pars, to_return="loglik_and_mw",
+                                  check_params=TRUE, minval=NA)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
   mod <- structure(list(data=data,
@@ -189,7 +187,8 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                                    d=ncol(data),
                                    conditional=conditional,
                                    parametrization=parametrization,
-                                   constraints=constraints),
+                                   constraints=constraints,
+                                   structural_pars=structural_pars),
                         params=params,
                         std_errors=rep(NA, npars),
                         mixing_weights=lok_and_mw$mw,

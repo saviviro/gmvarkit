@@ -377,6 +377,30 @@ test_that("pick_alphas works correctly", {
   expect_equal(pick_alphas(p=2, M=1, d=3, params=theta_213s), 1)
 })
 
+test_that("pick_W works correctly", {
+  expect_null(pick_W(p=1, M=1, d=2, params=theta_112))
+
+  # SGMVAR
+  expect_equal(pick_W(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W_112)), W_112)
+  expect_equal(pick_W(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W_122)), W_122)
+  expect_equal(pick_W(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W_222)), W_222)
+  expect_equal(pick_W(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W_332)), W_332)
+  expect_equal(pick_W(p=1, M=2, d=3, params=theta_123s, structural_pars=list(W_123)), W_123)
+  expect_equal(pick_W(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W_213)), W_213)
+})
+
+test_that("pick_lambdas works correctly", {
+  expect_null(pick_lambdas(p=1, M=1, d=2, params=theta_112))
+
+  # SGMVAR
+  expect_null(pick_lambdas(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W_112)))
+  expect_equal(pick_lambdas(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W_122)), lambdas_122)
+  expect_equal(pick_lambdas(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W_222)), lambdas_222)
+  expect_equal(pick_lambdas(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W_332)), c(lambdas2_332, lambdas3_332))
+  expect_equal(pick_lambdas(p=1, M=2, d=3, params=theta_123s, structural_pars=list(W_123)), lambdas_123)
+  expect_null(pick_lambdas(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W_213)))
+})
+
 
 test_that("pick_regime works correctly", {
   expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112, m=1), upsilon1_112)
@@ -406,6 +430,12 @@ params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 mod222 <- GMVAR(d=2, p=2, M=2, params=params222, parametrization="mean")
 get_boldA_eigens(mod222)
 
+## A(M)(p)_(p)(M)(d)
+rbind_diags <- function(p, M, d) {
+  I <- diag(p*d^2)
+  Reduce(rbind, replicate(M, I, simplify=FALSE))
+}
+
 # p=2, M=2, d=2, constraint AR-parameters to be the same for all regimes
 # and constraint the of-diagonal elements of AR-matrices to be zero.
 mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
@@ -421,13 +451,53 @@ theta_222_c2 <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vech(Ome
                   vech(Omega2_222_c2), alpha1_222_c2)
 mod222c <- GMVAR(d=2, p=2, M=2, params=theta_222_c2, constraints=C_222_2)
 
+# SGMVAR models
+C_112 <- rbind_diags(p=1, M=1, d=2)
+A11_112 <- matrix(c(0.25, 0.06, 0.04, 0.34), nrow=2, byrow=FALSE) # Re-define as stationary
+theta_112csWAR <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W and AR
+mod112csWAR <- GMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
+
+C_222 <- rbind_diags(p=2, M=2, d=2)
+C_lambda_222 <- matrix(c(1, 2), nrow=2)
+theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
+mod222csLAR <- GMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
+                     structural_pars=list(W=W_222, C_lambda=C_lambda_222))
 
 test_that("get_boldA_eigens works correctly", {
-  expect_equal(get_boldA_eigens(mod222)[[1]], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
-  expect_equal(get_boldA_eigens(mod222c)[[2]], c(0.9681610, 0.9569557, 0.3718390, 0.3030443), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222)[,1], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222c)[,2], c(0.9681610, 0.9569557, 0.3718390, 0.3030443), tolerance=1e-5)
+
+  # SGMVAR
+  expect_equal(get_boldA_eigens(mod112csWAR)[,1], c(0.3615207, 0.2284793), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222csLAR)[,2], c(0.9819784, 0.9215689, 0.4260533, 0.2603994), tolerance=1e-5)
 })
 
 test_that("get_omega_eigens works correctly", {
-  expect_equal(get_omega_eigens(mod222)[[1]], c(4.8391595, 0.9198405), tolerance=1e-5)
-  expect_equal(get_omega_eigens(mod222c)[[2]], c(11.611462, 3.608538), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222)[,1], c(4.8391595, 0.9198405), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222c)[,2], c(11.611462, 3.608538), tolerance=1e-5)
+
+  # SGMVAR
+  expect_equal(get_omega_eigens(mod112csWAR)[,1], c(5.2052628, 0.9247372), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222csLAR)[,2], c(2.0610439, 0.1882761), tolerance=1e-5)
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

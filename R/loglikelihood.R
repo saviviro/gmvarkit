@@ -1,6 +1,6 @@
 #' @import stats
 #'
-#' @title Compute log-likelihood of a Gaussian Mixture Vector Autoregressive model
+#' @title Compute log-likelihood of a Gaussian mixture vector autoregressive model
 #'
 #' @description \code{loglikelihood_int} computes log-likelihood of a GMVAR model.
 #'

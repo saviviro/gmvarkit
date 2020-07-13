@@ -2,7 +2,7 @@
 % Please edit documentation in R/loglikelihood.R
 \name{loglikelihood_int}
 \alias{loglikelihood_int}
-\title{Compute log-likelihood of a Gaussian Mixture Vector Autoregressive model}
+\title{Compute log-likelihood of a Gaussian mixture vector autoregressive model}
 \usage{
 loglikelihood_int(
   data,

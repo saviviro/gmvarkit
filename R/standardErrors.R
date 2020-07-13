@@ -5,16 +5,18 @@
 #'   roots of the diagonal of inverse of observed information matrix.
 #'
 #' @inheritParams loglikelihood_int
-#' @return a vector containing the approximate standard errors of the estimates
+#' @return A vector containing the approximate standard errors of the estimates.
 #' @inherit in_paramspace_int references
 
-standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, minval) {
+standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"),
+                            constraints=NULL, structural_pars=NULL, minval) {
 
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
-                      constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval),
+                               constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
+                               to_return="loglik", minval=minval),
              error=function(e) NA)
   }
 

@@ -343,15 +343,15 @@ check_pMd <- function(p, M, d) {
 }
 
 
-#' @title Checks whether the given object has class attribute "gmvar" or "sgmvar"
+#' @title Checks whether the given object has class attribute "gmvar"
 #'
-#' @description \code{check_gmvar} checks that the object has class attribute "gmvar" or "sgmvar".
+#' @description \code{check_gmvar} checks that the object has class attribute "gmvar".
 #'
 #' @param object S3 object to be tested
-#' @return Throws an error if the object doesn't have the class attribute "gmvar" or "sgmvar".
+#' @return Throws an error if the object doesn't have the class attribute "gmvar".
 
 check_gmvar <- function(object) {
-  if(!any(class(object) == "gmvar" || class(object) == "sgmvar")) {
+  if(!any(class(object) == "gmvar")) {
     stop("The object has to be of class 'gmvar' or 'sgmvar', typically created with function 'GMVAR' or 'fitGMVAR'")
   }
 }

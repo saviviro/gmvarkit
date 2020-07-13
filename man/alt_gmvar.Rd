@@ -22,8 +22,8 @@ Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the specified GMVAR model. Can be used
-  to work with other functions provided in \code{gmvarkit}.
+Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
+  Can be used to work with other functions provided in \code{gmvarkit}.
 
   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
   the second one for the lag one, etc.
@@ -52,6 +52,8 @@ It's sometimes useful to examine other estimates than the one with the highest l
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
  }

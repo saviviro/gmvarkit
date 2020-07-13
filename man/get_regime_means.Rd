@@ -30,7 +30,6 @@ mod122 <- GMVAR(data, p=1, M=2, params=params122)
 mod122
 get_regime_means(mod122)
 
-
 # GMVAR(2,2), d=2 model with mean-parametrization:
 params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
@@ -39,6 +38,15 @@ params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
 mod222
 get_regime_means(mod222)
+
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+ -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+mod222s
+get_regime_means(mod222s)
 }
 \references{
 \itemize{
