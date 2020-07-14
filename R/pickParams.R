@@ -216,14 +216,14 @@ pick_W <- function(p, M, d, params, structural_pars=NULL) {
 #' @details Constrained parameter vectors are not supported. Not even constraints in \eqn{W}!
 #' @return Returns a length \eqn{(d*(M - 1))} vector \eqn{(\strong{\lambda_{2}},...,\strong{\lambda_{M}})}
 #'  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
-#'   Returns \code{NULL} for reduced form models or when \eqn{M=1}.
+#'   Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
 
 pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
-  if(is.null(structural_pars) || M == 1) return(NULL)
+  if(is.null(structural_pars) || M == 1) return(numeric(0))
   params[(M*d + d^2*p*M + d^2 + 1):((M*d + d^2*p*M + d^2 + d*(M - 1)))]
 }
 

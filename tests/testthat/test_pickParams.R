@@ -390,15 +390,15 @@ test_that("pick_W works correctly", {
 })
 
 test_that("pick_lambdas works correctly", {
-  expect_null(pick_lambdas(p=1, M=1, d=2, params=theta_112))
+  expect_equal(pick_lambdas(p=1, M=1, d=2, params=theta_112), numeric(0))
 
   # SGMVAR
-  expect_null(pick_lambdas(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W_112)))
+  expect_equal(pick_lambdas(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W_112)), numeric(0))
   expect_equal(pick_lambdas(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W_122)), lambdas_122)
   expect_equal(pick_lambdas(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W_222)), lambdas_222)
   expect_equal(pick_lambdas(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W_332)), c(lambdas2_332, lambdas3_332))
   expect_equal(pick_lambdas(p=1, M=2, d=3, params=theta_123s, structural_pars=list(W_123)), lambdas_123)
-  expect_null(pick_lambdas(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W_213)))
+  expect_equal(pick_lambdas(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W_213)), numeric(0))
 })
 
 

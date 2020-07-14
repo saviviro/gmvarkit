@@ -53,19 +53,22 @@ random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_sca
 #' @param accuracy a positive real number adjusting how close to the given parameter vector the returned individual should be.
 #'   Larger number means larger accuracy. Read the source code for details.
 #' @param which_random a vector with length between 1 and M specifying the mixture components that should be random instead of
-#'   close to the given parameter vector. If constraints are employed, then this does not consider AR coefficients. Default is \code{NULL}.
+#'   close to the given parameter vector. This does not consider constrained AR or lambda parameters.
 #' @section Warning:
 #'   No argument checks!
 #' @inherit random_ind return references
 
-smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_random=numeric(0), mu_scale, mu_scale2, omega_scale, ar_scale=1) {
+smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_random=numeric(0), mu_scale, mu_scale2, omega_scale,
+                      ar_scale=1, W_scale, lambda_scale, structural_pars=NULL) {
     scale_A <- 1 + log(2*mean(c((p - 0.2)^(1.25), d)))
-    params_std <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints) # parameters in the standard form
+    params_std <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+    unc_structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
     alphas <- pick_alphas(p=p, M=M, d=d, params=params_std)
-    all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params_std)
-
-    if(is.null(constraints)) { # If there are no constraints
-      all_phi0_A <- pick_all_phi0_A(p=p, M=M, d=d, params=params_std) # or all_mu
+    if(is.null(structural_pars)) {
+      all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params_std)
+    }
+    if(is.null(constraints) && is.null(structural_pars)) { # If there are no AR constraints and a reduced form model is considered
+      all_phi0_A <- pick_all_phi0_A(p=p, M=M, d=d, params=params_std) # all_mu if called from GA
       pars <- vapply(1:M, function(m) {
         if(any(which_random == m)) {
           if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
@@ -81,26 +84,68 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
             smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy))
         }
       }, numeric(d + p*d^2 + d*(d + 1)/2))
-    } else { # If linear constraints are employed
-      all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params_std) # or all_mu
-      q <- ncol(constraints)
-      psi <- params[(M*d + 1):(M*d + q)]
-      pars_phi0 <- as.vector(vapply(1:M, function(m) {
+    } else { # If AR parameters are constrained or a structural model is considered
+      all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars) # all_mu if called from GA
+      phi0_pars <- as.vector(vapply(1:M, function(m) {
         if(any(which_random == m)) {
           rnorm(d, mean=mu_scale, sd=mu_scale2)
         } else {
           rnorm(d, mean=all_phi0[,m], sd=abs(all_phi0[,m]/accuracy))
         }
       }, numeric(d)))
-      pars_psi <- rnorm(q, mean=psi, sd=pmax(0.2, abs(psi))/accuracy)
-      pars_sigma <- as.vector(vapply(1:M, function(m) {
-        if(any(which_random == m)) {
-          random_covmat(d=d, omega_scale=omega_scale)
-        } else {
-          smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy)
+
+      if(is.null(constraints)) { # Structural model with AR parameters not constrained
+        all_A <- pick_allA(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars)
+        AR_pars <- as.vector(vapply(1:M, function(m) {
+          if(any(which_random == m)) {
+            if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
+              random_coefmats2(p=p, d=d, ar_scale=ar_scale)
+            } else {
+              random_coefmats(d=d, how_many=p, scale=scale_A)
+            }
+          } else {
+            all_Am <- as.vector(all_A[, , , m])
+            rnorm(n=length(all_Am), mean=all_Am, sd=pmax(0.2, abs(all_Am))/accuracy)
+          }
+
+        }, numeric(p*d^2)))
+      } else { # Structural or reduced form model with AR parameters constrained
+        q <- ncol(constraints)
+        psi <- params[(M*d + 1):(M*d + q)]
+        AR_pars <- rnorm(q, mean=psi, sd=pmax(0.2, abs(psi))/accuracy)
+      }
+      if(is.null(structural_pars)) { # Reduced form model
+        covmat_pars <- as.vector(vapply(1:M, function(m) {
+          if(any(which_random == m)) {
+            random_covmat(d=d, omega_scale=omega_scale)
+          } else {
+            smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy)
+          }
+        }, numeric(d*(d + 1)/2)))
+      } else { # Structural model
+        if(any(which_random == 1)) {
+          # If first regime is random, then W must be random. For brevity, the lambdas may also random as they define relation to the first regime
+          covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
+        } else { # First regime is smart
+          W_pars <- Wvec(pick_W(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars))
+          if(M > 1) {
+            n_lambs <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
+            W_and_lambdas <- c(W_pars, params[(length(params) - (M - 1) - n_lambs + 1):(length(params) - (M - 1))])
+          } else {
+            W_and_lambdas <- W_pars # No lambdas when M == 1
+          }
+          covmat_pars <- smart_covmat(d=d, M=M, W_and_lambdas=W_and_lambdas, accuracy=accuracy, structural_pars=structural_pars)
+          if(is.null(structural_pars$C_lambda) && M > 1) {
+            # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
+            for(m in 2:M) {
+              if(any(which_random == m)) {
+                W_and_lambdas[(length(W_and_lambdas) - n_lambs + d*(m - 2) + 1):(length(W_and_lambdas) - n_lambs + d*(m - 2) + d)] <- rt(n=d, df=lambda_scale[m - 1])
+              }
+            }
+          }
         }
-      }, numeric(d*(d + 1)/2)))
-      pars <- c(pars_phi0, pars_psi, pars_sigma)
+      }
+      pars <- c(phi0_pars, AR_pars, covmat_pars)
     }
     if(M > 1) {
       alphas2 <- abs(rnorm(M, mean=alphas, sd=0.2))
@@ -335,6 +380,9 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
     return(vech(covmat))
   } else {
     pars <- rnorm(n=length(W_and_lambdas), mean=W_and_lambdas, sd=sqrt(abs(W_and_lambdas)/(d + accuracy)))
+    W_const <- Wvec(structural_pars$W)
+    pars[1:(d^2)][W_const > 0] <- abs(pars[1:(d^2)][W_const > 0]) # We enforce W to satisfy the sign constraints
+    pars[1:(d^2)][W_const < 0] <- -abs(pars[1:(d^2)][W_const < 0])
     if(M > 1) {
       n_lambdas <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
       pars[(length(pars) - n_lambdas + 1):length(pars)] <- abs(pars[(length(pars) - n_lambdas + 1):length(pars)]) # make lambdas positive

@@ -63,7 +63,7 @@ a time-varying diagonal matrix with positive diagonal entries).}
 \value{
 Returns a length \eqn{(d*(M - 1))} vector \eqn{(\strong{\lambda_{2}},...,\strong{\lambda_{M}})}
  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
-  Returns \code{NULL} for reduced form models or when \eqn{M=1}.
+  Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 }
 \description{
 \code{pick_lambdas} picks the structural parameters eigenvalue 'lambdas from a parameter vector

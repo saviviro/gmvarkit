@@ -58,13 +58,13 @@ a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 \describe{
-    \item{For \strong{reduced form models}:}{returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
+    \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
       \eqn{\Omega}.}
-    \item{For \strong{structural models}:}{returns length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
+    \item{For \strong{structural models}:}{Returns a length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
       \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}
       contains the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)} and \eqn{n_zeros} is the number of zero constraints
       in \eqn{W}. If lambdas are constrained, replacce \eqn{d*(M - 1)} in the length with \eqn{r} and
-      \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}.}
+      \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}. The operator \eqn{Wvec()} vectorizes a matrix and removes zeros.}
   }
 }
 \description{
