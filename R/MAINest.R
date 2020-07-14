@@ -111,6 +111,11 @@
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
 #'
+#' # Structural GMVAR(1, 2) model identified with sign
+#' # constraints.
+#' W_122 <- matrix(c(1, NA, 0, 1), nrow=2)
+#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, seeds=1:10)
+#'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
 #'                   ncalls=16, seeds=1:16)
@@ -134,8 +139,9 @@
 #' }
 #' @export
 
-fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ncalls=round(10 + 9*log(M)),
-                     ncores=min(2, ncalls, parallel::detectCores()), maxit=300, seeds=NULL, print_res=TRUE, ...) {
+fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
+                     ncalls=round(10 + 9*log(M)), ncores=min(2, ncalls, parallel::detectCores()), maxit=300, seeds=NULL,
+                     print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
@@ -144,7 +150,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints)
+  npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
@@ -167,11 +173,12 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
-                                                              constraints=constraints, seed=seeds[i1], ...), cl=cl)
+                                                              constraints=constraints, structural_pars=structural_pars, seed=seeds[i1], ...), cl=cl)
 
   loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data, p, M, params=GAresults[[i1]], conditional=conditional,
                                                           parametrization=parametrization, constraints=constraints,
-                                                          check_params=TRUE, to_return="loglik", minval=minval), numeric(1))
+                                                          structural_pars=structural_pars, check_params=TRUE,
+                                                          to_return="loglik", minval=minval), numeric(1))
 
   if(print_res) {
     print_loks <- function() {
@@ -187,7 +194,8 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ### Optimization with the variable metric algorithm###
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
-                               constraints=constraints, check_params=TRUE, to_return="loglik", minval=minval), error=function(e) minval)
+                               constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
+                               to_return="loglik", minval=minval), error=function(e) minval)
   }
 
   h <- 6e-6
@@ -204,8 +212,9 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1))
 
   loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=NEWTONresults[[i1]]$par, conditional=conditional,
-                                                          constraints=constraints, parametrization=parametrization, check_params=TRUE,
-                                                          to_return="loglik", minval=minval), numeric(1))
+                                                          parametrization=parametrization, constraints=constraints,
+                                                          structural_pars=structural_pars, check_params=TRUE, to_return="loglik",
+                                                          minval=minval), numeric(1))
   if(print_res) {
     cat("Results from the variable metric algorithm:\n")
     print_loks()
@@ -216,16 +225,17 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   all_estimates <- lapply(NEWTONresults, function(x) x$par)
   best_fit <- NEWTONresults[[which(loks == max(loks))[1]]]
   params <- best_fit$par
-  if(is.null(constraints)) {
-    params <- sort_components(p=p, M=M, d=d, params=params)
-    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars))
+  if(is.null(constraints) && is.null(structural_pars$C_lambda)) {
+    params <- sort_components(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
   }
   if(best_fit$convergence == 1) {
     message("Iteration limit was reached when estimating the best fitting individual! Consider further estimations with the function 'iterate_more'")
   }
   mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                       parametrization=parametrization, constraints=constraints,
-                                      to_return="mw", check_params=TRUE, minval=NULL)
+                                      structural_pars=structural_pars, to_return="mw", check_params=TRUE,
+                                      minval=NULL)
   if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
     message("At least one of the mixture components in the estimated model seems to be wasted!")
   }
@@ -234,7 +244,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ### Wrap up ###
   cat("Calculating approximate standard errors...\n")
   ret <- GMVAR(data=data, p=p, M=M, d=d, params=params, conditional=conditional, parametrization=parametrization,
-               constraints=constraints, calc_std_errors=TRUE)
+               constraints=constraints, structural_pars=structural_pars, calc_std_errors=TRUE)
   ret$all_estimates <- all_estimates
   ret$all_logliks <- loks
   ret$which_converger <- converged

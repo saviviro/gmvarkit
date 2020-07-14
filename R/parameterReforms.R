@@ -63,7 +63,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structura
                              numeric(p*d^2 + d + d*(d + 1)/2)))
   } else { # Structural model
     W <- structural_pars$W # Obtain the indices with zero constraints (the zeros don't exist in params)
-    n_zeros <- sum(W == 0)
+    n_zeros <- sum(W == 0, na.rm=TRUE)
     new_W <- numeric(d^2)
     W_pars <- params[(d*M + q + 1):(d*M + q + d^2 - n_zeros)]
     new_W[W != 0] <- W_pars

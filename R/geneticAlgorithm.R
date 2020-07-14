@@ -170,8 +170,8 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
 
   # Defaults and checks
   if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu have to be positive integers")
@@ -228,12 +228,14 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     G <- numeric(0)
     for(i1 in 1:nattempts) {
       if(is.null(constraints)) {
-        inds <- replicate(popsize, random_ind2(p=p, M=M, d=d, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale, ar_scale=ar_scale))
+        inds <- replicate(popsize, random_ind2(p=p, M=M, d=d, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale, ar_scale=ar_scale,
+                                               W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
       } else {
-        inds <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale))
+        inds <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale,
+                                              W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
       }
       ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2], conditional=conditional,
-                                                                   parametrization="mean", constraints=constraints,
+                                                                   parametrization="mean", constraints=constraints, structural_pars=structural_pars,
                                                                    check_params=TRUE, to_return="loglik", minval=minval),numeric(1))
       G <- cbind(G, inds[, ind_loks > minval]) # Take good enough individuals
       if(ncol(G) >= popsize) {
@@ -241,7 +243,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         break
       } else if(i1 == nattempts) {
         if(length(G) == 0) {
-          stop("Failed to create initial population with good enough individuals. Consider setting up the initial population by hand using the argument 'initpop' of the function 'GAfit'.")
+          stop("Failed to create initial population with good enough individuals. Check if there is something weird in the data or in the provided constraints? You can also set up the initial population manually using the argument 'initpop' of the function 'GAfit'.")
         } else {
           G <- G[,sample.int(ncol(G), size=popsize, replace=TRUE)]
         }
@@ -251,12 +253,12 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     stopifnot(is.list(initpop))
     for(i1 in 1:length(initpop)) {
       ind <- initpop[[i1]]
-      tryCatch(check_parameters(p=p, M=M, d=d, params=ind, constraints=constraints),
+      tryCatch(check_parameters(p=p, M=M, d=d, params=ind, constraints=constraints, structural_pars=structural_pars),
                error=function(e) stop(paste("Problem with individual", i1, "in the initial population: "), e))
-      if(parametrization=="intercept") {
-        ind <- change_parametrization(p=p, M=M, d=d, params=ind, constraints=constraints, change_to="mean")
+      if(parametrization == "intercept") {
+        ind <- change_parametrization(p=p, M=M, d=d, params=ind, constraints=constraints, structural_pars=structural_pars, change_to="mean")
       }
-      initpop[[i1]] <- sort_components(p=p, M=M, d=d, params=ind)
+      initpop[[i1]] <- sort_components(p=p, M=M, d=d, params=ind, structural_pars=structural_pars)
     }
     G <- replicate(popsize, initpop[[sample.int(length(initpop), size=1)]])
   }
@@ -267,7 +269,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   }
 
   # Initial setup
-  generations <- array(dim=c(npars, popsize, ngen))
+  generations <- array(NA, dim=c(npars, popsize, ngen))
   logliks <- matrix(minval, nrow=ngen, ncol=popsize)
   redundants <- matrix(M, nrow=ngen, ncol=popsize) # Store the number of redundant regimes of each individual
   which_redundant_alt <- 1:M
@@ -290,11 +292,12 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     if(i1 == 1) {
       for(i2 in 1:popsize) {
         loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                         constraints=constraints, to_return="loglik_and_mw", check_params=TRUE, minval=minval)
+                                         constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
+                                         check_params=TRUE, minval=minval)
         fill_lok_and_red(i1, i2, loks_and_mw)
       }
     } else {
-      # Proportional fitness inheritance: individual has 50% change to inherit fitness if it's a result of crossover
+      # Proportional fitness inheritance: individual has 50% change to inherit fitness if it's a result of crossover.
       # Variable "I" tells the proportions of parent material.
       I2 <- rep(I, each=2)
       which_did_co <- which(1 - which_not_co == 1)
@@ -325,23 +328,24 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
           } else {
             if(stat_mu == TRUE & mutate[i2] == 1) {
               loks_and_mw <- tryCatch(loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                               constraints=constraints, to_return="loglik_and_mw",
-                                               check_params=FALSE, minval=minval), error=function(e) minval)
+                                                        constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
+                                                        check_params=FALSE, minval=minval), error=function(e) minval)
             } else {
               loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                               constraints=constraints, to_return="loglik_and_mw", check_params=TRUE, minval=minval)
+                                               constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
+                                               check_params=TRUE, minval=minval)
             }
             fill_lok_and_red(i1, i2, loks_and_mw)
          }
       }
     }
 
-    # Take care of individuals that are not good enough + calculate the numbers redudant regimes
+    # Take care of individuals that are not good enough + calculate the numbers redundant regimes
     logliks[i1, which(logliks[i1,] < minval)] <- minval
     redundants[i1, which(logliks[i1,] <= minval)] <- M
 
 
-    ## Natural selection and the reproduction pool ##
+    ## Selection and the reproduction pool ##
     if(length(unique(logliks[i1,])) == 1) {
       choosing_probs <- rep(1, popsize) # If all individuals are the same, the surviving probability weight is 1.
     } else {
@@ -350,7 +354,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       choosing_probs <- T_values/sum(T_values) # The surviving probability weights
     }
 
-    # Draw popsize individuals "with put back" and form the reproduction pool H.
+    # Draw popsize individuals with replacement and form the reproduction pool H.
     survivors <- sample(1:popsize, size=popsize, replace=TRUE, prob=choosing_probs)
     H <- G[,survivors]
 
@@ -383,10 +387,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
     # Get the best individual so far and check for reduntant regimes
     best_index0 <- which(logliks == max(logliks), arr.ind=TRUE)
-    best_index <- best_index0[order(best_index0[,1], decreasing=FALSE)[1],] # First generation when the best loglik occured (because of fitness inheritance)
+    best_index <- best_index0[order(best_index0[,1], decreasing=FALSE)[1],] # First generation when the best loglik occurred (because of fitness inheritance)
     best_ind <- generations[, best_index[2], best_index[1]]
     best_mw <- loglikelihood_int(data, p, M, params=best_ind, conditional=conditional, parametrization="mean",
-                                 constraints=constraints, to_return="mw", check_params=FALSE, minval=minval)
+                                 constraints=constraints, structural_pars=structural_pars, to_return="mw",
+                                 check_params=FALSE, minval=minval)
     which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1))) # Which regimes are wasted
 
     # Keep track of "the alternative best individual" that has (weakly) less reduntant regimes than the current best one.
@@ -413,12 +418,16 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         stat_mu <- FALSE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
                                                                                    mu_scale=mu_scale, mu_scale2=mu_scale2,
-                                                                                   omega_scale=omega_scale), numeric(npars))
-      } else { # For stationarity with algorithm (slower), Ansley and Kohn (1986)
+                                                                                   omega_scale=omega_scale, W_scale=W_scale,
+                                                                                   lambda_scale=lambda_scale,
+                                                                                   structural_pars=structural_pars), numeric(npars))
+      } else { # For stationarity with algorithm (slower but can skip stationarity test), Ansley and Kohn (1986)
         stat_mu <- TRUE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M, d=d, mu_scale=mu_scale,
                                                                                     mu_scale2=mu_scale2, omega_scale=omega_scale,
-                                                                                    ar_scale=ar_scale), numeric(npars))
+                                                                                    ar_scale=ar_scale, W_scale=W_scale,
+                                                                                    lambda_scale=lambda_scale,
+                                                                                    structural_pars=structural_pars), numeric(npars))
       }
     } else if(length(which_mutate) >= 1) { # Smart mutations
       stat_mu <- FALSE
@@ -439,7 +448,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
       ## 'Smart mutation': mutate close to a well fitting individual. We obviously don't mutate close to
       # redundant regimes but draw them at random ('rand_to_use' in what follows).
-      if(!is.null(constraints) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) {
+      if(!is.null(constraints) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5 | !is.null(structural_pars)) {
         # The first option for smart mutations: smart mutate to 'alt_ind' which is the best fitting individual
         # with least redundant regimes.
         # Note that best_ind == alt_ind when length(which_redundant) <= length(which_redundant_alt).
@@ -489,12 +498,14 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       H2[,which_mutate] <- vapply(1:length(which_mutate), function(i2) smart_ind(p, M, d, params=ind_to_use, constraints=constraints,
                                                                                  accuracy=accuracy[i2], which_random=rand_to_use,
                                                                                  mu_scale=mu_scale, mu_scale2=mu_scale2,
-                                                                                 omega_scale=omega_scale, ar_scale=ar_scale), numeric(npars))
+                                                                                 omega_scale=omega_scale, ar_scale=ar_scale,
+                                                                                 W_scale=W_scale, lambda_scale=lambda_scale,
+                                                                                 structural_pars=structural_pars), numeric(npars))
     }
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
-    if(is.null(constraints)) {
-      H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M, d=d, params=H2[,i2]), numeric(npars))
+    if(is.null(constraints) && is.null(structural_pars$C_lambda)) {
+      H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M, d=d, params=H2[,i2], structural_pars=structural_pars), numeric(npars))
     }
 
     # Save the results and set up new generation
@@ -511,7 +522,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   if(parametrization == "mean") {
     return(ret)
   } else {
-    return(change_parametrization(p=p, M=M, d=d, params=ret, constraints=constraints, change_to="intercept"))
+    return(change_parametrization(p=p, M=M, d=d, params=ret, constraints=constraints, structural_pars=structural_pars, change_to="intercept"))
   }
 }
 

@@ -87,9 +87,9 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
   if(!is.null(W_constraints)) {
     W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=list(W=W_constraints))
     # No need to check zero constraints because the zeros are not parametrized
-    if(any(W_pars[W_constraints < 0] > -1e-8)) {
+    if(any(W_pars[W_constraints < 0] > -1e-8, na.rm=TRUE)) {
       return(FALSE)
-    } else if(any(W_pars[W_constraints > 0] < 1e-8)) {
+    } else if(any(W_pars[W_constraints > 0] < 1e-8, na.rm=TRUE)) {
       return(FALSE)
     }
     if(M > 1) {
@@ -229,9 +229,9 @@ check_parameters <- function(p, M, d, params, constraints=NULL, structural_pars=
 
   if(!is.null(structural_pars)) {
     W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-    if(any(W_pars[W_constraints < 0] > -1e-8)) {
+    if(any(W_pars[W_constraints < 0] > -1e-8, na.rm=TRUE)) {
       stop("The W parameter does not satisfy the (strict) negative sign constraints (with large enough numerical tolerance)")
-    } else if(any(W_pars[W_constraints > 0] < 1e-8)) {
+    } else if(any(W_pars[W_constraints > 0] < 1e-8, na.rm=TRUE)) {
       stop("The W parameter does not satisfy the (strict) positive sign constraints (with large enough numerical tolerance)")
     }
     if(M > 1) {
