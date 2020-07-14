@@ -113,8 +113,8 @@
 #'
 #' # Structural GMVAR(1, 2) model identified with sign
 #' # constraints.
-#' W_122 <- matrix(c(1, NA, 0, 1), nrow=2)
-#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, seeds=1:10)
+#' W_122 <- matrix(c(1, NA, NA, 1), nrow=2)
+#' fit12s_3 <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, ncores=4, seeds=1:10)
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",

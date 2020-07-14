@@ -317,17 +317,18 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
     n_zeros <- vapply(1:d, function(i1) sum(W[i1,] == 0, na.rm=TRUE), numeric(1))
     std_devs <- sqrt(W_scale/(d - n_zeros))
     new_W <- matrix(rnorm(n=d^2, mean=0, sd=std_devs), nrow=d, byrow=FALSE) # The standard deviations are recycled
-    new_W[W == 0 && !is.na(W)] <- 0
-    new_W[W > 0 && !is.na(W)] <- abs(new_W[W > 0 && !is.na(W)])
-    new_W[W < 0 && !is.na(W)] <- -abs(new_W[W < 0 && !is.na(W)])
+    new_W[W == 0 & !is.na(W)] <- 0
+    new_W[W > 0 & !is.na(W)] <- abs(new_W[W > 0 & !is.na(W)])
+    new_W[W < 0 & !is.na(W)] <- -abs(new_W[W < 0 & !is.na(W)])
     if(M > 1) {
       if(is.null(structural_pars$C_lambda)) {
-        lambdas <- abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d)))
+        lambdas <- as.vector(abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d))))
       } else {
         lambdas <- abs(rt(n=ncol(structural_pars$C_lambda), df=lambda_scale)) # gammas
       }
       lambdas[lambdas == Inf | lambdas == -Inf] <- 1 # If the df is very close to zero, Inf values may appear
-      return(c(Wvec(new_W), vec(lambdas)))
+      # lambdas <- sort(lambdas, decreasing=TRUE)
+      return(c(Wvec(new_W), lambdas))
     } else {
       return(Wvec(new_W))
     }
@@ -380,14 +381,15 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
     return(vech(covmat))
   } else {
     pars <- rnorm(n=length(W_and_lambdas), mean=W_and_lambdas, sd=sqrt(abs(W_and_lambdas)/(d + accuracy)))
-    W_const <- Wvec(structural_pars$W)
-    pars[1:(d^2)][W_const > 0 && !is.na(W_const)] <- abs(pars[1:(d^2)][W_const > 0 && !is.na(W_const)]) # We enforce W to satisfy the sign constraints
-    pars[1:(d^2)][W_const < 0 && !is.na(W_const)] <- -abs(pars[1:(d^2)][W_const < 0 && !is.na(W_const)])
+    W_const <- structural_pars$W
+    pars[1:(d^2)][W_const > 0 & !is.na(W_const)] <- abs(pars[1:(d^2)][W_const > 0 & !is.na(W_const)]) # We enforce W to satisfy the sign constraints
+    pars[1:(d^2)][W_const < 0 & !is.na(W_const)] <- -abs(pars[1:(d^2)][W_const < 0 & !is.na(W_const)])
     if(M > 1) {
       n_lambdas <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
-      pars[(length(pars) - n_lambdas + 1):length(pars)] <- abs(pars[(length(pars) - n_lambdas + 1):length(pars)]) # make lambdas positive
+      lambdas <- abs(pars[(length(pars) - n_lambdas + 1):length(pars)]) # Make lambdas positive
+      # lambdas <- sort(lambdas, decreasing=TRUE)
+      pars[(length(pars) - n_lambdas + 1):length(pars)] <- lambdas
     }
     return(pars)
   }
 }
-

@@ -66,7 +66,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structura
     n_zeros <- sum(W == 0, na.rm=TRUE)
     new_W <- numeric(d^2)
     W_pars <- params[(d*M + q + 1):(d*M + q + d^2 - n_zeros)]
-    new_W[W != 0] <- W_pars
+    new_W[W != 0 | is.na(W)] <- W_pars
 
     if(M > 1) {
       if(!is.null(structural_pars$C_lambda)) {

@@ -11,6 +11,7 @@ fitGMVAR(
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
+  structural_pars = NULL,
   ncalls = round(10 + 9 * log(M)),
   ncores = min(2, ncalls, parallel::detectCores()),
   maxit = 300,
@@ -40,6 +41,21 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+    should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{ncalls}{the number of estimation rounds that should be performed.}
 
@@ -144,6 +160,11 @@ plot(fit12)
 summary(fit12)
 print_std_errors(fit12)
 profile_logliks(fit12)
+
+# Structural GMVAR(1, 2) model identified with sign
+# constraints.
+W_122 <- matrix(c(NA, NA, NA, NA), nrow=2)
+fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, seeds=1:10)
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",

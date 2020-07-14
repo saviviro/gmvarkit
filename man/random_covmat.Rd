@@ -34,9 +34,11 @@ is considered.}
   t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
   As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
   should be strictly positive real numbers with the \eqn{m-1}th element giving the degrees of freedom for the \eqn{m}th
-  regime. The expected value of the main \strong{diagonal} elements of the \eqn{m}th \eqn{(m>1)} error term covariance
-  matrix will be \code{lambdas*W_scale} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
-  of the t-distribution.
+  regime. The expected value of the main \strong{diagonal} elements \eqn{ij} of the \eqn{m}th \eqn{(m>1)} error term covariance
+  matrix will be \code{W_scale[i]*(d - n_i)^(-1)*sum(lambdas*ind_fun)} where the \eqn{(d x 1)} vector \code{lambdas} is
+  drawn from the absolute value of the t-distribution, \code{n_i} is the number of zero constraints in the \eqn{i}th
+  row of \eqn{W} and \code{ind_fun} is an indicator function that takes the value one iff the \eqn{ij}th element of
+  \eqn{W} is not constrained to zero. Basically, larger lambdas (or smaller degrees of freedom) imply larger variance.
 
   If the lambda parameters are \strong{constrained} with the \eqn{(d(M - 1) x r)} constraint matrix \eqn{C_lambda},
   then provide a length \eqn{r} vector specifying the degrees of freedoms of the (absolute value of the) mean zero

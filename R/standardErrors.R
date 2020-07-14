@@ -193,7 +193,7 @@ print_std_errors <- function(gmvar, digits=3) {
         if(any(C_lambda != 1 & C_lambda != 0) | any(rowSums(C_lambda) > 1)) {
           sep_lambda <- TRUE # The lambda parameter std errors must be printed separately
           lambdas <- matrix(NA, nrow=d, ncol=M - 1)
-          n_zeros <- sum(W == 0)
+          n_zeros <- sum(W == 0, na.rm=TRUE)
           lambda_stds <- gmvar$std_errors[(M*d + M*d^2*p + d^2 - n_zeros + 1):(M*d + M*d^2*p + d^2 - n_zeros + ncol(C_lambda))]
         } else {
           sep_lambda <- FALSE
