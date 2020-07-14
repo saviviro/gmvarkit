@@ -4,7 +4,18 @@
 \alias{random_ind2}
 \title{Create somewhat random parameter vector of a GMVAR model that is always stationary}
 \usage{
-random_ind2(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale = 1)
+random_ind2(
+  p,
+  M,
+  d,
+  mu_scale,
+  mu_scale2,
+  omega_scale,
+  ar_scale = 1,
+  W_scale,
+  lambda_scale,
+  structural_pars = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -34,6 +45,47 @@ structural model is considered.}
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
 some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
 constrained models.}
+
+\item{W_scale}{a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
+random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently
+from such normal distributions that the expectation of the main \strong{diagonal} elements of the first
+regime's error term covariance matrix \eqn{\Omega_1 = WW'} is \code{W_scale}. The distribution of \eqn{\Omega_1}
+will be in some sense like a Wishart distribution but with the columns (elements) of \eqn{W} obeying the given
+constraints. The constraints are accounted for by setting the element to be always zero if it is subject to a zero
+constraint and for sign constraints the absolute value or negative the absolute value are taken, and then the
+variances of the elements of \eqn{W} are adjusted accordingly. This argument is ignored if reduced form model
+is considered.}
+
+\item{lambda_scale}{a length \eqn{M - 1} vector specifying the \strong{degrees of freedom} of the mean zero and
+  t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
+  As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
+  should be strictly positive real numbers with the \eqn{m-1}th element giving the degrees of freedom for the \eqn{m}th
+  regime. The expected value of the main \strong{diagonal} elements of the \eqn{m}th \eqn{(m>1)} error term covariance
+  matrix will be \code{lambdas*W_scale} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
+  of the t-distribution.
+
+  If the lambda parameters are \strong{constrained} with the \eqn{(d(M - 1) x r)} constraint matrix \eqn{C_lambda},
+  then provide a length \eqn{r} vector specifying the degrees of freedoms of the (absolute value of the) mean zero
+  t-distributions each of the \eqn{\gamma} parameters are drawn from (the \eqn{\gamma} is a \eqn{(r x 1)} vector).
+  The expected value of the main diagonal elements of the covariance matrices then depend on the constraints.
+
+  This argument is ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=M-1)}
+  if lambdas are not constrained and \code{rep(1, times=r)} if lambdas are constrained.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+    should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}
@@ -46,13 +98,13 @@ Returns random mean-parametrized parameter vector that has the same form as the 
 \details{
 The coefficient matrices are generated using the algorithm proposed by Ansley
   and Kohn (1986) which forces stationarity. It's not clear in detail how \code{ar_scale}
-  affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
+  exactly affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
   AR coefficients. Read the cited article by Ansley and Kohn (1986) and the source code
   for more information.
 
   The covariance matrices are generated from (scaled) Wishart distribution.
 
-  Constrained models are not supported!
+  Models with AR parameters constrained are not supported!
 }
 \references{
 \itemize{
@@ -61,5 +113,7 @@ The coefficient matrices are generated using the algorithm proposed by Ansley
       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
  }
 }

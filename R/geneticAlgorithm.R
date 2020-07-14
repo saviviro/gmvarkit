@@ -36,15 +36,35 @@
 #'         constraint matrix.
 #'       }
 #'     }
+#'     \item{\strong{For structural GMVAR model:}}{
+#'       Should have the form
+#'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \itemize{
+#'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
+#'       }
+#'       \describe{
+#'         \item{\strong{If AR parameters are constrained: }}{Replace \strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+#'         \strong{\eqn{\phi}}\eqn{_{M}} with \strong{\eqn{\psi}} \eqn{(qx1)} that satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+#'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}, as above.}
+#'         \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
+#'          the sign constraints.}
+#'         \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
+#'          with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+#'         \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is a \eqn{(d(M-1) x r)}
+#'          constraint matrix.}
+#'       }
+#'     }
 #'   }
-#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of
-#'   the \eqn{m}:th mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th
-#'   mixture component, and \eqn{\alpha_{m}} is the mixing weight parameter.
-#'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with the regimewise mean \eqn{\mu_{m}}.
+#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
+#'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
+#'   \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
+#'   error term covariance matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+#'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} which introduces
-#'   the GMVAR model.
+#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.
+#' @param conditional a logical argument specifying whether the conditional or exact log-likelihood function
 #' @param mu_scale a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 #'   mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
 #'   mean-parametrization is always used for optimization in \code{GAfit} - even when \code{parametrization=="intercept"}.
@@ -62,19 +82,28 @@
 #'   structural model is considered.
 #' @param W_scale a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
 #'   random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently
-#'   from such normal distributions that the expectation of the first regime's error term covariance matrix
-#'   \eqn{\Omega_1 = WW'} equals to \code{diag(W_scale)}. The distribution of \eqn{\Omega_1} will be in some sense
-#'   like a Wishart distribution but with the columns (elements) of \eqn{W} obeying the given constraints.
-#'   The constraints are accounted for by setting the element to be always zero if it is subject to a zero constraint
-#'   and for sign constraints the absolute value or negative the absolute value are taken. This argument is ignored if
-#'   reduced form model is considered.
+#'   from such normal distributions that the expectation of the main \strong{diagonal} elements of the first
+#'   regime's error term covariance matrix \eqn{\Omega_1 = WW'} is \code{W_scale}. The distribution of \eqn{\Omega_1}
+#'   will be in some sense like a Wishart distribution but with the columns (elements) of \eqn{W} obeying the given
+#'   constraints. The constraints are accounted for by setting the element to be always zero if it is subject to a zero
+#'   constraint and for sign constraints the absolute value or negative the absolute value are taken, and then the
+#'   variances of the elements of \eqn{W} are adjusted accordingly. This argument is ignored if reduced form model
+#'   is considered.
 #' @param lambda_scale a length \eqn{M - 1} vector specifying the \strong{degrees of freedom} of the mean zero and
 #'   t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
 #'   As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
 #'   should be strictly positive real numbers with the \eqn{m-1}th element giving the degrees of freedom for the \eqn{m}th
-#'   regime. The expected value of the \eqn{m}th \eqn{(m>1)} error term covariance matrix will be
-#'   \code{diag(lambdas)} multiplied by \code{diag(W_scale)} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
-#'   of the t-distribution. Ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=M-1)}.
+#'   regime. The expected value of the main \strong{diagonal} elements of the \eqn{m}th \eqn{(m>1)} error term covariance
+#'   matrix will be \code{lambdas*W_scale} where the \eqn{(d x 1)} vector \code{lambdas} is drawn from the absolute value
+#'   of the t-distribution.
+#'
+#'   If the lambda parameters are \strong{constrained} with the \eqn{(d(M - 1) x r)} constraint matrix \eqn{C_lambda},
+#'   then provide a length \eqn{r} vector specifying the degrees of freedoms of the (absolute value of the) mean zero
+#'   t-distributions each of the \eqn{\gamma} parameters are drawn from (the \eqn{\gamma} is a \eqn{(r x 1)} vector).
+#'   The expected value of the main diagonal elements of the covariance matrices then depend on the constraints.
+#'
+#'   This argument is ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=M-1)}
+#'   if lambdas are not constrained and \code{rep(1, times=r)} if lambdas are constrained.
 #' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in
 #'   some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
 #'   constrained models.
@@ -128,9 +157,10 @@
 #'  @export
 
 
-GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, ngen=200, popsize,
-                  smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale,
-                  ar_scale=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
+GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
+                  ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
+                  lambda_scale, ar_scale=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"),
+                  minval, seed=NULL) {
 
   # Required values and premilinary checks
   set.seed(seed)
@@ -175,10 +205,15 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   } else if(!(length(W_scale) == d & all(W_scale > 0))) {
     stop("W_scale must be numeric vector with length d and positive elements")
   }
+  if(is.null(structural_pars$C_lambda)) {
+    n_lambs <- M - 1
+  } else {
+    n_lambs <- ncol(structural_pars$C_lambda)
+  }
   if(missing(lambda_scale)) {
-    lambda_scale <- rep(1, times=M-1)
-  } else if(!(length(lambda_scale) == M - 1 & all(lambda_scale > 0.1))) {
-    stop("lambda_scale must be numeric vector with length M-1 and elements larger than 0.1")
+    lambda_scale <- rep(1, times=n_lambs) # numeric(0) if M == 1
+  } else if(!(length(lambda_scale) == n_lambs & all(lambda_scale > 0.1))) {
+    stop("lambda_scale must be numeric vector with length M-1 (r if lambdas are constrained) and elements larger than 0.1")
   }
   if(length(ar_scale) != 1 | ar_scale <= 0) {
     stop("ar_scale must be positive and have length one")

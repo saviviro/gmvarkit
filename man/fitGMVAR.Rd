@@ -27,8 +27,7 @@ a single time series. \code{NA} values are not supported.}
 
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function
-should be used.}
+\item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function}
 
 \item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
 intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}

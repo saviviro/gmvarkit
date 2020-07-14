@@ -280,7 +280,18 @@ test_that("in_paramspace works correctly", {
   expect_false(in_paramspace(p=2, M=1, d=3, params=theta_213sWC, structural_pars=list(W=W_213)))
 
   expect_true(in_paramspace(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
-  expect_true(in_paramspace(p=2, M=2, d=2, params=theta_222_c2s, constraints=C_222_2, structural_pars=list(W=W_222)))
+  expect_true(in_paramspace(p=2, M=2, d=2, params=theta_222_c2s, constraints=C_222_2, structural_pars=list(W=W_222c2)))
+  theta_222_c3s <- theta_222_c2s
+  theta_222_c3s[9] <- 1
+  expect_false(in_paramspace(p=2, M=2, d=2, params=theta_222_c3s, constraints=C_222_2, structural_pars=list(W=W_222c2)))
+  theta_222csLAR_2 <- theta_222csLAR
+  theta_222csLAR_2[15] <- -1
+  expect_false(in_paramspace(p=2, M=2, d=2, params=theta_222csLAR_2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+  theta_222csLAR_3 <- theta_222csLAR
+  theta_222csLAR_3[17] <- -0.1
+  expect_false(in_paramspace(p=2, M=2, d=2, params=theta_222csLAR_3, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+  theta_112s_2 <- c(phi10_112, vec(A12_222), Wvec(W_112))
+  expect_true(in_paramspace(p=1, M=1, d=2, params=theta_112s_2, structural_pars=list(W=W_112)))
 })
 
 test_that("check_parameters works correctly", {
@@ -304,6 +315,15 @@ test_that("check_parameters works correctly", {
 
   expect_error(check_parameters(p=1, M=1, d=2, params=theta_112cs, constraints=C_112, structural_pars=list(W=W_112)))
   expect_error(check_parameters(p=2, M=2, d=2, params=theta_222c, constraints=C_222, structural_pars=list(W=W_123)))
+  theta_222_c3s <- theta_222_c2s
+  theta_222_c3s[9] <- 1
+  expect_error(check_parameters(p=2, M=2, d=2, params=theta_222_c3s, constraints=C_222_2, structural_pars=list(W=W_222c2)))
+  theta_222csLAR_2 <- theta_222csLAR
+  theta_222csLAR_2[15] <- -1
+  expect_error(check_parameters(p=2, M=2, d=2, params=theta_222csLAR_2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+  theta_222csLAR_3 <- theta_222csLAR
+  theta_222csLAR_3[17] <- -0.1
+  expect_error(check_parameters(p=2, M=2, d=2, params=theta_222csLAR_3, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
 })
 
 
@@ -325,6 +345,11 @@ test_that("check_constraints works correctly", {
   expect_error(check_constraints(p=3, M=3, d=2, structural_pars=list(A=1)))
   expect_error(check_constraints(p=3, M=3, d=2, structural_pars=list(W=W_332, C_lambda=matrix(1:3, nrow=3))))
   expect_error(check_constraints(p=1, M=2, d=2, structural_pars=list(W=W_122, C_lambda=matrix(1:6, nrow=2, ncol=3))))
+  W_bad <- matrix(c(0, 0, 1, 2), nrow=2)
+  expect_error(check_constraints(p=1, M=1, d=2, structural_pars=list(W=W_bad)))
+  expect_error(check_constraints(p=1, M=1, d=2, structural_pars=list(W=t(W_bad))))
+  C_lambda_bad <- matrix(c(1, -0.001), nrow=2)
+  expect_error(check_constraints(p=1, M=2, d=2, structural_pars=list(W=W_122, C_lambda=C_lambda_bad)))
 })
 
 

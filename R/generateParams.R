@@ -9,19 +9,28 @@
 #'   in the other functions, for instance, in the function \code{loglikelihood}.
 #' @inherit in_paramspace references
 
-random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_scale) {
+random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
   scale_A <- ifelse(is.null(constraints),
                     1 + log(2*mean(c((p - 0.2)^(1.25), d))),
                     1 + (sum(constraints)/(M*d^2))^0.85)
   if(is.null(constraints)) {
-    x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-                                             random_coefmats(d=d, how_many=p, scale=scale_A),
-                                             random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d+1)/2)))
+    if(is.null(structural_pars)) {
+      x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
+                                               random_coefmats(d=d, how_many=p, scale=scale_A),
+                                               random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d+1)/2)))
+    } else {
+      x <- c(rnorm(d*M, mean=mu_scale, sd=mu_scale2), as.vector(replicate(n=M, random_coefmats(d=d, how_many=p, scale=scale_A))),
+             random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+    }
   } else {
     q <- ncol(constraints)
-    x <- c(as.vector(replicate(n=M, rnorm(d, mean=mu_scale, sd=mu_scale2))),
-           rnorm(q, mean=0, sd=0.5/scale_A), # random psi
-           as.vector(replicate(n=M, random_covmat(d=d, omega_scale=omega_scale))))
+    psi <- rnorm(q, mean=0, sd=0.5/scale_A) # random psi
+    all_phi0 <- rnorm(d*M, mean=mu_scale, sd=mu_scale2) # as.vector(replicate(n=M, rnorm(d, mean=mu_scale, sd=mu_scale2)))
+    if(is.null(structural_pars)) {
+      x <- c(all_phi0, psi, as.vector(replicate(n=M, random_covmat(d=d, omega_scale=omega_scale))))
+    } else {
+      x <- c(all_phi0, psi, random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+    }
   }
   if(M > 1) {
     alphas <- runif(n=M)
@@ -111,13 +120,13 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
 #' @inheritParams is_stationary
 #' @details The coefficient matrices are generated using the algorithm proposed by Ansley
 #'   and Kohn (1986) which forces stationarity. It's not clear in detail how \code{ar_scale}
-#'   affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
+#'   exactly affects the coefficient matrices but larger \code{ar_scale} seems to result in larger
 #'   AR coefficients. Read the cited article by Ansley and Kohn (1986) and the source code
 #'   for more information.
 #'
 #'   The covariance matrices are generated from (scaled) Wishart distribution.
 #'
-#'   Constrained models are not supported!
+#'   Models with AR parameters constrained are not supported!
 #' @inherit random_ind return
 #' @references
 #'  \itemize{
@@ -126,12 +135,19 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
 #'       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
 #'  }
 
-random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1) {
-  x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-                                           random_coefmats2(p=p, d=d, ar_scale=ar_scale),
-                                           random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d + 1)/2)))
+random_ind2 <- function(p, M, d, mu_scale, mu_scale2, omega_scale, ar_scale=1, W_scale, lambda_scale, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
+                                             random_coefmats2(p=p, d=d, ar_scale=ar_scale),
+                                             random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d + 1)/2)))
+  } else {
+   x <- c(rnorm(d*M, mean=mu_scale, sd=mu_scale2), as.vector(replicate(n=M, random_coefmats2(p=p, d=d, ar_scale=ar_scale))),
+          random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+  }
   if(M > 1) {
     alphas <- runif(n=M)
     return(c(x, (alphas[order(alphas, decreasing=TRUE, method="radix")]/sum(alphas))[-M]))
@@ -232,16 +248,23 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 #' @title Create random VAR model error term covariance matrix
 #'
 #' @description \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
-#'   from (scaled) Wishart distribution.
+#'   from (scaled) Wishart distribution for reduced form models and the parameters \eqn{W},\eqn{\lambda_1,...,\lambda_M}
+#'   for structural models (from normal distributions).
 #'
 #' @inheritParams is_stationary
 #' @inheritParams GAfit
-#' @return Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega} for
-#'   reduced form models and vectors of length \eqn{d^2 + d*(M - 1)} of the form
-#'   \eqn{(Wvec(W),\strong{\lambda}_2,...,\strong{\lambda}_M)} where \eqn{\strong{\lambda}_m=(\lambda_{m1},...,\lambda_{md})}
-#'   containts the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)}.
+#' @return
+#'   \describe{
+#'     \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
+#'       \eqn{\Omega}.}
+#'     \item{For \strong{structural models}:}{Returns a length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
+#'       \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}
+#'       contains the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)} and \eqn{n_zeros} is the number of zero constraints
+#'       in \eqn{W}. If lambdas are constrained, replacce \eqn{d*(M - 1)} in the length with \eqn{r} and
+#'       \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}. The operator \eqn{Wvec()} vectorizes a matrix and removes zeros.}
+#'   }
 
-random_covmat <- function(d, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
+random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
   if(is.null(structural_pars)) {
     return(smart_covmat(d=d, Omega=diag(x=omega_scale), accuracy=1))
   } else {
@@ -252,12 +275,18 @@ random_covmat <- function(d, omega_scale, W_scale, lambda_scale, structural_pars
     new_W[W == 0 & !is.na(W)] <- 0
     new_W[W > 0 & !is.na(W)] <- abs(new_W[W > 0 & !is.na(W)])
     new_W[W < 0 & !is.na(W)] <- -abs(new_W[W < 0 & !is.na(W)])
-    lambdas <- abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d)))
-    lambdas[lambdas == Inf] <- 1 # If the df is very close to zero, Inf values may appear
-    return(c(Wvec(W), vec(lambdas)))
+    if(M > 1) {
+      if(is.null(structural_pars$C_lambda)) {
+        lambdas <- abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d)))
+      } else {
+        lambdas <- abs(rt(n=ncol(structural_pars$C_lambda), df=lambda_scale)) # gammas
+      }
+      lambdas[lambdas == Inf | lambdas == -Inf] <- 1 # If the df is very close to zero, Inf values may appear
+      return(c(Wvec(new_W), vec(lambdas)))
+    } else {
+      return(Wvec(new_W))
+    }
   }
-  # HUOM! TARKISTA TÄÄLLÄ, ETTÄ w ON EI-SINGULAARINEN!? TAITAA OLLA AINA KOSKA RNORMISTA ARVOTTU
-  # HUOM! TÄNNE TARVITSEE CASEN JOSSA LAMBDAT ON RAJOITETTU!
 }
 
 
@@ -271,22 +300,46 @@ random_covmat <- function(d, omega_scale, W_scale, lambda_scale, structural_pars
 #' @inheritParams is_stationary
 #' @param Omega a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
 #'   expected value of the matrix to be generated.
+#' @param W_and_lambdas the mean of the normal distribution the new parameters are generated
+#'   from.
+#'   \describe{
+#'     \item{If lambdas are \strong{not constrained}:}{a size \eqn{(d^2 - n_zeros + d*(M - 1))} vector
+#'       \eqn{(Wvec(W),\lambda_{2},...,\lambda{M})}, where \eqn{n_zeros} is the number of zero constraints
+#'       in \eqn{W} and \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}.}
+#'     \item{If lambdas are \strong{constrained}:}{a size \eqn{(d^2 - n_zeros + r)} vector
+#'       \eqn{(Wvec(W),\gamma)}, where \eqn{C_{\lambda}\gamma =(\lambda_2,....,\lambda_M)}, \eqn{\gamma}
+#'       is of the size \eqn{(r x 1)}, and \eqn{C_{\lambda}} of the size \eqn{(d*(M - 1) x r}).}
+#'   }
 #' @param accuracy a positive real number adjusting how close to the given covariance matrix
-#'   the returned individual should be. Standard deviation of each diagonal element is
+#'   the returned individual should be.
+#'
+#'   For \strong{reduced form models} standard deviation of each diagonal element is for reduced form
+#'   models
 #'   \itemize{
-#'    \item \eqn{\omega_{i,i}/}\code{accuracy} when \code{accuracy > d/2}
-#'    \item and \code{sqrt(2/d)*}\eqn{\omega_{i,i}} when \code{accuracy <= d/2}.
-#'  }
-#'  Wishart distribution is used, but for more details read the source code.
-#' @return Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega}.
+#'     \item \eqn{\omega_{i,i}/}\code{accuracy} when \code{accuracy > d/2}
+#'     \item and \code{sqrt(2/d)*}\eqn{\omega_{i,i}} when \code{accuracy <= d/2}.
+#'   }
+#'   Wishart distribution is used for reduced form models, but for more details read the source code.
+#'
+#'   For \strong{structural models}, the parameters are generated from normal distribution with mean given
+#'   by the argument \code{W_and_lambdas} and the standard deviation is \code{sqrt(abs(W_and_lambdas)/(d + accuracy))}.
+#' @inherit random_covmat return
 
-smart_covmat <- function(d, Omega, accuracy) {
-  # Tee vanhan W:n ja lambdojen päälle smartti?
-  if(accuracy <= d/2) {
-    covmat <- rWishart(n=1, df=d, Sigma=Omega/d)[, , 1]
+smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    if(accuracy <= d/2) {
+      covmat <- rWishart(n=1, df=d, Sigma=Omega/d)[, , 1]
+    } else {
+      covmat <- (1 - d/(2*accuracy))*Omega + rWishart(n=1, df=(d^2)/2, Sigma=Omega/(d*accuracy))[, , 1]
+    }
+    return(vech(covmat))
   } else {
-    covmat <- (1-d/(2*accuracy))*Omega + rWishart(n=1, df=(d^2)/2, Sigma=Omega/(d*accuracy))[, , 1]
+    pars <- rnorm(n=length(W_and_lambdas), mean=W_and_lambdas, sd=sqrt(abs(W_and_lambdas)/(d + accuracy)))
+    if(M > 1) {
+      n_lambdas <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
+      pars[(length(pars) - n_lambdas + 1):length(pars)] <- abs(pars[(length(pars) - n_lambdas + 1):length(pars)]) # make lambdas positive
+    }
+    return(pars)
   }
-  vech(covmat)
 }
 

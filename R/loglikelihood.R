@@ -77,8 +77,10 @@
 #'       unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
 #'       negative sign constraint, and zero indicating that the element is constrained to zero.
 #'     \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-#'       \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} (similarly to AR parameter constraints).
-#'       Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
+#'       \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+#'       parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+#'       must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+#'       should not be constrained.
 #'   }
 #'   See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 #'   a time-varying diagonal matrix with positive diagonal entries).
@@ -134,6 +136,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   # Collect parameter values
   parametrization <- match.arg(parametrization)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -147,7 +150,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)
   if(check_params) {
-    if(!in_paramspace_int(p=p, M=M, d=d, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega)) {
+    if(!in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega, W_constraints=W_constraints)) {
       return(minval)
     }
   }

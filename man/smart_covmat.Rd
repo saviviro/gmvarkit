@@ -6,24 +6,66 @@
   fairly close to a given \strong{positive definite} covariance matrix using (scaled)
   Wishart distribution}
 \usage{
-smart_covmat(d, Omega, accuracy)
+smart_covmat(d, M, Omega, W_and_lambdas, accuracy, structural_pars = NULL)
 }
 \arguments{
 \item{d}{the number of time series in the system.}
 
+\item{M}{a positive integer specifying the number of mixture components.}
+
 \item{Omega}{a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
 expected value of the matrix to be generated.}
 
+\item{W_and_lambdas}{the mean of the normal distribution the new parameters are generated
+from.
+\describe{
+  \item{If lambdas are \strong{not constrained}:}{a size \eqn{(d^2 - n_zeros + d*(M - 1))} vector
+    \eqn{(Wvec(W),\lambda_{2},...,\lambda{M})}, where \eqn{n_zeros} is the number of zero constraints
+    in \eqn{W} and \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}.}
+  \item{If lambdas are \strong{constrained}:}{a size \eqn{(d^2 - n_zeros + r)} vector
+    \eqn{(Wvec(W),\gamma)}, where \eqn{C_{\lambda}\gamma =(\lambda_2,....,\lambda_M)}, \eqn{\gamma}
+    is of the size \eqn{(r x 1)}, and \eqn{C_{\lambda}} of the size \eqn{(d*(M - 1) x r}).}
+}}
+
 \item{accuracy}{a positive real number adjusting how close to the given covariance matrix
- the returned individual should be. Standard deviation of each diagonal element is
- \itemize{
-  \item \eqn{\omega_{i,i}/}\code{accuracy} when \code{accuracy > d/2}
-  \item and \code{sqrt(2/d)*}\eqn{\omega_{i,i}} when \code{accuracy <= d/2}.
+  the returned individual should be.
+
+  For \strong{reduced form models} standard deviation of each diagonal element is for reduced form
+  models
+  \itemize{
+    \item \eqn{\omega_{i,i}/}\code{accuracy} when \code{accuracy > d/2}
+    \item and \code{sqrt(2/d)*}\eqn{\omega_{i,i}} when \code{accuracy <= d/2}.
+  }
+  Wishart distribution is used for reduced form models, but for more details read the source code.
+
+  For \strong{structural models}, the parameters are generated from normal distribution with mean given
+  by the argument \code{W_and_lambdas} and the standard deviation is \code{sqrt(abs(W_and_lambdas)/(d + accuracy))}.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+    should not be constrained.
 }
-Wishart distribution is used, but for more details read the source code.}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix \eqn{\Omega}.
+\describe{
+    \item{For \strong{reduced form models}:}{returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
+      \eqn{\Omega}.}
+    \item{For \strong{structural models}:}{returns length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
+      \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}
+      contains the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)} and \eqn{n_zeros} is the number of zero constraints
+      in \eqn{W}. If lambdas are constrained, replacce \eqn{d*(M - 1)} in the length with \eqn{r} and
+      \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}.}
+  }
 }
 \description{
 \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}

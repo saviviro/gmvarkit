@@ -68,6 +68,10 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #' @inheritParams is_stationary
 #' @param alphas (Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
 #' @param all_Omega 3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.
+#' @param W_constraints set \code{NULL} for reduced form models. For structural models, this should be the
+#'   constraint matrix \eqn{W} from the list of structural parameters.
+#' @details The parameter vector in the argument \code{params} should be unconstrained and it is used for
+#'   structural models only.
 #' @return Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.
 #'   This function does NOT consider the identifiability condition!
 #' @references
@@ -78,7 +82,23 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'      paper, available as arXiv:2007.04713.
 #'  }
 
-in_paramspace_int <- function(p, M, d, all_boldA, alphas, all_Omega) {
+in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_constraints=NULL) {
+
+  if(!is.null(W_constraints)) {
+    W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=list(W=W_constraints))
+    # No need to check zero constraints because the zeros are not parametrized
+    if(any(W_pars[W_constraints < 0] > -1e-8)) {
+      return(FALSE)
+    } else if(any(W_pars[W_constraints > 0] < 1e-8)) {
+      return(FALSE)
+    }
+    if(M > 1) {
+      lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=list(W=W_constraints))
+      if(any(lambdas < 1e-8)) {
+        return(FALSE)
+      }
+    }
+  }
   if(M >= 2 & sum(alphas[-M]) >= 1) {
     return(FALSE)
   } else if(any(alphas <= 0)) {
@@ -88,7 +108,6 @@ in_paramspace_int <- function(p, M, d, all_boldA, alphas, all_Omega) {
   }
   for(m in 1:M) {
     if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < 1e-8)) {
-      print(m)
       return(FALSE)
     }
   }
@@ -142,11 +161,14 @@ in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NUL
   if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
     stop("The parameter vector has wrong length!")
   }
+  W_constraints <- structural_pars$W
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-  in_paramspace_int(p=p, M=M, d=d, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
+  in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
                     alphas=pick_alphas(p=p, M=M, d=d, params=params),
-                    all_Omega=pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
+                    all_Omega=pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars),
+                    W_constraints=W_constraints)
 }
 
 
@@ -201,7 +223,24 @@ check_parameters <- function(p, M, d, params, constraints=NULL, structural_pars=
     stop("The parameter vector has wrong dimension!")
   }
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  W_constraints <- structural_pars$W
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+
+  if(!is.null(structural_pars)) {
+    W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    if(any(W_pars[W_constraints < 0] > -1e-8)) {
+      stop("The W parameter does not satisfy the (strict) negative sign constraints (with large enough numerical tolerance)")
+    } else if(any(W_pars[W_constraints > 0] < 1e-8)) {
+      stop("The W parameter does not satisfy the (strict) positive sign constraints (with large enough numerical tolerance)")
+    }
+    if(M > 1) {
+      lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+      if(any(lambdas < 1e-8)) {
+        stop("The lambda parameters are not strictly positive (with large enough numerical tolerance)")
+      }
+    }
+  }
 
   if(M >= 2 & sum(alphas[-M]) >= 1) {
     stop("The mixing weight parameters don't sum to one")
@@ -263,6 +302,8 @@ check_constraints <- function(p, M, d, constraints=NULL, structural_pars=NULL) {
         stop("The structural parameter constraint matrix 'C_lambda' has more columns than rows! What are you doing??")
       } else if(qr(C_lamb)$rank != ncol(C_lamb)) {
         stop("The structural parameter constraint matrix 'C_lambda' should have full column rank")
+      } else if(any(C_lamb < 0)) {
+        stop("Entries of the structural parameter constraint matrix 'C_lambda' should be positive or zero")
       }
     }
   }
