@@ -532,6 +532,20 @@ theta_332_cr <- c(upsilon1_332, upsilon2_332, upsilon2_332, alpha1_332, alpha2_3
 theta_123_cr1 <- c(upsilon1_123, upsilon1_123, alpha1_123)
 theta_123_cr2 <- c(upsilon2_123, upsilon2_123, alpha1_123)
 
+theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
+                vec(A22_222), vec(W_222), lambdas_222, alpha1_222)
+
+## A(M)(p)_(p)(M)(d)
+theta_122_crs <- c(phi10_122, phi10_122, vec(A11_122), vec(A11_122), Wvec(W_122), lambdas_122, alpha1_122)
+theta_122_crs2 <- c(phi20_122, phi20_122, vec(A21_122), vec(A21_122), Wvec(W_122), lambdas_122, alpha1_122)
+theta_222_crs <- c(phi10_222, phi10_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222), Wvec(W_222), lambdas_222, alpha1_222)
+theta_332_crs <- c(phi10_332, phi20_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
+                   vec(A21_332), vec(A22_332), vec(A23_332), vec(A21_332), vec(A22_332), vec(A23_332),
+                   Wvec(W_332), lambdas2_332, lambdas3_332, alpha1_332, alpha2_332)
+theta_123_crs <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), Wvec(W_123), lambdas_123, alpha1_123)
+theta_123_crs2 <- c(phi20_123, phi20_123, vec(A21_123), vec(A21_123), Wvec(W_123), lambdas_123, alpha1_123)
+
+
 
 test_that("change_regime works correctly", {
   expect_equal(change_regime(p=1, M=2, d=2, params=theta_122, m=1, regime_pars=upsilon2_122), theta_122_cr)
@@ -539,5 +553,49 @@ test_that("change_regime works correctly", {
   expect_equal(change_regime(p=3, M=3, d=2, params=theta_332, m=3, regime_pars=upsilon2_332), theta_332_cr)
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123, m=2, regime_pars=upsilon1_123), theta_123_cr1)
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123, m=1, regime_pars=upsilon2_123), theta_123_cr2)
+
+  # SGMVAR
+  rpars122_m1 <-c(phi20_122, vec(A21_122))
+  rpars122_m2 <-c(phi10_122, vec(A11_122))
+  expect_equal(change_regime(p=1, M=2, d=2, params=theta_122s, m=2, regime_pars=rpars122_m2,
+                             structural_pars=list(W=W_122)), theta_122_crs, tol=1-6)
+  expect_equal(change_regime(p=1, M=2, d=2, params=theta_122s, m=1, regime_pars=rpars122_m1,
+                             structural_pars=list(W=W_122)), theta_122_crs2, tol=1e-6)
+
+  rpars222_m2 <- c(phi10_222, vec(A11_222), vec(A12_222))
+  expect_equal(change_regime(p=2, M=2, d=2, params=theta_222s, m=2, regime_pars=rpars222_m2,
+                             structural_pars=list(W=W_222)), theta_222_crs, tol=1-6)
+
+  rpars332_m3 <- c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332))
+  expect_equal(change_regime(p=3, M=3, d=2, params=theta_332sWC, m=3, regime_pars=rpars332_m3,
+                             structural_pars=list(W=W_332)), theta_332_crs, tol=1-6)
+
+  rpars123_m2 <- c(phi10_123, vec(A11_123))
+  expect_equal(change_regime(p=1, M=2, d=3, params=theta_123s, m=2, regime_pars=rpars123_m2,
+                             structural_pars=list(W=W_123)), theta_123_crs, tol=1-6)
+  rpars123_m1 <- c(phi20_123, vec(A21_123))
+  expect_equal(change_regime(p=1, M=2, d=3, params=theta_123s, m=1, regime_pars=rpars123_m1,
+                             structural_pars=list(W=W_123)), theta_123_crs2, tol=1-6)
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

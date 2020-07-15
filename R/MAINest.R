@@ -32,6 +32,15 @@
 #'
 #'  The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
 #'  from the package \code{stats}.
+#'
+#'  Finally, note that the structural models are even more difficult to estimate than the reduced form models due to
+#'  the different parametrization of the covariance matrices. If necessary, an initial population may be constructed
+#'  for the genetic algorithm based on the estimation results of a reduced form model. It is not unambiguous, however,
+#'  how to do that so that the (structural) parameter constraints are satisfied. Also, be aware that if the lambda
+#'  parameters are constrained in any other way than by restricting some of them to be identical, the parameter
+#'  "lambda_scale" of the genetic algorithm (see \code{?GAfit}) needs to be carefully adjusted accordingly.
+#'  Be aware that if a structural model is considered and the lambda parameters are constrained in some other way
+#'  than constraining some of them to be identical, the settings on the genetic algorithm may have to be adjusted
 #' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model. Multivariate quantile residuals
 #'   (Kalliovirta and Saikkonen 2010) are also computed and included in the returned object. In addition, the returned
 #'   object contains the estimates and log-likelihood values from all the estimation rounds performed.
@@ -111,15 +120,30 @@
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
 #'
-#' # Structural GMVAR(1, 2) model identified with sign
-#' # constraints.
-#' W_122 <- matrix(c(1, NA, NA, 1), nrow=2)
-#' fit12s_3 <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, ncores=4, seeds=1:10)
+#' # Structural GMVAR(1,2) model identified with sign
+#' # constraints. The sign constraints (which fully identify
+#' # the shocks) are in line with the reduced form model,
+#' # so the maximized loglikelihood is the same.
+#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
+#'   ncalls=10, seeds=1:10)
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
 #'                   ncalls=16, seeds=1:16)
 #' fit22
+#'
+#' # Structural GMVAR(2,2) model with the lambda parameters restricted
+#' # to be identical (in the second regime) and the shocks identified
+#' # with diagonal of the B-matrix normalized positive and one zero constraint.
+#' # The resulting model has error term covariance matrices that are
+#' # multiplicatives of each other, while the identification equals to
+#' # identification through Cholesky decomposition.
+#' W_222 <- matrix(c(1, NA, 0, 1), nrow=2)
+#' C_lambda_222 <- matrix(c(1, 1), nrow=2)
+#' fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222, C_lambda=C_lambda_222),
+#'  ncores=4, ncalls=20, seeds=1:20)
+#' fit22s
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
@@ -230,7 +254,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
     all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
   }
   if(best_fit$convergence == 1) {
-    message("Iteration limit was reached when estimating the best fitting individual! Consider further estimations with the function 'iterate_more'")
+    message("Iteration limit was reached when estimating the best fitting individual! Consider further estimation with the function 'iterate_more'")
   }
   mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                       parametrization=parametrization, constraints=constraints,
@@ -288,6 +312,17 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' fit12_2 <- iterate_more(fit12)
 #' fit12_2
 #'
+#' # Structural GMVAR(1,2) model identified with sign
+#' # constraints. Only 10 iterations of the variable metric
+#' # algorithm
+#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
+#'   ncalls=10, maxit=10, seeds=1:10)
+#' fit12s
+#'
+#' # Iterate more:
+#' fit12s_2 <- iterate_more(fit12s)
+#' fit12s_2
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for all regimes, only 10 iterations of the

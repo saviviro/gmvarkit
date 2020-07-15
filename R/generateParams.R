@@ -124,8 +124,9 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
         }, numeric(d*(d + 1)/2)))
       } else { # Structural model
         if(any(which_random == 1)) {
-          # If first regime is random, then W must be random. For brevity, the lambdas may also random as they define relation to the first regime
+          # If first regime is random, then W must be random so the lambdas may as well be random too.
           covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
+
         } else { # First regime is smart
           W_pars <- Wvec(pick_W(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars))
           if(M > 1) {
@@ -135,12 +136,12 @@ smart_ind <- function(p, M, d, params, constraints=NULL, accuracy=1, which_rando
             W_and_lambdas <- W_pars # No lambdas when M == 1
           }
           covmat_pars <- smart_covmat(d=d, M=M, W_and_lambdas=W_and_lambdas, accuracy=accuracy, structural_pars=structural_pars)
-          if(is.null(structural_pars$C_lambda) && M > 1) {
-            # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
-            for(m in 2:M) {
-              if(any(which_random == m)) {
-                W_and_lambdas[(length(W_and_lambdas) - n_lambs + d*(m - 2) + 1):(length(W_and_lambdas) - n_lambs + d*(m - 2) + d)] <- rt(n=d, df=lambda_scale[m - 1])
-              }
+        }
+        if(is.null(structural_pars$C_lambda) && M > 1) {
+          # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
+          for(m in 2:M) {
+            if(any(which_random == m)) {
+              covmat_pars[(length(covmat_pars) - d*(M - 1) + d*(m - 2) + 1):(length(covmat_pars) - d*(M - 1) + d*(m - 2) + d)] <- rnorm(n=d, mean=0, sd=lambda_scale[m - 1])
             }
           }
         }
@@ -322,12 +323,13 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
     new_W[W < 0 & !is.na(W)] <- -abs(new_W[W < 0 & !is.na(W)])
     if(M > 1) {
       if(is.null(structural_pars$C_lambda)) {
-        lambdas <- as.vector(abs(vapply(1:(M - 1), function(i1) rt(n=d, df=lambda_scale[i1]), numeric(d))))
+        lambdas <- as.vector(abs(vapply(1:(M - 1), function(i1) rnorm(n=d, mean=0, sd=lambda_scale[i1]), numeric(d))))
       } else {
-        lambdas <- abs(rt(n=ncol(structural_pars$C_lambda), df=lambda_scale)) # gammas
+        lambdas <- abs(rnorm(n=ncol(structural_pars$C_lambda), mean=0, sd=lambda_scale)) # gammas
       }
       lambdas[lambdas == Inf | lambdas == -Inf] <- 1 # If the df is very close to zero, Inf values may appear
       # lambdas <- sort(lambdas, decreasing=TRUE)
+
       return(c(Wvec(new_W), lambdas))
     } else {
       return(Wvec(new_W))

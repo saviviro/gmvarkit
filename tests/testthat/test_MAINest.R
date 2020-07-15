@@ -4,7 +4,10 @@ library(gmvarkit)
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 
 test_that("fitGMVAR does not throw errors", {
-   tmp <- suppressMessages(fitGMVAR(data, p=1, M=1, ncalls=1, ncores=1, maxit=1, seeds=1, print_res=FALSE, ngen=1))
+   tmp <- suppressMessages(fitGMVAR(data, p=1, M=1, ncalls=1, ncores=1, maxit=1, seeds=1, print_res=FALSE, ngen=2))
+   W_112 <- matrix(c(1, -1, NA, 1), nrow=2)
+   tmp <- suppressMessages(fitGMVAR(data, p=1, M=1, structural_pars=list(W=W_112),
+                                    ncalls=1, ncores=1, maxit=1, seeds=1, print_res=FALSE, ngen=2))
    expect_true(TRUE)
 })
 

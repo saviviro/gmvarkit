@@ -56,6 +56,14 @@
 #' p2
 #' p3 <- predict(fit12, n_ahead=10, pi_type="upper")
 #' p3
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
+#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
+#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+#' # p1 <- predict(mod222s, n_ahead=10)
 #' }
 #' @export
 
@@ -94,20 +102,22 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     M <- gmvar$model$M
     d <- gmvar$model$d
     constraints <- gmvar$model$constraints
+    structural_pars <- gmvar$model$structural_pars
     params <- gmvar$params
     n_obs <- nrow(data)
     mw <- loglikelihood_int(data, p, M, params=params, conditional=gmvar$model$conditional,
-                            constraints=constraints, to_return="mw_tplus1")
+                            constraints=constraints, structural_pars=structural_pars, to_return="mw_tplus1")
     mw <- mw[nrow(mw),]
 
     # Collect parameter values
     if(gmvar$model$parametrization == "mean") {
       params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
-                                       change_to="intercept")
+                                       structural_pars=structural_pars, change_to="intercept")
     }
-    params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
-    all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params)
-    all_A <- pick_allA(p=p, M=M, d=d, params=params)
+    params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+    structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
+    all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
     # Calculate the conditional mean
     pred <- rowSums(vapply(1:M, function(m) mw[m]*(all_phi0[, m] + rowSums(vapply(1:p, function(i1) all_A[, , i1, m]%*%data[n_obs + 1 - i1,],

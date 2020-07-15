@@ -155,6 +155,31 @@ get_unconstrained_structural_pars <- function(structural_pars=NULL) {
 }
 
 
+
+#' @title Reform W
+#'
+#' @description \code{get_unconstrained_struct_pars} return structural parameters that indicate there are no constraints
+#'  (except possibly sign constraints).
+#'
+#' @inheritParams loglikelihood_int
+#' @return Returns a list with \code{$W} being \eqn{(d x d)} matrix of ones and \code{$C_lambda} being \code{NULL}. If the
+#'   supplied argument is \code{NULL}, returns \code{NULL}.
+#' @details Intended to be called after calling the function \code{reform_constrained_pars} to avoid remove the constraints
+#'   again in any further function calls as this will create bugs. Sign constraints are irrelevant in this context.
+#' @section Warning:
+#'  No argument checks!
+
+get_unconstrained_structural_pars2 <- function(structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    return(NULL)
+  } else {
+    d <- nrow(structural_pars$W)
+    new_W <- matrix(rep(1, d^2), nrow=d)
+    return(list(W=new_W))
+  }
+}
+
+
 #' @title Form the \eqn{((dp)x(dp))} "bold A" matrices related to the VAR processes
 #'
 #' @description \code{form_boldA} creates the "bold A" coefficient matrices related to
@@ -306,18 +331,29 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, structural
 #'   of the pointed regime to the new given parameters.
 #'
 #' @inheritParams pick_regime
-#' @param regime_pars a size \eqn{((pd^2+d+d(d+1)/2)x1)} vector
-#'   \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.
+#' @param regime_pars
+#'   \describe{
+#'     \item{For reduced form models:}{a size \eqn{((pd^2+d+d(d+1)/2)x1)} vector
+#'       \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.}
+#'     \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+#'   }
 #' @return Returns parameter vector with \code{m}:th regime changed to \code{regime_pars}.
+#' @details Does not currently support models with AR or lambda parameter constraints.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-
-change_regime <- function(p, M, d, params, m, regime_pars) {
-  qm1 <- (m-1)*(d + p*d^2 + d*(d + 1)/2)
-  params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)] <- regime_pars
-  params
+change_regime <- function(p, M, d, params, m, regime_pars, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
+    params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)] <- regime_pars
+    return(params)
+  } else {
+    n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
+    params[(d*(m - 1) + 1):(d*m)] <- regime_pars[1:d] # phi0
+    params[(d*M + d^2*p*(m - 1) + 1):(d*M + d^2*p*(m - 1) + d^2*p)] <- regime_pars[(d + 1):(d + d^2*p)] # AR coefs
+    return(params)
+  }
 }
 
 

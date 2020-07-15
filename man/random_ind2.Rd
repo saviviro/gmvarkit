@@ -56,8 +56,8 @@ constraint and for sign constraints the absolute value or negative the absolute 
 variances of the elements of \eqn{W} are adjusted accordingly. This argument is ignored if reduced form model
 is considered.}
 
-\item{lambda_scale}{a length \eqn{M - 1} vector specifying the \strong{degrees of freedom} of the mean zero and
-  t-distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
+\item{lambda_scale}{a length \eqn{M - 1} vector specifying the \strong{standard deviation} of the mean zero normal
+  distribution from which the eigenvalue \eqn{\lambda_{mi}} parameters are drawn from in random mutations.
   As the eigenvalues should always be positive, the absolute value is taken. The elements of \code{lambda_scale}
   should be strictly positive real numbers with the \eqn{m-1}th element giving the degrees of freedom for the \eqn{m}th
   regime. The expected value of the main \strong{diagonal} elements \eqn{ij} of the \eqn{m}th \eqn{(m>1)} error term covariance
@@ -67,12 +67,16 @@ is considered.}
   \eqn{W} is not constrained to zero. Basically, larger lambdas (or smaller degrees of freedom) imply larger variance.
 
   If the lambda parameters are \strong{constrained} with the \eqn{(d(M - 1) x r)} constraint matrix \eqn{C_lambda},
-  then provide a length \eqn{r} vector specifying the degrees of freedoms of the (absolute value of the) mean zero
-  t-distributions each of the \eqn{\gamma} parameters are drawn from (the \eqn{\gamma} is a \eqn{(r x 1)} vector).
+  then provide a length \eqn{r} vector specifying the standard deviation of the (absolute value of the) mean zero
+  normal distribution each of the \eqn{\gamma} parameters are drawn from (the \eqn{\gamma} is a \eqn{(r x 1)} vector).
   The expected value of the main diagonal elements of the covariance matrices then depend on the constraints.
 
-  This argument is ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(1, times=M-1)}
-  if lambdas are not constrained and \code{rep(1, times=r)} if lambdas are constrained.}
+  This argument is ignored if \eqn{M==1} or a reduced form model is considered. Default is \code{rep(3, times=M-1)}
+  if lambdas are not constrained and \code{rep(3, times=r)} if lambdas are constrained.
+
+  As with omega_scale and W_scale, this argument should be adjusted carefully if specified by hand. \strong{NOTE}
+  that if lambdas are constrained in some other way than restricting some of them to be identical, this parameter
+  should be adjusted accordingly in order to the estimation succeed!}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 the following elements:

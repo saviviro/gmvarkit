@@ -233,17 +233,29 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
 #' @inheritParams pick_Am
-#' @details Structural models are currectly not supported.
-#' @return Returns length \eqn{pd^2+d+d(d+1)/2} vector containing
-#'  \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}, where
-#'  \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})} and \eqn{\sigma_{m} = vech(\Omega_{m})}.
+#' @details Models with AR or lambda parameter constraints are currently not supported.
+#' @return
+#'   \describe{
+#'     \item{For reduced form models:}{returns length \eqn{pd^2+d+d(d+1)/2} vector containing
+#'       \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}, where
+#'       \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})} and \eqn{\sigma_{m} = vech(\Omega_{m})}.}
+#'     \item{For structural models:}{returns the length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+#'   }
+#
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
 
-pick_regime <- function(p, M, d, params, m) {
-  qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
-  params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)]
+pick_regime <- function(p, M, d, params, m, structural_pars=NULL) {
+  if(is.null(structural_pars)) {
+    qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
+    return(params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)])
+  } else {
+    n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
+    phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[,m]
+    all_Am <- pick_Am(p=p, M=M, d=d, params=params, m=m, structural_pars=structural_pars)
+    return(c(phi0, as.vector(all_Am)))
+  }
 }
 
 

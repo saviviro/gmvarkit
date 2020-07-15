@@ -402,6 +402,10 @@ test_that("pick_lambdas works correctly", {
 })
 
 
+## A(M)(p)_(p)(M)(d)
+theta_213sWC <- c(phi10_213, vec(A11_213), vec(A12_213), Wvec(W_213)) # SGMVAR
+theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR
+
 test_that("pick_regime works correctly", {
   expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112, m=1), upsilon1_112)
 
@@ -411,7 +415,6 @@ test_that("pick_regime works correctly", {
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222, m=1), upsilon1_222)
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222, m=2), upsilon2_222)
 
-
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=1), upsilon1_332)
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=2), upsilon2_332)
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=3), upsilon3_332)
@@ -420,6 +423,30 @@ test_that("pick_regime works correctly", {
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123, m=2), upsilon2_123)
 
   expect_equal(pick_regime(p=2, M=1, d=3, params=theta_213, m=1), upsilon1_213)
+
+  # SGMVAR
+  expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112sWC, m=1, structural_pars=list(W=W_112)),
+               c(phi10_112, vec(A11_112)))
+  expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122s, m=1, structural_pars=list(W=W_122)),
+               c(phi10_122, vec(A11_122)))
+  expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122s, m=2, structural_pars=list(W=W_122)),
+               c(phi20_122, vec(A21_122)))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222s, m=1, structural_pars=list(W=W_222)),
+               c(phi10_222, vec(A11_222), vec(A12_222)))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222s, m=2, structural_pars=list(W=W_222)),
+               c(phi20_222, vec(A21_222), vec(A22_222)))
+  expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=1, structural_pars=list(W=W_332)),
+               c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332)))
+  expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=2, structural_pars=list(W=W_332)),
+               c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332)))
+  expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=3, structural_pars=list(W=W_332)),
+               c(phi30_332, vec(A31_332), vec(A32_332), vec(A33_332)))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123s, m=1, structural_pars=list(W=W_123)),
+               c(phi10_123, vec(A11_123)))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123s, m=2, structural_pars=list(W=W_123)),
+               c(phi20_123, vec(A21_123)))
+  expect_equal(pick_regime(p=2, M=1, d=3, params=theta_213sWC, m=1, structural_pars=list(W=W_213)),
+               c(phi10_213, vec(A11_213), vec(A12_213)))
 })
 
 

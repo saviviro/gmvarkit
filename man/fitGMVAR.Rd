@@ -135,6 +135,9 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 
  The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
  from the package \code{stats}.
+
+ Be aware that if a structural model is considered and the lambda parameters are constrained in some other way
+ than constraining some of them to be identical, the settings on the genetic algorithm may have to be adjusted
 }
 \section{S3 methods}{
 
@@ -163,13 +166,15 @@ profile_logliks(fit12)
 
 # Structural GMVAR(1, 2) model identified with sign
 # constraints.
-W_122 <- matrix(c(NA, NA, NA, NA), nrow=2)
-fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, seeds=1:10)
+W_122 <- matrix(c(1, NA, NA, 1), nrow=2)
+fit12s_3 <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122), ncalls=10, ncores=4, seeds=1:10, lambda_scale=2)
 
 # GMVAR(2,2) model with mean parametrization
-fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean", ncores=4,
                   ncalls=16, seeds=1:16)
 fit22
+
+fit22s <- fitGMVAR(data, p=2, M=2, parametrization="mean", structural_pars=list(W=W_122), ncores=4, ncalls=16, seeds=1:16, lambda_scale=1)
 
 # GMVAR(2,2) model with autoregressive parameters restricted
 # to be the same for both regimes
