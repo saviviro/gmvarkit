@@ -10,9 +10,15 @@ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 # p=1, M=1, d=2, parametrization="mean"
 phi10_112 <- c(1.07, 127.71)
 A11_112 <- matrix(c(0.99, 0.00, -0.01, 0.99), nrow=2)
-Omega1_112 <- matrix(c(4.05, 2.22, 8.87, 2.22), nrow=2)
+Omega1_112 <- matrix(c(4.05, 2.22, 2.22, 2.22), nrow=2)
 theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 mod_112 <- GMVAR(data, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
+
+W_112 <- t(chol(Omega1_112))
+theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR, W constrained by Cholesky
+mod_112s <- GMVAR(data, p=1, M=1, d=2, params=theta_112sWC, conditional=TRUE, parametrization="mean", constraints=NULL,
+                  structural_pars=list(W=W_112))
+
 
 # p=2, M=2, d=2, no constraints, GMVAR-paper
 phi10_222 <- c(1.03, 2.36)
@@ -31,10 +37,19 @@ upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
 mod_222 <- GMVAR(data, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", constraints=NULL)
 
+WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
+W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
+lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
+theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
+                vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
+mod_222s <- GMVAR(data, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", constraints=NULL,
+                  structural_pars=list(W=W_222))
+
+
 # p=2, M=2, d=2, AR paramars same, non-diagonals zero, intercept
 theta_222c <- c(0.3552775, 3.1929675, -0.1143198, 2.8294743, 1.2633425, 1.3375150, -0.2919742, -0.3624010,
                 5.5971764, 3.4559442, 9.6221422, 0.9820759, -0.3267521, 5.2358855, 0.6501600)
-mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE) # Laske paperilla monimutkaisemmat rajoitteet
+mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
 C_222c <- rbind(mat0, mat0)
 mod_222c <- GMVAR(data, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c)
 
@@ -55,6 +70,8 @@ res_112 <- quantile_residual_tests(mod_112, lags_ac=1:2, lags_ch=1:2, nsimu=300,
 res_222 <- quantile_residual_tests(mod_222, lags_ac=3, lags_ch=1, nsimu=1, print_res=FALSE)
 res_123 <- quantile_residual_tests(mod_123, lags_ac=1, lags_ch=2, nsimu=1, print_res=FALSE)
 
+set.seed(1); res_112s <- quantile_residual_tests(mod_112s, lags_ac=1:2, lags_ch=1:2, nsimu=1, print_res=FALSE)
+set.seed(1); res_222s <- quantile_residual_tests(mod_222s, lags_ac=1, lags_ch=2, nsimu=300, print_res=FALSE)
 
 
 test_that("quantile_residual_tests - test_results - works correctly", {
@@ -69,6 +86,15 @@ test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_123$norm_res$test_stat, 5.912122, tolerance=1e-4)
   expect_equal(res_123$ac_res$test_results$test_stat, 17.55207, tolerance=1e-4)
   expect_equal(res_123$ch_res$test_results$test_stat, 24.99111, tolerance=1e-4)
+
+  # SGMVAR
+  expect_equal(res_112s$norm_res$test_stat, 115.5537, tolerance=1e-3)
+  expect_equal(res_112s$ac_res$test_results$test_stat, c(32.74336, 35.58885), tolerance=1e-3)
+  expect_equal(res_112s$ch_res$test_results$test_stat, c(16.27407, 22.02809), tolerance=1e-3)
+
+  expect_equal(res_222s$norm_res$p_val, 0.561786, tolerance=1e-4)
+  expect_equal(res_222s$ac_res$test_results$p_val, 0.8985538, tolerance=1e-4)
+  expect_equal(res_222s$ch_res$test_results$p_val, 0.7720037, tolerance=1e-4)
 })
 
 test_that("quantile_residual_tests - ind_stats - works correctly", {
@@ -82,6 +108,13 @@ test_that("quantile_residual_tests - ind_stats - works correctly", {
                c(2.0089681, -0.8670114, 0.6316378, 1.1598600, -1.5442288, 2.9690730, -1.6025916, -0.1522856, -0.1156838), tolerance=1e-4)
   expect_equal(res_123$ch_res$ind_stats$lag2,
                c(-1.48736102, -1.00846208, 0.11090136, 1.67935179, 0.6865806, -1.49368993, -2.04132820, 0.06928959, 0.44320965), tolerance=1e-4)
+
+  # SGMVAR
+  expect_equal(res_112s$ac_res$ind_stats$lag1, c(4.10238061, 0.95255874, 0.03488986, 3.79132960), tolerance=1e-4)
+  expect_equal(res_112s$ch_res$ind_stats$lag2, c(1.3283931, -0.8333597, 0.5940387, 3.4563746), tolerance=1e-4)
+
+  expect_equal(res_222s$ac_res$ind_stats$lag1, c(-0.1501102, 0.4471858, -0.5632530, 0.7932211), tolerance=1e-4)
+  expect_equal(res_222s$ch_res$ind_stats$lag2, c(0.2515854, -0.1910597, 1.3825613, 0.9136450), tolerance=1e-4)
 })
 
 
@@ -134,4 +167,29 @@ test_that("get_test_Omega works correctly", {
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, g=g_ac2, dim_g=dim_g_ac2)[,2],
                c(0.19172737, 0.85825300, 0.09773145, -0.18278803, 0.03803171, -0.07227835, -0.07058063, -0.08615313), tolerance=1e-4)
+
+  # SGMVAR
+  expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
+                              constraints=NULL, structural_pars=list(W=W_112), g=g_norm, dim_g=dim_g_norm)[2,],
+               c(2.284867, 21.283539, 51.544341, 1.723343, 15.281678, -16.989623), tolerance=1e-4)
+  expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
+                              constraints=NULL, structural_pars=list(W=W_112), g=g_ac1, dim_g=dim_g_ac1)[4,],
+               c(0.4927337, -3.5265900, 0.9979045, 94.4919253), tolerance=1e-4)
+  expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222s, conditional=TRUE, parametrization="intercept",
+                              constraints=NULL, structural_pars=list(W=W_222), g=g_ac2, dim_g=dim_g_ac2)[,8],
+               c(-0.03558556, -0.07470666, -0.07362959, -0.27822363, 0.17240094, -0.01494992, 0.11873980, 1.05340983), tolerance=1e-4)
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+

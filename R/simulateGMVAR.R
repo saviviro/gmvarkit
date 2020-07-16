@@ -9,10 +9,12 @@
 #' @param init_values a size \eqn{(pxd)} matrix specifying the initial values to be used in the simulation, where
 #'   d is the number of time series in the system.
 #'   The \strong{last} row will be used as initial values for the first lag, the second last row for second lag etc. If not
-#'   specified, initial values will be drawn from the stationary distribution.
+#'   specified, initial values will be drawn from the stationary distribution of the process.
 #' @param ntimes how many sets of simulations should be performed?
 #' @param drop if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 #'   \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.
+#' @param girf_pars This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
+#'   should ignore it.
 #' @details The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
 #'  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
 #'  intervals (see the forecasting example).
@@ -48,7 +50,17 @@
 #'  ts.plot(sim122$mixing_weights, col=c("blue", "red"), lty=2)
 #'  plot(sim122$component, type="l")
 #'
-#'  ## FORECASTING EXAMPLE
+#'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#'  params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+#'    -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+#'    0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
+#'  W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#'  mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
+#'  structural_pars=list(W=W_222))
+#'  sim222s <- simulateGMVAR(mod222s, nsimu=100)
+#'  plot.ts(sim222s$sample)
+#'
+#'  ## FORECASTING EXAMPLE ##
 #'  # Forecast 5-steps-ahead, 10000 sets of simulations with initial
 #'  # values from the data:
 #'  # GMVAR(2,2), d=2 model with mean-parametrization:
@@ -81,7 +93,14 @@
 #'  }
 #' @export
 
-simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
+simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, girf_pars=NULL) {
+  # girf_pars$variable - which variable?
+  # girf_pars$shock_size - size of the structural shock?
+  # girf_pars$init_regimes - init values generated from which regimes? Ignored if !is.null(init_values)
+  # girf_pars$R1 - the number of repetitions to base the GIRF on
+  # girf_pars$N - the horizon how far ahead to estimate the GIRF
+  # If !is.null(girf_pars), returns a size (N x 1) vector containing the estimated GIRF
+
   check_gmvar(gmvar)
   epsilon <- round(log(.Machine$double.xmin) + 10)
   p <- gmvar$model$p
@@ -129,9 +148,19 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
     det_Sigmas[m] <- det(Sigma_m)
   }
 
+  if(is.null(girf_pars)) {
+    R1 <- 1
+    init_regimes <- 1:M
+    reg_probs <- alphas
+  } else {
+    R1 <- girf_pars$R1
+    init_regimes <- girf_pars$init_regimes
+    reg_probs <- alphas[init_regimes]
+  }
+
   # Set/generate initial values
   if(is.null(init_values)) {
-    m <- sample.int(n=M, size=1, replace=TRUE, prob=alphas) # From which mixture component the initial values are drawn from?
+    m <- sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs) # From which mixture component the initial values are drawn from?
     mu <- rep(all_mu[, m], p)
     L <- t(chol(Sigmas[, , m]))
     init_values <- matrix(mu + L%*%rnorm(d*p), nrow=p, ncol=d, byrow=TRUE)

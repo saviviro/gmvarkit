@@ -147,7 +147,14 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 #' fit12
 #' profile_logliks(fit12)
-
+#'
+#' # Structural GMVAR(1,2) model identified with sign
+#' # constraints.
+#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
+#'   ncalls=10, seeds=1:10)
+#' profile_logliks(fit12s)
+#'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
 #'                   ncalls=16, seeds=11:26)
@@ -185,6 +192,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
     stop("There are dublicates in which_pars")
   }
   constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
   npars <- length(which_pars)
 
   if(missing(nrows)) nrows <- max(ceiling(log2(npars) - 1), 1)
@@ -199,10 +207,19 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
   # In order to get the labels right, we first determine which indeces in params
   # correspond to which parameters: different procedure for constrained models.
   if(is.null(constraints)) {
-    all_q <- rep(d^2*p + d + d*(d + 1)/2, M) # Length of (phi_0m, \bold{phi_m}, sigma_m) for each m.
-    cum_q <- c(0, cumsum(all_q)) # After this index, a new regime starts; after the last one the mixing weights start
+    if(is.null(structural_pars)) {
+      all_q <- rep(d^2*p + d + d*(d + 1)/2, M) # Length of (phi_0m, \bold{phi_m}, sigma_m) for each m.
+      cum_q <- c(0, cumsum(all_q)) # After this index, a new regime starts; after the last one the mixing weights start
+    } else { # Structural model
+      q <- p*d^2*M # The number of AR parameters
+    }
   } else {
-    q <- ncol(constraints)
+    q <- ncol(constraints) # The number of AR parameters
+  }
+  if(!is.null(structural_pars)) {
+    W_const <- structural_pars$W
+    n_zeros <- sum(W_const == 0, na.rm=TRUE) # The number of zero constraints in W
+    W_row_ind <- rep(1, times=d) # row for each column
   }
 
   for(i1 in which_pars) { # Go though the parameters
@@ -213,14 +230,14 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
     logliks <- vapply(vals, function(val) {
       new_pars <- pars
       new_pars[i1] <- val # Change the single parameter value
-      loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars, constraints=constraints,
-                        conditional=gmvar$model$conditional, parametrization=parametrization,
-                        check_params=TRUE, minval=NA)
+      loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars, conditional=gmvar$model$conditional,
+                        parametrization=parametrization, constraints=constraints,
+                        structural_pars=structural_pars, check_params=TRUE, minval=NA)
     }, numeric(1))
 
     # In order to get the labels right, we first determine which parameter is in question.
-    # We consider constrained models separately.
-    if(is.null(constraints)) {
+    # We consider constrained and structural models separately.
+    if(is.null(constraints) && is.null(structural_pars)) {
       if(i1 <= max(cum_q)) { # phi and sigma parameters first
         m <- sum(i1 > cum_q) # Which regime are we considering
         if(i1 > cum_q[m + 1] - d*(d + 1)/2 && i1 <= cum_q[m + 1]) { # Omega params
@@ -254,13 +271,14 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
             m <- i1 - max(cum_q)
             main <- substitute(alpha[foo], list(foo=m))
       }
-    } else { ## Linear constraints are employed
+    } else { ## If AR parameters are constrained or a structural model is considered
+      last_covmat_par_index <- length(params) - (M - 1)
 
       if(i1 <= M*d + q) { # phi_{m,0} and AR parameters
         if(i1 <= M*d) { # phi_{m,0}
           cum_d <- c(0, cumsum(rep(d, M))) # The index after which regime changes
           m <- sum(i1 > cum_d)
-          pos <- i1 - cum_d[m] # Which Time series?
+          pos <- i1 - cum_d[m] # Which time series?
           mylist <- list(foo=paste0(m, ",0"), foo2=pos)
           if(parametrization == "intercept") {
             main <- substitute(phi[foo](foo2), mylist)
@@ -268,21 +286,63 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
             main <- substitute(mu[foo](foo2), mylist)
           }
         } else { # The AR parameters
-          pos <- i1 - M*d
-          main <- substitute(AR(foo), list(foo=pos))
+          if(is.null(constraints)) { # Structural model with AR parameters not constrained
+            cum_q <- c(0, cumsum(rep(d^2*p, M))) # The index after which the regime changes
+            m <- sum(i1 > cum_q)
+            pos1 <- i1 - d*M - cum_q[m] # Position in vec(A_m1),...,vec(A_mp)
+            cum_a <- c(0, cumsum(rep(d^2, times=p))) # the index after which new matrix A_m,p starts in vec(A_m1),...,vec(A_mp)
+            which_mat <- sum(pos1 > cum_a) # in which matrix A_m,j, j=1,..,p we are?
+            pos2 <- pos1 - (which_mat - 1)*d^2 # Position in the current matrix A_m,j
+            cum_a_cols <- c(0, cumsum(rep(d, times=d))) # The index in current matrix after which a new column in A_m,j starts
+            col_ind <- sum(pos2 > cum_a_cols) # The column where we are in the current matrix
+            row_ind <- rep(1:d, times=d)[pos2] # The row where we are in the current matrix
+            main <- substitute(A[foo](foo2), list(foo=paste0(m, ",", which_mat), foo2=paste0(row_ind, ",", col_ind)))
+          } else {
+            pos <- i1 - M*d
+            main <- substitute(psi(foo), list(foo=pos))
+          }
         }
-      } else if(i1 <= M*(d + d*(d + 1)/2) + q) { # Omega parameters
-        cum_s <- M*d + q + c(0, cumsum(rep(d*(d + 1)/2, times=M))) # Index after which regime changes
-        m <- sum(i1 > cum_s)
-        i1 - cum_s[1] # Position in vech(Omega_1),...,vech(Omega_M)
-        pos <- i1 - cum_s[m] # position in vech(Omega_m)
-        cum_d <- c(0, cumsum(d - 0:(d - 1))) # Index after which column changes in the current vech(Omega_m)
-        col_ind <- sum(pos > cum_d) # Which column in the current Omega
-        row_inds <- unlist(lapply(1:d, function(i2) i2:d)) # At which row are we in the current Omega_m for each pos?
-        row_ind <- row_inds[pos] # At which row of Omega_m we are
-        main <- substitute(Omega[foo](foo2), list(foo=m, foo2=paste0(row_ind, ", ", col_ind)))
+      } else if(i1 <= last_covmat_par_index) { # Covariance matrix parameters
+        if(is.null(structural_pars)) { # Reduced form models, vech(Omega_1),...,vech(Omega_M)
+          cum_s <- M*d + q + c(0, cumsum(rep(d*(d + 1)/2, times=M))) # Index after which regime changes
+          m <- sum(i1 > cum_s)
+          i1 - cum_s[1] # Position in vech(Omega_1),...,vech(Omega_M)
+          pos <- i1 - cum_s[m] # position in vech(Omega_m)
+          cum_d <- c(0, cumsum(d - 0:(d - 1))) # Index after which column changes in the current vech(Omega_m)
+          col_ind <- sum(pos > cum_d) # Which column in the current Omega
+          row_inds <- unlist(lapply(1:d, function(i2) i2:d)) # At which row are we in the current Omega_m for each pos?
+          row_ind <- row_inds[pos] # At which row of Omega_m we are
+          main <- substitute(Omega[foo](foo2), list(foo=m, foo2=paste0(row_ind, ", ", col_ind)))
+        } else { # Structural models: W and lambdas
+          if(i1 <=  M*d + q + d^2 - n_zeros) { # W parameters
+            n_zeros_in_each_column <- vapply(1:d, function(i2) sum(W_const[,i2] == 0, na.rm=TRUE), numeric(1))
+            zero_positions <- lapply(1:d, function(i2) (1:d)[W_const[,i2] == 0 & !is.na(W_const[,i2])]) # Zero constraint positions in each column
+            cum_wc <- c(0, cumsum(d - n_zeros_in_each_column)) # Index in W parameters after which a new column in W starts
+            posw <- i1 - (M*d + q) # Index in W parameters
+            col_ind <- sum(posw > cum_wc)
+            while(TRUE) {
+              if(W_row_ind[col_ind] %in% zero_positions[[col_ind]]) {
+                W_row_ind[col_ind] <- W_row_ind[col_ind] + 1
+              } else {
+                break
+              }
+            }
+            main <- substitute(W(foo), list(foo=paste0(W_row_ind[col_ind], ", ", col_ind)))
+            W_row_ind[col_ind] <- W_row_ind[col_ind] + 1
+          } else { # lambda parameters
+            if(is.null(structural_pars$C_lambda)) { # Lambdas are not constraints
+              cum_lamb <- M*d + q + d^2 - n_zeros + c(0, cumsum(rep(d, times=M))) # Index after which the regime changes
+              m <- sum(i1 > cum_lamb) + 1
+              pos <- i1 - cum_lamb[m - 1] # which i=1,...,d in lambda_{mi}
+              main <- substitute(lambda[foo](foo2), list(foo=m, foo2=pos))
+            } else { # Lambdas are constrained
+              pos <- i1 - (M*d + q + d^2 - n_zeros)
+              main <- substitute(gamma(foo), list(foo=pos))
+            }
+          }
+        }
       } else { # alphas; we know M > 1 since we ended up here
-        m <- i1 - (M*(d + d*(d + 1)/2) + q)
+        m <- i1 - last_covmat_par_index
         main <- substitute(alpha[foo], list(foo=m))
       }
     }
