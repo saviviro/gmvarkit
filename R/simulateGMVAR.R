@@ -13,6 +13,7 @@
 #' @param ntimes how many sets of simulations should be performed?
 #' @param drop if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 #'   \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.
+#' @param seed set seed for the random number generator?
 #' @param girf_pars This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
 #'   should ignore it.
 #' @details The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
@@ -93,13 +94,12 @@
 #'  }
 #' @export
 
-simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, girf_pars=NULL) {
+simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
   # girf_pars$variable - which variable?
   # girf_pars$shock_size - size of the structural shock?
   # girf_pars$init_regimes - init values generated from which regimes? Ignored if !is.null(init_values)
-  # girf_pars$R1 - the number of repetitions to base the GIRF on
-  # girf_pars$N - the horizon how far ahead to estimate the GIRF
   # If !is.null(girf_pars), returns a size (N x 1) vector containing the estimated GIRF
+  if(!is.null(seed)) set.seed(seed)
 
   check_gmvar(gmvar)
   epsilon <- round(log(.Machine$double.xmin) + 10)
@@ -132,6 +132,24 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, g
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
 
+  all_Bm <- array(dim=c(d, d, M)) # Matrices such that all_Bm[, , m]%*%rnorm(d) follows N(0, \Omega_m)
+  if(!is.null(structural_pars)) { # Calculate  W%*%Lambda_m^{1/2} where Lambda_1 = I_d (not to be confused with the time-varying B-matrix)
+    W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    all_Bm[, , 1] <- W
+    if(M > 1) {
+      lambdas <- matrix(pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars), nrow=d, byrow=FALSE)
+      for(m in 2:M) {
+        Lambda_m <- diag(lambdas[, m - 1])
+        all_Bm[, , m] <- W%*%sqrt(Lambda_m)
+      }
+    }
+  } else { # Reduced form model
+    for(m in 1:M) { # t(chol(all_Omega[, , m]))
+      eig <- eigen(all_Omega[, , m], symmetric=TRUE) # Orthogonal eigenvalue decomposition of the error term covariance matrix
+      all_Bm[, , m] <- eig$vectors%*%tcrossprod(diag(sqrt(eig$values)), eig$vectors) # Symmetric square root matrix of the error term covariance matrix
+    }
+  }
+
   # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39))
   I_dp2 <- diag(nrow=(d*p)^2)
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
@@ -149,7 +167,6 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, g
   }
 
   if(is.null(girf_pars)) {
-    R1 <- 1
     init_regimes <- 1:M
     reg_probs <- alphas
   } else {
@@ -168,33 +185,47 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, g
     init_values <- init_values[(nrow(init_values) - p + 1):nrow(init_values), , drop=FALSE]
   }
 
-  # Container for the simulated values and initial values. First row row initival values vector, and t:th row for (y_{i-1}',...,y_{i-p}')
+  # Container for the simulated values and initial values. First row row initial values vector, and t:th row for (y_{i-1}',...,y_{i-p}')
   Y <- matrix(nrow=nsimu + 1, ncol=d*p)
   Y[1,] <- reform_data(init_values, p=p)
+  if(!is.null(girf_pars)) Y2 <- Y # Storage for the second sample path in the GIRF algorithm
 
   # Initialize data structures
   sample <- array(dim=c(nsimu, d, ntimes))
   component <- matrix(nrow=nsimu, ncol=ntimes)
   mixing_weights <- array(dim=c(nsimu, M, ntimes))
+  if(!is.null(girf_pars)) sample2 <- array(dim=c(nsimu, d, ntimes))
+
+  # Some functions to be used
+  get_matprods <- function(Y) vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
+  get_logmvnvalues <- function(matprods) vapply(1:M, function(m) -0.5*d*p*log(2*pi) - 0.5*log(det_Sigmas[m]) - 0.5*matprods[m], numeric(1))
+
+  get_numeratorsL <- function(log_mvnvalues) lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[m])))
+  get_demoninatorL <- function(numerators) Reduce('+', numerators)
+  get_alpha_mtL <- function(numerators, denominator) vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(1))
+
+  get_mvnvalues <- function(log_mvnvalues) exp(log_mvnvalues)
+  get_demoninator <- function(mvnvalues) as.vector(mvnvalues%*%alphas)
+  get_alpha_mt <- function(mvnvalues, denominator) alphas*(mvnvalues/denominator)
 
   for(j1 in seq_len(ntimes)) {
     for(i1 in seq_len(nsimu)) {
       # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)).
       # Calculated in logarithm because same values may be too close to zero for machine accuracy.
-      matprods <- vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
-      log_mvnvalues <- vapply(1:M, function(m) -0.5*d*p*log(2*pi) - 0.5*log(det_Sigmas[m]) - 0.5*matprods[m], numeric(1))
+      matprods <- get_matprods(Y)
+      log_mvnvalues <- get_logmvnvalues(matprods)
 
       # Calculate mixing weights
       if(M == 1) {
         alpha_mt <- 1
       } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
-        numerators <- lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[m])))
-        denominator <- Reduce('+', numerators)
-        alpha_mt <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(1))
+        numerators <- get_numeratorsL(log_mvnvalues)
+        denominator <- get_demoninatorL(numerators)
+        alpha_mt <- get_alpha_mtL(numerators=numerators, denominator=denominator)
       } else {
-        mvnvalues <- exp(log_mvnvalues)
-        denominator <- as.vector(mvnvalues%*%alphas)
-        alpha_mt <- alphas*(mvnvalues/denominator)
+        mvnvalues <- get_mvnvalues(log_mvnvalues)
+        denominator <- get_demoninator(mvnvalues)
+        alpha_mt <- get_alpha_mt(mvnvalues=mvnvalues, denominator=denominator)
       }
 
       # Draw a mixture component and store the values
@@ -207,8 +238,8 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, g
       mu_mt <- all_phi0[, m] + A2%*%Y[i1,]
 
       # Draw the sample and store it
-      L <- t(chol(all_Omega[, , m])) # Lower triangular cholesky of error term covariance matrix
-      sample[i1, , j1] <- mu_mt + L%*%rnorm(d)
+      eps_t <- rnorm(d)
+      sample[i1, , j1] <- mu_mt + all_Bm[, , m]%*%eps_t
 
       # Update storage matrix Y (overwrites when ntimes > 1)
       if(p == 1) {
@@ -216,7 +247,71 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, g
       } else {
         Y[i1 + 1,] <- c(sample[i1, , j1], Y[i1 , 1:(d*p - d)])
       }
+
+      # For the second sample path in GIRF (with a specific structural shock occurring)
+      if(!is.null(girf_pars)) {
+        matprods2 <- get_matprods(Y2)
+        log_mvnvalues2 <- get_logmvnvalues(matprods2)
+
+        if(M == 1) {
+          alpha_mt2 <- 1
+        } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
+          numerators2 <- get_numeratorsL(log_mvnvalues2)
+          denominator2 <- get_demoninatorL(numerators2)
+          alpha_mt2 <- get_alpha_mtL(numerators=numerators2, denominator=denominator2)
+        } else {
+          mvnvalues2 <- get_mvnvalues(log_mvnvalues2)
+          denominator2 <- get_demoninator(mvnvalues2)
+          alpha_mt2 <- get_alpha_mt(mvnvalues=mvnvalues2, denominator=denominator2)
+        }
+
+        if(!is.null(structural_pars)) {
+          if(i1 == 1) {
+            m2 <- m # Common regime at impact (the mixing weights are the same)
+          } else {
+            m2 <- sample.int(n=M, size=1, replace=TRUE, prob=alpha_mt2)
+          }
+        }
+
+        A22 <- matrix(all_A[, , , m2], nrow=d, byrow=FALSE) # (A_1:...:A_p)
+        mu_mt2 <- all_phi0[, m2] + A22%*%Y2[i1,]
+
+        u_t <- all_Bm[, , m2]%*%eps_t # Reduced form shock from the same NID(0,I) shock
+
+        if(i1 == 1) { # At impact, obtain reduced form shock from the specific structural shock
+
+          # Calculate the time-varying B-matrix
+          if(M == 1) {
+            B_t <- W
+          } else {
+            tmp <- array(dim=c(d, d, M))
+            tmp[, , 1] <- alpha_mt2[1]*diag(d)
+            for(m in 2:M) {
+              tmp[, , m] <- alpha_mt2[m]*diag(lambdas[, m - 1])
+            }
+            B_t <- W%*%sqrt(apply(tmp, 1:2, sum))
+            e_t <- solve(B_t, u_t) # Structural shock
+            e_t[girf_pars$variable] <- girf_pars$shock_size # Impose the size of a shock
+            u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th variaböe
+          }
+        }
+
+        sample2[i1, , j1] <- mu_mt2 + u_t
+
+        if(p == 1) {
+          Y2[i1 + 1,] <- sample2[i1, , j1]
+        } else {
+          Y2[i1 + 1,] <- c(sample2[i1, , j1], Y2[i1 , 1:(d*p - d)])
+        }
+      }
     }
+  }
+
+  # Calculate a single GIRF for the given variable: (N + 1 x d) matrix
+  if(!is.null(girf_pars)) {
+    one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
+    colnames(one_girf) <- colnames(gmvar$data)
+    return(one_girf)
   }
 
   if(ntimes == 1 & drop) {

@@ -214,7 +214,7 @@ pick_W <- function(p, M, d, params, structural_pars=NULL) {
 #'
 #' @inheritParams is_stationary
 #' @details Constrained parameter vectors are not supported. Not even constraints in \eqn{W}!
-#' @return Returns a length \eqn{(d*(M - 1))} vector \eqn{(\strong{\lambda_{2}},...,\strong{\lambda_{M}})}
+#' @return Returns a length \eqn{(d*(M - 1))} vector \eqn{(\lambda_{2},...,\lambda_{M})}
 #'  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
 #'   Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 #' @section Warning:

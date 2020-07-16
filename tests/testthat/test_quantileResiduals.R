@@ -95,10 +95,10 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res_222c[1,], c(0.09074664, -0.19603850), tolerance=1e-6)
   expect_equal(res_222c[100,], c(1.2506933, -0.4634526), tolerance=1e-6)
 
-  expect_equal(res_323[1,], c(-0.5599706, 0.7861472, -1.1307067), tolerance=1e-6)
-  expect_equal(res_323[13,], c(-1.0996495, -0.4214492, -0.2435677), tolerance=1e-6)
-  expect_equal(res_323[150,], c(-0.6546153, 0.9539610, 0.3529515), tolerance=1e-6)
-  expect_equal(res_323[497,], c(0.6395263, 0.1111915, -0.5907638), tolerance=1e-6)
+  expect_equal(res_323[1,], c(-0.04254252, 0.37966523, -1.43671034), tolerance=1e-6)
+  expect_equal(res_323[13,], c(-1.1160317, -0.1883617, -0.4064072), tolerance=1e-6)
+  expect_equal(res_323[150,], c(0.09401363, 0.44800577, 1.11962898), tolerance=1e-6)
+  expect_equal(res_323[497,], c(0.3658767, 0.4336302, -0.6696751), tolerance=1e-6)
 
   # SGMVAR
   expect_equal(res_112s[3,], c(0.5815407, -1.0931660), tol=1e-6)
@@ -115,3 +115,11 @@ test_that("quantile_residuals_int works correctly", {
   expect_equal(qr112, res_112, tol=1e-6)
   expect_equal(qr222csLAR, res_222csLAR, tol=1e-6)
 })
+
+
+
+
+
+
+
+

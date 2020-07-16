@@ -65,7 +65,6 @@
 #' mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
 #'  structural_pars=list(W=W_222))
 #' p1 <- predict(mod222s, n_ahead=10)
-#' p1
 #' }
 #' @export
 
@@ -105,6 +104,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     d <- gmvar$model$d
     constraints <- gmvar$model$constraints
     structural_pars <- gmvar$model$structural_pars
+
     params <- gmvar$params
     n_obs <- nrow(data)
     mw <- loglikelihood_int(data, p, M, params=params, conditional=gmvar$model$conditional,
@@ -117,7 +117,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
                                        structural_pars=structural_pars, change_to="intercept")
     }
     params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
-    structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
+    structural_pars <- get_unconstrained_structural_pars(structural_pars)
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 

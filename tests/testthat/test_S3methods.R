@@ -44,10 +44,10 @@ theta_123 <- random_ind2(p=1, M=2, d=3, mu_scale=c(-10, 0, 5), mu_scale2=1:3, om
 mod_123 <- GMVAR(p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
 sim_123 <- simulateGMVAR(mod_123, nsimu=300)
 data_123 <- sim_123$sample
-theta_123 <- c(-9.432281193, -0.505061517, 10.439237825, -0.007153524, 0.611600845, 0.316006743, 0.618395547, 0.242141051, -0.397496657,  0.607582014,
-               -0.588808209, 0.249527481, 1.000119135, 0.066231606, 0.772660170, 0.427032675, 0.173906741, 1.161863865, -8.261608811, 0.836296696,
-               2.010706334, 0.311276277, -0.049947762, -0.650465167, -0.857957924, -0.158176495, -0.218184205, -0.016438743, 0.606639158, -0.207387484,
-               0.393643727, -0.205999160, 0.008228229, 0.681252658, 1.261425042, 2.916105585, 0.685775441)
+# theta_123 <- c(-9.432281193, -0.505061517, 10.439237825, -0.007153524, 0.611600845, 0.316006743, 0.618395547, 0.242141051, -0.397496657,  0.607582014,
+#                -0.588808209, 0.249527481, 1.000119135, 0.066231606, 0.772660170, 0.427032675, 0.173906741, 1.161863865, -8.261608811, 0.836296696,
+#                2.010706334, 0.311276277, -0.049947762, -0.650465167, -0.857957924, -0.158176495, -0.218184205, -0.016438743, 0.606639158, -0.207387484,
+#                0.393643727, -0.205999160, 0.008228229, 0.681252658, 1.261425042, 2.916105585, 0.685775441)
 mod_123 <- GMVAR(data_123, p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
 
 set.seed(1)
@@ -59,14 +59,14 @@ test_that("predict works correctly", {
    expect_equal(predict.gmvar(mod_112, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(2.625171, 145.951650), tolerance=1e-5)
    expect_equal(predict.gmvar(mod_222c, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(2.643673, 144.594839), tolerance=1e-5)
 
-   expect_equal(tmp222, c(2.176329, 144.342199), tolerance=1e-5)
-   expect_equal(pred222$pred_ints[, 1, 1], c(-0.9990109, -4.7740002), tolerance=1e-3)
-   expect_equal(pred222$pred_ints[, 3, 2], c(146.1007, 149.1014), tolerance=1e-3)
-   expect_equal(pred222$mix_pred_ints[, 1, 1], c(0.005081765, 0.001111207), tolerance=1e-3)
+   expect_equal(tmp222, c(2.202927, 144.450148), tolerance=1e-5)
+   expect_equal(pred222$pred_ints[, 1, 1], c(-0.3797107, -4.2922563), tolerance=1e-3)
+   expect_equal(pred222$pred_ints[, 3, 2], c(147.5922, 150.4961), tolerance=1e-3)
+   expect_equal(pred222$mix_pred_ints[, 1, 1], c(0.005081765, 0.002005220), tolerance=1e-3)
 
 
-   expect_equal(unname(pred123$pred[1,]), c(-9.3293117, -0.4367334, 10.6762769), tolerance=1e-5)
-   expect_equal(pred123$pred_ints[ , 1, ], c(-7.976158,  1.307586, 11.744568), tolerance=1e-5)
-   expect_equal(unname(pred123$mix_pred[1 ,]), c(9.999964e-01, 3.617052e-06), tolerance=1e-5)
-   expect_equal(pred123$mix_pred_ints[1 , 1, 1], c(-7.976158), tolerance=1e-5)
+   expect_equal(unname(pred123$pred[1,]), c(-9.203200, 2.321089, 1.795961), tolerance=1e-5)
+   expect_equal(pred123$pred_ints[ , 1, ], c(-8.012776, 3.149987, 3.413862), tolerance=1e-5)
+   expect_equal(unname(pred123$mix_pred[1 ,]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
+   expect_equal(pred123$mix_pred_ints[1 , 1, 1], c(-8.012776), tolerance=1e-5)
 })
