@@ -88,6 +88,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
   M <- gmvar$model$M
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
   if(!all_pos_ints(c(nsimu, ntimes))) stop("Arguments n and ntimes must be positive integers")
   if(!is.null(init_values)) {
     if(!is.matrix(init_values)) stop("init_values must be numeric matrix")
@@ -99,14 +100,16 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE) {
   params <- gmvar$params
   if(gmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
-                                     change_to="intercept")
+                                     structural_pars=structural_pars, change_to="intercept")
   }
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+                                    structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
 
   all_mu <- get_regime_means(gmvar)
-  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params)
-  all_A <- pick_allA(p=p, M=M, d=d, params=params)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params)
+  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
 
