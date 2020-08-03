@@ -61,7 +61,7 @@ See Virolainen (2020) for the conditions required to identify the shocks and for
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns a length \eqn{(d*(M - 1))} vector \eqn{(\strong{\lambda_{2}},...,\strong{\lambda_{M}})}
+Returns a length \eqn{(d*(M - 1))} vector \eqn{(\lambda_{2},...,\lambda_{M})}
  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
   Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 }

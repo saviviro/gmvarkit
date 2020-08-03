@@ -88,12 +88,13 @@ p3 <- predict(fit12, n_ahead=10, pi_type="upper")
 p3
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
- -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
-  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
+params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+ -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+  0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
 W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
-mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
-# p1 <- predict(mod222s, n_ahead=10)
+mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
+ structural_pars=list(W=W_222))
+p1 <- predict(mod222s, n_ahead=10)
 }
 }
 \references{

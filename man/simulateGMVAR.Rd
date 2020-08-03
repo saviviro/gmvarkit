@@ -4,7 +4,15 @@
 \alias{simulateGMVAR}
 \title{Simulate from GMVAR process}
 \usage{
-simulateGMVAR(gmvar, nsimu, init_values = NULL, ntimes = 1, drop = TRUE)
+simulateGMVAR(
+  gmvar,
+  nsimu,
+  init_values = NULL,
+  ntimes = 1,
+  drop = TRUE,
+  seed = NULL,
+  girf_pars = NULL
+)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
@@ -14,12 +22,17 @@ simulateGMVAR(gmvar, nsimu, init_values = NULL, ntimes = 1, drop = TRUE)
 \item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values to be used in the simulation, where
 d is the number of time series in the system.
 The \strong{last} row will be used as initial values for the first lag, the second last row for second lag etc. If not
-specified, initial values will be drawn from the stationary distribution.}
+specified, initial values will be drawn from the stationary distribution of the process.}
 
 \item{ntimes}{how many sets of simulations should be performed?}
 
 \item{drop}{if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.}
+
+\item{seed}{set seed for the random number generator?}
+
+\item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
+should ignore it.}
 }
 \value{
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
@@ -62,7 +75,17 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
  ts.plot(sim122$mixing_weights, col=c("blue", "red"), lty=2)
  plot(sim122$component, type="l")
 
- ## FORECASTING EXAMPLE
+ # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+ params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+   -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
+ W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+ mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
+ structural_pars=list(W=W_222))
+ sim222s <- simulateGMVAR(mod222s, nsimu=100)
+ plot.ts(sim222s$sample)
+
+ ## FORECASTING EXAMPLE ##
  # Forecast 5-steps-ahead, 10000 sets of simulations with initial
  # values from the data:
  # GMVAR(2,2), d=2 model with mean-parametrization:

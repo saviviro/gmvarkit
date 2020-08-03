@@ -11,7 +11,7 @@
 
 \item{...}{currently not used.}
 
-\item{digits}{number of decimals to print}
+\item{digits}{the number of decimals to print}
 }
 \description{
 \code{print.gmvarpred} is a print method for object generated

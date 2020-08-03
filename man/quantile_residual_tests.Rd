@@ -24,7 +24,7 @@ quantile_residual_tests(
 
 \item{...}{currently not used.}
 
-\item{digits}{number of decimals to print}
+\item{digits}{the number of decimals to print}
 
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
@@ -69,14 +69,24 @@ colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model with default settings
 fit12 <- fitGMVAR(data, p=1, M=2)
-qrtests12 <- quantile_residual_tests(fit12, nsimu=1)
+qrtests12 <- quantile_residual_tests(fit12)
 qrtests12
 plot(qrtests12)
+
+# Structural GMVAR(1,2) model identified with sign
+# constraints. The sign constraints (which fully identify
+# the shocks) are in line with the reduced form model,
+# so the test results are the same.
+W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
+  ncalls=10, seeds=1:10)
+qrtests12s <- quantile_residual_tests(fit12s)
+qrtests12s
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
   ncalls=1, seeds=20)
-qrtests22 <- quantile_residual_tests(fit22, nsimu=1)
+qrtests22 <- quantile_residual_tests(fit22)
 qrtests22
 
 # GMVAR(2,2) model with autoregressive parameters restricted

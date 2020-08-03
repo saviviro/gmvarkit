@@ -398,7 +398,7 @@ check_pMd <- function(p, M, d) {
 
 check_gmvar <- function(object) {
   if(!any(class(object) == "gmvar")) {
-    stop("The object has to be of class 'gmvar' or 'sgmvar', typically created with function 'GMVAR' or 'fitGMVAR'")
+    stop("The object has to be of class 'gmvar', typically created with the function 'GMVAR' or 'fitGMVAR'")
   }
 }
 

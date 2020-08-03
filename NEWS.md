@@ -35,3 +35,6 @@
 
 # gmvarkit 1.2.0
 
+* A structural GMVAR model is introduced! The SGMVAR model can be estimated with the function 'fitGMVAR' or constructed by hand with the function 'GMVAR', while also other existing functions such as 'profile_logliks', 'quantile_residual_tests', 'diagnostic_plot', etc. work with the SGMVAR model as well. See the cited paper by Virolainen (2020) or the vignette for the model definition and identification conditions.
+* New exported function: 'GIRF' for estimating generalized impulse function for the variables in a SGMVAR model.
+* Bug fix: the prediction intervals for mixing weights were incorrect when calculating upper or lower prediction intervals with only one level of significance.

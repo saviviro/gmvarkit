@@ -98,7 +98,13 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   # girf_pars$variable - which variable?
   # girf_pars$shock_size - size of the structural shock?
   # girf_pars$init_regimes - init values generated from which regimes? Ignored if !is.null(init_values)
-  # If !is.null(girf_pars), returns a size (N x 1) vector containing the estimated GIRF
+  # girf_pars$include_mixweights - should GIRFs be estimated for the mixing weights as well? TRUE or FALSE
+  # If !is.null(girf_pars) and girf_pars$include_mixweights == TRUE, returns a size (N+1 x d+M) vector containing
+  #                                                                  the estimated GIRFs for the variables and
+  #                                                                  and the mixing weights (column d+m for the m:th regime).
+  # If !is.null(girf_pars) and girf_pars$include_mixweights == FALSE, returns a size (N+1 x d) vector containing
+  #                                                                   the estimated GIRFs for the variables only.
+  # The first row for response at impact
   if(!is.null(seed)) set.seed(seed)
 
   check_gmvar(gmvar)
@@ -194,7 +200,10 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   sample <- array(dim=c(nsimu, d, ntimes))
   component <- matrix(nrow=nsimu, ncol=ntimes)
   mixing_weights <- array(dim=c(nsimu, M, ntimes))
-  if(!is.null(girf_pars)) sample2 <- array(dim=c(nsimu, d, ntimes))
+  if(!is.null(girf_pars)) {
+    sample2 <- array(dim=c(nsimu, d, ntimes))
+    mixing_weights2 <- array(dim=c(nsimu, M, ntimes))
+  }
 
   # Some functions to be used
   get_matprods <- function(Y) vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
@@ -264,6 +273,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
           denominator2 <- get_demoninator(mvnvalues2)
           alpha_mt2 <- get_alpha_mt(mvnvalues=mvnvalues2, denominator=denominator2)
         }
+        mixing_weights2[i1, , j1] <- alpha_mt2
 
         if(!is.null(structural_pars)) {
           if(i1 == 1) {
@@ -311,7 +321,13 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   if(!is.null(girf_pars)) {
     one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
     colnames(one_girf) <- colnames(gmvar$data)
-    return(one_girf)
+    if(girf_pars$include_mixweights) {
+      mix_girf <- apply(X=mixing_weights2 - mixing_weights, MARGIN=1:2, FUN=mean)
+      colnames(mix_girf) <- paste("mw reg.", 1:M)
+      return(cbind(one_girf, mix_girf))
+    } else {
+      return(one_girf)
+    }
   }
 
   if(ntimes == 1 & drop) {

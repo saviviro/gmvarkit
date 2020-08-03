@@ -30,7 +30,7 @@
 #'   and at least \eqn{p} rows specifying an initial value for the GIRF. The last \eqn{p} rows
 #'   are taken to be the initial value assuming that the \strong{last} row is the most recent observation.
 #' @param include_mixweights should the generalized impulse response be calculated for the mixing weights
-#'   as well?
+#'   as well? \code{TRUE} or \code{FALSE}.
 #' @param ncores the number CPU cores to be used in parallel computing. Only single core computing is
 #'   supported if an initial value is specified (and the GIRF won't thus be estimated multiple times).
 #' @param seeds a length \code{R2} vector containing the random number generator seed for estimation
@@ -42,14 +42,18 @@
 #'   The confidence bounds reflect uncertainty about the initial state (but currently not about the parameter
 #'   estimates) if initial value is not specified. If initial value is specified, there won't (currently)
 #'   be confidence intervals. See the cited paper by Virolainen (2020) for details about the algorithm.
+#' @return Returns a class \code{'girf'} list with the \eqn{m}th element containing the point estimates for
+#'   the GIRF in \code{$point_est} (the first element) and confidence intervals in \code{$conf_ints} (the
+#'   second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
+#'   \eqn{n=1}, the third for \eqn{n=2}, and so on.
 #' @inherit in_paramspace_int references
 #' @examples
 #'  \donttest{
-#'  # To be filled in...
+#'  # To be filled in...TARKISTA ci! MYÖS JOS EI OLE MITÄÄN??
 #'  }
 #' @export
 
-GIRF <- function(gmvar, variables, shock_size, N=10, R1=10, R2=10, init_regimes=1:M, init_values=NULL,
+GIRF <- function(gmvar, variables, shock_size, N=4, R1=5, R2=3, init_regimes=1:M, init_values=NULL,
                  ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), seeds=NULL) {
   on.exit(closeAllConnections())
 
@@ -70,7 +74,8 @@ GIRF <- function(gmvar, variables, shock_size, N=10, R1=10, R2=10, init_regimes=
   get_one_girf <- function(variable, shock_size, seed) {
     simulateGMVAR(gmvar, nsimu=N + 1, init_values=init_values, ntimes=R1, seed=seed, girf_pars=list(variable=variable,
                                                                                                     shock_size=shock_size,
-                                                                                                    init_regimes=init_regimes))
+                                                                                                    init_regimes=init_regimes,
+                                                                                                    include_mixweights=include_mixweights))
   }
 
   # Calculate shock sizes if not specified
@@ -95,7 +100,7 @@ GIRF <- function(gmvar, variables, shock_size, N=10, R1=10, R2=10, init_regimes=
     message("ncores was set to be larger than the number of cores detected")
   }
   if(is.null(init_values)) {
-    cat(paste("Using", ncores, "cores for estimating", R2,"GIRFs for", length(variables), "variables each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores for estimating", R2,"GIRFs for", length(variables), "variables,", "each based on", R1, "Monte Carlo repetitions."), "\n")
   } else {
     R2 <- 1
   }
@@ -108,7 +113,7 @@ GIRF <- function(gmvar, variables, shock_size, N=10, R1=10, R2=10, init_regimes=
   GIRF_variables <- vector("list", length=length(variables))
 
   for(i1 in variables) {
-    cat(paste0("Estimating GIRFs for variable ", i1, "..."),"\n")
+    cat(paste0("Estimating GIRFs for variable ", i1, "..."), "\n")
     GIRF_variables[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(variable=i1, shock_size=shock_size[i1], seed=seeds[i2]), cl=cl)
   }
   parallel::stopCluster(cl=cl)
@@ -123,34 +128,19 @@ GIRF <- function(gmvar, variables, shock_size, N=10, R1=10, R2=10, init_regimes=
   }
 
   for(i1 in 1:length(variables)) {
-    res_in_array <- array(unlist(GIRF_variables[[i1]]), dim=c(N + 1, d, R2))
-    point_estimate <- apply(res_in_array, MARGIN=1:2, FUN=mean)
-    colnames(point_estimate) <- colnames(gmvar$data)
+    res_in_array <- array(unlist(GIRF_variables[[i1]]), dim=c(N + 1, d + ifelse(include_mixweights, M, 0), R2))
+    colnames(res_in_array) <- colnames(GIRF_variables[[1]][[1]])
+    point_estimate <- apply(X=res_in_array, MARGIN=1:2, FUN=mean)
     lower <- (1 - ci)/2
     upper <- rev(1 - lower)
     q_tocalc <- c(lower, upper)
     q_tocalc <- sort(q_tocalc, decreasing=FALSE)
     conf_ints <- apply(res_in_array, MARGIN=1:2, FUN=quantile, probs=q_tocalc)
-
-    # HUOM NÄMÄ TÄYTYY VIELÄ TARKISTAAA !!!
-    if(length(q_tocalc) == 1) {
-     # conf_ints <- array(pred_ints, dim=c(n_ahead, ncol(data), length(q_tocalc)), dimnames=list(NULL, colnames(sample), q_tocalc)) # Make it an array with length(q_tocalc) slices
-     # mix_pred_ints <- array(pred_ints, dim=c(n_ahead, gmvar$model$M, length(q_tocalc)), dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
-
-    #  pred_ints <- aperm(pred_ints, perm=c(1, 3, 2))
-    #  mix_pred_ints <- aperm(mix_pred_ints, perm=c(1, 3, 2))
-      conf_ints <- array(conf_ints, dim=c(N + 1, d, length(q_tocalc)), dimnames=list(NULL, colnames(gmvar$data), q_tocalc))
-      conf_ints <- aperm(conf_ints, perm=c(1, 3, 2))
-    } else {
-      conf_ints <- aperm(conf_ints, perm=c(2, 1, 3))
-      #mix_pred_ints <- aperm(mix_pred_ints, perm=c(2, 1, 3))
-    }
-    colnames(conf_ints) <- q_tocalc
-
+    conf_ints <- aperm(conf_ints, perm=c(2, 1, 3))
+    rownames(point_estimate) <- rownames(conf_ints) <- 0:N
     GIRF_results[[i1]] <- list(point_est=point_estimate,
                                conf_ints=conf_ints)
   }
-  print(names(GIRF_results))
 
   structure(GIRF_results, class="girf")
 }

@@ -18,9 +18,9 @@
 #'
 #'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
-#' @section S3 methods:
+#' @section About S3 methods:
 #'   Only the \code{print} method is available if data is not provided.
-#'   If data is provided, then \code{summary}, \code{predict}, and \code{plot} methods are also available.
+#'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}
 #' @references
 #'  \itemize{

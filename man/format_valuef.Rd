@@ -7,7 +7,7 @@
 format_valuef(digits)
 }
 \arguments{
-\item{digits}{number of digits to use}
+\item{digits}{the number of decimals to print}
 }
 \value{
 Returns a function that takes an atomic vector as argument

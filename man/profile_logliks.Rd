@@ -82,6 +82,14 @@ colnames(data) <- colnames(eurusd)
 fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 profile_logliks(fit12)
+
+# Structural GMVAR(1,2) model identified with sign
+# constraints.
+W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
+  ncalls=10, seeds=1:10)
+profile_logliks(fit12s)
+
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
                   ncalls=16, seeds=11:26)

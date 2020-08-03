@@ -176,7 +176,7 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     if(pi_type != "none") {
       if(length(q_tocalc) == 1) {
         pred_ints <- array(pred_ints, dim=c(n_ahead, ncol(data), length(q_tocalc)), dimnames=list(NULL, colnames(sample), q_tocalc)) # Make it an array with length(q_tocalc) slices
-        mix_pred_ints <- array(pred_ints, dim=c(n_ahead, gmvar$model$M, length(q_tocalc)), dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
+        mix_pred_ints <- array(mix_pred_ints, dim=c(n_ahead, gmvar$model$M, length(q_tocalc)), dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
         pred_ints <- aperm(pred_ints, perm=c(1, 3, 2))
         mix_pred_ints <- aperm(mix_pred_ints, perm=c(1, 3, 2))
       } else {
