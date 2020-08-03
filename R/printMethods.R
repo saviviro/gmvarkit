@@ -297,18 +297,19 @@ print.qrtest <- function(x, ..., digits=3) {
 
 print.girf <- function(x, ..., digits=2, N_to_print) {
   girf <- x
+  girf_res <- girf$girf_res
   stopifnot(digits >= 0 & digits%%1 == 0)
   format_value <- format_valuef(digits)
   if(missing(N_to_print)) {
-    N_to_print <- nrow(girf[[1]]$point_est)
+    N_to_print <- nrow(girf_res[[1]]$point_est)
   } else {
-    stopifnot(N_to_print %in% 1:nrow(girf[[1]]$point_est))
+    stopifnot(N_to_print %in% 1:nrow(girf_res[[1]]$point_est))
   }
 
-  for(i1 in 1:length(girf)) {
+  for(i1 in 1:length(girf_res)) {
     if(i1 > 1) cat("------------------------\n")
     cat(paste0("The GIRF of variable ", i1, ":"), "\n")
-    girf_i1 <- girf[[i1]]
+    girf_i1 <- girf$girf_res[[i1]]
     for(i2 in 1:dim(girf_i1$conf_ints)[3]) {
       cat(paste0("The response of ", dimnames(girf_i1$conf_ints)[[3]][i2], ":"), "\n")
       df <- as.data.frame(lapply(1:ncol(girf_i1$conf_ints[, , i2]), function(i3) format_value(girf_i1$conf_ints[, i3, i2])))

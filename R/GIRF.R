@@ -29,6 +29,8 @@
 #' @param init_values a matrix or a multivariate class \code{'ts'} object with \eqn{d} columns
 #'   and at least \eqn{p} rows specifying an initial value for the GIRF. The last \eqn{p} rows
 #'   are taken to be the initial value assuming that the \strong{last} row is the most recent observation.
+#' @param ci a numeric vector with elements in \eqn[(0, 1)] specifying the confidence levels of the
+#'   confidence intervals.
 #' @param include_mixweights should the generalized impulse response be calculated for the mixing weights
 #'   as well? \code{TRUE} or \code{FALSE}.
 #' @param ncores the number CPU cores to be used in parallel computing. Only single core computing is
@@ -42,9 +44,10 @@
 #'   The confidence bounds reflect uncertainty about the initial state (but currently not about the parameter
 #'   estimates) if initial value is not specified. If initial value is specified, there won't (currently)
 #'   be confidence intervals. See the cited paper by Virolainen (2020) for details about the algorithm.
-#' @return Returns a class \code{'girf'} list with the \eqn{m}th element containing the point estimates for
-#'   the GIRF in \code{$point_est} (the first element) and confidence intervals in \code{$conf_ints} (the
-#'   second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
+#' @return Returns a class \code{'girf'} list with the GIRFs in the first element (\code{$girf_res}) and the used
+#'   arguments the rest. The first element containing the GIRFs is a list with the \eqn{m}th element containing
+#'   the point estimates for the GIRF in \code{$point_est} (the first element) and confidence intervals in
+#'   \code{$conf_ints} (the second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
 #'   \eqn{n=1}, the third for \eqn{n=2}, and so on.
 #' @inherit in_paramspace_int references
 #' @examples
@@ -53,22 +56,22 @@
 #'  }
 #' @export
 
-GIRF <- function(gmvar, variables, shock_size, N=4, R1=5, R2=3, init_regimes=1:M, init_values=NULL,
+GIRF <- function(gmvar, variables, shock_size, N=10, R1=500, R2=500, init_regimes=1:M, init_values=NULL,
                  ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), seeds=NULL) {
   on.exit(closeAllConnections())
 
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  stopifnot(!is.null(gmvar$model$structural_pars))
   if(missing(variables)) {
     variables <- 1:d
   } else {
     stopifnot(length(variables) <= d && all(variables %in% 1:d) && length(unique(variables)) == length(variables))
   }
-  stopifnot(length(init_regimes) <= M && all(init_regimes %in% 1:M) && length(unique(init_regimes)) == length(init_regimes))
   if(!is.null(seeds) && length(seeds) != R2) stop("The argument 'seeds' needs be NULL or a vector of length 'R2'")
-
+  stopifnot(length(init_regimes) <= M && all(init_regimes %in% 1:M) && length(unique(init_regimes)) == length(init_regimes))
+  stopifnot(!is.null(gmvar$model$structural_pars))
+  stopifnot(length(ci) > 0 && all(ci > 0 & ci < 1))
 
   # Function that estimates GIRF
   get_one_girf <- function(variable, shock_size, seed) {
@@ -142,5 +145,15 @@ GIRF <- function(gmvar, variables, shock_size, N=4, R1=5, R2=3, init_regimes=1:M
                                conf_ints=conf_ints)
   }
 
-  structure(GIRF_results, class="girf")
+  structure(list(girf_res=GIRF_results,
+                 variables=variables,
+                 shock_size=shock_size,
+                 N=N,
+                 R1=R1,
+                 R2=R2,
+                 ci=ci,
+                 init_regimes=init_regimes,
+                 init_values=init_values,
+                 include_mixweights=include_mixweights),
+            class="girf")
 }

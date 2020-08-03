@@ -170,10 +170,10 @@ If data is provided, then also multivariate quantile residuals (\emph{Kalliovirt
 \item \code{print}: print method
 }}
 
-\section{S3 methods}{
+\section{About S3 methods}{
 
   Only the \code{print} method is available if data is not provided.
-  If data is provided, then \code{summary}, \code{predict}, and \code{plot} methods are also available.
+  If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
 }
 
 \examples{

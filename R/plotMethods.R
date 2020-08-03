@@ -146,10 +146,45 @@ plot.girf <- function(x, add_grid, ...) {
   on.exit(par(old_par))
 
   girf <- x
-  n_resp <- ncol(girf[[1]]$point_est)
-  resp_names <- colnames(girf[[1]]$point_est)
-  par(mfrow=c(n_resp, length(girf)), mar=c(2.5, 2.5, 2.1, 1))
+  girf_res <- girf$girf_res
+  n_resp <- ncol(girf_res[[1]]$point_est)
+  resp_names <- colnames(girf_res[[1]]$point_est)
+  n_girf <- length(girf_res)
+  par(las=1)
+  layoutmat <- matrix(seq_len(n_resp*n_girf), ncol=n_girf, byrow=FALSE)
+  layout(layoutmat)
 
+  # Function to plot the GIRF for each response separately
+  plot_girf <- function(resp_ind, main="", xaxt="n", ylab="") {
+    conf_ints <- girf_i1$conf_ints[, , resp_ind]
+
+    # Plot point estimate
+    point_est <- girf_i1$point_est[, resp_ind]
+    plot(x=0:(length(point_est) - 1), y=point_est, type="l", ylim=c(min(0, min(conf_ints)), max(0, max(conf_ints))),
+         main=main, ylab="", xaxt=xaxt, lwd=2, col="blue")
+    title(ylab=ylab, line=4, cex.lab=1, font.lab=2)
+
+    # Plot confidence intervals
+    #draw_poly <- function(ts1_or_ts2, pred_ts, col) polygon(x=c(t0, rev(t0)), y=c(ts1_or_ts2, rev(pred_ts)), col=col, border=NA)
+
+
+    abline(h=0, lty=3, col="red")
+  }
+
+  # Loop through the variables
+  for(i1 in 1:n_girf) {
+    girf_i1 <- girf_res[[i1]]
+
+    # Plot the GIRF of variable i1
+    par(mar=c(0, 5, 3, 2))
+    plot_girf(resp_ind=1, main=paste(names(girf_res)[i1], "shock"), ylab=resp_names[1])
+    par(mar=c(0, 5, 0, 2))
+    for(i2 in 2:(n_resp - 1)) {
+      plot_girf(resp_ind=i2, ylab=resp_names[i2])
+    }
+    par(mar=c(2.6, 5, 0, 2))
+    plot_girf(resp_ind=n_resps, xaxt="s", ylab=resp_names[i2])
+  }
 }
 
 
