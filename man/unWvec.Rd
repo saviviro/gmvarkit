@@ -10,6 +10,8 @@ unWvec(Wvector, d, structural_pars = NULL)
 \item{Wvector}{a length \eqn{d^2 - n_zeros} vector where \eqn{n_zeros} is the
 number of zero entries in the matrix \code{W}.}
 
+\item{d}{the number of rows in the square matrix to be formed.}
+
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 the following elements:
 \itemize{

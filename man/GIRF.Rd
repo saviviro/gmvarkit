@@ -59,7 +59,7 @@ of the \eqn{m}th regime. Ignored if \code{init_value} is specified.}
 and at least \eqn{p} rows specifying an initial value for the GIRF. The last \eqn{p} rows
 are taken to be the initial value assuming that the \strong{last} row is the most recent observation.}
 
-\item{ci}{a numeric vector with elements in \eqn[(0, 1)] specifying the confidence levels of the
+\item{ci}{a numeric vector with elements in \eqn{[(0, 1)]} specifying the confidence levels of the
 confidence intervals.}
 
 \item{include_mixweights}{should the generalized impulse response be calculated for the mixing weights

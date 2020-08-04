@@ -36,6 +36,7 @@ Wvec <- function(W) {
 #'   parameter constaints.
 #'
 #' @inheritParams loglikelihood_int
+#' @inheritParams unvec
 #' @param Wvector a length \eqn{d^2 - n_zeros} vector where \eqn{n_zeros} is the
 #'   number of zero entries in the matrix \code{W}.
 #' @return a \eqn{(d x d)} matrix \eqn{W}.

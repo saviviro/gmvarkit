@@ -317,7 +317,7 @@ print.girf <- function(x, ..., digits=2, N_to_print) {
       names(df) <- q
       df[, "mean"] <- format_value(girf_i1$point_est[, i2])
       new_order <- as.character(c(q[1:(length(q)/2)], "mean", q[(length(q)/2 + 1):length(q)]))
-      print(head(df[, new_order], n=N_to_print + 1))
+      print(utils::head(df[, new_order], n=N_to_print + 1))
       cat("\n")
     }
   }

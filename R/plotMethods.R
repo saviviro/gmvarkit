@@ -189,7 +189,7 @@ plot.girf <- function(x, add_grid=FALSE, ...) {
       plot_girf(resp_ind=i2, ylab=resp_names[i2])
     }
     par(mar=c(2.6, 5, 0, 2))
-    plot_girf(resp_ind=n_resps, xaxt="s", ylab=resp_names[i2])
+    plot_girf(resp_ind=n_resp, xaxt="s", ylab=resp_names[i2])
   }
 }
 
