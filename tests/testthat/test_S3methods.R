@@ -68,5 +68,5 @@ test_that("predict works correctly", {
    expect_equal(unname(pred123$pred[1,]), c(-9.203200, 2.321089, 1.795961), tolerance=1e-5)
    expect_equal(pred123$pred_ints[ , 1, ], c(-8.012776, 3.149987, 3.413862), tolerance=1e-5)
    expect_equal(unname(pred123$mix_pred[1 ,]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
-   expect_equal(pred123$mix_pred_ints[1 , 1, 1], c(-8.012776), tolerance=1e-5)
+   expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
 })

@@ -21,7 +21,7 @@
 #' @section About S3 methods:
 #'   Only the \code{print} method is available if data is not provided.
 #'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -340,7 +340,7 @@ swap_parametrization <- function(gmvar) {
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints.
-#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
 #'   ncalls=2, seeds=1:2)
 #' fit12s

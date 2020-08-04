@@ -242,5 +242,5 @@ mod222c2
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}
+\code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}}
 }

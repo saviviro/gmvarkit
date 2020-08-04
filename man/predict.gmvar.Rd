@@ -105,3 +105,6 @@ p1 <- predict(mod222s, n_ahead=10)
      paper, available as arXiv:2007.04713.
  }
 }
+\seealso{
+\code{\link{GIRF}}
+}

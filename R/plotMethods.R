@@ -141,7 +141,7 @@ plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
 #' @inherit in_paramspace_int references
 #' @export
 
-plot.girf <- function(x, add_grid, ...) {
+plot.girf <- function(x, add_grid=FALSE, ...) {
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
 
@@ -156,17 +156,23 @@ plot.girf <- function(x, add_grid, ...) {
 
   # Function to plot the GIRF for each response separately
   plot_girf <- function(resp_ind, main="", xaxt="n", ylab="") {
-    conf_ints <- girf_i1$conf_ints[, , resp_ind]
 
     # Plot point estimate
     point_est <- girf_i1$point_est[, resp_ind]
+    conf_ints <- girf_i1$conf_ints[, , resp_ind]
     plot(x=0:(length(point_est) - 1), y=point_est, type="l", ylim=c(min(0, min(conf_ints)), max(0, max(conf_ints))),
          main=main, ylab="", xaxt=xaxt, lwd=2, col="blue")
     title(ylab=ylab, line=4, cex.lab=1, font.lab=2)
+    if(add_grid) grid(...)
 
     # Plot confidence intervals
-    #draw_poly <- function(ts1_or_ts2, pred_ts, col) polygon(x=c(t0, rev(t0)), y=c(ts1_or_ts2, rev(pred_ts)), col=col, border=NA)
+    inds <- 0:girf$N
+    draw_poly <- function(up_or_low) polygon(x=c(inds, rev(inds)), y=c(up_or_low, rev(point_est)), col=grDevices::rgb(0, 0, 1, 0.2), border=NA)
 
+    for(i1 in 1:length(girf$ci)) {
+      draw_poly(conf_ints[, i1]) # lower
+      draw_poly(conf_ints[, ncol(conf_ints) + 1 - i1]) # upper
+    }
 
     abline(h=0, lty=3, col="red")
   }

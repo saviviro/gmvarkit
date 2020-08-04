@@ -84,7 +84,7 @@
 #'    \code{predict} and \code{plot}.
 #' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
-#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}
+#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}
 #' @references
 #'  \itemize{
 #'    \item Dorsey R. E. and Mayer W. J. 1995. Genetic algorithms for estimation problems with multiple optima,
@@ -124,7 +124,7 @@
 #' # constraints. The sign constraints (which fully identify
 #' # the shocks) are in line with the reduced form model,
 #' # so the maximized loglikelihood is the same.
-#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
 #'   ncalls=10, seeds=1:10)
 #'

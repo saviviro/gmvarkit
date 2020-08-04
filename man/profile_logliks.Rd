@@ -122,5 +122,5 @@ profile_logliks(fit22c2)
  }
 }
 \seealso{
-\code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}
+\code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}
 }

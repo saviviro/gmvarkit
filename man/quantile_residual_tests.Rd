@@ -77,7 +77,7 @@ plot(qrtests12)
 # constraints. The sign constraints (which fully identify
 # the shocks) are in line with the reduced form model,
 # so the test results are the same.
-W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
   ncalls=10, seeds=1:10)
 qrtests12s <- quantile_residual_tests(fit12s)
@@ -109,6 +109,6 @@ qrtests22c
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}},
-  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
+  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
 }

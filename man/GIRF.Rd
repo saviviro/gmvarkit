@@ -10,7 +10,7 @@ GIRF(
   gmvar,
   variables,
   shock_size,
-  N = 10,
+  N = 30,
   R1 = 500,
   R2 = 500,
   init_regimes = 1:M,
@@ -21,7 +21,7 @@ GIRF(
   seeds = NULL
 )
 
-\method{plot}{girf}(x, add_grid, ...)
+\method{plot}{girf}(x, add_grid = FALSE, ...)
 
 \method{print}{girf}(x, ..., digits = 2, N_to_print)
 }
@@ -84,9 +84,10 @@ or \code{NULL} for not initializing the seed. Exists for creating reproducible r
 confidence intervals. The default is that all the values are printed (\code{N_to_print=N}).}
 }
 \value{
-Returns a class \code{'girf'} list with the \eqn{m}th element containing the point estimates for
-  the GIRF in \code{$point_est} (the first element) and confidence intervals in \code{$conf_ints} (the
-  second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
+Returns a class \code{'girf'} list with the GIRFs in the first element (\code{$girf_res}) and the used
+  arguments the rest. The first element containing the GIRFs is a list with the \eqn{m}th element containing
+  the point estimates for the GIRF in \code{$point_est} (the first element) and confidence intervals in
+  \code{$conf_ints} (the second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
   \eqn{n=1}, the third for \eqn{n=2}, and so on.
 }
 \description{
@@ -94,11 +95,11 @@ Returns a class \code{'girf'} list with the \eqn{m}th element containing the poi
  a structural GMVAR model.
 }
 \details{
-The model needs to be structural in order to use this function. A structural GMVAR model can
-  be estimated by specifying the argument \code{structural_pars} in the function \code{fitGMVAR}.
+The model needs to be structural in order for this function to be applicable. A structural
+  GMVAR model can be estimated by specifying the argument \code{structural_pars} in the function \code{fitGMVAR}.
 
   The confidence bounds reflect uncertainty about the initial state (but currently not about the parameter
-  estimates) if initial value is not specified. If initial value is specified, there won't (currently)
+  estimates) if initial values are not specified. If initial values are specified, there won't currently
   be confidence intervals. See the cited paper by Virolainen (2020) for details about the algorithm.
 }
 \section{Methods (by generic)}{
@@ -110,7 +111,40 @@ The model needs to be structural in order to use this function. A structural GMV
 
 \examples{
  \donttest{
- # To be filled in...TARKISTA ci! MYÃ–S JOS EI OLE MITÃ„Ã„N??
+ # These are long-running examples that use parallel computing.
+ data(eurusd, package="gmvarkit")
+ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+ colnames(data) <- colnames(eurusd)
+
+ # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+ params222s <- c(1.428, -0.808, 1.029, 5.84, 1.314, 0.145, 0.094, 1.292,
+   -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272,
+   -0.074, 0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7, 1.44, 0.742)
+ W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+ mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+ mod222s
+ # Alternatively, use:
+ # fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
+ #                     ncalls=20, seeds=1:20)
+ # To obtain an estimated version of the same model.
+
+ # Estimating the GIRFs of both variables with default arguments
+ # (initial values are drawn from the stationary distribution of the process,
+ # 30 periods ahead, confidence levels 0.95 and 0.8):
+ girf1 <- GIRF(mod222s)
+ plot(girf1)
+ girf1
+
+ # Estimating the GIRF of the second variable only, 36 periods ahead
+ # and shock size 1, initial values drawn from the stationary distribution
+ # of the first regime, confidence level 0.9:
+ girf2 <- GIRF(mod222s, variables=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
+ plot(girf2)
+
+ # Estimating the GIRFs of both variables, shock sizes 1 and 3, N=50 periods ahead,
+ # estimation based on 1000 Monte Carlo simulations, and fixed initial values given
+ # by the last p observations of the data:
+ girf3 <- GIRF(mod222s, shock_size=c(1, 3), N=50, R1=1000, init_values=mod222s$data)
  }
 }
 \references{
@@ -120,4 +154,8 @@ The model needs to be structural in order to use this function. A structural GMV
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+}
+\seealso{
+\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
+ \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
 }

@@ -133,7 +133,7 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #' The red vertical line points the estimate.
 #' @return  Only plots to a graphical device and doesn't return anything.
 #' @inherit loglikelihood references
-#' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}
+#' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}
 #' @examples
 #' \donttest{
 #' # These examples use the data 'eurusd' which comes with the

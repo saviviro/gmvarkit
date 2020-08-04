@@ -31,6 +31,8 @@
 #'      sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
 #'      \code{[, , i]} indicates the i:th set of simulations.}
 #'   }
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
+#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
 #' @inherit in_paramspace_int references
 #' @examples
 #'  \donttest{
