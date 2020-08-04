@@ -322,7 +322,11 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   # Calculate a single GIRF for the given variable: (N + 1 x d) matrix
   if(!is.null(girf_pars)) {
     one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
-    colnames(one_girf) <- colnames(gmvar$data)
+    if(!is.null(gmvar$data)) {
+      colnames(one_girf) <- colnames(gmvar$data)
+    } else {
+      colnames(one_girf) <- paste("variable", 1:d)
+    }
     if(girf_pars$include_mixweights) {
       mix_girf <- apply(X=mixing_weights2 - mixing_weights, MARGIN=1:2, FUN=mean)
       colnames(mix_girf) <- paste("mw reg.", 1:M)

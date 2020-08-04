@@ -158,12 +158,10 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=500, R2=500, init_regime
   parallel::stopCluster(cl=cl)
 
   GIRF_results <- vector("list", length=length(variables))
-  if(!is.null(gmvar$data)) {
-    if(!is.null(colnames(gmvar$data))) {
-      names(GIRF_results) <- colnames(gmvar$data)[variables]
-    } else {
-      names(GIRF_results) <- paste("variable", variables)
-    }
+  if(!is.null(gmvar$data) && !is.null(colnames(gmvar$data))) {
+    names(GIRF_results) <- colnames(gmvar$data)[variables]
+  } else {
+    names(GIRF_results) <- paste("variable", variables)
   }
 
   for(i1 in 1:length(variables)) {
