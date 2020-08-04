@@ -287,9 +287,9 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
           }
         } else { # The AR parameters
           if(is.null(constraints)) { # Structural model with AR parameters not constrained
-            cum_q <- c(0, cumsum(rep(d^2*p, M))) # The index after which the regime changes
+            cum_q <- d*M + c(0, cumsum(rep(d^2*p, M))) # The index after which the regime changes
             m <- sum(i1 > cum_q)
-            pos1 <- i1 - d*M - cum_q[m] # Position in vec(A_m1),...,vec(A_mp)
+            pos1 <- i1 - cum_q[m] # Position in vec(A_m1),...,vec(A_mp)
             cum_a <- c(0, cumsum(rep(d^2, times=p))) # the index after which new matrix A_m,p starts in vec(A_m1),...,vec(A_mp)
             which_mat <- sum(pos1 > cum_a) # in which matrix A_m,j, j=1,..,p we are?
             pos2 <- pos1 - (which_mat - 1)*d^2 # Position in the current matrix A_m,j
