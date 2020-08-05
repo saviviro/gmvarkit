@@ -192,7 +192,7 @@ fit22
 W_222 <- matrix(c(1, NA, 0, 1), nrow=2)
 C_lambda_222 <- matrix(c(1, 1), nrow=2)
 fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222, C_lambda=C_lambda_222),
- ncores=4, ncalls=20, seeds=1:20)
+  ncalls=20, seeds=1:20)
 fit22s
 
 # GMVAR(2,2) model with autoregressive parameters restricted
@@ -232,5 +232,5 @@ fit22c2
 \seealso{
 \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
-  \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}
+  \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
 }

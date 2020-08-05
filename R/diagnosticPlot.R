@@ -20,7 +20,7 @@
 #'  \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is employed.
 #' @inherit quantile_residual_tests references
 #' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
-#'  \code{\link[stats]{acf}}, \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
+#'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link[stats]{acf}}, \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
 #' @examples
 #' # These examples use the data 'eurusd' which comes with the
 #' # package, but in a scaled form.
@@ -133,7 +133,8 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #' The red vertical line points the estimate.
 #' @return  Only plots to a graphical device and doesn't return anything.
 #' @inherit loglikelihood references
-#' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}
+#' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}},
+#'   \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
 #' @examples
 #' \donttest{
 #' # These examples use the data 'eurusd' which comes with the

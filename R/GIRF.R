@@ -49,8 +49,8 @@
 #'   the point estimates for the GIRF in \code{$point_est} (the first element) and confidence intervals in
 #'   \code{$conf_ints} (the second element). The first row is for the GIRF at impact \eqn{(n=0)}, the second for
 #'   \eqn{n=1}, the third for \eqn{n=2}, and so on.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
-#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{simulateGMVAR}}, \code{\link{predict.gmvar}},
+#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
 #' @inherit in_paramspace_int references
 #' @examples
 #'  \donttest{

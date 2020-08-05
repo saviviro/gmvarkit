@@ -18,7 +18,7 @@
 
 # gmvarkit 1.1.2
 
-* New functions: 'profile_logliks' (plot profile log-likelihood functions), 'get_foc' (gradient at the estimates, remember also 'get_soc')
+* New exported functions: 'profile_logliks' (plot profile log-likelihood functions), 'get_foc' (gradient at the estimates, recall also 'get_soc')
 * Now standard errors are printed correctly for models imposing all kinds of constraints (in earlier versions standard errors for such constrained AR parameters that involved sums or multiplication were incorrect).
 * Minor update on the genetic algorithm.
 * Minor update on the print and summary-print methods. 
@@ -37,4 +37,6 @@
 
 * A structural GMVAR model is introduced! The SGMVAR model can be estimated with the function 'fitGMVAR' or constructed by hand with the function 'GMVAR', while also other existing functions such as 'profile_logliks', 'quantile_residual_tests', 'diagnostic_plot', etc. work with the SGMVAR model as well. See the cited paper by Virolainen (2020) or the vignette for the model definition and identification conditions.
 * New exported function: 'GIRF' for estimating generalized impulse function for the variables in a SGMVAR model.
+* New exported function: 'Wald_test' for conducting a Wald test testing validity of parameter constraints.
+* New exported function: 'LR_test' for conducting a likelihood ratio test testing validity of parameter constraints.
 * Bug fix: the prediction intervals for mixing weights were incorrect when calculating upper or lower prediction intervals with only one level of significance.

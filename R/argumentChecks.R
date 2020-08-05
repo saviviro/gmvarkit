@@ -396,9 +396,10 @@ check_pMd <- function(p, M, d) {
 #' @param object S3 object to be tested
 #' @return Throws an error if the object doesn't have the class attribute "gmvar".
 
-check_gmvar <- function(object) {
+check_gmvar <- function(object, object_name) {
+  if(missing(object_name)) object_name <- "gmvar"
   if(!any(class(object) == "gmvar")) {
-    stop("The object has to be of class 'gmvar', typically created with the function 'GMVAR' or 'fitGMVAR'")
+    stop(paste("The object", object_name, "has to be of class 'gmvar', typically created with the function 'GMVAR' or 'fitGMVAR'"))
   }
 }
 

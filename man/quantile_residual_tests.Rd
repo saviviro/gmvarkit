@@ -110,5 +110,6 @@ qrtests22c
 }
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
-  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
+  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+  \code{\link{LR_test}}, \code{\link{Wald_test}}
 }

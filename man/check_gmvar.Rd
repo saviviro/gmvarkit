@@ -4,7 +4,7 @@
 \alias{check_gmvar}
 \title{Checks whether the given object has class attribute "gmvar"}
 \usage{
-check_gmvar(object)
+check_gmvar(object, object_name)
 }
 \arguments{
 \item{object}{S3 object to be tested}

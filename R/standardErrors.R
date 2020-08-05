@@ -14,20 +14,17 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
-    tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
+    tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
                                constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
                                to_return="loglik", minval=minval),
              error=function(e) NA)
   }
 
-  npars <- length(params)
-  I <- diag(1, ncol=npars, nrow=npars) # Indicates which parameter is derivated
-
   # Calculate Hessian
   Hess <- calc_hessian(x=params, fn=loglik_fn, h=6e-6)
 
   # Inverse of the observed information matrix
-  inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=npars, ncol=npars))
+  inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=length(params), ncol=length(params)))
 
   # Calculate the standard errors
   diag_inv_obs_inf <- diag(inv_obs_inf)
@@ -232,8 +229,8 @@ print_std_errors <- function(gmvar, digits=3) {
     n_sign <- d^2 - n_zero - n_free
     if(sep_lambda) cat(paste0("lambda parameters: ", paste0(format_value(lambda_stds), collapse=", ")), "\n\n")
     cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
-    cat("Eigenvalues lambda_{mi} are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
-                                             "subject to linear constraints."))
+    cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
+                                                  "subject to linear constraints."))
     cat("\n")
   }
   invisible(gmvar)
