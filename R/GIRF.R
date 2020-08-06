@@ -98,6 +98,7 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=500, R2=500, init_regime
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
+  if(M == 1) include_mixweights <- FALSE
   if(missing(variables)) {
     variables <- 1:d
   } else {

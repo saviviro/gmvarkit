@@ -117,6 +117,9 @@ unvech <- function(d, a) {
 #'   the matrix \eqn{\Omega_2^\Omega_1^{-1}} and the rest \eqn{d} elements are the
 #'   corresponding eigenvalues "lambdas". The result satisfies \eqn{WW' = Omega1} and
 #'   \eqn{Wdiag(lambdas)W' = Omega2}.
+#'
+#'   If \code{Omega2} is not supplied, returns a vectorized symmetric (and pos. def.)
+#'   square root matrix of \code{Omega1}.
 #' @section Warning:
 #'  No argument checks! Does not work with dimension \eqn{d=1}!
 #' @references
@@ -141,6 +144,7 @@ diag_Omegas <- function(Omega1, Omega2) {
   D <- diag(eig1$values) # Pos. def.
   H <- eig1$vectors # Orthogonal
   sqrt_omg1 <- H%*%sqrt(D)%*%t(H) # Symmetric and pos. def.
+  if(missing(Omega2)) return(vec(sqrt_omg1))
   inv_sqrt_omg1 <- solve(sqrt_omg1)
   eig2 <- eigen(inv_sqrt_omg1%*%Omega2%*%inv_sqrt_omg1, symmetric=TRUE)
   lambdas <- eig2$values

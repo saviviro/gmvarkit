@@ -277,12 +277,10 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
         }
         mixing_weights2[i1, , j1] <- alpha_mt2
 
-        if(!is.null(structural_pars)) {
-          if(i1 == 1) {
-            m2 <- m # Common regime at impact (the mixing weights are the same)
-          } else {
-            m2 <- sample.int(n=M, size=1, replace=TRUE, prob=alpha_mt2)
-          }
+        if(i1 == 1) {
+          m2 <- m # Common regime at impact (the mixing weights are the same)
+        } else {
+          m2 <- sample.int(n=M, size=1, replace=TRUE, prob=alpha_mt2)
         }
 
         A22 <- matrix(all_A[, , , m2], nrow=d, byrow=FALSE) # (A_1:...:A_p)
@@ -302,10 +300,10 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
               tmp[, , m] <- alpha_mt2[m]*diag(lambdas[, m - 1])
             }
             B_t <- W%*%sqrt(apply(tmp, 1:2, sum))
-            e_t <- solve(B_t, u_t) # Structural shock
-            e_t[girf_pars$variable] <- girf_pars$shock_size # Impose the size of a shock
-            u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th variaböe
           }
+          e_t <- solve(B_t, u_t) # Structural shock
+          e_t[girf_pars$variable] <- girf_pars$shock_size # Impose the size of a shock
+          u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th variaböe
         }
 
         sample2[i1, , j1] <- mu_mt2 + u_t

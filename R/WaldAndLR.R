@@ -22,6 +22,7 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
 #' @inherit in_paramspace_int references
 #' @examples
+#' \donttest{
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -33,7 +34,7 @@
 #'                      ncalls=1, seeds=1)
 #'  fit222s
 #'
-#'  # Test whether the lambda parameters (of the second regime) are the same:
+#'  # Test whether the lambda parameters (of the second regime) are identical:
 #'  # fit222s has parameter vector of length 27 with the lambda parameters
 #'  # in elements 25 and 26.
 #'  A <- matrix(c(rep(0, times=24), 1, -1, 0), nrow=1, ncol=27)
@@ -48,6 +49,7 @@
 #'             c(rep(0, times=6), 1, rep(0, times=20)))
 #'  c <- c(0, 0)
 #'  Wald_test(fit222s, A, c)
+#' }
 #' @export
 
 Wald_test <- function(gmvar, A, c, h=6e-6) {
@@ -117,6 +119,7 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
 #' @inherit in_paramspace_int references
 #' @examples
+#'  \donttest{
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -132,10 +135,11 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 #'  fit222sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
 #'                       structural_pars=list(W=W_222),
-#'                       ncalls=16, seeds=1:16)
+#'                       ncalls=1, seeds=1)
 #'
 #'  # Test whether the constraints are supported by the data:
 #'  LR_test(fit222s, fit222sc)
+#'  }
 #' @export
 
 LR_test <- function(gmvar1, gmvar2) {

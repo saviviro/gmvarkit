@@ -365,7 +365,7 @@ check_data <- function(data, p) {
 #' @return Returns \code{TRUE} or \code{FALSE} accordingly.
 
 all_pos_ints <- function(x) {
-  all(vapply(x, function(x)  x %% 1 == 0 & length(x) == 1 & x >= 1, logical(1)))
+  all(vapply(x, function(x1) length(x1) == 1 && x1 %% 1 == 0 && length(x1) == 1 && x1 >= 1, logical(1)))
 }
 
 
@@ -389,12 +389,13 @@ check_pMd <- function(p, M, d) {
 }
 
 
-#' @title Checks whether the given object has class attribute "gmvar"
+#' @title Checks whether the given object has class attribute 'gmvar'
 #'
-#' @description \code{check_gmvar} checks that the object has class attribute "gmvar".
+#' @description \code{check_gmvar} checks that the object has class attribute 'gmvar'.
 #'
 #' @param object S3 object to be tested
-#' @return Throws an error if the object doesn't have the class attribute "gmvar".
+#' @param object_name what is the name of the object that should of class 'gmvar'?
+#' @return Throws an error if the object doesn't have the class attribute 'gmvar'.
 
 check_gmvar <- function(object, object_name) {
   if(missing(object_name)) object_name <- "gmvar"

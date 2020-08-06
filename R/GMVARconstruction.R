@@ -93,7 +93,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   if(missing(data) & missing(d)) stop("data or d must be provided")
-  if(missing(data)) {
+  if(missing(data) || is.null(data)) {
     data <- NULL
   } else {
     data <- check_data(data=data, p=p)
@@ -356,4 +356,91 @@ alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_err
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
         constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
         calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors)
+}
+
+
+#' @title Switch from two-regime reduced form GMVAR model to a structural GMVAR model.
+#'
+#' @description \code{gmvar_to_sgmvar} constructs SGMVAR model based on a reduced form GMVAR model.
+#'
+#' @inheritParams simulateGMVAR
+#' @details The switch is made by simultaneously diagonalizing the two error term covariance matrices
+#'   with a well known matrix decomposition (Muirhead, 1982, Theorem A9.9) and then normalizing the
+#'   diagonal of the matrix W positive (which implies positive diagonal of the B-matrix). Models with
+#'   more that two regimes are not supported because the matrix decomposition does not generally
+#'   exists for more than two covariance matrices. If the model has only one regime (= regular SVAR model),
+#'   a symmetric and pos. def. square root matrix of the error term covariance matrix is used.
+#'
+#'   The columns of \eqn{W} as well as the lambda parameters can be re-ordered (without changing the implied
+#'   reduced form model) afterwards with the function \code{reorder_W_columns}. Also all signs in any column
+#'   of \eqn{W} can be swapped (without changing the implied reduced form model) afterwards with the function
+#'   \code{swap_W_signs}. These two functions work with models containing any number of regimes.
+#' @return Returns an object of class \code{'gmvar'} defining a structural GMVAR model based on a
+#'   two-regime reduced form GMVAR model with the main diagonal of the B-matrix normalized to be
+#'   positive.
+#' @seealso FILL IN
+#' @references
+#'  \itemize{
+#'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
+#'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
+#'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
+#'  }
+#' @examples
+#' \donttest{
+#' # These are long running examples and use parallel computing
+#' data(eurusd, package="gmvarkit")
+#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+#' colnames(data) <- colnames(eurusd)
+#'
+#' # Reduced form GMVAR(1,2) model
+#' fit12 <- fitGMVAR(data, 1, 2, ncalls=16, seeds=1:16)
+#'
+#' # Form a structural model based on the reduced form model:
+#' mod12s <- gmvar_to_sgmvar(fit12)
+#' }
+#' @export
+
+gmvar_to_sgmvar <- function(gmvar) {
+  check_gmvar(gmvar)
+  if(!is.null(gmvar$model$structural_pars)) stop("Only reduced form models are supported!")
+  p <- gmvar$model$p
+  M <- gmvar$model$M
+  if(M > 2) stop("Only models with at most two regimes are supported!")
+  d <- gmvar$model$d
+  constraints <- gmvar$model$constraints
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=NULL)
+  if(M == 1) {
+    W <- matrix(diag_Omegas(Omega1=all_Omega[, , 1]), nrow=d, ncol=d, byrow=FALSE)
+    lambdas <- numeric(0)
+  } else { # M == 2
+    tmp <- diag_Omegas(Omega1=all_Omega[, , 1], Omega2=all_Omega[, , 2])
+    W <- matrix(tmp[1:(d^2)], nrow=d, ncol=d, byrow=FALSE)
+    lambdas <- tmp[(d^2 + 1):(d^2 + d)]
+  }
+
+  # Normalize the main diagonal of W to be positive
+  for(i1 in 1:d) {
+    if(W[i1, i1] < 0) W[,i1] <- -W[,i1]
+  }
+
+  # Create SGMVAR parameter vector
+  all_phi0 <- as.vector(pick_phi0(p=p, M=M, d=d, params=params))
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+  if(is.null(constraints)) {
+    all_A <- as.vector(pick_allA(p=p, M=M, d=d, params=params))
+  } else {
+    all_A <- gmvar$params[(d*M + 1):(d*M + ncol(constraints))] # \psi
+  }
+  new_params <- c(all_phi0, all_A, vec(W), lambdas, alphas[-M])
+  new_W <- matrix(NA, nrow=d, ncol=d)
+  diag(new_W) <- rep(1, times=d)
+
+  # Construct the SGMVAR model based on the obtained structural parameters
+  calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
+  GMVAR(data=data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
+        parametrization=gmvar$model$parametrization, constraints=constraints,
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
 }
