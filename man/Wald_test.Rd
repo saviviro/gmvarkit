@@ -48,6 +48,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
 }}
 
 \examples{
+\donttest{
  # Load the data
  data(eurusd, package="gmvarkit")
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -59,7 +60,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
                      ncalls=1, seeds=1)
  fit222s
 
- # Test whether the lambda parameters (of the second regime) are the same:
+ # Test whether the lambda parameters (of the second regime) are identical:
  # fit222s has parameter vector of length 27 with the lambda parameters
  # in elements 25 and 26.
  A <- matrix(c(rep(0, times=24), 1, -1, 0), nrow=1, ncol=27)
@@ -74,6 +75,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
             c(rep(0, times=6), 1, rep(0, times=20)))
  c <- c(0, 0)
  Wald_test(fit222s, A, c)
+}
 }
 \references{
 \itemize{

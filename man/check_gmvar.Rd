@@ -2,16 +2,18 @@
 % Please edit documentation in R/argumentChecks.R
 \name{check_gmvar}
 \alias{check_gmvar}
-\title{Checks whether the given object has class attribute "gmvar"}
+\title{Checks whether the given object has class attribute 'gmvar'}
 \usage{
 check_gmvar(object, object_name)
 }
 \arguments{
 \item{object}{S3 object to be tested}
+
+\item{object_name}{what is the name of the object that should of class 'gmvar'?}
 }
 \value{
-Throws an error if the object doesn't have the class attribute "gmvar".
+Throws an error if the object doesn't have the class attribute 'gmvar'.
 }
 \description{
-\code{check_gmvar} checks that the object has class attribute "gmvar".
+\code{check_gmvar} checks that the object has class attribute 'gmvar'.
 }

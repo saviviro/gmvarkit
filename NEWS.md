@@ -39,6 +39,9 @@
 * New exported function: 'GIRF' for estimating generalized impulse function for the variables in a SGMVAR model.
 * New exported function: 'Wald_test' for conducting a Wald test testing validity of parameter constraints.
 * New exported function: 'LR_test' for conducting a likelihood ratio test testing validity of parameter constraints.
+* New exported function: 'gmvar_to_sgmvar' for building a structural GMVAR model based on a two-regime reduced form GMVAR model.
+* New exported function: 'reorderd_W_column' for reordering the columns of W matrix of a structural GMVAR model.
+* New exported function: 'swap_W_signs' for swapping all signs the pointed columns of W matrix (and also B-matrix) of a structural GMVAR model.
 * Bug fix: the prediction intervals for mixing weights were incorrect when calculating upper or lower prediction intervals with only one level of significance.
 * Minor computation speed improvements.
 * Non-backward-compatible change: the functions 'get_boldA_eigens' and 'get_omega_eigens' now return matrices and not lists.

@@ -104,3 +104,127 @@ test_that("alt_gmvar does not throw errors", {
   tmp <- alt_gmvar(gmvar11, which_round=1, calc_cond_moments=FALSE, calc_std_errors=FALSE)
   expect_true(TRUE)
 })
+
+# GMVAR(1,2), d=2 model:
+params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
+               0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019,
+               0.943, 6.926, 3.982, 12.135, 0.789)
+mod122 <- GMVAR(data, p=1, M=2, params=params122)
+mod122s <- gmvar_to_sgmvar(mod122)
+
+# GMVAR(2,2), d=2 model with AR-parameters restricted to be
+# the same for both regimes:
+C_mat <- rbind(diag(2*2^2), diag(2*2^2))
+params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
+                1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152,
+                5.201, 5.883, 3.560, 9.799, 0.368)
+mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
+mod222cs <- gmvar_to_sgmvar(mod222c)
+
+test_that("gmvar_to_sgmvar works correctly", {
+  expect_equal(mod122s$params, c(0.623, -0.129, 3.245, 7.913, 0.959, 0.089, -0.006, 1.006, 0.952, -0.037, -0.019, 0.943,
+                                 1.31216, 0.87892, -0.15571, 2.2431, 3.99732, 1.79808, 0.789), tolerance=1e-3)
+  expect_equal(mod222cs$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, 0.89382,
+                                  0.71976, -0.36753, 2.16401, 7.14351, 1.30222, 0.368), tolerance=1e-3)
+})
+
+
+mod222cs2 <- reorder_W_columns(mod222cs, perm=2:1)
+
+params112 <- c(0.899784972, 1.707574085, 0.989440729, 0.002636335, -0.006957649, 0.986606661,
+               1.961053552, 0.452934215, 0.452934215, 2.944004374)
+W112 <- matrix(NA, nrow=2, ncol=2)
+diag(W112) <- c(1, 1)
+mod112 <- GMVAR(data, p=1, M=1, params=params112, structural_pars=list(W=W112))
+mod112_2 <- reorder_W_columns(mod112, perm=2:1)
+
+test_that("reorder_W_columns works correctly", {
+  expect_equal(mod222cs2$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, -0.36753,
+                                   2.16401, 0.89382, 0.71976, 1.30222, 7.14351, 0.368), tolerance=1e-3)
+  expect_equal(mod112_2$params, c(0.89978, 1.70757, 0.98944, 0.00264, -0.00696, 0.98661, 0.45293, 2.944, 1.96105, 0.45293), tolerance=1e-3)
+
+})
+
+mod222cs3 <- swap_W_signs(mod222cs, which_to_swap=1:2)
+mod112_3 <- swap_W_signs(mod112, which_to_swap=2)
+
+test_that("swap_W_signs works correctly", {
+  expect_equal(mod222cs3$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, -0.89382,
+                                   -0.71976, 0.36753, -2.16401, 7.14351, 1.30222, 0.368), tolerance=1e-3)
+  expect_equal(mod112_3$params, c(0.89978, 1.70757, 0.98944, 0.00264, -0.00696, 0.98661, 1.96105, 0.45293, -0.45293, -2.944),
+               tolerance=1e-3)
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

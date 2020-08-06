@@ -365,7 +365,7 @@ check_data <- function(data, p) {
 #' @return Returns \code{TRUE} or \code{FALSE} accordingly.
 
 all_pos_ints <- function(x) {
-  all(vapply(x, function(x1) length(x1) == 1 && x1 %% 1 == 0 && length(x1) == 1 && x1 >= 1, logical(1)))
+  all(vapply(x, function(x1) x1 %% 1 == 0 && length(x1) == 1 && x1 >= 1, logical(1)))
 }
 
 

@@ -21,7 +21,8 @@
 #' @section About S3 methods:
 #'   Only the \code{print} method is available if data is not provided.
 #'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}},
+#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -90,7 +91,7 @@
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
                   structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE) {
   parametrization <- match.arg(parametrization)
-  if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data), FALSE, TRUE)
+  if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   if(missing(data) & missing(d)) stop("data or d must be provided")
   if(missing(data) || is.null(data)) {
@@ -378,7 +379,8 @@ alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_err
 #' @return Returns an object of class \code{'gmvar'} defining a structural GMVAR model based on a
 #'   two-regime reduced form GMVAR model with the main diagonal of the B-matrix normalized to be
 #'   positive.
-#' @seealso FILL IN
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+#'  \code{\link{swap_W_signs}}
 #' @references
 #'  \itemize{
 #'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
@@ -389,13 +391,13 @@ alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_err
 #'  }
 #' @examples
 #' \donttest{
-#' # These are long running examples and use parallel computing
+#' # These are long running examples
 #' data(eurusd, package="gmvarkit")
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #' colnames(data) <- colnames(eurusd)
 #'
 #' # Reduced form GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, 1, 2, ncalls=16, seeds=1:16)
+#' fit12 <- fitGMVAR(data, 1, 2, ncalls=1, seeds=3)
 #'
 #' # Form a structural model based on the reduced form model:
 #' mod12s <- gmvar_to_sgmvar(fit12)
@@ -440,7 +442,145 @@ gmvar_to_sgmvar <- function(gmvar) {
 
   # Construct the SGMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
-  GMVAR(data=data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
+  GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
+        parametrization=gmvar$model$parametrization, constraints=constraints,
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
+}
+
+
+#' @title Reorder columns of the W-matrix and lambda parameters of a structural GMVAR model.
+#'
+#' @description \code{reorder_W_columns} reorder columns of the W-matrix and lambda parameters
+#'   of a structural GMVAR model.
+#'
+#' @inheritParams simulateGMVAR
+#' @param perm an integer vector of length \eqn{d} specifying the new order of the columns of \eqn{W}.
+#'   Also lambda parameters of each regime will be reordered accordingly.
+#' @details The order of the columns of \eqn{W} can be changed without changing the implied reduced
+#'   form model as long as the order of lambda parameters is also changed accordingly. Note that the
+#'   constraints imposed on \eqn{W} (or the B-matrix) will also be modified accordingly.
+#'
+#'   This function does not support models with constraints imposed on the lambda parameters!
+#'
+#'   Also all signs in any column of \eqn{W} can be swapped (without changing the implied reduced form model)
+#'   with the function \code{swap_W_signs} but this obviously also swaps the sign constraints in the
+#'   corresponding columns of \eqn{W}.
+#' @return Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+#'   structural parameters and constraints.
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{gmvar_to_sgmvar}},
+#'  \code{\link{swap_W_signs}}
+#' @inherit in_paramspace_int references
+#' @examples
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
+#'                  structural_pars=list(W=W_222))
+#' mod222s
+#'
+#' # The same reduced form model, modified W and lambda:
+#' reorder_W_columns(mod222s, perm=2:1)
+#' @export
+
+reorder_W_columns <- function(gmvar, perm) {
+  check_gmvar(gmvar)
+  if(is.null(gmvar$model$structural_pars)) stop("Only structural models are supported!")
+  if(!is.null(gmvar$model$structural_pars$C_lambda)) stop("Models with constraints imposed on the lambda parameters are not supported!")
+  p <- gmvar$model$p
+  M <- gmvar$model$M
+  d <- gmvar$model$d
+  stopifnot(length(perm) == d && all(perm %in% 1:d) && length(unique(perm)) == d)
+  constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints, structural_pars=structural_pars)
+  W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+
+  # Create the new parameter vector
+  W <- W[, perm]
+  W <- Wvec(W) # Zeros removed
+  if(M > 1) {
+    lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)
+    lambdas <- vec(lambdas[perm,])
+  }
+  new_params <- gmvar$params
+  new_params[(length(new_params) - (M - 1 + length(W) + length(lambdas)) + 1):(length(new_params) - (M - 1))] <- c(W, lambdas)
+  new_W <- structural_pars$W[, perm]
+
+  # Construct the SGMVAR model based on the obtained structural parameters
+  calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
+  GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
+        parametrization=gmvar$model$parametrization, constraints=constraints,
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
+}
+
+
+#' @title Swap all signs in pointed columns a the \eqn{W} matrix of a structural GMVAR model.
+#'
+#' @description \code{swap_W_signs} swaps all signs in pointed columns a the \eqn{W} matrix
+#'  of a structural GMVAR model. Consequently, signs in the columns of the B-matrix are also swapped
+#'  accordingly.
+#'
+#' @inheritParams simulateGMVAR
+#' @param which_to_swap a numeric vector of length at most \eqn{d} and elemnts in \eqn{1,..,d}
+#'   specifying the columns of \eqn{W} whose sign should be swapped.
+#' @details All signs in any column of \eqn{W} can be swapped without changing the implied reduced form model.
+#'   Consequently, also the signs in the columns of the B-matrix are swapped. Note that the sign constraints
+#'   imposed on \eqn{W} (or the B-matrix) are also swapped in the corresponding columns accordingly.
+#'
+#'   Also the order of the columns of \eqn{W} can be changed (without changing the implied reduced
+#'   form model) as long as the order of lambda parameters is also changed accordingly. This can be
+#'   done with the function \code{reorder_W_columns}.
+#' @return Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+#'   structural parameters and constraints.
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+#'  \code{\link{gmvar_to_sgmvar}}
+#' @inherit reorder_W_columns references
+#' @examples
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
+#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
+#'                  structural_pars=list(W=W_222))
+#' mod222s
+#'
+#' # The same reduced form model, with signs in the second column of W swapped:
+#' swap_W_signs(mod222s, which_to_swap=2)
+#'
+#' # The same reduced form model, with signs in both column of W swapped:
+#' swap_W_signs(mod222s, which_to_swap=1:2)
+#' @export
+
+swap_W_signs <- function(gmvar, which_to_swap) {
+  check_gmvar(gmvar)
+  if(is.null(gmvar$model$structural_pars)) stop("Only structural models are supported!")
+  p <- gmvar$model$p
+  M <- gmvar$model$M
+  d <- gmvar$model$d
+  stopifnot(length(which_to_swap) <= d && length(which_to_swap) >= 1 && all(which_to_swap %in% 1:d)
+            && length(unique(which_to_swap)) == length(which_to_swap))
+  constraints <- gmvar$model$constraints
+  structural_pars <- gmvar$model$structural_pars
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints, structural_pars=structural_pars)
+  W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+
+  # Create the new parameter vector
+  W[, which_to_swap] <- -W[, which_to_swap]
+  W <- Wvec(W) # Zeros removed
+  r <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), r <- ncol(structural_pars$C_lambda))
+
+  new_params <- gmvar$params
+  new_params[(length(new_params) - (M - 1 + length(W) + r) + 1):(length(new_params) - (M - 1 + r))] <- W
+  new_W <- structural_pars$W
+  new_W[, which_to_swap] <- -new_W[, which_to_swap]
+
+  # Construct the SGMVAR model based on the obtained structural parameters
+  calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
+  GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=constraints,
         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
 }

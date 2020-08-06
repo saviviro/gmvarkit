@@ -17,6 +17,9 @@ Returns a length \eqn{d^2 + d} vector where the first \eqn{d^2} elements
   the matrix \eqn{\Omega_2^\Omega_1^{-1}} and the rest \eqn{d} elements are the
   corresponding eigenvalues "lambdas". The result satisfies \eqn{WW' = Omega1} and
   \eqn{Wdiag(lambdas)W' = Omega2}.
+
+  If \code{Omega2} is not supplied, returns a vectorized symmetric (and pos. def.)
+  square root matrix of \code{Omega1}.
 }
 \description{
 \code{diag_Omegas} Simultaneously diagonalizes two covariance matrices using
