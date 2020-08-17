@@ -92,7 +92,7 @@
 #'  }
 #' @export
 
-GIRF <- function(gmvar, variables, shock_size, N=30, R1=500, R2=500, init_regimes=1:M, init_values=NULL,
+GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regimes=1:M, init_values=NULL,
                  ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), seeds=NULL) {
   on.exit(closeAllConnections())
 
