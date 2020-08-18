@@ -210,6 +210,30 @@ Use the package `uGMAR` for analysing univariate time series.
 
 # Structural GMVAR model
 
+## Defition of the SGMVAR model
+Consider the GMVAR model defined above under the headline "Definition of the GMVAR model". We focus of the so-called "B-model" setup and write the structural GMVAR model as
+$$
+y_t = \sum_{m=1}^Ms_{t,m}\left(\phi_{m,0} + \sum_{i=i}^{p}A_{m,i}y_{i-1} \right) + B_te_t
+$$
+and
+$$
+u_t\equiv B_te_t= 
+\left\lbrace\begin{matrix}
+u_{1,t} \sim N(0, \Omega_1) & \text{if} & s_{t,1} = 1 & (\text{with probability } \alpha_{1,t}) \\
+u_{2,t} \sim N(0, \Omega_2) & \text{if} & s_{t,2} = 1 & (\text{with probability } \alpha_{2,t}) \\
+\vdots & & & \\
+u_{M,t} \sim N(0, \Omega_M) & \text{if} & s_{t,M} = 1 & (\text{with probability } \alpha_{M,t}) \\
+\end{matrix}\right.
+$$
+where the probabilities are expressed conditionally on $\mathcal{F}_{t-1}=\sigma\lbrace y_{t-j}, j>0\rbrace$ and $e_t$ is an orthogonal structural error. Unlike in conventional SVAR analysis, the $(d\times d)$ "B-matrix" $B_t$, which governs the contemporaneous relations of the shocks, is time-varying. This enables to amplify a constant sized structural shock according to the conditional variance of the reduced form error which varies according to the mixing weights.
+
+We have $\Omega_{u,t}\equiv\text{Cov}(u_t|\mathcal{F}_{t-1})=\sum_{m=1}^M\alpha_{m,t}\Omega_m$, while the (conditional) covariance matrix of the structural errors $e_t=B_t^{-1}u_t$ (which have a mixture normal distribution and are not IID) is obtained as 
+\begin{equation}
+\text{Cov}(e_t|\mathcal{F}_{t-1})=\sum_{m=1}^M\alpha_{m,t}B_t^{-1}\Omega_mB_t'^{-1}.
+\end{equation}
+The B-matrix $B_t$ should thus be chosen so that the structural shocks are orthogonal regardless of which regime they come from. A suitable approach is thereby to build on the identification strategies proposed by \cite{Lanne+Lutkepohl:2010} and \cite{Lanne+Lutkepohl+Maciejowska:2010} where the error term covariance matrices are simultaneously diagonalized with a well known matrix decomposition.
+LANNE JA LUTKE SEKA LANNE ET AL TARVITAAN LAHTEISIIN JATA SILTI VIKA VIRKE POIS?
+
 ## References
 * Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. _Journal of Econometrics_, __192__, 485-498.
 * Kalliovirta L. and Saikkonen P. (2010)  Reliable Residuals for Multivariate Nonlinear Time Series Models. _Unpublished Revision of HECER Discussion Paper No. 247_.
