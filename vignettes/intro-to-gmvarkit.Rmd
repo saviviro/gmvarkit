@@ -17,13 +17,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-The package `gmvarkit` contains tools to estimate and analyze Gaussian Mixture Vector Autoregressive (GMVAR) model (see Kalliovirta et. al. 2016). We briefly give the definition of the GMVAR model in this vignette, and also very briefly cover some its attractive theoretical and practical properties. For more comprehensive discussion, we refer to the cited article by Kalliovirta, Meitz, and Saikkonen (2016). 
+## Introduction
+The package `gmvarkit` contains tools to estimate and analyze both reduced form and structural Gaussian mixture vector autoregressive (GMVAR) model (Kalliovirta, Meitz, and Saikkonen, 2016, and Virolainen, 2020). In this vignette, we first define the reduced form GMVAR model, briefly discuss some of its properties, and demonstrate how to use the functions in `gmvarkit` to estimate the model, examine the estimates, check its adequacy with quantile residual diagnostics, simulate from the process, and forecast future observations of the process. Then, we define the structural GMVAR model, discuss its identification, and demonstrate how to use the functions in `gmvarkit` to estimate generalized impulse response function. The diagnostic tools introduced for the reduced form model also work with the structural model. For more comprehensive discussion on the reduced form model, see the cited article by Kalliovirta, Meitz, and Saikkonen (2016), and for the structural model, see the cited article by Virolainen (2020). For a shorter introduction on how to use `gmvarkit`, see the readme file.
 
-See the readme file for a short introduction on how to use `gmvarkit`.
-
-The GMVAR models in `gmvarkit` are defined as class `gmvar` S3 objects which can be created with the estimation function `fitGMVAR` or with the constructor function `GMVAR`. The created `gmvar` objects are then be conveniently used as main arguments in many other functions that allow, for example, model diagnostics, simulations, and forecasting. Therefore, after estimating a GMVAR model it's easy to use the other functions for further analysis. However, some tasks such as imposing linear constraints, creating GMVAR models without estimation, or setting up initial population for the genetic algorithm employed by the estimation function, require accurate understanding on how the parameter vectors are constructed in this package. 
+### Some general notes on gmvarkit
+The GMVAR models in `gmvarkit` are defined as class `gmvar` S3 objects which can be created with the estimation function `fitGMVAR` or with the constructor function `GMVAR`. The created `gmvar` objects are then be conveniently used as main arguments in many other functions that allow, for example, model diagnostics, simulations, and forecasting - similarly to many of the popular R packages. Therefore, after estimating a GMVAR model, it's easy to use the other functions for further analysis. Some tasks, however, such as creating GMVAR models without estimation, or setting up initial population for the genetic algorithm employed by the estimation function, require accurate understanding on how the parameter vectors are constructed in this package. 
 
 The notations for (unconstrained) parameter vector are in line with the cited article by Kalliovirta et. al. (2016), but for clarity we repeat these notations in the second section of this vignette. In the third section, we show how to apply general linear constraints to the autoregressive parameters of a GMVAR model. Two examples are given to demonstrate how to use the general formula. In the fourth section we have listed some useful functions and methods found in `gmvarkit` and briefly explain how they work and how to use them. 
+HUOM TAMA PITAA PAIVITTAA
+
+# Reduced form GMVAR model
 
 ## Definition of the GMVAR model
 The Gaussian mixture vector autoregressive (GMVAR) model with $M$ mixture components and autoregressive order $p$, which we refer to as the GMVAR($p,M$) model, is a mixture of $M$ stationary Gaussian VAR($p$) models with time varying mixing weights. At each point of time $t$, a GMVAR process generates an observation from one of its mixture components (also called regimes) according to the probabilities pointed by the mixing weights. 
@@ -37,7 +40,7 @@ where $\Omega_{m}$ is a conditional positive definite covariance matrix, NID sta
 $$
 \mu_{m,t} = \varphi_{m,0} + \sum_{i=1}^p A_{m,i}y_{t-i}
 $$
-is interpreted as the conditional mean of the $m$th mixture components. The terms $\varphi_{m,0}$ $(d\times 1)$ are intercept parameters and $A_{m,i}$ $(d\times d)$ are the autoregressive (AR) matrices. The random vectors $\varepsilon_t$ are assumed to be independent from $\mathcal{F}_{t-1}$ and conditionally indepedent from $\boldsymbol{s}_{t}$ given $\mathcal{F}_{t-1}$. The probabilities $\alpha_{m,t}$ are referred to as the mixing weights.
+is interpreted as the conditional mean of the $m$th mixture components. The terms $\varphi_{m,0}$ $(d\times 1)$ are intercept parameters and $A_{m,i}$ $(d\times d)$ are the autoregressive (AR) matrices. The random vectors $\varepsilon_t$ are assumed to be independent from $\mathcal{F}_{t-1}$ and conditionally independent from $\boldsymbol{s}_{t}$ given $\mathcal{F}_{t-1}$. The probabilities $\alpha_{m,t}$ are referred to as the mixing weights.
 
 For each $m=1,...,M$, the AR matrices $A_{m,i}$, $i=1,...,p$ are assumed to satisfy the usual stability condition of VAR models. Namely, denoting
 $$
@@ -62,7 +65,6 @@ $$
 \text{E}[y_t|\mathcal{F}_{t-1}]=\sum_{m=1}^M\alpha_{m,t}\mu_{m,t}, \quad \text{Cov}[y_t|\mathcal{F}_{t-1}]=\sum_{m=1}^M\alpha_{m,t}\Omega_m + \sum_{m=1}^M\alpha_{m,t}\left(\mu_{m,t} - \sum_{n=1}^M\alpha_{n,t}\mu_{n,t} \right)\left(\mu_{m,t} - \sum_{n=1}^M\alpha_{n,t}\mu_{n,t} \right)'.
 $$
 
-
 In order to define the mixing weights $\alpha_{m,t}$, consider first auxiliary stationary Gaussian VAR-processes $z_{m,t}$, and the related $dp$-dimensional random vectors $\boldsymbol{z}_{t,m}=(z_{t,m},...,z_{m,t-p+1})$. The density of $\boldsymbol{z}_{t,m}$ is 
 \begin{equation}\label{dpdensities}
 n_{dp}(\boldsymbol{z}_{t,m};\mu_m,\boldsymbol{\Sigma}_{m,p})=(2\pi)^{-dp/2}\det(\boldsymbol{\Sigma}_{m,p})^{-1/2}\exp\left\lbrace -\frac{1}{2}(\boldsymbol{z}_{t,m} - \boldsymbol{1}_p\otimes\mu_m)´\boldsymbol{\Sigma}_{m,p}^{-1}(\boldsymbol{z}_{t,m} - \boldsymbol{1}_p\otimes\mu_m)\right\rbrace ,
@@ -78,7 +80,6 @@ $$
 \end{bmatrix}
 \enspace (dp\times dp).
 $$
-
 Denoting $\boldsymbol{y}_{t-1}=(y_{t-1},...,y_{t-p})$ $(dp\times 1)$, the mixing weights of the GMVAR model are defined as 
 $$
 \alpha_{m,t} = \frac{\alpha_mn_{dp}(\boldsymbol{y}_{t-1};\mu_m,\boldsymbol{\Sigma}_{m,p})}{\sum_{n=1}^M\alpha_nn_{dp}(\boldsymbol{y}_{t-1};\mu_n,\boldsymbol{\Sigma}_{n,p})},
@@ -94,24 +95,23 @@ f(\boldsymbol{y};\boldsymbol{\theta})=\sum_{m=1}^M\alpha_m n_{dp}(\boldsymbol{y}
 $$
 Moreover, $\boldsymbol{y}_t$ is ergodic.
 
-Theorem 1 shows that the stationary distribution of $\boldsymbol{y}_t$ is a mixture of M multinormal distributions with constant mixing weights $\alpha_m$. Consequently, all moments of the stationary distribution exist and are finite. 
+Theorem 1 shows that the stationary distribution of $\boldsymbol{y}_t$ is a mixture of $M$ multinormal distributions with constant mixing weights $\alpha_m$. Consequently, all moments of the stationary distribution exist and are finite. 
 
 ### Interpretation of the mixing weights $\alpha_m$ and $\alpha_{m,t}$
-According to Theorem 1 $\alpha_m$ immediately has the interpretation as the unconditional probability of the random vector $\boldsymbol{y}_t$ being generated from the $m$th mixture component. Consequently $\alpha_m$ also represents the unconditional probability of the component $y_t$ being generated from the $m$th mixture component (see Kalliovirta et al. 2016, Section 3.3 for more details).
+Based on Theorem 1 $\alpha_m$ has the interpretation as the unconditional probability of the random vector $\boldsymbol{y}_t$ being generated from the $m$th mixture component. Consequently, $\alpha_m$ also represents the unconditional probability of the observation $y_t$ being generated from the $m$th mixture component (see Kalliovirta et al. 2016, Section 3.3 for more details).
 
-As noted, the mixing weights $\alpha_{m,t}$ are the conditional probabilities for the random vector $y_t$ being generated from the $m$th mixture component. According the definition of the mixing weights, regimes with higher likelihood of the past $p$ observations are more likeli to generate the new observations but the likelihoods are also scaled with the mixing weight parameters $\alpha_m$. 
+As noted, the mixing weights $\alpha_{m,t}$ are the conditional probabilities for the random vector $y_t$ being generated from the $m$th mixture component. According the definition of the mixing weights, regimes with higher likelihood of the past $p$ observations are more likely to generate the new observations but the likelihoods are also scaled with the mixing weight parameters $\alpha_m$. 
 
 ### Properties of the maximum likelihood estimator
 Under general conditions (see Kalliovirta et al. 2016, Assumption 1), the maximum likelihood estimator for the parameters of the GMVAR model is strongly consistent.
 
 Under general conditions (namely, Assumptions 1 and 2 in Kalliovirta et al. 2016), the maximum likelihood estimator has the conventional limiting distribution (normal).  
 
+## Parameter vectors and unconstrained models
+In this section, we cover the notation for parameter vectors (the same as in Kalliovirta et al. 2016 for unconstrained models) and explain how to impose linear constraints in `gmvarkit`. Knowledge of the form of the parameter vector is required for creating GMVAR models without estimation with prespecified parameter values or for setting up initial population for the genetic algorithm, but it is not required for estimation and basic analysis of the models. The form of the parameter vector depends on whether an unconstrained or constrained model is considered. 
 
-## General notations and unconstrained models
-In this section, we cover the notation for parameter vectors (the same as in Kalliovirta et al. 2016 for unconstrained models) and explain how to impose linear constraints in `gmvarkit`.
-
-### General notations
-Specifying the order of a GMVAR model requires specifying the autoregressive order _p_ and the number of mixture components _M_. The number of time series in the system is denoted by _d_, and it's assumed that _d_ is larger than one.^[For univariate analysis one may use the package `uGMAR`.] The form of the parameter vector depends on whether an unconstrained or constrained model is considered. 
+### Order of the model
+Specifying the order of a GMVAR model requires specifying the autoregressive order _p_ and the number of mixture components _M_. The number of time series in the system is denoted by _d_, and it's assumed that _d_ is larger than one.^[For univariate analysis one may use the package `uGMAR`.]
 
 ### Parameter vector of unconstrained model
 The parameter vector for unconstrained model is of size _((M(pd^2+d(d+1)/2+1)-1)x1)_ and has form
@@ -124,10 +124,10 @@ Above $\phi_{m,0}$ denotes the intercept parameter of _m_:th mixture component, 
 
 The parameter vector above has "intercept" parametrization, referring to the intercept terms $\phi_{m,0}$. However, it's also possible to use "mean" parametrization, where the intercept terms are simply replaced by the regimewise means $\mu_m=(I_d-\sum_{i=1}^pA_{m,i})^{-1}\phi_{m,0}$.
 
-## Models with linear constraints
+## Models imposing linear constraints
 
-### General linear constraints and parameter vector
-Imposing linear constraints on the autoregressive parameters of GMVAR model is straightforward in `gmvarkit`. The constraints are expressed in a rather general form allowing arbitrary linear constraints, but one needs to take the time to construct the constraint matrix carefully for each particular case. 
+### Imposing linear constraints and parameter vector
+Imposing linear constraints on the autoregressive parameters of GMVAR model is straightforward in `gmvarkit`. The constraints are expressed in a rather general form which allows to impose a wide class of constraints but one needs to take the time to construct the constraint matrix carefully for each particular case. 
 
 We consider constraints of form 
 $$(\boldsymbol{\phi_1},...,\boldsymbol{\phi_M}) = \boldsymbol{C}\boldsymbol{\psi},\enspace \text{where}\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\enspace$$
@@ -140,7 +140,6 @@ where $\boldsymbol{\psi}$ is the $(qx1)$ parameter vector containing constrained
 
 ### Examples of linear constraints
 Consider the following two common uses for linear constraints: restricting the autoregressive parameters to be the same for all regimes and constraining some parameters to zero. Of course also some other constraints may be useful, but we chose to show illustrative examples of these two as they occur in the cited article by Kalliovirta et al. (2016). 
-
 
 #### Restricting AR parameters to be the same for all regimes
 To restrict the AR parameters to be the same for all regimes, we want $\boldsymbol{\phi_m}$ to be the same for all _m=1,...,M_. The parameter vector $\boldsymbol{\psi}$ $(qx1)$ then corresponds to any $\boldsymbol{\phi_m}=\boldsymbol{\phi}$, and therefore $q=pd^2$. For the constraint matrix we choose 
@@ -203,7 +202,6 @@ One may wish to construct an arbitrary GMVAR model without any estimation proces
 ### Simulating from GMVAR process
 The function `simulateGMVAR` is the one for the job. As the main argument it uses a `gmvar` object created with `fitGMVAR` or `GMVAR`. 
 
-
 ### Forecasting GMVAR process
 The package `gmvarkit` contains predict method `predict.gmvar` for forecasting GMVAR processes. For one step predictions using the exact formula for conditional mean is supported, but the forecasts further than that are based on independent simulations. The predictions are either sample means or medians and the confidence intervals are based on sample quantiles. The objects generated by `predict.gmvar` have their own plot method. We also encourage directly using the function `simulateGMVAR` for forecasting (see the forecasting example in the documentation `?simulateGMVAR`).
 
@@ -214,3 +212,4 @@ Use the package `uGMAR` for analysing univariate time series.
 ## References
 * Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. _Journal of Econometrics_, __192__, 485-498.
 * Kalliovirta L. and Saikkonen P. (2010)  Reliable Residuals for Multivariate Nonlinear Time Series Models. _Unpublished Revision of HECER Discussion Paper No. 247_.
+* Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working paper, available as arXiv:2007.04713.
