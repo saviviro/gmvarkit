@@ -18,7 +18,9 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
-The package `gmvarkit` contains tools to estimate and analyze both reduced form and structural Gaussian mixture vector autoregressive (GMVAR) model (Kalliovirta, Meitz, and Saikkonen, 2016, and Virolainen, 2020). In this vignette, we first define the reduced form GMVAR model, briefly discuss some of its properties, and demonstrate how to use the functions in `gmvarkit` to estimate the model, examine the estimates, check its adequacy with quantile residual diagnostics, simulate from the process, and forecast future observations of the process. Then, we define the structural GMVAR model, discuss its identification, and demonstrate how to use the functions in `gmvarkit` to estimate generalized impulse response function. The diagnostic tools introduced for the reduced form model also work with the structural model. For more comprehensive discussion on the reduced form model, see the cited article by Kalliovirta, Meitz, and Saikkonen (2016), and for the structural model, see the cited article by Virolainen (2020). For a shorter introduction on how to use `gmvarkit`, see the readme file.
+The package `gmvarkit` contains tools to estimate and analyze both reduced form and structural Gaussian mixture vector autoregressive (GMVAR) model (Kalliovirta, Meitz, and Saikkonen, 2016, and Virolainen, 2020). In this vignette, we first define the reduced form GMVAR model, briefly discuss some of its properties, and explain how to use the functions in `gmvarkit` to estimate the model, examine the estimates, check its adequacy with quantile residual diagnostics, simulate from the process, and forecast future observations of the process. Then, we define the structural GMVAR model, discuss its identification, and explain how to use the functions in `gmvarkit` to estimate generalized impulse response function and to test hypotheses regarding the paremeters. Most of the functions work with both, reduced form and structural models, but particularly the one for estimating generalized impulse response function accomodates structural models. 
+
+For more comprehensive discussion on the reduced form model, see the cited article by Kalliovirta, Meitz, and Saikkonen (2016), and for the structural model, see the cited article by Virolainen (2020). For a shorter introduction and demonstration on how to use `gmvarkit`, see the readme file.
 
 ### Some general notes on gmvarkit
 The GMVAR models in `gmvarkit` are defined as class `gmvar` S3 objects which can be created with the estimation function `fitGMVAR` or with the constructor function `GMVAR`. The created `gmvar` objects are then be conveniently used as main arguments in many other functions that allow, for example, model diagnostics, simulations, and forecasting - similarly to many of the popular R packages. Therefore, after estimating a GMVAR model, it's easy to use the other functions for further analysis. Some tasks, however, such as creating GMVAR models without estimation, or setting up initial population for the genetic algorithm employed by the estimation function, require accurate understanding on how the parameter vectors are constructed in this package. 
@@ -173,41 +175,40 @@ $$\boldsymbol{\tilde{c}}=\left[{\begin{array}{cccc}
 \enspace (pd^2x4)$$
 satisfies $\boldsymbol{C}\boldsymbol{\psi}=(\boldsymbol{\phi},...,\boldsymbol{\phi}).$
 
-## Functions in gmvarkit
+## Some useful functions in gmvarkit
 
 ### Estimating a GMVAR model
-`gmvarkit` provides the function `fitGMVAR` for estimating a GMVAR model. The maximum likelihood estimation is performed in two phases: in the first phase `fitGMVAR` uses a genetic algorithm to find starting values for gradient based variable metric algorithm, which it then uses to finalize the estimation in the second phase. It's important to keep in mind that it's not guaranteed that the numerical estimation algorithms end up in the global maximum point rather than a local one. Because of multimodality and challenging surface of the log-likelihood function, it's actually expected that most of the estimation rounds won't find the global maximum point. For this reason one should always perform multiple estimation rounds. Parallel computing is used to obtain the results faster. The number of CPU cores used can be set with the argument `ncores`, and the number of estimation rounds can be controlled with the argument `ncalls`. 
+`gmvarkit` provides the function `fitGMVAR` for estimating a GMVAR model. The maximum likelihood estimation is performed in two phases: in the first phase `fitGMVAR` uses a genetic algorithm to find starting values for gradient based variable metric algorithm, which it then uses to finalize the estimation in the second phase. It's important to keep in mind that it's not guaranteed that the numerical estimation algorithms end up in the global maximum point rather than a local one. Because of high multimodality and challenging surface of the log-likelihood function, it's actually expected that most of the estimation rounds won't find the global maximum point. For this reason one should always perform multiple estimation rounds and parallel computing is used to obtain the results faster. The number of CPU cores used can be set with the argument `ncores`, and the number of estimation rounds can be chosen with the argument `ncalls`. 
 
-If the model estimates poorly, it is often because the number of mixture components _M_ is chosen too large. One reason for is that the genetic algorithm is (with the default settings) designed to find solutions with non-zero mixing weights for all regimes. One may also adjust the settings of the genetic algorithm employed, or set up an initial population with guesses for the estimates. This can by done by passing arguments in `fitGMVAR` to the function `GAfit` which implements the genetic algorithm. To check the available settings, read the documentation `?GAfit`. If the iteration limit is reached when estimating the model, the function `iterate_more` can be used to finish the estimation. 
+If the model estimates poorly, it is often because the number of mixture components _M_ is chosen too large. One reason for is that the genetic algorithm is (with the default settings) designed to find solutions with non-zero mixing weights for all regimes. One may also adjust the settings of the genetic algorithm or set up an initial population with approximate guesses for the estimates. This can by done by passing arguments in `fitGMVAR` to the function `GAfit` which implements the genetic algorithm. To check the available settings, read the documentation `?GAfit`. If the iteration limit is reached when estimating the model, the function `iterate_more` can be used to finish the estimation. 
 
+### Examining the estimates
 Parameters of the estimated model are printed in an illustrative and easy to read form. In order to easily compare approximate standard errors to certain estimates, one can print the approximate standard errors of the estimates in the same form with the function `print_std_errors`. Numerical approximation of the gradient and Hessian matrix of the log-likelihood at the estimates can be obtained conveniently with the functions `get_gradient` or `get_foc` and `get_hessian`, and eigenvalues of the Hessian can be obtained with the function `get_soc`.
 
-Profile log-likelihood functions of the parameters around the estimates can be plotted with the function `profile_logliks`.
+Graphs of the profile log-likelihood functions of the parameters around the estimates can be plotted with the function `profile_logliks`.
 
 The estimated objects have their own print, plot, and summary methods.
 
 The function `alt_gmvar` can be used to build GMVAR model based on an arbitrary estimation round. This can be used to consider estimates pointed by local maximums instead of the ML estimate. 
 
-
 ### Model diagnostics
-`gmvarkit` considers model diagnostics based on multivariate extension of quantile residuals (see Kalliovirta and Saikkonen 2010), whose are under the correct model specification asymptotically multivariate standard normal distributed. The quantile residual tests introduced by Kalliovirta and Saikkonen (2010) can be performed with the function `quantile_residual_tests` by providing the estimated model (that is class `gmvar` object) as an argument.
+`gmvarkit` considers model diagnostics based on multivariate extension of quantile residuals (see Kalliovirta and Saikkonen 2010) which are under the correct model specification asymptotically multivariate standard normal distributed. The quantile residual tests introduced by Kalliovirta and Saikkonen (2010) can be performed with the function `quantile_residual_tests` by providing the estimated model (that is class `gmvar` object) as an argument.
 
 For graphical diagnostics one may use the function `diagostic_plot`, which enables one to plot the quantile residual time series, auto- and cross-correlation functions of quantile residuals or their squares, or quantile residual histograms and normal QQ-plots.  
-
 
 ### Constructing a GMVAR model without estimation
 One may wish to construct an arbitrary GMVAR model without any estimation process, for example in order to simulate from a particular process of interest. An arbitrary model can be created with the function `GMVAR`. If one wants to add or update data to the model afterwards, it's advisable to use the function `add_data`. 
 
-
-### Simulating from GMVAR process
-The function `simulateGMVAR` is the one for the job. As the main argument it uses a `gmvar` object created with `fitGMVAR` or `GMVAR`. 
+### Simulating from a GMVAR process
+The function `simulateGMVAR` is the one for the job. As the main argument it uses a class `gmvar` object created with `fitGMVAR` or `GMVAR`. 
 
 ### Forecasting GMVAR process
-The package `gmvarkit` contains predict method `predict.gmvar` for forecasting GMVAR processes. For one step predictions using the exact formula for conditional mean is supported, but the forecasts further than that are based on independent simulations. The predictions are either sample means or medians and the confidence intervals are based on sample quantiles. The objects generated by `predict.gmvar` have their own plot method. We also encourage directly using the function `simulateGMVAR` for forecasting (see the forecasting example in the documentation `?simulateGMVAR`).
+The package `gmvarkit` contains predict method `predict.gmvar` for forecasting GMVAR processes. For one step predictions using the exact formula for conditional mean is supported, but forecasts further than that are based on independent simulations. The predictions are either sample means or medians and the confidence intervals are based on sample quantiles. The objects generated by `predict.gmvar` have their own plot method. 
 
 ### Univariate analysis
 Use the package `uGMAR` for analysing univariate time series.
 
+# Structural GMVAR model
 
 ## References
 * Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. _Journal of Econometrics_, __192__, 485-498.
