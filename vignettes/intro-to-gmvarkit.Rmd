@@ -212,11 +212,11 @@ Use the package `uGMAR` for analysing univariate time series.
 
 ## Defition of the SGMVAR model
 Consider the GMVAR model defined above under the headline "Definition of the GMVAR model". We focus of the so-called "B-model" setup and write the structural GMVAR model as
-$$
+\begin{equation}\label{eq:sgmvar}
 y_t = \sum_{m=1}^Ms_{t,m}\left(\phi_{m,0} + \sum_{i=i}^{p}A_{m,i}y_{i-1} \right) + B_te_t
-$$
+\end{equation}
 and
-$$
+\begin{equation}\label{eq:sgmvarerr}
 u_t\equiv B_te_t= 
 \left\lbrace\begin{matrix}
 u_{1,t} \sim N(0, \Omega_1) & \text{if} & s_{t,1} = 1 & (\text{with probability } \alpha_{1,t}) \\
@@ -224,17 +224,100 @@ u_{2,t} \sim N(0, \Omega_2) & \text{if} & s_{t,2} = 1 & (\text{with probability 
 \vdots & & & \\
 u_{M,t} \sim N(0, \Omega_M) & \text{if} & s_{t,M} = 1 & (\text{with probability } \alpha_{M,t}) \\
 \end{matrix}\right.
-$$
+\end{equation}
 where the probabilities are expressed conditionally on $\mathcal{F}_{t-1}=\sigma\lbrace y_{t-j}, j>0\rbrace$ and $e_t$ is an orthogonal structural error. Unlike in conventional SVAR analysis, the $(d\times d)$ "B-matrix" $B_t$, which governs the contemporaneous relations of the shocks, is time-varying. This enables to amplify a constant sized structural shock according to the conditional variance of the reduced form error which varies according to the mixing weights.
 
 We have $\Omega_{u,t}\equiv\text{Cov}(u_t|\mathcal{F}_{t-1})=\sum_{m=1}^M\alpha_{m,t}\Omega_m$, while the (conditional) covariance matrix of the structural errors $e_t=B_t^{-1}u_t$ (which have a mixture normal distribution and are not IID) is obtained as 
 \begin{equation}
 \text{Cov}(e_t|\mathcal{F}_{t-1})=\sum_{m=1}^M\alpha_{m,t}B_t^{-1}\Omega_mB_t'^{-1}.
 \end{equation}
-The B-matrix $B_t$ should thus be chosen so that the structural shocks are orthogonal regardless of which regime they come from. A suitable approach is thereby to build on the identification strategies proposed by \cite{Lanne+Lutkepohl:2010} and \cite{Lanne+Lutkepohl+Maciejowska:2010} where the error term covariance matrices are simultaneously diagonalized with a well known matrix decomposition.
-LANNE JA LUTKE SEKA LANNE ET AL TARVITAAN LAHTEISIIN JATA SILTI VIKA VIRKE POIS?
+The B-matrix $B_t$ should thus be chosen so that the structural shocks are orthogonal regardless of which regime they come from.
+
+Following Lanne & Lütkepohl (2010) and Lanne et al. (2010), we decompose the error term covariance matrices as
+\begin{equation}\label{eq:decomp}
+\Omega_1 = WW' \quad \text{and} \quad \Omega_m=W\Lambda_mW', \quad m=2,...,M,
+\end{equation}
+where the diagonal of $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of the matrix $\Omega_m\Omega_1^{-1}$ and columns of the nonsingular $W$ are the related eigenvectors. When $M=2$, the above decomposition always exists (e.g. Lanne & Lütkepohl, 2010, Proposition 1), but for $M\geq 3$ its existence requires that the matrices $\Omega_m\Omega_1^{-1}$ share the common eigenvectors in $W$. Whether imposing the above structure on the covariance matrices is appropriate with $M\geq 3$, can be evaluated by estimating the restricted and unrestricted SGMVAR models and conducting a likelihood ratio test, comparing values of information criteria, or examining quantile residual diagnostics, for example. These three methods are accomodated in `gmvarkit`: values of the information criteria are calculated for all estimated models and available, for instance, in the summary print, likelihood ratio test is available as the function `LR_test` and quantile residual diagnostics can be eximined with the functions `diagnostic_plot` and `quantile_residual_tests`.
+
+Lanne & Lütkepohl (2010) show that for a given ordering of the eigenvalues, W is unique apart from changing all signs in a column, as long as for all $i\neq j\in \lbrace 1,...,d \rbrace$ there exists an $m\in \lbrace 2,...,M \rbrace$ such that $\lambda_{mi} \neq \lambda_{mj}$. A locally unique B-matrix that amplifies a constant sized structural shock according to the conditional variance of the reduced form error is therefore obtained as
+\begin{equation}\label{eq:bt}
+B_t=W(\alpha_{1,t}I_d + \sum_{m=2}^M\alpha_{m,t}\Lambda_m)^{1/2}
+\end{equation}
+which simultaneously diagonalizes $\Omega_1,...,\Omega_M$, and $\Omega_{u,t}$ for each $t$ so that $\text{Cov}(e_t|\mathcal{F}_{t-1})=I_d$. In `gmvarkit`, the B-matrix always has the above structure. 
+
+## Identification of the structural shocks
+Even if all pairs of $\lambda_{mi}$ are distinct for some $m$, unique identification of $B_t$ requires deciding upon the ordering of $\lambda_{mi}$ in the diagonals of $\Lambda_m$ which fixes also the ordering of the columns of $W$. With an arbitrary ordering of the eigenvalues and eigenvectors, it is not guaranteed that the structural shocks have economic interpretations. However, after the statistical identification, overidentifying restrictions that lead economically interpretable structural shocks can be tested and thus validated statistically. Furthermore, it turns out that globally unique identification of the structural shocks can often be achieved with less restrictive constraints than in conventional SVAR models. The following proposition gives sufficient and necessary conditions for global identification of the shocks when all pairs of $\lambda_{mi}$ are distinct for some $m$.
+
+#### Proposition 1
+Suppose $\Omega_1=WW'$ and $\Omega_m=W\Lambda_mW', \ \ m=2,...,M,$ where $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of $\Omega_m\Omega_1^{-1}$ in the diagonal and the columns of the nonsingular $W$ are the related eigenvectors. Then, if (1) for all $i\neq j$ there exists an $m\in \lbrace 2,...,M \rbrace$ such that $\lambda_{mi} \neq \lambda_{mj}$, (2) there is one (strict) sign constraint in each column of $W$, and (3) the columns of $W$ are constrained in a way that their ordering cannot be changed, the above decomposition of $\Omega_1,...,\Omega_M$ is globally unique, provided that it exists.
+
+\noindent Notice that normalizing the diagonal of the B-matrix to be positive or negative is enough to fulfil condition (2) of Proposition 1. This kind of normalization is merely a matter of deciding upon whether positive or negative shocks are considered and therefore not restricting.
+
+Because imposing zero or sign constraints on $W$ equals to placing them on $B_t$, they may be justified economically. For example, if $d=2$ and $\lambda_{m1}\neq\lambda_{m2}$ for some $m$, structural shocks can be uniquely identified by placing one (strict) negative and one (strict) positive sign constraint in the same row of $B_t$ because reordering of the columns would violate the sign constraints. If the diagonal of $B_t$ is normalized to be positive, the negative sign constraint becomes testable. Given that condition (1) holds, for $d=3$ having one positive sign, one negative sign, and one zero constraint the same row of $B_t$, in addition to a single sign constraint in the column that has the zero constraint is enough for global identification of all the shocks. Moreover, because the zero constraint in the $d=3$ example is overidentifying, it can be tested.
+
+If $\lambda_{mi}=\lambda_{mj}$ for some $i\neq j$ and all $m\in \lbrace 2,...,M \rbrace$
+but they are placed on the first (or last) positions of $\Lambda_m$, the rest of the shocks with distinct $\lambda_{mi}$ for some $m$ are still globally identified as long as the conditions (2) and (3) of Proposition 1 are satisfied. Identification of the shocks with identical eigenvalues in all $m$ requires stronger conditions, however. Whether some of the $\lambda_{mi}$ are equal can be tested with Wald test which is available in `gmvarkit` as the function  `Wald_test`. The following proposition provides sufficient criteria for global identification of all the shocks when at most two eigenvalues are identical to each other in all $m$ but there are possibly multiple pairs of such eigenvalues.
+
+#### Proposition 2
+Consider the matrix decomposition of Proposition 1 and further suppose that $\lambda_{mi}=\lambda_{mj}$ for some $i\neq j$ and all $m$, but for all $l\neq k$ such that $l$ is not in $\lbrace i,j \rbrace$ or $k$ is not $\lbrace i,j \rbrace$, $\lambda_{ml}\neq\lambda_{mk}$ for some $m$. Then, the decomposition of $\Omega_1,...,\Omega_M$ is globally unique if in addition to conditions (2) and (3) of Proposition 1, the following condition is satisfied:
+(3) each of the columns $i,j$ of $W$ (or equally $B_t$) such that $\lambda_{mi}=\lambda_{mj}$ for all $m$ have at least one zero constraint where the other one does not and also have at least one (strict) sign constraint where the other one has a zero constraint.
+
+The result holds provided that the decomposition exists.
+
+To exemplify, if $d=4$, $\lambda_{m1}=\lambda_{m2}$ for all $m$, $\lambda_{m2}\neq\lambda_{m3}$ for some $m$, $\lambda_{m2}\neq\lambda_{m4}$ for some $m$, and $\lambda_{m3}\neq\lambda_{m4}$ for some $m$, the following constraints lead to global identification of all the shocks:
+\begin{equation}\label{eq:exampleconstraints}
+B_t=\begin{bmatrix}
+* & * & * & *\\
+* & * & * & *\\
++ & 0 & * & -\\
+0 & + & - & +\\
+\end{bmatrix}
+\ \text{or} \
+\begin{bmatrix}
++ & * & * & *\\
+* & + & * & *\\
+0 & - & + & *\\
+- & 0 & 0 & +\\
+\end{bmatrix}
+\ \text{or} \
+\begin{bmatrix}
++ & 0 & * & +\\
+* & * & * & *\\
+0 & - & + & -\\
+* & * & * & *\\
+\end{bmatrix}
+\end{equation}
+and so on, where $"*"$ signifies that the element is not constrained, $"+"$ denotes strict positive and $"-"$ a strict negative sign constraint, and $"0"$ means that the element is constrained to zero. As is demonstrated above, the structural shocks can often be identified with less restrictive constraints than in a conventional SVAR model, even when some of the eigenvalues are identical for all covariance matrices. 
+
+The conditions of Proposition 2 are not in general necessary. If $d=2$ and $\lambda_{m1}=\lambda_{m2}$ for all $m$, for instance, identification (of all regimes) with Cholesky decomposition leads to unique solution with less restrictive constraints than the ones required in Proposition 2. More generally, if all the eigenvalues are the same for each covariance matrix, then $\Omega_m=\lambda_{m1}\Omega_1$ and the necessary identification condition is the same as for the conventional SVAR model. Proofs for the above propositions are given in Virolainen (2020).
+
+## Estimation of the structural GMVAR model
+The SGMVAR model is estimated similarly to the reduced form version, expect that the model is parametrized with $W$ and $\lambda_{mi}$, $m=2,...,M$, $i=1,...,d$ instead of the covariance matrices $\Omega_{m}$, $m=1,...,M$. The estimation is can be done with the function `fitGMVAR` but now the argument `structural_pars` needs to be supplied with a list providing the constraints on $W$ (which equally imposes the constraints on the B-matrix) and optionally linear constraints on the $\lambda_{mi}$ parameters. 
+
+The list `structural_pars` should contain at least the element `W` which is a $(dxd)$ matrix matrix with its entries imposing constraints on W: NA indicating that the element is unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict negative sign constraint, and zero indicating that the element is constrained to zero. The optional element named `C_lambda` which is a $(d(M-1) \times r)$ constraint matrix that satisfies ($\lambda_{2},...,\lambda_{M}) =C_{\lambda} \gamma$ where $\lambda_{m}=(\lambda_{m1},...,\lambda_{md})$ and $\gamma$ is the new $(r x 1)$ parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of `C_lambda` must be either __positive__ or __zero__. Ignore (or set to `NULL`) if the eigenvalues $\lambda_{mi}$ should not be constrained. Note that other constraints than constraining some of the $\lambda_{mi}$ to be identical are not recommended but is such constraints are imposed, the argument `lambda_scale` in the genetic algorithm (see `?GAfit`) should be adjusted accordingly.
+
+## Impulse response analysis
+Following Koop et al. (1996) and Kilian & Lütkepohl (2017), we consider the generalized impulse response function (GIRF) defined as
+\begin{equation}\label{eq:girf}
+\text{GIRF}(n,\delta_j,\mathcal{F}_{t-1}) = \text{E}[y_{t+n}|\delta_j,\mathcal{F}_{t-1}] - \text{E}[y_{t+n}|\mathcal{F}_{t-1}],
+\end{equation}
+where $n$ is the chosen horizon, $\mathcal{F}_{t-1}=\sigma\lbrace y_{t-j},j>0\rbrace$ as before, the first term in the RHS is the expected realization of the process at time $t+n$ conditionally on a structural shock of magnitude $\delta_j \in\mathbb{R}$ in the $j$th variable at time $t$ and the previous observations, and the second term in the RHS is the expected realization of the process conditionally on the previous observations only. GIRF thus expresses the expected difference in the future outcomes when the specific structural shock hits the system at time $t$ as opposed to all shocks being random.
+
+Due to the $p$-step Markov property of the SGMVAR model, conditioning on (the $\sigma$-algebra generated by) the $p$ previous observations $\boldsymbol{y}_{t-1}\equiv(y_{t-1},...,y_{t-p})$ is effectively the same as conditioning on $\mathcal{F}_{t-1}$ at the time $t$ and later. The history $\boldsymbol{y}_{t-1}$ can be either fixed or random, but with random history the GIRF becomes a random vector, however. Using fixed $\boldsymbol{y}_{t-1}$ makes sense when one is interested in the effects of the shock in a particular point of time, whereas more general results are obtained by assuming that $\boldsymbol{y}_{t-1}$ follows the stationary distribution of the process. If one is, on the other hand, concerned about a specific regime, $\boldsymbol{y}_{t-1}$ can be assumed to follow the stationary distribution of the corresponding component model. 
+
+In practice, the GIRF and its distributional properties can be approximated with a Monte Carlo algorithm that generates independent realizations of the process and then takes the sample mean for point estimate. If $\boldsymbol{y}_{t-1}$ is random and follows the distribution $G$, the GIRF should be estimated for different values of $\boldsymbol{y}_{t-1}$ generated from $G$, and then the sample mean and sample quantiles can be taken to obtain the point estimate and confidence intervals. The algorithm implemented in `gmvarkit` is presented in Virolainen (2020).
+
+Because the SGMVAR model allows to associate specific features or economic interpretations for different regimes, it might be interesting to also examine the effects of a structural shock to the mixing weights $\alpha_{m,t}$, $m=1,...,M$. We then consider the related GIRFs $E[\alpha_{m,t+n}|\delta_j,\boldsymbol{y}_{t-1}] - E[\alpha_{m,t+n}|\boldsymbol{y}_{t-1}]$ for which point estimates and confidence intervals can be constructed similarly to (\ref{eq:girf}).
+
+In `gmvarkit`, the GIRF can be estimated with the function `GIRF` which should be supplied with the estimated SGMVAR model or a SGMVAR model build with hand specified parameter values using the function `GMVAR`. The size of the structural shock can be set with the argument `shock_size`. If not specified, the size of one standard deviation is used, calculated as the weighted average of the component process error term standard deviations with weights given by the mixing weight parameters. Among other arguments, the function may also be supplied with the argument `init_regimes` which specifies from which regimes' stationary distributions the initial values are generated from. If more than one regime is specified, a mixture distribution with weights given by the mixing weight parameters is used. Alternatively, one may specify fixed initial values with the argument `init_values`. Note that the confidence intervals (whose confidence level can be specified with the argument `ci`) reflect uncertainty about the initial value only and not about the parameter estimates. 
+
+Because estimating the GIRF and confidence intervals for it is computationally demanding, parallel computing is taken use of to shorten the estimation time. The number of CPU cores used can be set with the argument `ncores`. Finally, observe that the objects returned by the GIRF function have their own plot and print methods.
 
 ## References
+* Lanne, M. and Lütkepohl, H. (2010). Structural vector autoregressions with nonnormal residuals. _Journal of Business & Economic Statistics_, 28(1):159–168.
+* Lanne, M., Lütkepohl, H., and Maciejowsla, K. (2010). Structural vector autoregressions with markov switching. _Journal of Economic Dynamics and Control_, 34(2):121–131.
 * Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. _Journal of Econometrics_, __192__, 485-498.
 * Kalliovirta L. and Saikkonen P. (2010)  Reliable Residuals for Multivariate Nonlinear Time Series Models. _Unpublished Revision of HECER Discussion Paper No. 247_.
+* Kilian, L. and Lütkepohl, H. (2017). Structural Vector Autoregressive Analysis. Cambridge University Press, Cambridge, 1st edition.
+* Koop, G., Pesaran, M., and Potter, S. (1996). Impulse response analysis in nonlinear multivariate models. _Journal of Econometrics_, 74(1):119–147.
 * Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working paper, available as arXiv:2007.04713.

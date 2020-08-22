@@ -115,7 +115,7 @@
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'            \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Lutkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
+#'    \item Lütkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
 #'            \emph{Springer}.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
@@ -145,7 +145,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   }
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars) # A_{m,i}, m=1,...,M, i=1,..,p
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars) # Omega_m
-  all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A) # The 'bold A' for each m=1,..,M, Lutkepohl 2005, eq.(2.1.8)
+  all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A) # The 'bold A' for each m=1,..,M, Lütkepohl 2005, eq.(2.1.8)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params) # Mixing weight parameters
 
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)

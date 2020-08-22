@@ -99,7 +99,7 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structura
   ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
   all_Gammas <- array(NA, dim=c(d, d, p + 1, M)) # For each m=1,..,M, store the (dxd) covariance matrices Gamma_{y,m}(0),...,Gamma{y,m}(p-1),,Gamma{y,m}(p)
   for(m in 1:M) {
-    # Calculate the (dpxdp) Gamma_{Y,m}(0) covariance matrix (Lutkepohl 2005, eq. (2.1.39))
+    # Calculate the (dpxdp) Gamma_{Y,m}(0) covariance matrix (Lütkepohl 2005, eq. (2.1.39))
     kronmat <- I_dp2 - kronecker(all_boldA[, , m], all_boldA[, , m])
     sigma_epsm <- rbind(cbind(all_Omega[, , m], ZER_right), ZER_lower)
     Gamma_m <- matrix(solve(kronmat, vec(sigma_epsm)), nrow=d*p, ncol=d*p, byrow=FALSE)
@@ -107,7 +107,7 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structura
     # Obtain the Gamma_{y,m}(0),...,Gamma_{y,m}(p-1) covariance matrices from Gamma_{Y,m}(0)
     all_Gammas[, , , m] <- c(as.vector(Gamma_m[1:d,]), rep(NA, d*d))
 
-    # Calculate the Gamma{y,m}(p) recursively from Gamma_{y,m}(0),...,Gamma_{y,m}(p-1) (Lutkepohl 2005, eq. (2.1.37))
+    # Calculate the Gamma{y,m}(p) recursively from Gamma_{y,m}(0),...,Gamma_{y,m}(p-1) (Lütkepohl 2005, eq. (2.1.37))
     all_Gammas[, , p + 1, m] <- rowSums(vapply(1:p, function(i1) all_A[, ,i1 , m]%*%all_Gammas[, , p + 1 - i1, m], numeric(d*d)))
   }
   all_Gammas

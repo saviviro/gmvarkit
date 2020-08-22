@@ -158,7 +158,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
     }
   }
 
-  # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39))
+  # Calculate the covariance matrices Sigma_{m,p} (Lütkepohl 2005, eq. (2.1.39))
   I_dp2 <- diag(nrow=(d*p)^2)
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
   ZER_right <- matrix(0, nrow=d, ncol=d*(p-1))
