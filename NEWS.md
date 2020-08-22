@@ -45,3 +45,4 @@
 * Bug fix: the prediction intervals for mixing weights were incorrect when calculating upper or lower prediction intervals with only one level of significance.
 * Minor computation speed improvements.
 * Non-backward-compatible change: the functions 'get_boldA_eigens' and 'get_omega_eigens' now return matrices and not lists.
+* Included the structural GMVAR model in a vignette. 
