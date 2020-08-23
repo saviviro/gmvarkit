@@ -21,7 +21,7 @@
 #'   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{LR_test}}, \code{\link{Wald_test}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the

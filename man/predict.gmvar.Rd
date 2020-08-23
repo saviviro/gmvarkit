@@ -59,7 +59,7 @@ Forecast GMVAR process defined as a class \code{'gmvar'} object. The forecasts a
   using the exact conditional mean is also supported.
 }
 \examples{
-\dontrun{
+\donttest{
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the

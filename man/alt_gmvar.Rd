@@ -36,7 +36,7 @@ It's sometimes useful to examine other estimates than the one with the highest l
   is wrapper around \code{GMVAR} that picks the correct estimates from an object returned by \code{fitGMVAR}.
 }
 \examples{
-\dontrun{
+\donttest{
 # These are long running examples and use parallel computing
 data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])

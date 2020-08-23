@@ -70,7 +70,7 @@ When the number of parameters is large, it might be better to plot a smaller num
 The red vertical line points the estimate.
 }
 \examples{
-\dontrun{
+\donttest{
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form (similar to Kalliovirta et al. 2016).
 data(eurusd, package="gmvarkit")

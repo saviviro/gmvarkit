@@ -172,7 +172,7 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 }
 
 \examples{
-\dontrun{
+\donttest{
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the

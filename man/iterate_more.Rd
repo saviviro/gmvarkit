@@ -28,7 +28,7 @@ The purpose of \code{iterate_more} is to provide a simple and convenient tool to
   \code{gmvarkit}.
 }
 \examples{
-\dontrun{
+\donttest{
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the

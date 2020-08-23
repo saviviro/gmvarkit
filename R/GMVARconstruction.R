@@ -261,7 +261,7 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 #' @inherit GMVAR references return
 #' @inherit add_data seealso
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # These examples use the data 'eurusd' which comes with the
 #' # package, but in a scaled form.
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -327,7 +327,7 @@ swap_parametrization <- function(gmvar) {
 #' @inherit GMVAR references return
 #' @inherit add_data seealso
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # These are long running examples and use parallel computing
 #' data(eurusd, package="gmvarkit")
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -390,7 +390,7 @@ alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_err
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # These are long running examples
 #' data(eurusd, package="gmvarkit")
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])

@@ -123,7 +123,7 @@
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the
@@ -318,7 +318,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}, \code{\link{profile_logliks}}
 #' @inherit GMVAR references
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the

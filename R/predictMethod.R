@@ -30,7 +30,7 @@
 #' @seealso \code{\link{GIRF}}
 #' @inherit in_paramspace_int references
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the

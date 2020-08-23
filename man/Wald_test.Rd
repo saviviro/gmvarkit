@@ -48,7 +48,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
 }}
 
 \examples{
-\dontrun{
+\donttest{
  # Load the data
  data(eurusd, package="gmvarkit")
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

@@ -136,7 +136,7 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}},
 #'   \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # These examples use the data 'eurusd' which comes with the
 #' # package, but in a scaled form (similar to Kalliovirta et al. 2016).
 #' data(eurusd, package="gmvarkit")
