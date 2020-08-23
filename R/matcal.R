@@ -114,7 +114,7 @@ unvech <- function(d, a) {
 #' @details See the return value and Muirhead (1982), Theorem A9.9 for details.
 #' @return Returns a length \eqn{d^2 + d} vector where the first \eqn{d^2} elements
 #'   are \eqn{vec(W)} with the columns of \eqn{W} being (specific) eigenvectors of
-#'   the matrix \eqn{\Omega_2^\Omega_1^{-1}} and the rest \eqn{d} elements are the
+#'   the matrix \eqn{\Omega_2\Omega_1^{-1}} and the rest \eqn{d} elements are the
 #'   corresponding eigenvalues "lambdas". The result satisfies \eqn{WW' = Omega1} and
 #'   \eqn{Wdiag(lambdas)W' = Omega2}.
 #'
