@@ -123,7 +123,7 @@
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the
@@ -148,6 +148,7 @@
 #' W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
 #'   ncalls=10, seeds=1:10)
+#' fit12s
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
@@ -317,7 +318,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}, \code{\link{profile_logliks}}
 #' @inherit GMVAR references
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the

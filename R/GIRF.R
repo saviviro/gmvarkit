@@ -54,7 +54,7 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
 #' @inherit in_paramspace_int references
 #' @examples
-#'  \donttest{
+#'  \dontrun{
 #'  # These are long-running examples that use parallel computing.
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

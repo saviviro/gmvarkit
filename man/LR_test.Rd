@@ -42,7 +42,7 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
 }}
 
 \examples{
- \donttest{
+\dontrun{
  # Load the data
  data(eurusd, package="gmvarkit")
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

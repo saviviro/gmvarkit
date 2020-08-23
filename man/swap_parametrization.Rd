@@ -26,7 +26,7 @@ Returns an object of class \code{'gmvar'} defining the specified reduced form or
  In \code{gmvarkit}, the approximate standard errors are only available for parametrized parameters.
 }
 \examples{
-\donttest{
+\dontrun{
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form.
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])

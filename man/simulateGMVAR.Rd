@@ -57,7 +57,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
  intervals (see the forecasting example).
 }
 \examples{
- \donttest{
+ \dontrun{
  # These examples use the data 'eurusd' which comes with the
  # package, but in a scaled form.
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

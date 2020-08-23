@@ -172,7 +172,7 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
 }
 
 \examples{
-\donttest{
+\dontrun{
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the
@@ -197,6 +197,7 @@ profile_logliks(fit12)
 W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
   ncalls=10, seeds=1:10)
+fit12s
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",

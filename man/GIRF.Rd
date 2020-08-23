@@ -110,7 +110,7 @@ The model needs to be structural in order for this function to be applicable. A 
 }}
 
 \examples{
- \donttest{
+ \dontrun{
  # These are long-running examples that use parallel computing.
  data(eurusd, package="gmvarkit")
  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

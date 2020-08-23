@@ -31,7 +31,7 @@ The switch is made by simultaneously diagonalizing the two error term covariance
   \code{swap_W_signs}. These two functions work with models containing any number of regimes.
 }
 \examples{
-\donttest{
+\dontrun{
 # These are long running examples
 data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])

@@ -49,7 +49,7 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 #'  \code{\link{swap_parametrization}}
 #' @inherit GMVAR references
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ## These are long running examples that use parallel computing!
 #'
 #' # These examples use the data 'eurusd' which comes with the

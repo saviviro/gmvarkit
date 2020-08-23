@@ -24,7 +24,7 @@ The main purpose of \code{print_std_errors} is to provide a convenient tool to m
   standard errors.
 }
 \examples{
-\donttest{
+\dontrun{
 ## These are long running examples that use parallel computing!
 
 # These examples use the data 'eurusd' which comes with the

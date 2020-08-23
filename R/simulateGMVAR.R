@@ -35,7 +35,7 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
 #' @inherit in_paramspace_int references
 #' @examples
-#'  \donttest{
+#'  \dontrun{
 #'  # These examples use the data 'eurusd' which comes with the
 #'  # package, but in a scaled form.
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

@@ -22,7 +22,7 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
 #' @inherit in_paramspace_int references
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -119,7 +119,7 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
 #' @inherit in_paramspace_int references
 #' @examples
-#'  \donttest{
+#' \dontrun{
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
