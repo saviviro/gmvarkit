@@ -46,3 +46,7 @@
 * Minor computation speed improvements.
 * Non-backward-compatible change: the functions 'get_boldA_eigens' and 'get_omega_eigens' now return matrices and not lists.
 * Included the structural GMVAR model in a vignette. 
+
+# gmvarkit 1.2.1
+
+* Fixed CRAN issues concerning certain unit tests (not visible to users).
