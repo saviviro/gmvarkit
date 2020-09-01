@@ -87,5 +87,5 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
 }
 \seealso{
 \code{\link{LR_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
- \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
+ \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 }

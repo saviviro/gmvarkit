@@ -218,7 +218,7 @@ plot.gmvar <- function(x, ...) {
   # Time series and mixing weights
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
-  graphics::par(mfrow=c(2, 1), mar=c(2.5, 2.5, 2.1, 1), ask=TRUE)
+  graphics::par(mfrow=c(2, 1), mar=c(2.5, 2.5, 2.1, 1))
   colpal_ts <- grDevices::colorRampPalette(c("darkgreen", "darkblue", "darkmagenta", "red3"))(d)
   colpal_mw <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
   names_ts <- colnames(data)
@@ -233,12 +233,12 @@ plot.gmvar <- function(x, ...) {
   draw_legend(names_mw, cols=colpal_mw)
 
   # Marginal stationary distributions
+  devAskNewPage(TRUE)
   nrows <- max(ceiling(log2(d) - 1), 1)
   ncols <- ceiling(d/nrows)
   graphics::par(mfrow=c(nrows, ncols), mar=c(2.5, 2.5, 2.1, 1))
 
   alphas <- pick_alphas(p=p, M=M, d=d, params=gmvar$params)
-  gmvar$uncond_moments$uncond_mean
   means <- get_regime_means(gmvar) # Regs in cols, d in rows
   vars <- vapply(1:M, function(m) diag(get_regime_autocovs(gmvar)[, , 1, m]), numeric(d)) # Regs in cols, d in rows
   reg_dens <- function(d1, m, xx) alphas[m]*dnorm(xx, mean=means[d1, m], sd=sqrt(vars[d1, m])) # Marginal stat dens of d1:th series and m:th regime multiplied with mix weight param
@@ -256,12 +256,13 @@ plot.gmvar <- function(x, ...) {
     y1 <- max(c(data_dens$y, mod_dens))
 
     # Plot the densities
-    plot(x=data_dens$x, y=data_dens$y, xlim=c(x0, x1), ylim=c(y0, y1), main="Density",
+    plot(x=data_dens$x, y=data_dens$y, xlim=c(x0, x1), ylim=c(y0, y1), main=paste("Density:", names_ts[d1]),
          ylab="", xlab="", cex.axis=0.8, font.axis=2, type="l")
     lines(x=xpp, y=mod_dens, type="l", lty=2, lwd=2, col="darkgrey")
     for(m in 1:M) {
       lines(x=xpp, y=reg_dens(d1=d1, m=m, xx=xpp), type="l", lty=3, col=colpal_mw[m])
     }
+    if(d1 == 1) draw_legend(names_mw, cols=colpal_mw)
   }
 }
 

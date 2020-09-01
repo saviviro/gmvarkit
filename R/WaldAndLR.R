@@ -19,7 +19,7 @@
 #'   the implied constrained model would be stationary or have positive definite error term covariance matrices).
 #' @return Returns an object of class \eqn{'wald'} containing the test statistic and the related p-value.
 #' @seealso \code{\link{LR_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
-#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
+#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
 #' @examples
 #' \donttest{
@@ -116,7 +116,7 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'   Note that this function does \strong{not} verify that the two models are actually nested.
 #' @return Returns an object of class \eqn{'lr'} containing the test statistic and the related p-value.
 #' @seealso \code{\link{Wald_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
-#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
+#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
 #' @examples
 #' \donttest{

@@ -74,5 +74,6 @@ diagnostic_plot(mod222c, type="ac", maxlag=12)
 }
 \seealso{
 \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
- \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link[stats]{acf}}, \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
+ \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
+  \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
 }

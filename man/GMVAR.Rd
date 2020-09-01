@@ -156,6 +156,11 @@ Returns an object of class \code{'gmvar'} defining the specified reduced form or
 \details{
 If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
   are computed and included in the returned object.
+
+The first plot displays the time series together with estimated mixing weights.
+  The second plot displays (Gaussian) kernel density estimates of the individual series
+  together with the marginal stationary density implied by the model. The colored regimewise
+  stationary densities are multiplied with the mixing weight parameter estimates.
 }
 \section{Methods (by generic)}{
 \itemize{

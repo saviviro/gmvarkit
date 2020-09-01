@@ -74,5 +74,5 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
 }
 \seealso{
 \code{\link{Wald_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
- \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}
+ \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 }

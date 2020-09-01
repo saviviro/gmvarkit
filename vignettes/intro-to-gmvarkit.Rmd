@@ -187,7 +187,7 @@ Parameters of the estimated model are printed in an illustrative and easy to rea
 
 Graphs of the profile log-likelihood functions of the parameters around the estimates can be plotted with the function `profile_logliks`.
 
-The estimated objects have their own print, plot, and summary methods.
+The estimated objects have their own print, plot, and summary methods. In-sample conditional moments can be examined with the function `cond_moment_plot`.
 
 The function `alt_gmvar` can be used to build GMVAR model based on an arbitrary estimation round. This can be used to consider estimates pointed by local maximums instead of the ML estimate. 
 

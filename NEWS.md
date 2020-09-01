@@ -50,3 +50,8 @@
 # gmvarkit 1.2.1
 
 * Fixed CRAN issues concerning certain unit tests (not visible to users).
+
+# gmvarkit 1.2.2
+
+* The plot method of class gmvar objects now also plots marginal stationary densities along with kernel density estimates of the individual time series.
+* New exported function: 'cond_moment_plot' for plotting in-sample conditional means and variances

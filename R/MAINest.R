@@ -105,7 +105,7 @@
 #' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
 #'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
-#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}
+#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}}
 #' @references
 #'  \itemize{
 #'    \item Dorsey R. E. and Mayer W. J. 1995. Genetic algorithms for estimation problems with multiple optima,

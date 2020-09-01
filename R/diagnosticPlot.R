@@ -9,6 +9,7 @@
 #' @inheritParams simulateGMVAR
 #' @param type which type of diagnostic plot should be plotted?
 #'   \itemize{
+#'     \item{\code{"all"} all below sequentially.}
 #'     \item{\code{"series"} the quantile residual time series.}
 #'     \item{\code{"ac"} the quantile residual autocorrelation and cross-correlation functions.}
 #'     \item{\code{"ch"} the squared quantile residual autocorrelation and cross-correlation functions.}
@@ -20,7 +21,8 @@
 #'  \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is employed.
 #' @inherit quantile_residual_tests references
 #' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
-#'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link[stats]{acf}}, \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
+#'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
+#'   \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
 #' @examples
 #' # These examples use the data 'eurusd' which comes with the
 #' # package, but in a scaled form.
@@ -55,21 +57,49 @@
 #' diagnostic_plot(mod222c, type="ac", maxlag=12)
 #' @export
 
-diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=10) {
+diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=10) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   type <- match.arg(type)
   qres <- gmvar$quantile_residuals
   colnames(qres) <- colnames(as.ts(gmvar$data))
-  if(type == "series") {
+  old_par <- par(no.readonly=TRUE)
+  on.exit(par(old_par))
+  #devAskNewPage(TRUE)
+
+  if(type == "series" || type == "all") {
     plot.ts(qres, plot.type="multiple", main="Quantile residual time series", xlab=NULL)
-  } else if(type == "ac") {
-    acf(qres, lag.max=maxlag, plot=TRUE)
-  } else if(type == "ch") {
-    acf(qres^2, lag.max=maxlag, plot=TRUE)
-  } else if(type == "norm") {
-    old_par <- par(no.readonly=TRUE)
-    on.exit(par(old_par))
+
+#    par(mfrow=c(d, 1), mar=c(2.5, 2.5, 2.1, 1.1))
+#    for(d1 in 1:d)
+#    yaxt1 <- round(min(qres))
+#    yaxt2 <- round(max(qresiduals))
+#    plot(qresiduals, yaxt="n", type="l", col=rgb(0, 0, 0, 1), ylab="", xlab="", main="Quantile residuals")
+#    axis(2, at=yaxt1:yaxt2, labels=yaxt1:yaxt2)
+#    abline(h=0, col=rgb(1, 0, 0, 0.3), lwd=2)
+#    qqnorm(qresiduals, yaxt="n", ylab="", xlab="", main="Normal QQ-plot")
+#    axis(2, at=yaxt1:yaxt2, labels=FALSE)
+#    qqline(qresiduals, col=rgb(1, 0, 0, 0.8))
+#    if(type == "all") par(ask=TRUE)
+    # TÄYTYY TEHDÄ ACFILLE OMAT PLOTIT ETTÄ TOIMII DEVASKNEWPAGE OIKEIN
+  }
+  if(type == "ac" || type == "all") {
+    devAskNewPage(TRUE)
+    tmp <- acf(qres, lag.max=maxlag, plot=FALSE)
+    plot(tmp)
+    #print(tmp2)
+  }
+  if(type == "ch" || type == "all") {
+    devAskNewPage(TRUE)
+    tmp <- acf(qres^2, lag.max=maxlag, plot=FALSE)
+    plot(tmp)
+    #print(tmp2)
+  }
+  if(type == "norm" || type == "all") {
+    devAskNewPage(TRUE)
+
+ #   old_par <- par(no.readonly=TRUE)
+#   on.exit(par(old_par))
     d <- gmvar$model$d
     par(mfrow=c(2, d), mar=c(2.5, 2.5, 2.1, 1.1))
     for(i1 in 1:d) {
@@ -134,7 +164,7 @@ diagnostic_plot <- function(gmvar, type=c("series", "ac", "ch", "norm"), maxlag=
 #' @return  Only plots to a graphical device and doesn't return anything.
 #' @inherit loglikelihood references
 #' @seealso  \code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}},
-#'   \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}
+#'   \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}
 #' @examples
 #' \donttest{
 #' # These examples use the data 'eurusd' which comes with the
