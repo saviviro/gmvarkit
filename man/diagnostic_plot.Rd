@@ -4,13 +4,19 @@
 \alias{diagnostic_plot}
 \title{Quantile residual diagnostic plot for a GMVAR model}
 \usage{
-diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"), maxlag = 10)
+diagnostic_plot(
+  gmvar,
+  type = c("all", "series", "ac", "ch", "norm"),
+  maxlag = 10,
+  wait_time = 4
+)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
 \item{type}{which type of diagnostic plot should be plotted?
 \itemize{
+  \item{\code{"all"} all below sequentially.}
   \item{\code{"series"} the quantile residual time series.}
   \item{\code{"ac"} the quantile residual autocorrelation and cross-correlation functions.}
   \item{\code{"ch"} the squared quantile residual autocorrelation and cross-correlation functions.}
@@ -19,6 +25,8 @@ diagnostic_plot(gmvar, type = c("series", "ac", "ch", "norm"), maxlag = 10)
 }}
 
 \item{maxlag}{the maximum lag considered in types \code{"ac"} and \code{"ch"}.}
+
+\item{wait_time}{if \code{type == all} how many seconds to wait before showing next figure?}
 }
 \description{
 \code{diagnostic_plot} plots a multivariate quantile residual diagnostic plot

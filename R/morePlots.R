@@ -61,7 +61,7 @@ cond_moment_plot <- function(gmvar, which_moment=c("mean", "variance"), grid=FAL
   right_marg <- ifelse(which_moment == "mean", 1, 2.5)
   graphics::par(mfrow=c(d, 1), mar=c(0.5, 2.5, 2.1, right_marg))
   colpal_reg <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
-  names_ts <- colnames(data)
+  names_ts <- colnames(as.ts(data))
   names_reg <- paste0("mix.comp.", 1:M)
   make_ts <- function(dat) ts(c(rep(NA, p), dat), start=start(data), frequency=frequency(data))
 

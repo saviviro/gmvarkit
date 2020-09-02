@@ -21,9 +21,9 @@ cond_moment_plot(
 \item{...}{additional paramters passed to \code{grid(...)} plotting the grid if \code{grid == TRUE}.}
 }
 \description{
-\code{cond_moment_plot} plots the in-sample conditional means/variances of the model along with
+\code{cond_moment_plot} plots the one-step in-sample conditional means/variances of the model along with
  the individual time series contained in the model (e.g. the time series the model was fitted to). Also plots
- the regimiwise conditional means/variances multiplied with mixing weights.
+ the regimewise conditional means/variances multiplied with mixing weights.
 }
 \details{
 The conditional mean plot works best if the data contains positive values only.
