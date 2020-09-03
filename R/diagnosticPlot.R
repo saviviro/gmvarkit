@@ -54,7 +54,7 @@
 #'  1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
 #'  3.560, 9.799, 0.368)
 #' mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
-#' diagnostic_plot(mod222c)
+#' diagnostic_plot(mod222c, wait_time=0.1)
 #' diagnostic_plot(mod222c, type="ac", maxlag=12)
 #' @export
 
@@ -65,7 +65,7 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
   type <- match.arg(type)
   qres <- gmvar$quantile_residuals
   d <- gmvar$model$d
-  names_ts <- colnames(as.ts(data))
+  names_ts <- colnames(as.ts(gmvar$data))
   colnames(qres) <- names_ts
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
@@ -93,9 +93,9 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
       yaxt1 <- round(min(qres[,d1]))
       yaxt2 <- round(max(qres[,d1]))
       main <- ifelse(all.equal(d1, 1), "Quantile residual time series", "")
-      plot(qres[,d1], yaxt="n", xaxt=xaxt, type="l", col=rgb(0, 0, 0, 1), ylab="", xlab="", main=main)
+      plot(qres[,d1], yaxt="n", xaxt=xaxt, type="l", col=grDevices::rgb(0, 0, 0, 1), ylab="", xlab="", main=main)
       axis(2, at=yaxt1:yaxt2, labels=yaxt1:yaxt2)
-      abline(h=0, col=rgb(1, 0, 0, 0.3), lwd=2)
+      abline(h=0, col=grDevices::rgb(1, 0, 0, 0.3), lwd=2)
       legend("topleft", legend=names_ts[d1], bty="n", col="black", text.font=2, cex=0.65, x.intersp=0.5, y.intersp=1)
     }
 

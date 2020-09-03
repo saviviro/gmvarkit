@@ -233,7 +233,7 @@ plot.gmvar <- function(x, ...) {
   draw_legend(names_mw, cols=colpal_mw)
 
   # Marginal stationary distributions
-  devAskNewPage(TRUE)
+  grDevices::devAskNewPage(TRUE)
   nrows <- max(ceiling(log2(d) - 1), 1)
   ncols <- ceiling(d/nrows)
   graphics::par(mfrow=c(nrows, ncols), mar=c(2.5, 2.5, 2.1, 1))

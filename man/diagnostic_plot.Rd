@@ -67,7 +67,7 @@ params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
  1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
  3.560, 9.799, 0.368)
 mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
-diagnostic_plot(mod222c)
+diagnostic_plot(mod222c, wait_time=0.1)
 diagnostic_plot(mod222c, type="ac", maxlag=12)
 }
 \references{
