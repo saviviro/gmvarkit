@@ -56,3 +56,4 @@
 * The plot method of class gmvar objects now also plots marginal stationary densities along with kernel density estimates of the individual time series.
 * New exported function: 'cond_moment_plot' for plotting in-sample conditional means and variances
 * Changed 'diagnostic_plot' to automatically show all four figures by default and improved the quantile residual time series plot. 
+* Added the argument 'which_largest' to the function 'alt_gmvar'
