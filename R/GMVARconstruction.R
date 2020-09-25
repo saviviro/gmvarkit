@@ -322,6 +322,9 @@ swap_parametrization <- function(gmvar) {
 #' @inheritParams simulateGMVAR
 #' @inheritParams GMVAR
 #' @param which_round based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.
+#' @param which_largest based on estimation round with which largest log-likelihood should the model be constructed?
+#'   An integer value in 1,...,\code{ncalls}. For example, \code{which_largest=2} would take the second largest log-likelihood
+#'   and construct the model based on the corresponding estimates. If used, then \code{which_round} is ignored.
 #' @details It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
 #'   is wrapper around \code{GMVAR} that picks the correct estimates from an object returned by \code{fitGMVAR}.
 #' @inherit GMVAR references return
@@ -350,9 +353,13 @@ swap_parametrization <- function(gmvar) {
 #' }
 #' @export
 
-alt_gmvar <- function(gmvar, which_round=1, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
+alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
   stopifnot(!is.null(gmvar$all_estimates))
   stopifnot(which_round >= 1 || which_round <= length(gmvar$all_estimates))
+  if(!missing(which_largest)) {
+    stopifnot(which_largest >= 1 || which_largest <= length(gmvar$all_estimates))
+    which_round <- order(gvmar$all_logliks, decreasing=TRUE)[which_largest]
+  }
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
         constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
