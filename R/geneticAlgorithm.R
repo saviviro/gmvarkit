@@ -162,7 +162,6 @@
 #'  }
 #'  @export
 
-
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
                   lambda_scale, ar_scale=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"),

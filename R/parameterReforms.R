@@ -239,7 +239,7 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
     if(all(ord == 1:(M - 1))) {
       return(params)
     } else {
-      n_zeros <- sum(structural_pars$W == 0)
+      n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
       phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
       A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE)
       lambdas <- matrix(params[(d*M + d^2*p*M + d^2 - n_zeros + 1):(d*M + d^2*p*M + d^2 - n_zeros + d*(M - 1))],

@@ -46,7 +46,6 @@ Wvec <- function(W) {
 unWvec <- function(Wvector, d, structural_pars=NULL) {
   if(is.null(structural_pars)) stop("Structural parameters needed")
   W <- structural_pars$W
-  n_zeros <- sum(W == 0, na.rm=TRUE)
   new_W <- numeric(d^2)
   new_W[W != 0] <- Wvector
   matrix(new_W, nrow=d, byrow=FALSE)

@@ -57,3 +57,4 @@
 * New exported function: 'cond_moment_plot' for plotting in-sample conditional means and variances
 * Changed 'diagnostic_plot' to automatically show all four figures by default and improved the quantile residual time series plot. 
 * Added the argument 'which_largest' to the function 'alt_gmvar'
+* Fixed a bug that caused error when trying to estimate a structural model with more than two regimes and no zero restrictions.
