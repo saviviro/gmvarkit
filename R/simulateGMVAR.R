@@ -185,7 +185,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
 
   # Set/generate initial values
   if(is.null(init_values)) {
-    m <- sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs) # From which mixture component the initial values are drawn from?
+    m <- ifelse(length(init_regimes) == 1 && init_regimes != 1, init_regimes, sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs)) # From which mixture component the initial values are drawn from?
     mu <- rep(all_mu[, m], p)
     L <- t(chol(Sigmas[, , m]))
     init_values <- matrix(mu + L%*%rnorm(d*p), nrow=p, ncol=d, byrow=TRUE)
