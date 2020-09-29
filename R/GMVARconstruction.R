@@ -358,7 +358,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   stopifnot(which_round >= 1 || which_round <= length(gmvar$all_estimates))
   if(!missing(which_largest)) {
     stopifnot(which_largest >= 1 || which_largest <= length(gmvar$all_estimates))
-    which_round <- order(gvmar$all_logliks, decreasing=TRUE)[which_largest]
+    which_round <- order(gmvar$all_logliks, decreasing=TRUE)[which_largest]
   }
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
