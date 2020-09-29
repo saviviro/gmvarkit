@@ -161,7 +161,7 @@ plot.girf <- function(x, add_grid=FALSE, ...) {
     point_est <- girf_i1$point_est[, resp_ind]
     conf_ints <- girf_i1$conf_ints[, , resp_ind]
     plot(x=0:(length(point_est) - 1), y=point_est, type="l", ylim=c(min(0, min(conf_ints)), max(0, max(conf_ints))),
-         main=main, ylab="", xaxt=xaxt, lwd=2, col="blue")
+         main=main, ylab="", xlab="", xaxt=xaxt, lwd=2, col="blue")
     title(ylab=ylab, line=4, cex.lab=1, font.lab=2)
     if(add_grid) grid(...)
 
