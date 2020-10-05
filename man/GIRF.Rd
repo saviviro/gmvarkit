@@ -33,9 +33,9 @@ and elements in \eqn{1,...,d} specifying the variables for which the GIRF
 should be estimated.}
 
 \item{shock_size}{a vector with the same length as \code{variables} specifying
-the size of the structural shock for each variable. By default, the size of one standard
-deviation is used, calculated as the weighted average of the component process error term
-standard deviations with weights given by the mixing weight parameters.}
+the size of the structural shock for each variable. By default, the shock size is
+one, which is then amplified by the B-matrix according to the conditional standard deviation
+of the model.}
 
 \item{N}{a positive integer specifying the horizon how far ahead should the generalized
 impulse responses be calculated?}

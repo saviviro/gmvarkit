@@ -42,6 +42,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structura
   if(is.null(constraints)) { # For SGMVAR model with constrained structural parameters but no AR constraints
     q <- M*p*d^2
     psi_expanded <- params[(d*M + 1):(d*M + d^2*p*M)] # AR coefficients (without constraints)
+    psiNA <- FALSE
   } else {
     q <- ncol(constraints)
     psi <- params[(M*d + 1):(M*d + q)]

@@ -9,9 +9,9 @@
 #'   and elements in \eqn{1,...,d} specifying the variables for which the GIRF
 #'   should be estimated.
 #' @param shock_size a vector with the same length as \code{variables} specifying
-#'   the size of the structural shock for each variable. By default, the size of one standard
-#'   deviation is used, calculated as the weighted average of the component process error term
-#'   standard deviations with weights given by the mixing weight parameters.
+#'   the size of the structural shock for each variable. By default, the shock size is
+#'   one, which is then amplified by the B-matrix according to the conditional standard deviation
+#'   of the model.
 #' @param N a positive integer specifying the horizon how far ahead should the generalized
 #'   impulse responses be calculated?
 #' @param R1 the number of repetitions used to estimate GIRF for each initial value?
@@ -121,16 +121,7 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
 
   # Calculate shock sizes if not specified
   if(missing(shock_size)) {
-    params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
-                                      structural_pars=gmvar$model$structural_pars)
-    structural_pars <- get_unconstrained_structural_pars(gmvar$model$structural_pars)
-    all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-    alphas <- pick_alphas(p=p, M=M, d=d, params=params)
-    shock_size_tmp <- matrix(nrow=M, ncol=d)
-    for(m in 1:M) {
-      shock_size_tmp[m,] <- diag(all_Omega[, , m])*alphas[m]
-    }
-    shock_size <- colMeans(shock_size_tmp)
+    shock_size <- rep(1, times=length(variables))
   } else {
     stopifnot(length(shock_size) == length(variables))
   }
