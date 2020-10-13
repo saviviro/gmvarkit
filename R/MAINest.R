@@ -142,12 +142,10 @@
 #' profile_logliks(fit12)
 #'
 #' # Structural GMVAR(1,2) model identified with sign
-#' # constraints. The sign constraints (which fully identify
-#' # the shocks) are in line with the reduced form model,
-#' # so the maximized loglikelihood is the same.
-#' W_122 <- matrix(c(1, NA, -1, 1), nrow=2)
+#' # constraints.
+#' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=10, seeds=1:10)
+#'   ncalls=16, seeds=1:16)
 #' fit12s
 #'
 #' # GMVAR(2,2) model with mean parametrization
@@ -338,9 +336,9 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints. Only 10 iterations of the variable metric
 #' # algorithm
-#' W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+#' W_122 <- matrix(c(1, -1, 1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=10, maxit=10, seeds=1:10)
+#'   ncalls=16, maxit=10, seeds=1:16)
 #' fit12s
 #'
 #' # Iterate more:

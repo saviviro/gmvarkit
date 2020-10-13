@@ -79,9 +79,9 @@ predict(fitc, n_ahead=10)
 ## Structural GMVAR model ##
 
 # Estimate structural GMVAR(2,2) model identified with sign constraints:
-W_22 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
-fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-                   ncalls=16, seeds=1:16)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
+                   ncalls=40, seeds=1:40)
 fit22s
 
 # Estimate generalized impulse response function (GIRF) with starting values
@@ -91,7 +91,7 @@ plot(girf1)
 
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
-girf2 <- GIRF(fit22s, N=60, init_values=fit22s$data)
+girf2 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
 plot(girf2)
 
 # Test with Wald test whether the lambda parameters (of the second regime)

@@ -28,25 +28,25 @@
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #'  colnames(data) <- colnames(eurusd)
 #'
-#'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#'  W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
+#'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
 #'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=1, seeds=1)
+#'                      ncalls=1, seeds=16)
 #'  fit222s
 #'
 #'  # Test whether the lambda parameters (of the second regime) are identical:
-#'  # fit222s has parameter vector of length 27 with the lambda parameters
-#'  # in elements 25 and 26.
-#'  A <- matrix(c(rep(0, times=24), 1, -1, 0), nrow=1, ncol=27)
+#'  # fit222s has parameter vector of length 26 with the lambda parameters
+#'  # in elements 24 and 25.
+#'  A <- matrix(c(rep(0, times=23), 1, -1, 0), nrow=1, ncol=26)
 #'  c <- 0
 #'  Wald_test(fit222s, A, c)
 #'
 #'  # Test whether the off-diagonal elements of the first regime's first
 #'  # AR coefficient matrix (A_11) are both zero:
-#'  # fit222s has parameter vector of length 27 and the off-diagonal elements
+#'  # fit222s has parameter vector of length 26 and the off-diagonal elements
 #'  # of the 1st regime's 1st AR coefficient matrix are in the elements 6 and 7.
-#'  A <- rbind(c(rep(0, times=5), 1, rep(0, times=21)),
-#'             c(rep(0, times=6), 1, rep(0, times=20)))
+#'  A <- rbind(c(rep(0, times=5), 1, rep(0, times=20)),
+#'             c(rep(0, times=6), 1, rep(0, times=19)))
 #'  c <- c(0, 0)
 #'  Wald_test(fit222s, A, c)
 #' }
@@ -125,17 +125,17 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #'  colnames(data) <- colnames(eurusd)
 #'
-#'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#'  W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
+#'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
 #'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=1, seeds=1)
+#'                      ncalls=1, seeds=16)
 #'
 #'  # The same model but the AR coefficients restricted to be the same
 #'  # in both regimes:
 #'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 #'  fit222sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
 #'                       structural_pars=list(W=W_222),
-#'                       ncalls=1, seeds=1)
+#'                       ncalls=1, seeds=16)
 #'
 #'  # Test whether the constraints are supported by the data:
 #'  LR_test(fit222s, fit222sc)

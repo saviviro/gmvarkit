@@ -48,9 +48,9 @@ fit12_2
 # Structural GMVAR(1,2) model identified with sign
 # constraints. Only 10 iterations of the variable metric
 # algorithm
-W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+W_122 <- matrix(c(1, -1, 1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-  ncalls=10, maxit=10, seeds=1:10)
+  ncalls=16, maxit=10, seeds=1:16)
 fit12s
 
 # Iterate more:

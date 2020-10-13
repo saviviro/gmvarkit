@@ -61,3 +61,7 @@
 * Fixed a bug that caused error when trying to estimate a structural model with more than two regimes and no zero restrictions.
 * Fixed a bug that caused error when estimating GIRF with only one initial regime that is not the first regime.
 * Fixed a bug that caused error when printing standard errors of a SGMVAR model with constraints on the lambda parameters.
+
+# gmvarkit 1.2.3
+
+* Updated some of the examples, readme, and vignette.

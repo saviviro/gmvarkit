@@ -60,7 +60,7 @@ get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept",
 #' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
 #'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
 #'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 #' mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
 #' mod222s
 #' get_regime_means(mod222s)
@@ -144,7 +144,7 @@ get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, structura
 #' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
 #'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
 #'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 #' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, structural_pars=list(W=W_222))
 #' get_regime_autocovs(mod222s)
 #' @export
@@ -232,7 +232,7 @@ uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "
 #' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
 #'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
 #'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-#' W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 #' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, structural_pars=list(W=W_222))
 #' uncond_moments(mod222s)
 #' @export

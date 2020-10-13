@@ -91,7 +91,7 @@ p3
 params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
  structural_pars=list(W=W_222))
 p1 <- predict(mod222s, n_ahead=10)

@@ -38,7 +38,7 @@ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
 # Reduced form GMVAR(1,2) model
-fit12 <- fitGMVAR(data, 1, 2, ncalls=1, seeds=3)
+fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=3)
 
 # Form a structural model based on the reduced form model:
 mod12s <- gmvar_to_sgmvar(fit12)

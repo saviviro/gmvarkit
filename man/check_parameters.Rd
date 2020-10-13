@@ -123,7 +123,7 @@ check_parameters(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
+W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 check_parameters(p=2, M=2, d=2, params=params222s,
  structural_pars=list(W=W_222))
 }

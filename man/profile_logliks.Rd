@@ -85,7 +85,7 @@ profile_logliks(fit12)
 
 # Structural GMVAR(1,2) model identified with sign
 # constraints.
-W_122 <- matrix(c(1, -1, NA, 1), nrow=2)
+W_122 <- matrix(c(1, -1, 1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
   ncalls=10, seeds=1:10)
 profile_logliks(fit12s)
