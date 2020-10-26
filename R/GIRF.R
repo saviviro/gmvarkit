@@ -9,7 +9,8 @@
 #'   and elements in \eqn{1,...,d} specifying the variables for which the GIRF
 #'   should be estimated.
 #' @param shock_size a vector with the same length as \code{variables} specifying
-#'   the size of the structural shock for each variable. By default, the shock size is
+#'   the size of the structural shock for each variable. Alternatively, is a scalar
+#'   value that specifies a common shock size for all variables. By default, the shock size is
 #'   one, which is then amplified by the B-matrix according to the conditional standard deviation
 #'   of the model.
 #' @param N a positive integer specifying the horizon how far ahead should the generalized
@@ -124,7 +125,8 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
   if(missing(shock_size)) {
     shock_size <- rep(1, times=length(variables))
   } else {
-    stopifnot(length(shock_size) == length(variables))
+    stopifnot(length(shock_size) == length(variables) | length(shock_size) == 1)
+    if(length(shock_size) == 1) shock_size <- rep(shock_size, times=length(variables))
   }
 
 

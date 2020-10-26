@@ -266,7 +266,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
 
         if(M == 1) {
           alpha_mt2 <- 1
-        } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
+        } else if(any(log_mvnvalues2 < epsilon)) { # If some values are too close to zero use the package Brobdingnag
           numerators2 <- get_numeratorsL(log_mvnvalues2)
           denominator2 <- get_demoninatorL(numerators2)
           alpha_mt2 <- get_alpha_mtL(numerators=numerators2, denominator=denominator2)

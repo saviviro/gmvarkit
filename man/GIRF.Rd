@@ -33,7 +33,8 @@ and elements in \eqn{1,...,d} specifying the variables for which the GIRF
 should be estimated.}
 
 \item{shock_size}{a vector with the same length as \code{variables} specifying
-the size of the structural shock for each variable. By default, the shock size is
+the size of the structural shock for each variable. Alternatively, is a scalar
+value that specifies a common shock size for all variables. By default, the shock size is
 one, which is then amplified by the B-matrix according to the conditional standard deviation
 of the model.}
 

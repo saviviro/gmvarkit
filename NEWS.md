@@ -65,3 +65,4 @@
 # gmvarkit 1.2.3
 
 * Updated some of the examples, readme, and vignette.
+* Fixed a bug that caused error in estimation of GIRF with very large shock size.
