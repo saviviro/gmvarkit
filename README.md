@@ -79,10 +79,24 @@ predict(fitc, n_ahead=10)
 ## Structural GMVAR model ##
 
 # Estimate structural GMVAR(2,2) model identified with sign constraints:
-W_22 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
-fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-                   ncalls=16, seeds=1:16)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
+                   ncalls=40, seeds=1:40)
 fit22s
+
+# Alternatively, if there are two regimes (M=2), a stuctural model can 
+# be build based on the reduced form model:
+fit22s_2 <- gmvar_to_sgmvar(fit)
+fit22s_2
+
+# Columns of the matrix W can be permutated and all signs in any column
+# can be swapped without affecting the implied reduced form model, as 
+# long as the lambda parameters are also rearranged accordingly: 
+fit22s_3 <- reorder_W_columns(fit22s_2, perm=c(2, 1))
+fit22s_3
+
+fit22s_4 <- swap_W_signs(fit22s_3, which_to_swap=1)
+fit22s_4
 
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
@@ -91,7 +105,7 @@ plot(girf1)
 
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
-girf2 <- GIRF(fit22s, N=60, init_values=fit22s$data)
+girf2 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
 plot(girf2)
 
 # Test with Wald test whether the lambda parameters (of the second regime)

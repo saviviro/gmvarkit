@@ -84,6 +84,20 @@ fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
                    ncalls=40, seeds=1:40)
 fit22s
 
+# Alternatively, if there are two regimes (M=2), a stuctural model can 
+# be build based on the reduced form model:
+fit22s_2 <- gmvar_to_sgmvar(fit)
+fit22s_2
+
+# Columns of the matrix W can be permutated and all signs in any column
+# can be swapped without affecting the implied reduced form model, as 
+# long as the lambda parameters are also rearranged accordingly: 
+fit22s_3 <- reorder_W_columns(fit22s_2, perm=c(2, 1))
+fit22s_3
+
+fit22s_4 <- swap_W_signs(fit22s_3, which_to_swap=1)
+fit22s_4
+
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
 girf1 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), R1=200, R2=200)
