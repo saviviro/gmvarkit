@@ -263,7 +263,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       if(parametrization == "intercept") {
         ind <- change_parametrization(p=p, M=M, d=d, params=ind, constraints=constraints, structural_pars=structural_pars, change_to="mean")
       }
-      initpop[[i1]] <- sort_components(p=p, M=M, d=d, params=ind, structural_pars=structural_pars)
+      if(is.null(constraints)) {
+        initpop[[i1]] <- sort_components(p=p, M=M, d=d, params=ind, structural_pars=structural_pars)
+      } else {
+        initpop[[i1]] <- ind
+      }
     }
     G <- replicate(popsize, initpop[[sample.int(length(initpop), size=1)]])
   }
