@@ -105,9 +105,10 @@ Based on Theorem 1 $\alpha_m$ has the interpretation as the unconditional probab
 As noted, the mixing weights $\alpha_{m,t}$ are the conditional probabilities for the random vector $y_t$ being generated from the $m$th mixture component. According the definition of the mixing weights, regimes with higher likelihood of the past $p$ observations are more likely to generate the new observations but the likelihoods are also scaled with the mixing weight parameters $\alpha_m$. 
 
 ### Properties of the maximum likelihood estimator
-Under general conditions (see Kalliovirta et al. 2016, Assumption 1), the maximum likelihood estimator for the parameters of the GMVAR model is strongly consistent.
 
-Under general conditions (namely, Assumptions 1 and 2 in Kalliovirta et al. 2016), the maximum likelihood estimator has the conventional limiting distribution (normal).  
+1. Under general conditions (see Kalliovirta et al. 2016, Assumption 1), the maximum likelihood estimator for the parameters of the GMVAR model is strongly consistent.
+
+2. Under general conditions (namely, Assumptions 1 and 2 in Kalliovirta et al. 2016), the maximum likelihood estimator has the conventional limiting distribution (normal).  
 
 ## Parameter vectors and unconstrained models
 In this section, we cover the notation for parameter vectors (the same as in Kalliovirta et al. 2016 for unconstrained models) and explain how to impose linear constraints in `gmvarkit`. Knowledge of the form of the parameter vector is required for creating GMVAR models without estimation with prespecified parameter values or for setting up initial population for the genetic algorithm, but it is not required for estimation and basic analysis of the models. The form of the parameter vector depends on whether an unconstrained or constrained model is considered. 
