@@ -15,6 +15,7 @@ GIRF(
   R2 = 250,
   init_regimes = 1:M,
   init_values = NULL,
+  which_cumulative,
   ci = c(0.95, 0.8),
   include_mixweights = TRUE,
   ncores = min(2, parallel::detectCores()),
@@ -59,6 +60,9 @@ of the \eqn{m}th regime. Ignored if \code{init_value} is specified.}
 \item{init_values}{a matrix or a multivariate class \code{'ts'} object with \eqn{d} columns
 and at least \eqn{p} rows specifying an initial value for the GIRF. The last \eqn{p} rows
 are taken to be the initial value assuming that the \strong{last} row is the most recent observation.}
+
+\item{which_cumulative}{a numeric vector with values in \eqn{1,...,d} (\code{d=ncol(data)}) specifying
+which the variables for which the impulse responses should be cumulative. Default is none.}
 
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the confidence levels of the
 confidence intervals.}

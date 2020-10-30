@@ -305,6 +305,11 @@ print.girf <- function(x, ..., digits=2, N_to_print) {
   } else {
     stopifnot(N_to_print %in% 1:nrow(girf_res[[1]]$point_est))
   }
+  if(length(girf$which_cumulative) > 0) {
+    cat(paste0("The responses of the variable(s) ",
+               paste0(dimnames(girf$girf_res[[1]]$point_est)[[2]][girf$which_cumulative], collapse=", "),
+               " were accumulated."), "\n\n")
+  }
 
   for(i1 in 1:length(girf_res)) {
     if(i1 > 1) cat("------------------------\n")
@@ -315,6 +320,7 @@ print.girf <- function(x, ..., digits=2, N_to_print) {
       df <- as.data.frame(lapply(1:ncol(girf_i1$conf_ints[, , i2]), function(i3) format_value(girf_i1$conf_ints[, i3, i2])))
       q <- dimnames(girf_i1$conf_ints)[[2]]
       names(df) <- q
+
       df[, "mean"] <- format_value(girf_i1$point_est[, i2])
       new_order <- as.character(c(q[1:(length(q)/2)], "mean", q[(length(q)/2 + 1):length(q)]))
       print(utils::head(df[, new_order], n=N_to_print + 1))
