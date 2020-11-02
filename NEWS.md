@@ -64,7 +64,7 @@
 
 # gmvarkit 1.2.3
 
-* The function GIRF now enables to calculate cumulative GIRFs to some variables directly.
+* The function GIRF now enables to directly calculate cumulative impulse responses.
 * Updated some of the examples, readme, and vignette.
 * Fixed a bug that caused error in estimation of GIRF with very large shock size.
 * Fixed a bug that caused error in estimation of AR constrained models when initial population is used in the genetic algorithm.

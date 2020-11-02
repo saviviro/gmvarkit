@@ -250,7 +250,7 @@ which simultaneously diagonalizes $\Omega_1,...,\Omega_M$, and $\Omega_{u,t}$ fo
 Even if all pairs of $\lambda_{mi}$ are distinct for some $m$, unique identification of $B_t$ requires deciding upon the ordering of $\lambda_{mi}$ in the diagonals of $\Lambda_m$ which fixes also the ordering of the columns of $W$. With an arbitrary ordering of the eigenvalues and eigenvectors, it is not guaranteed that the structural shocks have economic interpretations. However, after the statistical identification, overidentifying restrictions that lead economically interpretable structural shocks can be tested and thus validated statistically. Furthermore, it turns out that globally unique identification of the structural shocks can often be achieved with less restrictive constraints than in conventional SVAR models. The following proposition gives sufficient and necessary conditions for global identification of the shocks when all pairs of $\lambda_{mi}$ are distinct for some $m$.
 
 #### Proposition 1
-Suppose $\Omega_1=WW'$ and $\Omega_m=W\Lambda_mW', \ \ m=2,...,M,$ where $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of $\Omega_m\Omega_1^{-1}$ in the diagonal and the columns of the nonsingular $W$ are the related eigenvectors. Then, the last $d_1$ structural shocks are uniquely identified if 
+Suppose $\Omega_1=WW'$ and $\Omega_m=W\Lambda_mW', \ \ m=2,...,M,$ where $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of $\Omega_m\Omega_1^{-1}$ in the diagonal and the columns of the nonsingular $W$ are the related eigenvectors. Then, the last $d_1$ structural shocks are uniquely identified^[We say that the $j$th structural shock is uniquely identified the $j$th column of the B-matri is unique for given mixing weights $\alpha_{1,t},...,\alpha_{M,t}$. This requires that the $j$th column of $W$ and $\Lambda_m$, $m=2,..,M$, are unique. Identification of all the shocks is thus equivalent to uniqueness of the employed decomposition of $\Omega_1,...,\Omega_M$. Note that the economic shock to which the $j$th structural shock relates to does not depend on any particular ordering of the structural shocks but instead on the specific constraints that only the shock of interest satisfies.] if 
 
 1. for all $j\geq d_1$ and $i\neq j$ there exists an $m\in \lbrace 2,...,M \rbrace$ such that $\lambda_{mi} \neq \lambda_{mj}$,
 
@@ -258,10 +258,10 @@ Suppose $\Omega_1=WW'$ and $\Omega_m=W\Lambda_mW', \ \ m=2,...,M,$ where $\Lambd
 
 3. there is at least one (strict) sign constraint in each of the last $d_1$ columns of $W$.
 
-\noindent Notice that changing all signs in a column of $W$ merely switches the sign of the corresponding shock and condition (3) of Proposition \ref{prop:ident1} can therefore be always satisfied without loss of generality. The assumption that the identified shocks are the last $d_1$ shocks is neither restrictive as one may always reordering the variables accordingly. 
+\noindent Notice that changing all signs in a column of $W$ merely switches the sign of the corresponding shock and condition (3) of Proposition \ref{prop:ident1} can therefore be always satisfied without loss of generality. The assumption that the identified shocks are the last $d_1$ shocks is neither restrictive as one may always reordering the variables (or just the structural shocks) accordingly. 
 
 For example, if $d=3$, $\lambda_{m1}\neq\lambda_{m3}$ for some $m$, and $\lambda_{m2}\neq\lambda_{m3}$ for some $m$, the third structural shock can be identified with the following constraints:
-\begin{equation}\label{eq:exampleconstraints}
+$$
 B_t=\begin{bmatrix}
 * & * & *    \\
 + & + &  - \\
@@ -279,46 +279,44 @@ B_t=\begin{bmatrix}
 * & * & *  \\
 + & * & + \\
 \end{bmatrix}
-\end{equation} 
-and so on, where $"*"$ signifies that the element is not constrained, $"+"$ denotes strict positive and $"-"$ a strict negative sign constraint, and $"0"$ means that the element is constrained to zero. Because imposing zero or sign constraints on $W$ equals to placing them on $B_t$, they may be justified economically. Furthermore, besides a single sign constraint in each column, the constraints are overidentifying and can thus be also justified statistically. Sign constraints, however, don't reduce the dimension of the parameter space, making some of the measures such as the conventional likelihood ratio test and information criteria unsuitable for testing them. Quantile residual diagnostics, on the other hand, can be used to evaluate how well the restricted model is able to encapsulate the statistical properties of the data compared to the unrestricted alternative.
+$$ 
+and so on, where $"*"$ signifies that the element is not constrained, $"+"$ denotes strict positive and $"-"$ a strict negative sign constraint, and $"0"$ means that the element is constrained to zero. Because imposing zero or sign constraints on $W$ equals to placing them on $B_t$, they may be justified economically. Furthermore, besides a single sign constraint in each column, the constraints are over-identifying and can thus be also justified statistically. Sign constraints, however, don't reduce the dimension of the parameter space, making some of the measures such as the conventional likelihood ratio test and information criteria unsuitable for testing them. Quantile residual diagnostics, on the other hand, can be used to evaluate how well the restricted model is able to encapsulate the statistical properties of the data compared to the unrestricted alternative.
 
-Shocks that don't satisfy the condition (1) of Proposition \ref{prop:ident1} can still be identified but it requires stronger conditions. The following proposition provides sufficient criteria for global identification of the shocks when exactly one of the eigenvalues $\lambda_{mi},\ i\neq j \geq d_1$ is identical to $\lambda_{mj}$ in all $m$.
+Shocks that don't satisfy the condition (1) of Proposition 1 can still be identified but it requires stronger conditions. The following proposition provides sufficient criteria for global identification of the last $d_1$ shocks when exactly one of the eigenvalues $\lambda_{mi}$ with $i\neq j > d - d_1$ is identical to $\lambda_{mj}$ in all $m$. For simplicity, we assume that only another one the shocks with identical eigenvalues is to be identified.
 
 #### Proposition 2
-Consider the matrix decomposition of Proposition \ref{prop:ident1} and further suppose that $\lambda_{mi}=\lambda_{mj}$ for some $i\neq j  \geq d_1$ and all $m$, but for all $l$ that are not included in $\lbrace i,j \rbrace$, $\lambda_{ml}\neq\lambda_{mj}$ for some $m$. Then, the last $d_1$ structural shocks are uniquely identified if conditions (1)-(3) of Proposition \ref{prop:ident1} are otherwise satisfied, and in addition
+Let $d_1<d$. Consider the matrix decomposition of Proposition 1 and further suppose that for $j=d-d_1+1$ and some $i\leq d-d_1$ we have $\lambda_{mi}=\lambda_{mj}$ for all $m$, but for all $l\centernot\in\lbrace i,j \rbrace$, $\lambda_{ml}\neq\lambda_{mj}$ for some $m$. Then, the last $d_1$ structural shocks are uniquely identified if conditions (1)-(3) of Proposition 1 are otherwise satisfied, and in addition
 
-4. the column $i\neq j$ of $W$ such that $\lambda_{mi}=\lambda_{mj}$ for all $m$ has at least one (strict) sign constraint and the $j$th column has a zero constraint where the $i$th column has the (strict) sign constraint. 
+4. the column $i\leq d-d_1$ of $W$ such that $\lambda_{mi}=\lambda_{mj}$ for all $m$ has at least one (strict) sign constraint and the $j$th column has a zero constraint where the $i$th column has the (strict) sign constraint. 
 
-\noindent Note that identification of several shocks with Proposition \ref{prop:ident2} allows for multiple pairs of identical eigenvalues $\lambda_{mi}$ but no more than two of them can be identical in all $m$.
+\noindent Note that the assumption $j=d-d_1+1$ is made without loss of generality as the structural shocks can always be reordered accordingly by also reordering the columns of $W$ (including the constraints) and the eigenvalues $\lambda_{mi}$ correspondingly.^[While the assumptions in Propositions 1 and \ref{prop:ident2} regarding the ordering of the shocks are not restrictive, they can also be relaxed to allow for any ordering and are made here for simplicity only.]
 
-__Note: condition (4) of Proposition 2 is more relaxed here than in the cited arXiv paper Virolainen (2020, version 2). This more relaxed condition will be updated to the paper in later versions.__
-
-To exemplify, if $d=4$, $\lambda_{m1}=\lambda_{m2}$ for all $m$, $\lambda_{m2}\neq\lambda_{m3}$ for some $m$, $\lambda_{m2}\neq\lambda_{m4}$ for some $m$, and $\lambda_{m3}\neq\lambda_{m4}$ for some $m$, the following constraints lead to global identification of all the shocks:
+To exemplify, if $d=4$, $\lambda_{m1}\neq\lambda_{m4}$ for some $m$, $\lambda_{m2}\neq\lambda_{m4}$ for some $m$, and $\lambda_{m3}=\lambda_{m4}$ for all $m$, the following constraints lead to global identification of last shock:
 $$
 B_t=\begin{bmatrix}
 * & * & * & *\\
-* & * & * & *\\
-+ & 0 & + & -\\
-0 & + & + & +\\
+* & * & + & 0\\
++ & + & * & -\\
++ & + & * & +\\
 \end{bmatrix}
 \ \text{or} \
 \begin{bmatrix}
+* & * & - & 0\\
 * & * & * & *\\
-* & * & * & *\\
-0 & - & + & +\\
-- & 0 & + & -\\
++ & - & * & +\\
+- & + & * & +\\
 \end{bmatrix}
 \ \text{or} \
 \begin{bmatrix}
-+ & 0 & - & -\\
++ & - & - & 0\\
 * & * & * & *\\
-0 & - & + & -\\
 * & * & * & *\\
+* & * & * & +\\
 \end{bmatrix}
 $$
-and so on. 
+and so on. As is demonstrated above, the structural shocks can often be identified with less restrictive or more suitable constraints than in a conventional SVAR model even when some of the eigenvalues are identical for all covariance matrices.
 
-The conditions of Proposition 2 are not in general necessary. If $d=2$ and $\lambda_{m1}=\lambda_{m2}$ for all $m$, for instance, identification (of all shocks) with Cholesky decomposition leads to unique solution with less restrictive constraints than the ones required in Proposition 2. More generally, if all the eigenvalues are the same for all covariance matrices, then $\Omega_m=\lambda_{m1}\Omega_1$ and the necessary identification condition is the same as for the conventional SVAR model. If more than two eigenvalues are identical for all $m=2,...,M$ but they are not all identical, it may still be possible to find less restrictive (or more suitable) conditions for identification of the shocks. Specifically, the idea utilized in the proof of Proposition 2 (presented in an Appendix in Virolainen (2020)) generalizes to larger numbers of identical eigenvalues, but the sufficient conditions become increasingly more complicated and are not presented for brevity. As a general remark, observe that constraining an element of $B_t$ to be any constant other than zero is infeasible because all elements in the B-matrix are either zero or time varying due to the time-varying mixing weights.
+If more than two eigenvalues are identical for all $m=2,...,M$ but they are not all identical, it may still be possible to find less restrictive (or more suitable) conditions for identification of the shocks. Specifically, the idea utilized in the proof of Proposition 2 (presented in an Appendix of Virolainen (2020)) can be applied to larger numbers of identical eigenvalues. If all the eigenvalues are identical for all covariance matrices, then $\Omega_m=\lambda_{m1}\Omega_1$ and the necessary identification condition is the same as for the conventional SVAR model. As a general remark, observe that constraining an element of $B_t$ to be any constant other than zero is infeasible because all elements in the B-matrix are either zero or time varying due to the time-varying mixing weights.
 
 ## Estimation of the structural GMVAR model
 The SGMVAR model is estimated similarly to the reduced form version, expect that the model is parametrized with $W$ and $\lambda_{mi}$, $m=2,...,M$, $i=1,...,d$ instead of the covariance matrices $\Omega_{m}$, $m=1,...,M$. The estimation is can be done with the function `fitGMVAR` but now the argument `structural_pars` needs to be supplied with a list providing the constraints on $W$ (which equally imposes the constraints on the B-matrix) and optionally linear constraints on the $\lambda_{mi}$ parameters. 
