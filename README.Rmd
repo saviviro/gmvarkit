@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of gmvarkit is to provide tools to analyse the Gaussian mixture vector autoregressive (GMVAR) model. `gmvarkit` provides functions for unconstrained and constrained maximum likelihood estimation of the model parameters, quantile residual based model diagnostics, simulation from the processes, and forecasting.
+The goal of gmvarkit is to provide tools to analyse structural and reduced form Gaussian mixture vector autoregressive (GMVAR) model. `gmvarkit` provides functions for unconstrained and constrained maximum likelihood estimation of the model parameters, quantile residual based model diagnostics, simulation from the processes, forecasting, estimation of generalized impulse response function, and more.
 
 ## Installation
 
@@ -38,7 +38,7 @@ devtools::install_github("saviviro/gmvarkit")
 Simple example
 --------------
 
-This is a basic example how to estimate a GMVAR model to data. The example data is the same that is used by Kalliovirta et al. (2016) in their paper introducing the GMVAR model. The estimation process is computationally demanding and takes advantage of parallel computing. After estimating the model, it's shown by simple examples how to conduct some further analysis.
+This is a basic example on how to use `gmvarkit` in time series analysis. The example data is the same that is used by Kalliovirta et al. (2016) in their paper introducing the GMVAR model. The estimation process is computationally demanding and takes advantage of parallel computing. After estimating the model, it is shown by simple examples how to conduct some further analysis.
 
 ``` r
 # These examples use the data 'eurusd' which comes with the package, but in a scaled form.
@@ -66,11 +66,11 @@ get_soc(fitc) # The second order condition (eigenvalues of approximated Hessian)
 profile_logliks(fitc) # Profile log-likelihood functions
 
 # Quantile residual diagnostics
-diagnostic_plot(fitc, type="series") # type=c("series", "ac", "ch", "norm")
-qrt <- quantile_residual_tests(fitc)
+diagnostic_plot(fitc) # type=c("all", "series", "ac", "ch", "norm")
+qrt <- quantile_residual_tests(fitc, nsimu=10000)
 
-# Simulate a sample path form the estimated process
-sim <- simulateGMVAR(fitc, nsimu=10)
+# Simulate a sample path from the estimated process
+sim <- simulateGMVAR(fitc, nsimu=100)
 
 # Forecast future values of the process
 predict(fitc, n_ahead=10)
@@ -103,10 +103,15 @@ fit22s_4
 girf1 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), R1=200, R2=200)
 plot(girf1)
 
+# Estimate GIRF with starting values generated from the stationary distribution
+# of the first regime:
+girf2 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), init_regimes=1, R1=200, R2=200)
+plot(girf2)
+
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
-girf2 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
-plot(girf2)
+girf3 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
+plot(girf3)
 
 # Test with Wald test whether the lambda parameters (of the second regime)
 # are identical:

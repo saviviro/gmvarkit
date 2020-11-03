@@ -34,7 +34,7 @@ quantile_residual_tests(
 
 \item{nsimu}{to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-of simulations might improve the tests size properties but increase the computation time.}
+of simulations might improve the tests size properties but it increases the computation time.}
 
 \item{print_res}{should the test results be printed while computing the tests?}
 }

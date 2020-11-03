@@ -147,6 +147,13 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
  use the found estimates as starting values for the genetic algorithm and and employ another round of estimation
  (see \code{?GAfit} how to set up an initial population with the dot parameters).
 
+ \strong{If the estimation algorithm fails to create an initial population for the genetic algorithm},
+ it usually helps to scale the individual series so that the AR coefficients (of a VAR model) will be
+ relative small, preferably less than one. Even if one is able to create an initial population, it should
+ be preferred to scale the series so that most of the AR coefficients will not be very large, as the
+ estimation algorithm works better with small AR coefficients. If needed, another package can be used
+ to fit linear VARs to the series to see which scaling of the series results in relatively small AR coefficients.
+
  The code of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)} but it
  includes some extra features that were found useful for this particular estimation problem. For instance,
  the genetic algorithm uses a slightly modified version of the individually adaptive crossover and mutation

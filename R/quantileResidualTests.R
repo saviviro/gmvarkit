@@ -9,7 +9,7 @@
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
-#'   of simulations might improve the tests size properties but increase the computation time.
+#'   of simulations might improve the tests size properties but it increases the computation time.
 #' @param print_res should the test results be printed while computing the tests?
 #' @return Returns an object of class \code{'qrtest'} which has its own print method. The returned object
 #'   is a list containing the quantile residual test results for normality, autocorrelation, and conditional
