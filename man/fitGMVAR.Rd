@@ -14,7 +14,7 @@ fitGMVAR(
   structural_pars = NULL,
   ncalls = round(10 + 9 * log(M)),
   ncores = min(2, ncalls, parallel::detectCores()),
-  maxit = 300,
+  maxit = 500,
   seeds = NULL,
   print_res = TRUE,
   ...

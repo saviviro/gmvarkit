@@ -15,7 +15,7 @@ W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
 mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
 
 girf1 <- GIRF(mod222s, N=2, R2=2, R1=2, seeds=1:2)
-girf2 <- GIRF(mod222s, variables=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
+girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
               include_mixweights=FALSE, init_values=mod222s$data, ci=0.1)
 girf3 <- GIRF(mod222s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1)
 

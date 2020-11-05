@@ -97,7 +97,7 @@
 #' @export
 
 simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
-  # girf_pars$variable - which variable?
+  # girf_pars$shock_numb - which shock?
   # girf_pars$shock_size - size of the structural shock?
   # girf_pars$init_regimes - init values generated from which regimes? Ignored if !is.null(init_values)
   # girf_pars$include_mixweights - should GIRFs be estimated for the mixing weights as well? TRUE or FALSE
@@ -302,8 +302,8 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
             B_t <- W%*%sqrt(apply(tmp, 1:2, sum))
           }
           e_t <- solve(B_t, u_t) # Structural shock
-          e_t[girf_pars$variable] <- girf_pars$shock_size # Impose the size of a shock
-          u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th variable
+          e_t[girf_pars$shock_numb] <- girf_pars$shock_size # Impose the size of a shock
+          u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th element
         }
 
         sample2[i1, , j1] <- mu_mt2 + u_t
@@ -317,13 +317,13 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
     }
   }
 
-  # Calculate a single GIRF for the given variable: (N + 1 x d) matrix
+  # Calculate a single GIRF for the given structural shock: (N + 1 x d) matrix
   if(!is.null(girf_pars)) {
     one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
     if(!is.null(gmvar$data)) {
       colnames(one_girf) <- colnames(gmvar$data)
     } else {
-      colnames(one_girf) <- paste("variable", 1:d)
+      colnames(one_girf) <- paste("shock", 1:d)
     }
     if(girf_pars$include_mixweights) {
       mix_girf <- apply(X=mixing_weights2 - mixing_weights, MARGIN=1:2, FUN=mean)

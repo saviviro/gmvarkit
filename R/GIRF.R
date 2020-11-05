@@ -5,12 +5,12 @@
 #'  a structural GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
-#' @param variables a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
-#'   and elements in \eqn{1,...,d} specifying the variables for which the GIRF
+#' @param which_shocks a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
+#'   and elements in \eqn{1,...,d} specifying the structural shocks for which the GIRF
 #'   should be estimated.
-#' @param shock_size a vector with the same length as \code{variables} specifying
-#'   the size of the structural shock for each variable. Alternatively, is a scalar
-#'   value that specifies a common shock size for all variables. By default, the shock size is
+#' @param shock_size a vector with the same length as \code{which_shocks} specifying
+#'   the size of each structural shock. Alternatively, is a scalar value that specifies a
+#'   common shock size for all structural shocks. By default, the shock size is
 #'   one, which is then amplified by the B-matrix according to the conditional standard deviation
 #'   of the model.
 #' @param N a positive integer specifying the horizon how far ahead should the generalized
@@ -22,7 +22,7 @@
 #' @param init_regimes a numeric vector of length at most \eqn{M} and elements in \eqn{1,...,M}
 #'   specifying the regimes from which the initial values should be generated from. The initial
 #'   values will be generated from a mixture distribution with the mixture components being the
-#'   stationary distirbutions of the specific regimes and the (proportiional) mixing weights given
+#'   stationary distributions of the specific regimes and the (proportional) mixing weights given
 #'   by the mixing weight parameters of those regimes. Note that if \code{init_regimes=1:M}, the
 #'   initial values are generated from the stationary distribution of the process and if
 #'   \code{init_regimes=m}, the initial value are generated from the stationary distribution
@@ -75,20 +75,20 @@
 #'  #                     ncalls=20, seeds=1:20)
 #'  # To obtain an estimated version of the same model.
 #'
-#'  # Estimating the GIRFs of both variables with default arguments
+#'  # Estimating the GIRFs of both structural shocks with default arguments
 #'  # (initial values are drawn from the stationary distribution of the process,
 #'  # 30 periods ahead, confidence levels 0.95 and 0.8):
 #'  girf1 <- GIRF(mod222s)
 #'  plot(girf1)
 #'  girf1
 #'
-#'  # Estimating the GIRF of the second variable only, 36 periods ahead
+#'  # Estimating the GIRF of the second shock only, 36 periods ahead
 #'  # and shock size 1, initial values drawn from the stationary distribution
 #'  # of the first regime, confidence level 0.9:
-#'  girf2 <- GIRF(mod222s, variables=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
+#'  girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
 #'  plot(girf2)
 #'
-#'  # Estimating the GIRFs of both variables, shock sizes 1 and 3, N=50 periods ahead,
+#'  # Estimating the GIRFs of both structural shocks, shock sizes 1 and 3, N=50 periods ahead,
 #'  # estimation based on 1000 Monte Carlo simulations, and fixed initial values given
 #'  # by the last p observations of the data:
 #'  girf3 <- GIRF(mod222s, shock_size=c(1, 3), N=50, R1=1000, init_values=mod222s$data)
@@ -96,7 +96,7 @@
 #'  }
 #' @export
 
-GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regimes=1:M, init_values=NULL, which_cumulative,
+GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL, which_cumulative,
                  ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), seeds=NULL) {
   on.exit(closeAllConnections())
 
@@ -104,10 +104,10 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
   M <- gmvar$model$M
   d <- gmvar$model$d
   if(M == 1) include_mixweights <- FALSE
-  if(missing(variables)) {
-    variables <- 1:d
+  if(missing(which_shocks)) {
+    which_shocks <- 1:d
   } else {
-    stopifnot(length(variables) <= d && all(variables %in% 1:d) && length(unique(variables)) == length(variables))
+    stopifnot(length(which_shocks) <= d && all(which_shocks %in% 1:d) && length(unique(which_shocks)) == length(which_shocks))
   }
   if(!is.null(init_values)) R2 <- 1
   if(!is.null(seeds) && length(seeds) != R2) stop("The argument 'seeds' needs be NULL or a vector of length 'R2'")
@@ -116,10 +116,10 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
   stopifnot(length(ci) > 0 && all(ci > 0 & ci < 1))
 
   if(missing(shock_size)) {
-    shock_size <- rep(1, times=length(variables))
+    shock_size <- rep(1, times=length(which_shocks))
   } else {
-    stopifnot(length(shock_size) == length(variables) | length(shock_size) == 1)
-    if(length(shock_size) == 1) shock_size <- rep(shock_size, times=length(variables))
+    stopifnot(length(shock_size) == length(which_shocks) | length(shock_size) == 1)
+    if(length(shock_size) == 1) shock_size <- rep(shock_size, times=length(which_shocks))
   }
   if(missing(which_cumulative)) {
     which_cumulative <- numeric(0)
@@ -129,8 +129,8 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
   }
 
   # Function that estimates GIRF
-  get_one_girf <- function(variable, shock_size, seed) {
-    simulateGMVAR(gmvar, nsimu=N + 1, init_values=init_values, ntimes=R1, seed=seed, girf_pars=list(variable=variable,
+  get_one_girf <- function(shock_numb, shock_size, seed) {
+    simulateGMVAR(gmvar, nsimu=N + 1, init_values=init_values, ntimes=R1, seed=seed, girf_pars=list(shock_numb=shock_numb,
                                                                                                     shock_size=shock_size,
                                                                                                     init_regimes=init_regimes,
                                                                                                     include_mixweights=include_mixweights))
@@ -142,9 +142,9 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
     message("ncores was set to be larger than the number of cores detected")
   }
   if(is.null(init_values)) {
-    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", length(variables), "variables,", "each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", length(which_shocks), "structural shocks,", "each based on", R1, "Monte Carlo repetitions."), "\n")
   } else {
-    cat(paste("Using", ncores, "cores to estimate one GIRF for", length(variables), "variables, each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate one GIRF for", length(which_shocks), "structural shocks, each based on", R1, "Monte Carlo repetitions."), "\n")
   }
 
   ### Calculate the GIRFs ###
@@ -152,29 +152,29 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
   parallel::clusterExport(cl, ls(environment(GIRF)), envir = environment(GIRF)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
-  GIRF_variables <- vector("list", length=length(variables))
+  GIRF_shocks <- vector("list", length=length(which_shocks))
 
-  for(i1 in 1:length(variables)) {
-    cat(paste0("Estimating GIRFs for variable ", variables[i1], "..."), "\n")
-    GIRF_variables[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(variable=variables[i1], shock_size=shock_size[i1], seed=seeds[i2]), cl=cl)
+  for(i1 in 1:length(which_shocks)) {
+    cat(paste0("Estimating GIRFs for structural shock ", which_shocks[i1], "..."), "\n")
+    GIRF_shocks[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(shock_numb=which_shocks[i1], shock_size=shock_size[i1], seed=seeds[i2]), cl=cl)
   }
   parallel::stopCluster(cl=cl)
 
-  GIRF_results <- vector("list", length=length(variables))
+  GIRF_results <- vector("list", length=length(which_shocks))
   if(!is.null(gmvar$data) && !is.null(colnames(gmvar$data))) {
-    names(GIRF_results) <- colnames(gmvar$data)[variables]
+    names(GIRF_results) <- colnames(gmvar$data)[which_shocks]
   } else {
-    names(GIRF_results) <- paste("variable", variables)
+    names(GIRF_results) <- paste("shock", which_shocks)
   }
 
-  for(i1 in 1:length(variables)) {
-    res_in_array <- array(unlist(GIRF_variables[[i1]]), dim=c(N + 1, d + ifelse(include_mixweights, M, 0), R2))
+  for(i1 in 1:length(which_shocks)) {
+    res_in_array <- array(unlist(GIRF_shocks[[i1]]), dim=c(N + 1, d + ifelse(include_mixweights, M, 0), R2))
     if(length(which_cumulative) > 0) {
       for(i2 in which_cumulative) {
         res_in_array[, i2, ] <- apply(res_in_array[, i2, , drop=FALSE], MARGIN=3, FUN=cumsum) # Replace GIRF with cumulative GIRF
       }
     }
-    colnames(res_in_array) <- colnames(GIRF_variables[[1]][[1]])
+    colnames(res_in_array) <- colnames(GIRF_shocks[[1]][[1]])
     point_estimate <- apply(X=res_in_array, MARGIN=1:2, FUN=mean)
     lower <- (1 - ci)/2
     upper <- rev(1 - lower)
@@ -189,7 +189,7 @@ GIRF <- function(gmvar, variables, shock_size, N=30, R1=250, R2=250, init_regime
 
   cat("Finished!\n")
   structure(list(girf_res=GIRF_results,
-                 variables=variables,
+                 shocks=which_shocks,
                  shock_size=shock_size,
                  N=N,
                  R1=R1,

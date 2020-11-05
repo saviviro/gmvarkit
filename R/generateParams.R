@@ -383,9 +383,9 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
     return(vech(covmat))
   } else {
     pars <- rnorm(n=length(W_and_lambdas), mean=W_and_lambdas, sd=sqrt(abs(W_and_lambdas)/(d + accuracy)))
-    W_const <- structural_pars$W
-    pars[1:(d^2)][W_const > 0 & !is.na(W_const)] <- abs(pars[1:(d^2)][W_const > 0 & !is.na(W_const)]) # We enforce W to satisfy the sign constraints
-    pars[1:(d^2)][W_const < 0 & !is.na(W_const)] <- -abs(pars[1:(d^2)][W_const < 0 & !is.na(W_const)])
+    W_const <- structural_pars$W[structural_pars$W != 0] # Non-zero constraints/free values - first length(W_const) values in pars are W parameters
+    pars[1:length(W_const)][W_const > 0 & !is.na(W_const)] <- abs(pars[1:length(W_const)][W_const > 0 & !is.na(W_const)]) # We enforce W to satisfy the sign constraints
+    pars[1:length(W_const)][W_const < 0 & !is.na(W_const)] <- -abs(pars[1:length(W_const)][W_const < 0 & !is.na(W_const)])
     if(M > 1) {
       n_lambdas <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
       lambdas <- abs(pars[(length(pars) - n_lambdas + 1):length(pars)]) # Make lambdas positive

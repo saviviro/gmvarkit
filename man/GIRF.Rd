@@ -8,12 +8,12 @@
 \usage{
 GIRF(
   gmvar,
-  variables,
+  which_shocks,
   shock_size,
   N = 30,
   R1 = 250,
   R2 = 250,
-  init_regimes = 1:M,
+  init_regimes = 1:gmvar$model$M,
   init_values = NULL,
   which_cumulative,
   ci = c(0.95, 0.8),
@@ -29,13 +29,13 @@ GIRF(
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 
-\item{variables}{a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
-and elements in \eqn{1,...,d} specifying the variables for which the GIRF
+\item{which_shocks}{a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
+and elements in \eqn{1,...,d} specifying the structural shocks for which the GIRF
 should be estimated.}
 
-\item{shock_size}{a vector with the same length as \code{variables} specifying
-the size of the structural shock for each variable. Alternatively, is a scalar
-value that specifies a common shock size for all variables. By default, the shock size is
+\item{shock_size}{a vector with the same length as \code{which_shocks} specifying
+the size of each structural shock. Alternatively, is a scalar value that specifies a
+common shock size for all structural shocks. By default, the shock size is
 one, which is then amplified by the B-matrix according to the conditional standard deviation
 of the model.}
 
@@ -51,7 +51,7 @@ different initial values. Ignored if the argument \code{init_value} is specified
 \item{init_regimes}{a numeric vector of length at most \eqn{M} and elements in \eqn{1,...,M}
 specifying the regimes from which the initial values should be generated from. The initial
 values will be generated from a mixture distribution with the mixture components being the
-stationary distirbutions of the specific regimes and the (proportiional) mixing weights given
+stationary distributions of the specific regimes and the (proportional) mixing weights given
 by the mixing weight parameters of those regimes. Note that if \code{init_regimes=1:M}, the
 initial values are generated from the stationary distribution of the process and if
 \code{init_regimes=m}, the initial value are generated from the stationary distribution
@@ -133,20 +133,20 @@ The model needs to be structural in order for this function to be applicable. A 
  #                     ncalls=20, seeds=1:20)
  # To obtain an estimated version of the same model.
 
- # Estimating the GIRFs of both variables with default arguments
+ # Estimating the GIRFs of both structural shocks with default arguments
  # (initial values are drawn from the stationary distribution of the process,
  # 30 periods ahead, confidence levels 0.95 and 0.8):
  girf1 <- GIRF(mod222s)
  plot(girf1)
  girf1
 
- # Estimating the GIRF of the second variable only, 36 periods ahead
+ # Estimating the GIRF of the second shock only, 36 periods ahead
  # and shock size 1, initial values drawn from the stationary distribution
  # of the first regime, confidence level 0.9:
- girf2 <- GIRF(mod222s, variables=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
+ girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
  plot(girf2)
 
- # Estimating the GIRFs of both variables, shock sizes 1 and 3, N=50 periods ahead,
+ # Estimating the GIRFs of both structural shocks, shock sizes 1 and 3, N=50 periods ahead,
  # estimation based on 1000 Monte Carlo simulations, and fixed initial values given
  # by the last p observations of the data:
  girf3 <- GIRF(mod222s, shock_size=c(1, 3), N=50, R1=1000, init_values=mod222s$data)

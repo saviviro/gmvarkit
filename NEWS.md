@@ -68,3 +68,10 @@
 * Updated some of the examples, readme, and vignette.
 * Fixed a bug that caused error in estimation of GIRF with very large shock size.
 * Fixed a bug that caused error in estimation of AR constrained models when initial population is used in the genetic algorithm.
+
+# gmvarkit 1.2.4
+
+* In the function GIRF, the argument 'variables' was remanamed as 'which_shocks'.
+* Fixed a problem in the estimation algorithm that occurred when estimating a structural model with zero constraints in the W matrix. 
+* Increased the default maxit from 300 to 500 in fitGMVAR.
+
