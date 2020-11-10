@@ -107,7 +107,7 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
     return(FALSE)
   }
   for(m in 1:M) {
-    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < 1e-6)) {
+    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < 1e-8)) {
       return(FALSE)
     }
   }
