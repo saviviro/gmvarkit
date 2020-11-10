@@ -58,7 +58,7 @@
 #' diagnostic_plot(mod222c, type="ac", maxlag=12)
 #' @export
 
-diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=10, wait_time=4) {
+diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=12, wait_time=4) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   stopifnot(wait_time >= 0)
