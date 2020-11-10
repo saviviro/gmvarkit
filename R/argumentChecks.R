@@ -46,7 +46,7 @@
 #'  No argument checks!
 #' @inherit loglikelihood_int references
 
-is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL, tolerance=1e-2) {
+is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL, tolerance=1e-3) {
   if(is.null(all_boldA)) {
     all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
