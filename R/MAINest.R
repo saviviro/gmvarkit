@@ -33,7 +33,8 @@
 #'  to fit linear VARs to the series to see which scaling of the series results in relatively small AR coefficients.
 #'  If initial population is still not found, you can try to adjust the argument \code{ar_scale} (which is passed to \code{GAfit})
 #'  to something small, e.g. \code{0.1}. The smaller \code{ar_scale} is, the smaller the random AR coefficients 
-#'  proposed by the algorithm are in absolute value. 
+#'  proposed by the algorithm are in absolute value. Other parameters of the genetic algorithm may also be adjusted
+#'  according to the characteristics of the time series (for the list of the available settings, see \code{?GAfit}).
 #'
 #'  The code of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)} but it
 #'  includes some extra features that were found useful for this particular estimation problem. For instance,
