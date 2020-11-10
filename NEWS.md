@@ -73,5 +73,5 @@
 
 * In the function GIRF, the argument 'variables' was remanamed as 'which_shocks'.
 * Fixed a problem in the estimation algorithm that occurred when estimating a structural model with zero constraints in the W matrix. 
-* Increased the default maxit from 300 to 500 in fitGMVAR.
+* Increased the default maxit from 300 to 500 in fitGMVAR and the default maxlag from 10 to 12 in diagnostic_plot
 
