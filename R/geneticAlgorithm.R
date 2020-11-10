@@ -248,7 +248,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         break
       } else if(i1 == nattempts) {
         if(length(G) == 0) {
-          stop("Failed to create initial population with good enough individuals. Scaling the individual series so that the AR coefficients (of a VAR model) will not be very large (preferably less than one) should solve the problem. If needed, another package may be used to fit linear VARs so see which scalings produce relatively small AR coefficient estimates.")
+          stop("Failed to create initial population with good enough individuals. Scaling the individual series so that the AR coefficients (of a VAR model) will not be very large (preferably less than one) may solve the problem. If needed, another package may be used to fit linear VARs so see which scalings produce relatively small AR coefficient estimates.")
         } else {
           G <- G[,sample.int(ncol(G), size=popsize, replace=TRUE)]
         }
