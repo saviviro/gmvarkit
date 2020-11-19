@@ -7,7 +7,7 @@
 diagnostic_plot(
   gmvar,
   type = c("all", "series", "ac", "ch", "norm"),
-  maxlag = 10,
+  maxlag = 12,
   wait_time = 4
 )
 }

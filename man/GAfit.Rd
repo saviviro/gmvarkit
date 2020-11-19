@@ -21,9 +21,10 @@ GAfit(
   omega_scale,
   W_scale,
   lambda_scale,
-  ar_scale = 1,
+  ar_scale,
   regime_force_scale = 1,
   red_criteria = c(0.05, 0.01),
+  pre_smart_mu_prob = 0.05,
   to_return = c("alt_ind", "best_ind"),
   minval,
   seed = NULL
@@ -180,8 +181,9 @@ is considered.}
   should be adjusted accordingly in order to the estimation succeed!}
 
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
-some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
-constrained models.}
+some random mutations: larger value implies larger coefficients (in absolute value). See the function
+\code{random_coefmats2} for details. By default, a new scale is drawn from \eqn{(0,1)} uniform distribution
+in each iteration. This is ignored when estimating constrained models.}
 
 \item{regime_force_scale}{a non-negative real number specifying how much should natural selection favour individuals
 with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large
@@ -196,6 +198,9 @@ redundant (or "wasted") or not.
 Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will
 be considered "redundant". One should be careful when adjusting this argument (set \code{c(0, 0)} to fully disable
 the 'redundant regime' features from the algorithm).}
+
+\item{pre_smart_mu_prob}{A number in \eqn{[0,1]} giving a probability of a "smart mutation" occuring randomly in each
+iteration before the iteration given by the argument \code{smart_mu}.}
 
 \item{to_return}{should the genetic algorithm return the best fitting individual which has "positive enough" mixing
 weights for as many regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood

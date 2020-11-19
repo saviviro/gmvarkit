@@ -95,8 +95,9 @@ Note that for \code{d>4} this scale may need to be chosen carefully. Default in 
 structural model is considered.}
 
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
-some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
-constrained models.}
+some random mutations: larger value implies larger coefficients (in absolute value). See the function
+\code{random_coefmats2} for details. By default, a new scale is drawn from \eqn{(0,1)} uniform distribution
+in each iteration. This is ignored when estimating constrained models.}
 
 \item{W_scale}{a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
 random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently

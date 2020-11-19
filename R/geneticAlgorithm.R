@@ -111,8 +111,9 @@
 #'   that if lambdas are constrained in some other way than restricting some of them to be identical, this parameter
 #'   should be adjusted accordingly in order to the estimation succeed!
 #' @param ar_scale a positive real number adjusting how large AR parameter values are typically generated in
-#'   some random mutations. See the function \code{random_coefmats2} for details. This is ignored when estimating
-#'   constrained models.
+#'   some random mutations: larger value implies larger coefficients (in absolute value). See the function
+#'   \code{random_coefmats2} for details. By default, a new scale is drawn from \eqn{(0,1)} uniform distribution
+#'   in each iteration. This is ignored when estimating constrained models.
 #' @param regime_force_scale a non-negative real number specifying how much should natural selection favour individuals
 #'   with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large
 #'   number for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the
@@ -125,6 +126,8 @@
 #'   Any regime \code{m} which satisfies \code{sum(mixingWeights[,m] > red_criteria[1]) < red_criteria[2]*n_obs} will
 #'   be considered "redundant". One should be careful when adjusting this argument (set \code{c(0, 0)} to fully disable
 #'   the 'redundant regime' features from the algorithm).
+#' @param pre_smart_mu_prob A number in \eqn{[0,1]} giving a probability of a "smart mutation" occuring randomly in each
+#'   iteration before the iteration given by the argument \code{smart_mu}.
 #' @param to_return should the genetic algorithm return the best fitting individual which has "positive enough" mixing
 #'   weights for as many regimes as possible (\code{"alt_ind"}) or the individual which has the highest log-likelihood
 #'   in general (\code{"best_ind"}) but might have more wasted regimes?
@@ -164,8 +167,8 @@
 
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
-                  lambda_scale, ar_scale=0.5, regime_force_scale=1, red_criteria=c(0.05, 0.01), to_return=c("alt_ind", "best_ind"),
-                  minval, seed=NULL) {
+                  lambda_scale, ar_scale, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.05,
+                  to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and premilinary checks
   set.seed(seed)
@@ -210,6 +213,12 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   } else if(!(length(W_scale) == d & all(W_scale > 0))) {
     stop("W_scale must be numeric vector with length d and positive elements")
   }
+  if(missing(ar_scale)) {
+    ar_scale <- 0.2 # Initial ar_scale
+  } else {
+    stopifnot(length(ar_scale == 1) && ar_scale > 0)
+  }
+  stopifnot(pre_smart_mu_prob >= 0 && pre_smart_mu_prob <= 1)
   if(is.null(structural_pars$C_lambda)) {
     n_lambs <- M - 1
   } else {
@@ -422,8 +431,9 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     # Do mutations and keep track if they are stationary for sure
     mutate <- rbinom(n=popsize, size=1, prob=mu_rates)
     which_mutate <- which(mutate == 1)
-    if(i1 <= smart_mu & length(which_mutate) >= 1) { # Random mutations
-      if(!is.null(constraints) | runif(1) > 0.5) { # Regular, can be nonstationary
+    pre_smart_mu <- runif(1, min=1e-6, max=1-1e-6) < pre_smart_mu_prob
+    if(i1 <= smart_mu & length(which_mutate) >= 1 & !pre_smart_mu) { # Random mutations
+      if(!is.null(constraints) | runif(1, min=1e-6, max=1-1e-6) > 0.5) { # Regular, can be nonstationary
         stat_mu <- FALSE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
                                                                                    mu_scale=mu_scale, mu_scale2=mu_scale2,
@@ -432,6 +442,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                                                                                    structural_pars=structural_pars), numeric(npars))
       } else { # For stationarity with algorithm (slower but can skip stationarity test), Ansley and Kohn (1986)
         stat_mu <- TRUE
+        ar_scale <- runif(1, min=1e-6, max=1-1e-6) # Random AR scale
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M, d=d, mu_scale=mu_scale,
                                                                                     mu_scale2=mu_scale2, omega_scale=omega_scale,
                                                                                     ar_scale=ar_scale, W_scale=W_scale,

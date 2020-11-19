@@ -153,6 +153,8 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
  be preferred to scale the series so that most of the AR coefficients will not be very large, as the
  estimation algorithm works better with small AR coefficients. If needed, another package can be used
  to fit linear VARs to the series to see which scaling of the series results in relatively small AR coefficients.
+ If initial population is still not found, you can try to adjust the parameters of the genetic algorithm
+ according to the characteristics of the time series (for the list of the available settings, see \code{?GAfit}).
 
  The code of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)} but it
  includes some extra features that were found useful for this particular estimation problem. For instance,

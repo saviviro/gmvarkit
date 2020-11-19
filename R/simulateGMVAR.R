@@ -299,7 +299,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
             for(m in 2:M) {
               tmp[, , m] <- alpha_mt2[m]*diag(lambdas[, m - 1])
             }
-            B_t <- W%*%sqrt(apply(tmp, 1:2, sum))
+            B_t <- W%*%sqrt(apply(tmp, MARGIN=1:2, FUN=sum))
           }
           e_t <- solve(B_t, u_t) # Structural shock
           e_t[girf_pars$shock_numb] <- girf_pars$shock_size # Impose the size of a shock
