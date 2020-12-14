@@ -192,20 +192,40 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   }
 
   l_0 <- 0 # First term of the exact log-likelihood (Kalliovirta et al. 2016, eq.(9))
+  small_logmvns <- log_mvnvalues < epsilon
+  large_logmvns <- log_mvnvalues > -epsilon
   if(M == 1) {
     alpha_mt <- as.matrix(rep(1, nrow(log_mvnvalues)))
     if(conditional == FALSE) {
       l_0 <- log_mvnvalues[1,]
     }
-  } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
-    numerators <- lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m]))) # lapply(1:M, function(m) alphas[m]*Brobdingnag::as.brob(exp(1))^log_mvnvalues[,m])
-    denominator <- Reduce('+', numerators)
-    alpha_mt <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(nrow(log_mvnvalues)))
-
-    if(conditional == FALSE) {
-      l_0 <- log(Reduce('+', lapply(1:M, function(m) numerators[[m]][1])))
-    }
+  #} else if(any(small_logmvns) | any(large_logmvns)) { # If some values are too close to zero use the package Brobdingnag
+    #numerators <- lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m]))) # lapply(1:M, function(m) alphas[m]*Brobdingnag::as.brob(exp(1))^log_mvnvalues[,m])
+    #denominator <- Reduce('+', numerators)
+    #alpha_mt <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(nrow(log_mvnvalues)))
+    #if(conditional == FALSE) {
+    #  l_0 <- log(Reduce('+', lapply(1:M, function(m) numerators[[m]][1])))
+    #}
   } else {
+    small_logmvns <- log_mvnvalues < epsilon
+    large_logmvns <- log_mvnvalues > -epsilon
+    if(any(small_logmvns) | any(large_logmvns)) {
+      # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
+      # we replace them with ones that are not too small or large but imply the same mixing weights
+      # up to negligible numerical tolerance.
+      which_change <- rowSums(small_logmvns) > 0 | rowSums(large_logmvns) > 0 # Which rows contain too small/large values
+      to_change <- log_mvnvalues[which_change,]
+      largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
+      diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
+
+      # For each element in each row, check the (negative) distance from the largest value of the row. If the difference
+      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
+      diff_to_largest[diff_to_largest < epsilon] <- epsilon
+
+      # Replace the old log_mvnvalues with the new ones
+      log_mvnvalues[which_change,] <- diff_to_largest
+    }
+
     mvnvalues <- exp(log_mvnvalues)
     denominator <- as.vector(mvnvalues%*%alphas)
     alpha_mt <- (mvnvalues/denominator)%*%diag(alphas)
