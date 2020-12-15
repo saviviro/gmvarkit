@@ -21,7 +21,7 @@ GAfit(
   omega_scale,
   W_scale,
   lambda_scale,
-  ar_scale,
+  ar_scale = 0.2,
   regime_force_scale = 1,
   red_criteria = c(0.05, 0.01),
   pre_smart_mu_prob = 0.05,
@@ -180,14 +180,13 @@ is considered.}
   that if lambdas are constrained in some other way than restricting some of them to be identical, this parameter
   should be adjusted accordingly in order to the estimation succeed!}
 
-\item{ar_scale}{a positive real number adjusting how large AR parameter values are typically generated in
-some random mutations: larger value implies larger coefficients (in absolute value). See the function
-\code{random_coefmats2} for details. By default, a new scale is drawn from \eqn{(0,1)} uniform distribution
-in each iteration. This is ignored when estimating constrained models.}
+\item{ar_scale}{a positive real number adjusting how large AR parameter values are typically proposed in construction
+of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
+initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.}
 
-\item{regime_force_scale}{a non-negative real number specifying how much should natural selection favour individuals
-with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favouring or large
-number for heavy favouring. Without any favouring the genetic algorithm gets more often stuck in an area of the
+\item{regime_force_scale}{a non-negative real number specifying how much should natural selection favor individuals
+with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favoring or large
+number for heavy favoring. Without any favoring the genetic algorithm gets more often stuck in an area of the
 parameter space where some regimes are wasted, but with too much favouring the best genes might never mix into
 the population and the algorithm might converge poorly. Default is \code{1} and it gives \eqn{2x} larger surviving
 probability weights for individuals with no wasted regimes compared to individuals with one wasted regime.

@@ -190,50 +190,11 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   if(to_return != "mw_tplus1") {
     log_mvnvalues <- log_mvnvalues[1:T_obs, , drop=FALSE] # alpha_mt uses y_{t-1} so the last row is not needed
   }
+  alpha_mt_and_l_0 <- get_alpha_mt(M=M, log_mvnvalues=log_mvnvalues, alphas=alphas,
+                                   epsilon=epsilon, conditional=conditional, also_l_0=TRUE)
+  alpha_mt <- alpha_mt_and_l_0$alpha_mt
+  l_0 <- alpha_mt_and_l_0$l_0 # The first term in the exact log-likelihood function (=0 for conditional)
 
-  l_0 <- 0 # First term of the exact log-likelihood (Kalliovirta et al. 2016, eq.(9))
-  small_logmvns <- log_mvnvalues < epsilon
-  large_logmvns <- log_mvnvalues > -epsilon
-  if(M == 1) {
-    alpha_mt <- as.matrix(rep(1, nrow(log_mvnvalues)))
-    if(conditional == FALSE) {
-      l_0 <- log_mvnvalues[1,]
-    }
-  #} else if(any(small_logmvns) | any(large_logmvns)) { # If some values are too close to zero use the package Brobdingnag
-    #numerators <- lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m]))) # lapply(1:M, function(m) alphas[m]*Brobdingnag::as.brob(exp(1))^log_mvnvalues[,m])
-    #denominator <- Reduce('+', numerators)
-    #alpha_mt <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(nrow(log_mvnvalues)))
-    #if(conditional == FALSE) {
-    #  l_0 <- log(Reduce('+', lapply(1:M, function(m) numerators[[m]][1])))
-    #}
-  } else {
-    small_logmvns <- log_mvnvalues < epsilon
-    large_logmvns <- log_mvnvalues > -epsilon
-    if(any(small_logmvns) | any(large_logmvns)) {
-      # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
-      # we replace them with ones that are not too small or large but imply the same mixing weights
-      # up to negligible numerical tolerance.
-      which_change <- rowSums(small_logmvns) > 0 | rowSums(large_logmvns) > 0 # Which rows contain too small/large values
-      to_change <- log_mvnvalues[which_change,]
-      largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
-      diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
-
-      # For each element in each row, check the (negative) distance from the largest value of the row. If the difference
-      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
-      diff_to_largest[diff_to_largest < epsilon] <- epsilon
-
-      # Replace the old log_mvnvalues with the new ones
-      log_mvnvalues[which_change,] <- diff_to_largest
-    }
-
-    mvnvalues <- exp(log_mvnvalues)
-    denominator <- as.vector(mvnvalues%*%alphas)
-    alpha_mt <- (mvnvalues/denominator)%*%diag(alphas)
-
-    if(conditional == FALSE) {
-      l_0 <- log(sum(alphas*mvnvalues[1,]))
-    }
-  }
   if(to_return == "mw" | to_return == "mw_tplus1") {
     return(alpha_mt)
   }
@@ -259,7 +220,9 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   # Calculate the second term of the log-likelihood (KMS 2016 eq.(10))
   dat <- data[(p + 1):n_obs,] # Initial values are not used here
   mvn_vals <- vapply(1:M, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
-  l_t <- log(rowSums(alpha_mt*mvn_vals))
+  weighted_mvn <- rowSums(alpha_mt*mvn_vals)
+  weighted_mvn[weighted_mvn == 0] <- exp(epsilon)
+  l_t <- log(weighted_mvn)
 
   if(to_return == "terms") {
      return(l_t)
@@ -270,6 +233,65 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   }
 }
 
+
+#' @title Get mixing weights alpha_mt (this function is for internal use)
+#'
+#' @description \code{get_alpha_mt} computes the mixing weights based on
+#'   the logarithm of the multivariate normal densities in the definition of
+#'   the mixing weights.
+#'
+#' @inheritParams loglikelihood_int
+#' @param log_mvnvalues \eqn(T x M) matrix containing the log multivariate normal densities.
+#' @param alphas \eqn{M x 1} vector containing the mixing weight pa
+#' @param epsilon the smallest number such that its exponent is wont classified as numerically zero
+#'   (around \code{-698} is used).
+#' @param also_l_0 return also l_0 (the first term in the exact log-likelihood function)?
+#' @details Note that we index the time series as \eqn{-p+1,...,0,1,...,T} as in Kalliovirta et al. (2016).
+#' @return Returns the mixing weights a matrix of the same dimension as \code{log_mvnvalues} so
+#'   that the t:th row is for the time point t and m:th column is for the regime m.
+#' @inherit loglikelihood_int references
+#' @seealso \code{\link{loglikelihood_int}}
+
+get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0=FALSE) {
+  if(M == 1) {
+    alpha_mt <- as.matrix(rep(1, nrow(log_mvnvalues)))
+  } else {
+    small_logmvns <- log_mvnvalues < epsilon
+    if(any(small_logmvns)) {
+      # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
+      # we replace them with ones that are not too small or large but imply the same mixing weights
+      # up to negligible numerical tolerance.
+      which_change <- rowSums(small_logmvns) > 0 # Which rows contain too small  values
+      to_change <- log_mvnvalues[which_change, , drop=FALSE]
+      largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
+      diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
+
+      # For each element in each row, check the (negative) distance from the largest value of the row. If the difference
+      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
+      diff_to_largest[diff_to_largest < epsilon] <- epsilon
+
+      # Replace the old log_mvnvalues with the new ones
+      log_mvnvalues[which_change,] <- diff_to_largest
+    }
+
+    mvnvalues <- exp(log_mvnvalues)
+    denominator <- as.vector(mvnvalues%*%alphas)
+    alpha_mt <- (mvnvalues/denominator)%*%diag(alphas)
+  }
+  if(!also_l_0) {
+    return(alpha_mt)
+  } else {
+    # First term of the exact log-likelihood (Kalliovirta et al. 2016, eq.(9))
+    l_0 <- 0
+    if(M == 1 && conditional == FALSE) {
+      l_0 <- log_mvnvalues[1,]
+    } else if(M > 1 && conditional == FALSE) {
+      l_0 <- log(sum(alphas*mvnvalues[1,]))
+    }
+    return(list(alpha_mt=alpha_mt,
+                l_0=l_0))
+  }
+}
 
 
 #' @title Compute log-likelihood of a GMVAR model using parameter vector

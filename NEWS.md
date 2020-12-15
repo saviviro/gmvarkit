@@ -71,9 +71,11 @@
 
 # gmvarkit 1.2.4
 
-* In the function GIRF, the argument 'variables' was remanamed as 'which_shocks'.
+* Major speed improvement! Related to that, the Brobdingnag package is no more required.
+* Log-likelihood function should not return -Inf anymore but with extremely bad estimates (for some t) the value is not precise (before in such cases it was -Inf). This should lead to better estimation results.
+* In the function GIRF, the argument 'variables' was renamed as 'which_shocks'.
 * Fixed a problem in the estimation algorithm that occurred when estimating a structural model with zero constraints in the W matrix. 
 * Increased the default maxit from 300 to 500 in fitGMVAR, the default maxlag from 10 to 12 in diagnostic_plot, and decreased the default ar_scale from 1 to 0.5 in GAfit.
 * Updated the documentation of fitGMVAR: more instructions on what to do when the algorithm fails to create an initial population were added.
-* By default there is now randomly varying "ar_scale" in the genetic algorithm
+* There is now randomly varying "ar_scale" in the genetic algorithm but initial population ar_scale can still be adjusted.
 * There is now random preliminary smart mutations in the genetic algorithm

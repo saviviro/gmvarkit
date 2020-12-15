@@ -69,6 +69,15 @@ lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
 
+# p=2, M=4, d=2
+theta_142 <- c(22.743598, 98.461525, -0.006778, 0.212983, -0.12094, -0.061364,
+               1.313218, -3.305944, 14.459664, 44.482964, 82.615109, -0.344603,
+               0.082359, -0.168216, 0.341988, 4.012248, -3.555077, 6.449586,
+               14.672977, 100.177417, 0.345826, -0.338611, -0.18687, -0.221931,
+               12.086199, 3.677137, 1.331716, 17.668096, 129.042416, 0.628735,
+               -0.026376, 0.185899, -0.199485, 0.470336, 0.980442, 7.146605,
+               0.427396, 0.417413, 0.142379)
+
 
 theta_112_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112, change_to="mean")
 theta_212_mu <- change_parametrization(p=2, M=1, d=2, params=theta_212, change_to="mean")
@@ -91,6 +100,10 @@ test_that("loglikelihood_int works correctly", {
   expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122_mu, conditional=FALSE, parametrization="mean"), -30712.15, tolerance=1e-2)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222_mu, conditional=FALSE, parametrization="mean"), -1095.952, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222_mu, conditional=TRUE, parametrization="mean"), -1084.186, tolerance=1e-3)
+
+  expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=FALSE, parametrization="intercept"), -20948.16, tolerance=1e-2)
+  expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="intercept"), -20947.31, tolerance=1e-2)
+  expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="mean"), -30299.49, tolerance=1e-2)
 
   # SGMVAR
   expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112sWC, structural_pars=list(W=W_112), conditional=FALSE),
