@@ -118,8 +118,7 @@ Returns log-likelihood if \code{params} is in the parameters space and \code{min
   control what happens when the parameter vector is outside the parameter space.
 }
 \details{
-\code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}
-  to cut down computation time. Values extremely close to zero are handled with the package \code{Brobdingnag}.
+\code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 }
 \examples{
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])

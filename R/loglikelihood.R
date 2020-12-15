@@ -93,8 +93,7 @@
 #'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Or should
 #'   the regimewise conditional means, total conditional means, or total conditional covariance matrices
 #'   be returned? Default is the log-likelihood value (\code{"loglik"}).
-#' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}
-#'   to cut down computation time. Values extremely close to zero are handled with the package \code{Brobdingnag}.
+#' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 #' @return
 #'  \describe{
 #'   \item{By default:}{log-likelihood value of the specified GMVAR model,}
@@ -185,7 +184,6 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   # Calculated in logarithm because same values may be too close to zero for machine accuracy
   log_mvnvalues <- vapply(1:M, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
 
-
   ## Calculate the mixing weights alpha_{m,t} (KMS 2016, eq.(7))
   if(to_return != "mw_tplus1") {
     log_mvnvalues <- log_mvnvalues[1:T_obs, , drop=FALSE] # alpha_mt uses y_{t-1} so the last row is not needed
@@ -254,8 +252,11 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
 get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0=FALSE) {
   if(M == 1) {
+    if(!is.matrix(log_mvnvalues)) log_mvnvalues <- as.matrix(log_mvnvalues) # Possibly many time points but only one regime
     alpha_mt <- as.matrix(rep(1, nrow(log_mvnvalues)))
   } else {
+    if(!is.matrix(log_mvnvalues)) log_mvnvalues <- t(as.matrix(log_mvnvalues)) # Only one time point but multiple regimes
+
     small_logmvns <- log_mvnvalues < epsilon
     if(any(small_logmvns)) {
       # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),

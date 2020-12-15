@@ -150,7 +150,7 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
   ### Calculate the GIRFs ###
   cl <- parallel::makeCluster(ncores)
   parallel::clusterExport(cl, ls(environment(GIRF)), envir = environment(GIRF)) # assign all variables from package:gmvarkit
-  parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
+  parallel::clusterEvalQ(cl, c(library(mvnfast), library(pbapply)))
 
   GIRF_shocks <- vector("list", length=length(which_shocks))
 

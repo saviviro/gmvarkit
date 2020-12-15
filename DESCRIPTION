@@ -12,9 +12,8 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
-Imports: Brobdingnag (>= 1.2-6), mvnfast (>= 0.2.5), parallel (>=
-        4.0.0), stats (>= 4.0.0), pbapply (>= 1.4-2), graphics (>=
-        4.0.0), grDevices (>= 4.0.0)
+Imports: mvnfast (>= 0.2.5), parallel (>= 4.0.0), stats (>= 4.0.0),
+         pbapply (>= 1.4-2), graphics (>= 4.0.0), grDevices (>= 4.0.0)
 Suggests: testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no

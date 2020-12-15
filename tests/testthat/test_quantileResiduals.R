@@ -44,6 +44,18 @@ theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
 mod_222s <- GMVAR(data, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", constraints=NULL,
                  structural_pars=list(W=W_222))
 
+# p=1, M=4, d=2
+theta_142 <- c(22.743598, 98.461525, -0.006778, 0.212983, -0.12094, -0.061364,
+               1.313218, -3.305944, 14.459664, 44.482964, 82.615109, -0.344603,
+               0.082359, -0.168216, 0.341988, 4.012248, -3.555077, 6.449586,
+               14.672977, 100.177417, 0.345826, -0.338611, -0.18687, -0.221931,
+               12.086199, 3.677137, 1.331716, 17.668096, 129.042416, 0.628735,
+               -0.026376, 0.185899, -0.199485, 0.470336, 0.980442, 7.146605,
+               0.427396, 0.417413, 0.142379)
+mod_142_int <- GMVAR(data, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="intercept")
+mod_142_mean <- GMVAR(data, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="mean")
+
+
 # p=2, M=2, d=2, SGMVAR AR params constrained to be the same in both regimes
 rbind_diags <- function(p, M, d) {
   I <- diag(p*d^2)
@@ -75,6 +87,9 @@ res_222 <- quantile_residuals(mod_222)
 res_222c <- quantile_residuals(mod_222c)
 res_323 <- quantile_residuals(mod_323)
 
+res_142_int <- quantile_residuals(mod_142_int)
+res_142_mean <- quantile_residuals(mod_142_mean)
+
 res_112s <- quantile_residuals(mod_112s)
 res_222s <- quantile_residuals(mod_222s)
 res_222csLAR <- quantile_residuals(mod_222csLAR)
@@ -99,6 +114,12 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res_323[13,], c(-1.1160317, -0.1883617, -0.4064072), tolerance=1e-6)
   expect_equal(res_323[150,], c(0.09401363, 0.44800577, 1.11962898), tolerance=1e-6)
   expect_equal(res_323[497,], c(0.3658767, 0.4336302, -0.6696751), tolerance=1e-6)
+
+  expect_equal(res_142_int[122:125, 1], c(-0.1932272, -0.6044207, -1.1737746, -1.1299033), tolerance=1e-6)
+  expect_equal(res_142_int[12:15, 2], c(0.3681731, 1.7120364, 0.7318820, -0.1006260), tolerance=1e-6)
+  expect_equal(res_142_mean[132:135, 1], c(-4.506558, -4.203856, -4.220869, -3.854244), tolerance=1e-6)
+  expect_equal(res_142_int[2:5, 2], c(1.612173, 2.645782, 4.811656, 8.014016), tolerance=1e-6)
+
 
   # SGMVAR
   expect_equal(res_112s[3,], c(0.5815407, -1.0931660), tol=1e-6)

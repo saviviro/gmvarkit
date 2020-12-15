@@ -223,7 +223,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ### Optimization with the genetic algorithm ###
   cl <- parallel::makeCluster(ncores)
   parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
-  parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
+  parallel::clusterEvalQ(cl, c(library(mvnfast), library(pbapply)))
 
   cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,

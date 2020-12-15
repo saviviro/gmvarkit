@@ -147,15 +147,38 @@ quantile_residuals <- function(gmvar) {
                                                            mu=as.matrix(mu_mt[, 1:(j - 1), m]),
                                                            Omega=upleft_jjmat(all_Omega[, , m], j - 1)),
                                              numeric(T_obs))
-    if(any(log_mvnvalues < epsilon)) { # Use Brobdingnag
-      numerators <- lapply(1:M, function(m) alpha_mt[,m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m])))
-      denominator <- Reduce('+', numerators)
-      beta_mtj[, , j] <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(T_obs))
-    } else {
-      numerators <- as.matrix(alpha_mt*exp(log_mvnvalues))
-      denominator <- rowSums(numerators)
-      beta_mtj[, , j] <- numerators/denominator
+    # if(any(log_mvnvalues < epsilon)) { # Use Brobdingnag
+    #   numerators <- lapply(1:M, function(m) alpha_mt[,m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m])))
+    #   denominator <- Reduce('+', numerators)
+    #   beta_mtj[, , j] <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(T_obs))
+    # } else {
+    #   numerators <- as.matrix(alpha_mt*exp(log_mvnvalues))
+    #   denominator <- rowSums(numerators)
+    #   beta_mtj[, , j] <- numerators/denominator
+    # }
+
+    small_logmvns <- log_mvnvalues < epsilon
+    if(any(small_logmvns)) {
+      # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
+      # we replace them with ones that are not too small or large but imply the same mixing weights
+      # up to negligible numerical tolerance.
+      which_change <- rowSums(small_logmvns) > 0 # Which rows contain too small  values
+      to_change <- log_mvnvalues[which_change, , drop=FALSE]
+      largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
+      diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
+
+      # For each element in each row, check the (negative) distance from the largest value of the row. If the difference
+      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
+      diff_to_largest[diff_to_largest < epsilon] <- epsilon
+
+      # Replace the old log_mvnvalues with the new ones
+      log_mvnvalues[which_change,] <- diff_to_largest
     }
+
+    numerators <- as.matrix(alpha_mt*exp(log_mvnvalues))
+    denominator <- rowSums(numerators)
+    beta_mtj[, , j] <- numerators/denominator
+
   }
 
   # Then calculate (y_{i_j,t} - mu_mtj)/sqrt(variance_mtj) for m=1,...,M, t=1,...,T, j=1,...,d
