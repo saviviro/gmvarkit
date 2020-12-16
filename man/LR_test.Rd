@@ -51,16 +51,16 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-                     ncalls=1, seeds=16)
+                     ncalls=1, seeds=4)
 
  # The same model but the AR coefficients restricted to be the same
  # in both regimes:
  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
  fit222sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
                       structural_pars=list(W=W_222),
-                      ncalls=1, seeds=16)
+                      ncalls=1, seeds=9)
 
- # Test whether the constraints are supported by the data:
+ # Test the AR constraints with likelihood ratio test:
  LR_test(fit222s, fit222sc)
  }
 }

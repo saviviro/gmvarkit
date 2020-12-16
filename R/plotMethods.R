@@ -96,7 +96,11 @@ plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
   draw_poly <- function(ts1_or_ts2, pred_ts, col) polygon(x=c(t0, rev(t0)), y=c(ts1_or_ts2, rev(pred_ts)), col=col, border=NA)
   col_pred <- grDevices::rgb(0, 0, 1, 0.2)
     for(i1 in 1:d) {
-    ts.plot(ts_dat[,i1], ts_pred[,i1], gpars=list(col=c("black", "blue"), lty=1:2, ylim=c(floor(min(all_val[[i1]])), ceiling(max(all_val[[i1]]))), main=ts_names[i1]))
+    ts.plot(ts_dat[,i1], ts_pred[,i1], gpars=list(col=c("black", "blue"),
+                                                  lty=1:2,
+                                                  ylim=c(floor(min(all_val[[i1]])),
+                                                         ceiling(max(all_val[[i1]]))),
+                                                  main=ts_names[i1]))
     if(add_grid) grid(...)
     if(gmvarpred$pi_type %in% c("two-sided", "upper", "lower")) {
       for(i2 in 1:length(gmvarpred$pi)) {
@@ -112,7 +116,9 @@ plot.gmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
     # Point forecasts
     colpal_mw <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
     colpal_mw2 <- grDevices::adjustcolor(colpal_mw, alpha.f=0.5)
-    ts.plot(ts_mix, ts_mix_pred, gpars=list(col=c(colpal_mw2, colpal_mw), ylim=c(0, 1), lty=c(rep(1, M), rep(2, M)), main="Mixing weights"))
+    ts.plot(ts_mix, ts_mix_pred, gpars=list(col=c(colpal_mw2, colpal_mw),
+                                            ylim=c(0, 1), lty=c(rep(1, M), rep(2, M)),
+                                            main="Mixing weights"))
     legend("topleft", legend=paste0("regime ", 1:M), bty="n", col=colpal_mw, lty=1, lwd=2,
            text.font=2, cex=0.9, x.intersp=0.5, y.intersp=1)
     if(add_grid) grid(...)

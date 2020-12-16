@@ -147,15 +147,6 @@ quantile_residuals <- function(gmvar) {
                                                            mu=as.matrix(mu_mt[, 1:(j - 1), m]),
                                                            Omega=upleft_jjmat(all_Omega[, , m], j - 1)),
                                              numeric(T_obs))
-    # if(any(log_mvnvalues < epsilon)) { # Use Brobdingnag
-    #   numerators <- lapply(1:M, function(m) alpha_mt[,m]*exp(Brobdingnag::as.brob(log_mvnvalues[,m])))
-    #   denominator <- Reduce('+', numerators)
-    #   beta_mtj[, , j] <- vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(T_obs))
-    # } else {
-    #   numerators <- as.matrix(alpha_mt*exp(log_mvnvalues))
-    #   denominator <- rowSums(numerators)
-    #   beta_mtj[, , j] <- numerators/denominator
-    # }
 
     small_logmvns <- log_mvnvalues < epsilon
     if(any(small_logmvns)) {
@@ -205,11 +196,12 @@ quantile_residuals <- function(gmvar) {
 #'   No argument checks!
 #' @inherit quantile_residuals return references
 
-quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL, structural_pars=NULL) {
+quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL,
+                                   structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
   lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                   parametrization=parametrization, constraints=constraints,
                                   structural_pars=structural_pars, to_return="loglik_and_mw",
-                                  check_params=TRUE, minval=NA)
+                                  check_params=TRUE, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
   mod <- structure(list(data=data,
@@ -230,7 +222,9 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                         IC=NA,
                         all_estimates=NULL,
                         all_logliks=NULL,
-                        which_converged=NULL),
+                        which_converged=NULL,
+                        num_tols=list(stat_tol=stat_tol,
+                                      posdef_tol=posdef_tol)),
                    class="gmvar")
   quantile_residuals(mod)
 }

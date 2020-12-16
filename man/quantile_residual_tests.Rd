@@ -13,10 +13,12 @@
 
 quantile_residual_tests(
   gmvar,
-  lags_ac = c(1:2, 4, 8),
+  lags_ac = c(1, 3, 6, 12),
   lags_ch = lags_ac,
   nsimu = 1,
-  print_res = TRUE
+  print_res = TRUE,
+  stat_tol,
+  posdef_tol
 )
 }
 \arguments{
@@ -37,6 +39,15 @@ If smaller than sample size, then the covariance matrix will be evaluated from t
 of simulations might improve the tests size properties but it increases the computation time.}
 
 \item{print_res}{should the test results be printed while computing the tests?}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
 Returns an object of class \code{'qrtest'} which has its own print method. The returned object
@@ -49,6 +60,13 @@ Returns an object of class \code{'qrtest'} which has its own print method. The r
 \code{quantile_residual_tests} performs quantile residual tests described
  by \emph{Kalliovirta and Saikkonen 2010}, testing autocorrelation, conditional heteroskedasticity,
  and normality.
+}
+\details{
+If the function fails to calculate the tests because of numerical problems and the parameter values
+  are near the border of the parameter space, it might help to use smaller numerical tolerance for the
+  stationarity and positeve definiteness conditions. The numerical tolerance of an existing model
+  can be changed with the function \code{update_numtols} or you can set it directly with the arguments
+  \code{stat_tol} and \code{posdef_tol}.
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -111,5 +129,5 @@ qrtests22c
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
-  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}
+  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 }

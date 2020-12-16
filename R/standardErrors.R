@@ -9,14 +9,14 @@
 #' @inherit in_paramspace_int references
 
 standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"),
-                            constraints=NULL, structural_pars=NULL, minval) {
+                            constraints=NULL, structural_pars=NULL, minval, stat_tol=1e-3, posdef_tol=1e-8) {
 
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
                                constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                               to_return="loglik", minval=minval),
+                               to_return="loglik", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol),
              error=function(e) NA)
   }
 

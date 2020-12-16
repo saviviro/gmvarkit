@@ -4,6 +4,7 @@
 #'
 #' @description \code{loglikelihood_int} computes log-likelihood of a GMVAR model.
 #'
+#' @inheritParams in_paramspace_int
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 #'  a single time series. \code{NA} values are not supported.
 #' @param p a positive integer specifying the autoregressive order of the model.
@@ -123,7 +124,7 @@
 loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
                               structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans", "total_cmeans", "total_ccovs"),
-                              check_params=TRUE, minval=NULL) {
+                              check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
   # Compute required values
   epsilon <- round(log(.Machine$double.xmin) + 10) # Logarithm of the smallest value that can be handled normally
@@ -149,7 +150,8 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)
   if(check_params) {
-    if(!in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega, W_constraints=W_constraints)) {
+    if(!in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega,
+                          W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol)) {
       return(minval)
     }
   }
@@ -239,7 +241,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 #'   the mixing weights.
 #'
 #' @inheritParams loglikelihood_int
-#' @param log_mvnvalues \eqn(T x M) matrix containing the log multivariate normal densities.
+#' @param log_mvnvalues \eqn{T x M} matrix containing the log multivariate normal densities.
 #' @param alphas \eqn{M x 1} vector containing the mixing weight pa
 #' @param epsilon the smallest number such that its exponent is wont classified as numerically zero
 #'   (around \code{-698} is used).
@@ -325,7 +327,7 @@ get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_
 #' @export
 
 loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                          structural_pars=NULL, minval=NA) {
+                          structural_pars=NULL, minval=NA, stat_tol=1e-3, posdef_tol=1e-8) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
   data <- check_data(data, p)
@@ -335,7 +337,8 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
     stop("Parameter vector has wrong dimension")
   }
   loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
-                    constraints=constraints, structural_pars=structural_pars, to_return="loglik", check_params=TRUE, minval=minval)
+                    constraints=constraints, structural_pars=structural_pars, to_return="loglik", check_params=TRUE,
+                    minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 
 
@@ -375,7 +378,8 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
 #' @export
 
 cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL,
-                         structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs")) {
+                         structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs"),
+                         stat_tol=1e-3, posdef_tol=1e-8) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
   to_return <- match.arg(to_return)
@@ -386,7 +390,8 @@ cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mea
     stop("Parameter vector has wrong dimension")
   }
   loglikelihood_int(data, p, M, params, conditional=TRUE, parametrization=parametrization,
-                    constraints=constraints, structural_pars=structural_pars, to_return=to_return, check_params=TRUE, minval=NA)
+                    constraints=constraints, structural_pars=structural_pars, to_return=to_return, check_params=TRUE,
+                    minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 
 

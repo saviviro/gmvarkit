@@ -50,13 +50,16 @@ colnames(data) <- colnames(eurusd)
 ## Reduced form GMVAR model ##
 
 # Estimate a GMVAR(2,2) model: 16 estimation rounds and seeds for reproducible results
-fit <- fitGMVAR(data, p=2, M=2, ncalls=16, seeds=1:16)
+fit <- fitGMVAR(data, p=2, M=2, ncalls=16, seeds=1:16, ncores=4)
 fit
 
 # Estimate a GMVAR(2,2) model with autoregressive parameters restricted to be the same for all regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=16, seeds=1:16)
+fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=16, seeds=1:16, ncores=4)
 fitc
+
+# Test the above constraints on the AR parameters with likelihood ratio test:
+LR_test(fit, fitc)
 
 # Further information on the estimated model:
 plot(fitc)
@@ -72,6 +75,7 @@ qrt <- quantile_residual_tests(fitc, nsimu=10000)
 
 # Simulate a sample path from the estimated process
 sim <- simulateGMVAR(fitc, nsimu=100)
+plot.ts(sim$sample)
 
 # Forecast future values of the process
 predict(fitc, n_ahead=10)
@@ -82,7 +86,7 @@ predict(fitc, n_ahead=10)
 # Estimate structural GMVAR(2,2) model identified with sign constraints:
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
-                   ncalls=40, seeds=1:40)
+                   ncalls=20, seeds=1:20, ncores=4)
 fit22s
 
 # Alternatively, if there are two regimes (M=2), a stuctural model can 
@@ -102,23 +106,20 @@ fit22s_4
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
 girf1 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), R1=200, R2=200)
-plot(girf1)
 
 # Estimate GIRF with starting values generated from the stationary distribution
 # of the first regime:
 girf2 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), init_regimes=1, R1=200, R2=200)
-plot(girf2)
 
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
 girf3 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
-plot(girf3)
 
-# Test with Wald test whether the lambda parameters (of the second regime)
-# are identical:
-# fit22s has parameter vector of length 27 with the lambda parameters
-# in elements 25 and 26.
-A <- matrix(c(rep(0, times=24), 1, -1, 0), nrow=1, ncol=27)
+# Test with Wald test whether the diagonal elements of the first AR coefficient
+# matrix of the second regime are identical:
+# fit22s has parameter vector of length 27 with the diagonal elements  of the
+# first A-matrix of the second regime are in elements 13 and 16.
+A <- matrix(c(rep(0, times=12), 1, 0, 0, -1, rep(0, times=27-16)), nrow=1, ncol=27)
 c <- 0
 Wald_test(fit22s, A, c)
 

@@ -57,7 +57,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-                     ncalls=1, seeds=16)
+                     ncalls=20, seeds=1:20, ncores=)
  fit222s
 
  # Test whether the lambda parameters (of the second regime) are identical:
@@ -75,6 +75,14 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
             c(rep(0, times=6), 1, rep(0, times=19)))
  c <- c(0, 0)
  Wald_test(fit222s, A, c)
+
+# Test whether the diagonal elements of the first AR coefficient
+# matrix of the second regime are identical:
+# fit222s has parameter vector of length 27 with the diagonal elements  of the
+# first A-matrix of the second regime are in elements 13 and 16.
+A <- matrix(c(rep(0, times=12), 1, 0, 0, -1, rep(0, times=27-16)), nrow=1, ncol=27)
+c <- 0
+Wald_test(fit22s, A, c)
 }
 }
 \references{

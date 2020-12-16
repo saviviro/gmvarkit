@@ -13,6 +13,10 @@
 #' @param calc_std_errors should approximate standard errors be calculated?
 #' @details If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
 #'   are computed and included in the returned object.
+#'
+#'   If the function fails to calculate approximative standard errors and the parameter values are near the border
+#'   of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
+#'   definiteness conditions.
 #' @return Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
 #'   Can be used to work with other functions provided in \code{gmvarkit}.
 #'
@@ -22,7 +26,7 @@
 #'   Only the \code{print} method is available if data is not provided.
 #'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}},
-#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}
+#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{update_numtols}}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -89,7 +93,7 @@
 #' @export
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                  structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE) {
+                  structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE, stat_tol=1e-3, posdef_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
@@ -106,7 +110,8 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     }
   }
   check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  check_parameters(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  check_parameters(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars,
+                   stat_tol=stat_tol, posdef_tol=posdef_tol)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
 
   if(is.null(data)) {
@@ -117,7 +122,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     if(npars >= nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
     lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                     parametrization=parametrization, constraints=constraints, structural_pars=structural_pars,
-                                    to_return="loglik_and_mw", check_params=FALSE, minval=NA)
+                                    to_return="loglik_and_mw", check_params=FALSE, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                          parametrization=parametrization, constraints=constraints, structural_pars=structural_pars)
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
@@ -130,7 +135,8 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     } else {
       std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
                                              constraints=constraints, structural_pars=structural_pars,
-                                             minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1)),
+                                             minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1),
+                                             stat_tol=stat_tol, posdef_tol=posdef_tol),
                              error=function(e) {
                                warning("Approximate standard errors can't be calculated")
                                std_errors=rep(NA, npars)
@@ -147,7 +153,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
   } else {
     get_cm <- function(to_return) loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
                                                     constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                                                    to_return=to_return, minval=NA)
+                                                    to_return=to_return, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
     regime_cmeans <- get_cm("regime_cmeans")
     total_cmeans <- get_cm("total_cmeans")
     total_ccovs <- get_cm("total_ccovs")
@@ -176,7 +182,9 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                                                    constraints=constraints, structural_pars=structural_pars),
                  all_estimates=NULL,
                  all_logliks=NULL,
-                 which_converged=NULL),
+                 which_converged=NULL,
+                 num_tols=list(stat_tol=stat_tol,
+                               posdef_tol=posdef_tol)),
             class="gmvar")
 }
 
@@ -191,7 +199,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 #' @inheritParams GMVAR
 #' @return Returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
 #'   If the object already contained data, the data will be updated.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -245,7 +253,8 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
   GMVAR(data=data, p=gmvar$model$p, M=gmvar$model$M, params=gmvar$params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
         structural_pars=gmvar$model$structural_pars, calc_cond_moments=calc_cond_moments,
-        calc_std_errors=calc_std_errors)
+        calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -311,7 +320,8 @@ swap_parametrization <- function(gmvar) {
                                        change_to=change_to)
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=new_params, conditional=gmvar$model$conditional,
         parametrization=change_to, constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
-        calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE))
+        calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE), stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -363,7 +373,8 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
         constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
-        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors)
+        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -451,7 +462,8 @@ gmvar_to_sgmvar <- function(gmvar) {
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=constraints,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -521,7 +533,8 @@ reorder_W_columns <- function(gmvar, perm) {
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=constraints,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -590,5 +603,51 @@ swap_W_signs <- function(gmvar, which_to_swap) {
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=constraints,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors)
+        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+        posdef_tol=gmvar$num_tols$posdef_tol)
+}
+
+
+
+#' @title Update the stationarity and positive definiteness numerical tolerances of an
+#'   existing class 'gmvar' model.
+#'
+#' @description \code{update_numtols} updates the stationarity and positive definiteness
+#'   numerical tolerances of an existing class 'gmvar' model.
+#'
+#' @inheritParams simulateGMVAR
+#' @inheritParams in_paramspace_int
+#' @details All signs in any column of \eqn{W} can be swapped without changing the implied reduced form model.
+#'   Consequently, also the signs in the columns of the B-matrix are swapped. Note that the sign constraints
+#'   imposed on \eqn{W} (or the B-matrix) are also swapped in the corresponding columns accordingly.
+#'
+#'   Also the order of the columns of \eqn{W} can be changed (without changing the implied reduced
+#'   form model) as long as the order of lambda parameters is also changed accordingly. This can be
+#'   done with the function \code{reorder_W_columns}.
+#' @return Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+#'   structural parameters and constraints.
+#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+#'  \code{\link{gmvar_to_sgmvar}}
+#' @inherit reorder_W_columns references
+#' @examples
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
+#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
+#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
+#'                  structural_pars=list(W=W_222))
+#' mod222s
+#'
+#' # Update numerical tolerances:
+#' mod222s <- update_numtols(mod222s, stat_tol=1e-4, posdef_tol=1e-9)
+#' mod222s
+#' @export
+
+update_numtols <- function(gmvar, stat_tol=1e-3, posdef_tol=1e-8) {
+  GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
+        conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
+        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
+        calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE), stat_tol=stat_tol,
+        posdef_tol=posdef_tol)
 }

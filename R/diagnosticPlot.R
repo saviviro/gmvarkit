@@ -133,6 +133,7 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' @description \code{profile_logliks} plots profile log-likelihoods around the estimates.
 #'
 #' @inheritParams simulateGMVAR
+#' @inheritParams in_paramspace_int
 #' @param which_pars the profile log-likelihood function of which parameters should be plotted? An integer
 #'  vector specifying the positions of the parameters in the parameter vector. The parameter vector has the
 #'  form...
@@ -220,7 +221,7 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' }
 #' @export
 
-profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, precission=200) {
+profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, precission=200, stat_tol=1e-3, posdef_tol=1e-8) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   p <- gmvar$model$p
@@ -275,7 +276,8 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
       new_pars[i1] <- val # Change the single parameter value
       loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars, conditional=gmvar$model$conditional,
                         parametrization=parametrization, constraints=constraints,
-                        structural_pars=structural_pars, check_params=TRUE, minval=NA)
+                        structural_pars=structural_pars, check_params=TRUE, minval=NA,
+                        stat_tol=stat_tol, posdef_tol=posdef_tol)
     }, numeric(1))
 
     # In order to get the labels right, we first determine which parameter is in question.

@@ -109,7 +109,9 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     params <- gmvar$params
     n_obs <- nrow(data)
     mw <- loglikelihood_int(data, p, M, params=params, conditional=gmvar$model$conditional,
-                            constraints=constraints, structural_pars=structural_pars, to_return="mw_tplus1")
+                            constraints=constraints, structural_pars=structural_pars,
+                            to_return="mw_tplus1", stat_tol=gmvar$num_tols$stat_tol,
+                            posdef_tol=gmvar$num_tols$posdef_tol)
     mw <- mw[nrow(mw),]
 
     # Collect parameter values

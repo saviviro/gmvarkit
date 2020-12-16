@@ -5,12 +5,18 @@
 #'  and normality.
 #'
 #' @inheritParams quantile_residuals
+#' @inheritParams loglikelihood_int
 #' @param lags_ac a positive integer vector specifying the lags used to test autocorrelation.
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
 #'   of simulations might improve the tests size properties but it increases the computation time.
 #' @param print_res should the test results be printed while computing the tests?
+#' @details If the function fails to calculate the tests because of numerical problems and the parameter values
+#'   are near the border of the parameter space, it might help to use smaller numerical tolerance for the
+#'   stationarity and positeve definiteness conditions. The numerical tolerance of an existing model
+#'   can be changed with the function \code{update_numtols} or you can set it directly with the arguments
+#'   \code{stat_tol} and \code{posdef_tol}.
 #' @return Returns an object of class \code{'qrtest'} which has its own print method. The returned object
 #'   is a list containing the quantile residual test results for normality, autocorrelation, and conditional
 #'   heteroskedasticity. The autocorrelation and conditional heteroskedasticity results also contain the
@@ -19,7 +25,7 @@
 #' @inherit quantile_residuals references
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
 #'   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
-#'   \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}
+#'   \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 #' @examples
 #' \donttest{
 #' ## These are long running examples that use parallel computing!
@@ -61,7 +67,8 @@
 #' }
 #' @export
 
-quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac, nsimu=1, print_res=TRUE) {
+quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsimu=1, print_res=TRUE,
+                                    stat_tol, posdef_tol) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")
@@ -76,6 +83,8 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
   data <- gmvar$data
   n_obs <- nrow(data)
   T_obs <- n_obs - p
+  if(missing(stat_tol)) stat_tol <- gmvar$num_tols$stat_tol
+  if(missing(posdef_tol)) posdef_tol <- gmvar$num_tols$posdef_tol
   if(max(c(lags_ac, lags_ch)) >= T_obs) stop("The lags are too large compared to the data size")
 
   qresiduals <- gmvar$quantile_residuals
@@ -98,7 +107,8 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
     }
     omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M, params=params, conditional=conditional,
                                    parametrization=parametrization, constraints=constraints,
-                                   structural_pars=structural_pars, g=g, dim_g=dim_g),
+                                   structural_pars=structural_pars, g=g, dim_g=dim_g, stat_tol=stat_tol,
+                                   posdef_tol=posdef_tol),
                     error=function(e) {
                       print_message(which_test, which_lag, because_of="because of numerical problems")
                       return(NA)
@@ -245,7 +255,8 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1:2, 4, 8), lags_ch=lags_ac
 #' @return Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen 2010}.
 #' @inherit quantile_residuals references
 
-get_test_Omega <- function(data, p, M, params, conditional, parametrization, constraints, structural_pars=NULL, g, dim_g) {
+get_test_Omega <- function(data, p, M, params, conditional, parametrization, constraints, structural_pars=NULL, g, dim_g,
+                           stat_tol=1e-3, posdef_tol=1e-8) {
 
   n_obs <- nrow(data)
   T_obs <- n_obs - p
@@ -256,7 +267,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   g_fn <- function(pars) {
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=pars, conditional=conditional,
                                          parametrization=parametrization, constraints=constraints,
-                                         structural_pars=structural_pars)
+                                         structural_pars=structural_pars, stat_tol=stat_tol, posdef_tol=posdef_tol)
     g(qresiduals) # a row for each t=1,...,T and column for each output of g
   }
 
@@ -264,7 +275,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   loglik_fn <- function(pars) {
     loglikelihood_int(data, p, M, params=pars, conditional=conditional, parametrization=parametrization,
                       constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                      to_return="terms", minval=minval)
+                      to_return="terms", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
   }
 
   npars <- length(params)

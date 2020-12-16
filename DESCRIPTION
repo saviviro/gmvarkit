@@ -1,6 +1,6 @@
 Package: gmvarkit
 Title: Estimate Gaussian Mixture Vector Autoregressive Model
-Version: 1.2.4
+Version: 1.3.0
 Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
 Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
     Gaussian mixture vector autoregressive (GMVAR) model, quantile residual tests, graphical diagnostics,

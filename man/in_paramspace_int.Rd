@@ -12,7 +12,9 @@ in_paramspace_int(
   all_boldA,
   alphas,
   all_Omega,
-  W_constraints = NULL
+  W_constraints = NULL,
+  stat_tol = 0.001,
+  posdef_tol = 1e-08
 )
 }
 \arguments{
@@ -63,6 +65,15 @@ obtained from \code{form_boldA}. Will be computed if not given.}
 
 \item{W_constraints}{set \code{NULL} for reduced form models. For structural models, this should be the
 constraint matrix \eqn{W} from the list of structural parameters.}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
 Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.

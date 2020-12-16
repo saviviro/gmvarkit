@@ -135,7 +135,7 @@ Returns an object of class \code{'gmvar'} defining the estimated (reduced form o
   estimation in the second phase. Parallel computing is utilized to perform multiple rounds of estimations in parallel.
 }
 \details{
-Because of complexity and multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
+Because of complexity and high multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
  algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in
  some local maximum or saddle point instead. Therefore, a (sometimes large) number of estimation rounds is required
  for reliable results. Because of the nature of the model, the estimation may fail especially in the cases where the
@@ -165,14 +165,15 @@ Because of complexity and multimodality of the log-likelihood function, it's \st
  The gradient based variable metric algorithm used in the second phase is implemented with function \code{optim}
  from the package \code{stats}.
 
- Finally, note that the structural models are even more difficult to estimate than the reduced form models due to
- the different parametrization of the covariance matrices. If necessary, an initial population may be constructed
- for the genetic algorithm based on the estimation results of a reduced form model. It does not seem unambiguous,
- however, how to do that so that the (structural) parameter constraints are satisfied. Also, be aware that if the
- lambda parameters are constrained in any other way than by restricting some of them to be identical, the parameter
- "lambda_scale" of the genetic algorithm (see \code{?GAfit}) needs to be carefully adjusted accordingly.
- Be aware that if a structural model is considered and the lambda parameters are constrained in some other way
- than constraining some of them to be identical, the settings of the genetic algorithm may have to be adjusted.
+ Note that the structural models are even more difficult to estimate than the reduced form models due to
+ the different parametrization of the covariance matrices, so larger number of estimation rounds should be considered.
+ Also, be aware that if the lambda parameters are constrained in any other way than by restricting some of them to be
+ identical, the parameter "lambda_scale" of the genetic algorithm (see \code{?GAfit}) needs to be carefully adjusted accordingly.
+
+ Finally, the function fails to calculate approximative standard errors and the parameter estimates are near the border
+ of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
+ definiteness conditions. The numerical tolerance of an existing model can be changed with the function
+ \code{update_numtols}.
 }
 \section{S3 methods}{
 
@@ -208,7 +209,7 @@ fit12s
 
 # GMVAR(2,2) model with mean parametrization
 fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
-                  ncalls=16, seeds=1:16)
+                  ncalls=20, seeds=1:20, ncores=4)
 fit22
 
 # Structural GMVAR(2,2) model with the lambda parameters restricted
@@ -261,5 +262,6 @@ fit22c2
 \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
-  \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}}
+  \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
+  \code{\link{update_numtols}}
 }

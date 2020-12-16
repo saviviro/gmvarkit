@@ -166,7 +166,7 @@
 
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
-                  lambda_scale, ar_scale=0.2, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.05,
+                  lambda_scale, ar_scale=0.2, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00,
                   to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and premilinary checks
@@ -343,9 +343,9 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                                                         constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
                                                         check_params=FALSE, minval=minval), error=function(e) minval)
             } else {
-              loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                               constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
-                                               check_params=TRUE, minval=minval)
+              loks_and_mw <- tryCatch(loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
+                                                        constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
+                                                        check_params=TRUE, minval=minval), error=function(e) minval)
             }
             fill_lok_and_red(i1, i2, loks_and_mw)
          }

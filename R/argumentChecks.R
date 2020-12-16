@@ -70,6 +70,13 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #' @param all_Omega 3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.
 #' @param W_constraints set \code{NULL} for reduced form models. For structural models, this should be the
 #'   constraint matrix \eqn{W} from the list of structural parameters.
+#' @param stat_tol numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+#'   has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+#'   tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.
+#' @param posdef_tol numerical tolerance for positive definiteness of the error term covariance matrices: if
+#'   the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+#'   as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+#'   evaluation of the log-likelihood might fail and cause error.
 #' @details The parameter vector in the argument \code{params} should be unconstrained and it is used for
 #'   structural models only.
 #' @return Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.
@@ -82,7 +89,7 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'      paper, available as arXiv:2007.04713.
 #'  }
 
-in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_constraints=NULL) {
+in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
   if(!is.null(W_constraints)) {
     W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=list(W=W_constraints))
@@ -103,11 +110,11 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
     return(FALSE)
   } else if(any(alphas <= 0)) {
     return(FALSE)
-  } else if(!is_stationary(p=p, M=M, d=d, all_boldA=all_boldA)) {
+  } else if(!is_stationary(p=p, M=M, d=d, all_boldA=all_boldA, tolerance=stat_tol)) {
     return(FALSE)
   }
   for(m in 1:M) {
-    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < 1e-8)) {
+    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < posdef_tol)) {
       return(FALSE)
     }
   }
@@ -118,10 +125,11 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
 #' @title Determine whether the parameter vector lies in the parameter space
 #'
 #' @description \code{in_paramspace} checks whether the given parameter vector lies in
-#'   the parameter space. Does NOT consider the identifiability condition!
+#'   the parameter space. Does NOT test the identification conditions!
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
+#' @inheritParams in_paramspace_int
 #' @return Returns \code{TRUE} if the given parameter vector lies in the parameter space
 #'  and \code{FALSE} otherwise.
 #' @inherit in_paramspace_int references
@@ -155,7 +163,7 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
 #'   structural_pars=list(W=W_222))
 #' @export
 
-in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
+in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
   check_pMd(p=p, M=M, d=d)
   check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
   if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
@@ -168,7 +176,7 @@ in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NUL
   in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
                     alphas=pick_alphas(p=p, M=M, d=d, params=params),
                     all_Omega=pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars),
-                    W_constraints=W_constraints)
+                    W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 
 
@@ -179,6 +187,7 @@ in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NUL
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
+#' @inheritParams in_paramspace_int
 #' @return Throws an informative error if there is something wrong with the parameter vector.
 #' @inherit in_paramspace references
 #' @examples
@@ -215,7 +224,7 @@ in_paramspace <- function(p, M, d, params, constraints=NULL, structural_pars=NUL
 #' }
 #' @export
 
-check_parameters <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
+check_parameters <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
   check_pMd(p=p, M=M, d=d)
   check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
@@ -246,12 +255,12 @@ check_parameters <- function(p, M, d, params, constraints=NULL, structural_pars=
     stop("The mixing weight parameters don't sum to one")
   } else if(any(alphas <= 0)) {
     stop("The mixing weight parameters must be strictly positive")
-  } else if(!is_stationary(p=p, M=M, d=d, params=params, structural_pars=structural_pars)) {
+  } else if(!is_stationary(p=p, M=M, d=d, params=params, structural_pars=structural_pars, tolerance=stat_tol)) {
     stop("The stationarity condition is not satisfied (with large enough numerical tolerance)")
   }
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   for(m in 1:M) {
-    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < 1e-8)) {
+    if(any(eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$values < posdef_tol)) {
       stop(paste0("Error term covariance matrix of regime ", m, " is not (numerically enough) positive definite"))
     }
   }

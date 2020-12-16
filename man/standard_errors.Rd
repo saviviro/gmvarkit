@@ -13,7 +13,9 @@ standard_errors(
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   structural_pars = NULL,
-  minval
+  minval,
+  stat_tol = 0.001,
+  posdef_tol = 1e-08
 )
 }
 \arguments{
@@ -107,6 +109,15 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{minval}{the value that will be returned if the parameter vector does not lie in the parameter space
 (excluding the identification condition).}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
 A vector containing the approximate standard errors of the estimates.

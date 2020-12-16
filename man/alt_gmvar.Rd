@@ -74,5 +74,5 @@ fit12s_2
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}
+\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
 }

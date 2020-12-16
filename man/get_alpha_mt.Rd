@@ -9,7 +9,7 @@ get_alpha_mt(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0 = FALSE)
 \arguments{
 \item{M}{a positive integer specifying the number of mixture components.}
 
-\item{log_mvnvalues}{\eqn(T x M) matrix containing the log multivariate normal densities.}
+\item{log_mvnvalues}{\eqn{T x M} matrix containing the log multivariate normal densities.}
 
 \item{alphas}{\eqn{M x 1} vector containing the mixing weight pa}
 

@@ -78,5 +78,5 @@ mod222s_2 # mean parametrization
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}
+\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
 }

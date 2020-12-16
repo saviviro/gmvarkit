@@ -24,7 +24,7 @@ GAfit(
   ar_scale = 0.2,
   regime_force_scale = 1,
   red_criteria = c(0.05, 0.01),
-  pre_smart_mu_prob = 0.05,
+  pre_smart_mu_prob = 0,
   to_return = c("alt_ind", "best_ind"),
   minval,
   seed = NULL

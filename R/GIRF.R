@@ -38,6 +38,7 @@
 #'   as well? \code{TRUE} or \code{FALSE}.
 #' @param ncores the number CPU cores to be used in parallel computing. Only single core computing is
 #'   supported if an initial value is specified (and the GIRF won't thus be estimated multiple times).
+#' @param plot \code{TRUE} if the results should be plotted, \code{FALSE} if not.
 #' @param seeds a length \code{R2} vector containing the random number generator seed for estimation
 #'   of each GIRF. A single number of an initial value is specified.
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
@@ -79,8 +80,8 @@
 #'  # (initial values are drawn from the stationary distribution of the process,
 #'  # 30 periods ahead, confidence levels 0.95 and 0.8):
 #'  girf1 <- GIRF(mod222s)
-#'  plot(girf1)
 #'  girf1
+#'  plot(girf1)
 #'
 #'  # Estimating the GIRF of the second shock only, 36 periods ahead
 #'  # and shock size 1, initial values drawn from the stationary distribution
@@ -97,7 +98,7 @@
 #' @export
 
 GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL, which_cumulative,
-                 ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), seeds=NULL) {
+                 ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=min(2, parallel::detectCores()), plot=TRUE, seeds=NULL) {
   on.exit(closeAllConnections())
 
   p <- gmvar$model$p
@@ -188,16 +189,18 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
   }
 
   cat("Finished!\n")
-  structure(list(girf_res=GIRF_results,
-                 shocks=which_shocks,
-                 shock_size=shock_size,
-                 N=N,
-                 R1=R1,
-                 R2=R2,
-                 ci=ci,
-                 which_cumulative=which_cumulative,
-                 init_regimes=init_regimes,
-                 init_values=init_values,
-                 include_mixweights=include_mixweights),
-            class="girf")
+  ret <- structure(list(girf_res=GIRF_results,
+                        shocks=which_shocks,
+                        shock_size=shock_size,
+                        N=N,
+                        R1=R1,
+                        R2=R2,
+                        ci=ci,
+                        which_cumulative=which_cumulative,
+                        init_regimes=init_regimes,
+                        init_values=init_values,
+                        include_mixweights=include_mixweights),
+                   class="girf")
+  if(plot) plot(ret)
+  ret
 }

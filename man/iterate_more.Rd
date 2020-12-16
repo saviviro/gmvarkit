@@ -4,7 +4,13 @@
 \alias{iterate_more}
 \title{Maximum likelihood estimation of a GMVAR model with preliminary estimates}
 \usage{
-iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
+iterate_more(
+  gmvar,
+  maxit = 100,
+  calc_std_errors = TRUE,
+  stat_tol = 0.001,
+  posdef_tol = 1e-08
+)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
@@ -12,6 +18,15 @@ iterate_more(gmvar, maxit = 100, calc_std_errors = TRUE)
 \item{maxit}{the maximum number of iterations in the variable metric algorithm.}
 
 \item{calc_std_errors}{should approximate standard errors be calculated?}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
 Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
@@ -89,5 +104,6 @@ fit32_2
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}}, \code{\link{profile_logliks}}
+\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}},
+ \code{\link{profile_logliks}}, \code{\link{update_numtols}}
 }

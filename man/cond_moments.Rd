@@ -12,7 +12,9 @@ cond_moments(
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   structural_pars = NULL,
-  to_return = c("regime_cmeans", "total_cmeans", "total_ccovs")
+  to_return = c("regime_cmeans", "total_cmeans", "total_ccovs"),
+  stat_tol = 0.001,
+  posdef_tol = 1e-08
 )
 }
 \arguments{
@@ -103,6 +105,15 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{to_return}{should the regimewise conditional means, total conditional means, or total conditional covariance matrices
 be returned?}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
 \describe{

@@ -31,7 +31,7 @@
 #'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
 #'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
 #'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=1, seeds=16)
+#'                      ncalls=20, seeds=1:20, ncores=)
 #'  fit222s
 #'
 #'  # Test whether the lambda parameters (of the second regime) are identical:
@@ -49,6 +49,14 @@
 #'             c(rep(0, times=6), 1, rep(0, times=19)))
 #'  c <- c(0, 0)
 #'  Wald_test(fit222s, A, c)
+#'
+#' # Test whether the diagonal elements of the first AR coefficient
+#' # matrix of the second regime are identical:
+#' # fit222s has parameter vector of length 27 with the diagonal elements  of the
+#' # first A-matrix of the second regime are in elements 13 and 16.
+#' A <- matrix(c(rep(0, times=12), 1, 0, 0, -1, rep(0, times=27-16)), nrow=1, ncol=27)
+#' c <- 0
+#' Wald_test(fit22s, A, c)
 #' }
 #' @export
 
@@ -61,11 +69,12 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 
   # Calculate Hessian matrix at the estimate
   minval <- get_minval(gmvar$data)
-  loglik_fn <- function(params) {
-    tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=params, conditional=gmvar$model$conditional,
+  loglik_fn <- function(pars) {
+    tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=pars, conditional=gmvar$model$conditional,
                                parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
                                structural_pars=gmvar$model$structural_pars, check_params=TRUE,
-                               to_return="loglik", minval=minval),
+                               to_return="loglik", minval=minval, stat_tol=gmvar$num_tols$stat_tol,
+                               posdef_tol=gmvar$num_tols$posdef_tol),
              error=function(e) {
                print(paste("Failed to evualuate log-likelihood function in the approximation of Hessian matrix:", e))
                return(NA)
@@ -128,16 +137,16 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
 #'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
 #'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=1, seeds=16)
+#'                      ncalls=1, seeds=4)
 #'
 #'  # The same model but the AR coefficients restricted to be the same
 #'  # in both regimes:
 #'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 #'  fit222sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
 #'                       structural_pars=list(W=W_222),
-#'                       ncalls=1, seeds=16)
+#'                       ncalls=1, seeds=9)
 #'
-#'  # Test whether the constraints are supported by the data:
+#'  # Test the AR constraints with likelihood ratio test:
 #'  LR_test(fit222s, fit222sc)
 #'  }
 #' @export
@@ -159,11 +168,5 @@ LR_test <- function(gmvar1, gmvar2) {
                  p_value=p_value),
             class="lr")
 }
-
-
-
-
-
-
 
 

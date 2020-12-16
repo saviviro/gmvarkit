@@ -211,33 +211,12 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   get_matprods <- function(Y) vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
   get_logmvnvalues <- function(matprods) vapply(1:M, function(m) -0.5*d*p*log(2*pi) - 0.5*log(det_Sigmas[m]) - 0.5*matprods[m], numeric(1))
 
-#  get_numeratorsL <- function(log_mvnvalues) lapply(1:M, function(m) alphas[m]*exp(Brobdingnag::as.brob(log_mvnvalues[m])))
-#  get_demoninatorL <- function(numerators) Reduce('+', numerators)
-#  get_alpha_mtL <- function(numerators, denominator) vapply(1:M, function(m) as.numeric(numerators[[m]]/denominator), numeric(1))
-
-#  get_mvnvalues <- function(log_mvnvalues) exp(log_mvnvalues)
-#  get_demoninator <- function(mvnvalues) as.vector(mvnvalues%*%alphas)
-#  get_alpha_mt <- function(mvnvalues, denominator) alphas*(mvnvalues/denominator)
-
   for(j1 in seq_len(ntimes)) {
     for(i1 in seq_len(nsimu)) {
       # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)).
       # Calculated in logarithm because same values may be too close to zero for machine accuracy.
       matprods <- get_matprods(Y)
       log_mvnvalues <- get_logmvnvalues(matprods)
-
-      # Calculate mixing weights
-      # if(M == 1) {
-      #   alpha_mt <- 1
-      # } else if(any(log_mvnvalues < epsilon)) { # If some values are too close to zero use the package Brobdingnag
-      #   numerators <- get_numeratorsL(log_mvnvalues)
-      #   denominator <- get_demoninatorL(numerators)
-      #   alpha_mt <- get_alpha_mtL(numerators=numerators, denominator=denominator)
-      # } else {
-      #   mvnvalues <- get_mvnvalues(log_mvnvalues)
-      #   denominator <- get_demoninator(mvnvalues)
-      #   alpha_mt <- get_alpha_mt(mvnvalues=mvnvalues, denominator=denominator)
-      # }
       alpha_mt <- get_alpha_mt(M=M, log_mvnvalues=log_mvnvalues, alphas=alphas,
                                epsilon=epsilon, also_l_0=FALSE)
 
@@ -265,18 +244,6 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
       if(!is.null(girf_pars)) {
         matprods2 <- get_matprods(Y2)
         log_mvnvalues2 <- get_logmvnvalues(matprods2)
-#
-#         if(M == 1) {
-#           alpha_mt2 <- 1
-#         } else if(any(log_mvnvalues2 < epsilon)) { # If some values are too close to zero use the package Brobdingnag
-#           numerators2 <- get_numeratorsL(log_mvnvalues2)
-#           denominator2 <- get_demoninatorL(numerators2)
-#           alpha_mt2 <- get_alpha_mtL(numerators=numerators2, denominator=denominator2)
-#         } else {
-#           mvnvalues2 <- get_mvnvalues(log_mvnvalues2)
-#           denominator2 <- get_demoninator(mvnvalues2)
-#           alpha_mt2 <- get_alpha_mt(mvnvalues=mvnvalues2, denominator=denominator2)
-#         }
         alpha_mt2 <- get_alpha_mt(M=M, log_mvnvalues=log_mvnvalues2, alphas=alphas,
                                   epsilon=epsilon, also_l_0=FALSE)
         mixing_weights2[i1, , j1] <- alpha_mt2

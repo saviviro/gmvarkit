@@ -69,14 +69,18 @@
 * Fixed a bug that caused error in estimation of GIRF with very large shock size.
 * Fixed a bug that caused error in estimation of AR constrained models when initial population is used in the genetic algorithm.
 
-# gmvarkit 1.2.4
+# gmvarkit 1.3.0
 
 * Major speed improvement!
-* Log-likelihood function should not return -Inf anymore but with extremely bad estimates (for some t) the value is not precise (before in such cases it was -Inf). This should lead to better estimation results.
+* Changing the numerical tolerances for stationarity of the AR parameters and positive definiteness of the error term covariance matrices is now possible everywhere expect in the main estimation function and genetic algorithm (to avoid errors in the estimation). This might help in the analysis (std errors, quantile residual tests, further iterative estimation, etc) of models with parameter values that are very close to the border of the parameter space, but too small numerical tolerance may also cause errors. 
 * In the function GIRF, the argument 'variables' was renamed as 'which_shocks'.
+* New exported function: "update_numtols" which enables one to update the numerical tolerances for stationarity of the AR parameters and positive definiteness of the error term covariance matrices in existing class 'gmvar' model.
+* Log-likelihood function should not return -Inf anymore but with extremely bad estimates (for some t) the value is not precise (before in such cases it was -Inf). This should lead to better estimation results in some cases.
 * Fixed a problem in the estimation algorithm that occurred when estimating a structural model with zero constraints in the W matrix. 
-* Increased the default maxit from 300 to 500 in fitGMVAR, the default maxlag from 10 to 12 in diagnostic_plot, and decreased the default ar_scale from 1 to 0.5 in GAfit.
-* Updated the documentation of fitGMVAR: more instructions on what to do when the algorithm fails to create an initial population were added.
+* Increased the default maxit from 300 to 500 in fitGMVAR, the default maxlag from 10 to 12 in diagnostic_plot, and decreased the default initial ar_scale from 1 to 0.2 in GAfit.
 * There is now randomly varying "ar_scale" in the genetic algorithm but initial population ar_scale can still be adjusted.
-* There is now random preliminary smart mutations in the genetic algorithm.
+* There is now possibility to set random preliminary smart mutations in the genetic algorithm.
 * The package Brobdingnag is not imported anymore.
+* The default lags used in quantile residual tests are now 1, 3, 6, and 12.
+* Updated the documentation of fitGMVAR: more instructions on what to do when the algorithm fails to create an initial population were added.
+* Some updates in the vignette, examples, and other documentation.

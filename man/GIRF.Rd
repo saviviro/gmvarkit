@@ -19,6 +19,7 @@ GIRF(
   ci = c(0.95, 0.8),
   include_mixweights = TRUE,
   ncores = min(2, parallel::detectCores()),
+  plot = TRUE,
   seeds = NULL
 )
 
@@ -72,6 +73,8 @@ as well? \code{TRUE} or \code{FALSE}.}
 
 \item{ncores}{the number CPU cores to be used in parallel computing. Only single core computing is
 supported if an initial value is specified (and the GIRF won't thus be estimated multiple times).}
+
+\item{plot}{\code{TRUE} if the results should be plotted, \code{FALSE} if not.}
 
 \item{seeds}{a length \code{R2} vector containing the random number generator seed for estimation
  of each GIRF. A single number of an initial value is specified.
@@ -137,8 +140,8 @@ The model needs to be structural in order for this function to be applicable. A 
  # (initial values are drawn from the stationary distribution of the process,
  # 30 periods ahead, confidence levels 0.95 and 0.8):
  girf1 <- GIRF(mod222s)
- plot(girf1)
  girf1
+ plot(girf1)
 
  # Estimating the GIRF of the second shock only, 36 periods ahead
  # and shock size 1, initial values drawn from the stationary distribution
