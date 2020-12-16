@@ -259,6 +259,7 @@ get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_
   } else {
     if(!is.matrix(log_mvnvalues)) log_mvnvalues <- t(as.matrix(log_mvnvalues)) # Only one time point but multiple regimes
 
+    log_mvnvalues_orig <- log_mvnvalues
     small_logmvns <- log_mvnvalues < epsilon
     if(any(small_logmvns)) {
       # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
@@ -289,7 +290,11 @@ get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_
     if(M == 1 && conditional == FALSE) {
       l_0 <- log_mvnvalues[1,]
     } else if(M > 1 && conditional == FALSE) {
-      l_0 <- log(sum(alphas*mvnvalues[1,]))
+      if(any(log_mvnvalues_orig[1,] < epsilon)) { # Need to use Brobdingnag
+        l_0 <- log(Reduce("+", lapply(1:M, function(i1) alphas[i1]*exp(Brobdingnag::as.brob(log_mvnvalues_orig[1, i1])))))
+      } else {
+        l_0 <- log(sum(alphas*mvnvalues[1,]))
+      }
     }
     return(list(alpha_mt=alpha_mt,
                 l_0=l_0))
