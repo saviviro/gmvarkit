@@ -88,3 +88,7 @@
 # gmvarkit 1.3.1 
 
 * Bug fix which required that Brobdingnag was added back to the imported packages. There was in some rare cases a problem with the exact log-likelihood function that was introduced in the version 1.3.0 (the fix was introduced in the same day as the bug, however).
+
+# gmvarkit 1.3.2
+
+* Technical update to the estimation function.

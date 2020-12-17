@@ -145,7 +145,7 @@
 #'
 #' # GMVAR(1,2) model: 10 estimation rounds with seeds set
 #' # for reproducibility
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
+#' fit12 <- fitGMVAR(data, p=1, M=4, ncalls=10, seeds=1:10)
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
@@ -225,7 +225,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ### Optimization with the genetic algorithm ###
   cl <- parallel::makeCluster(ncores)
   parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
-  parallel::clusterEvalQ(cl, c(library(mvnfast), library(pbapply)))
+  parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
   cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
