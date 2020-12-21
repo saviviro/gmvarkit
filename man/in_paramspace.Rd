@@ -46,7 +46,7 @@ in_paramspace(
   }
   \item{\strong{For same_intercept models:}}{
     Should have the form
-    \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\phi_{0}}}\strong{\eqn{\psi}}
+    \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\phi_{0}},}\strong{\eqn{\psi}}
     \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
     \itemize{
       \item \strong{\eqn{\phi_{0}}}\eqn{= (\phi_{0,g1},...,\phi_{0,gg})} where
