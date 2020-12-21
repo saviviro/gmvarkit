@@ -24,7 +24,7 @@ get_regime_means_int(
 \item{params}{a real valued vector specifying the parameter values.
 \describe{
   \item{\strong{For unconstrained models:}}{
-    Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form
+    Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have the form
     \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
     ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where
     \itemize{
@@ -34,13 +34,26 @@ get_regime_means_int(
     }
   }
   \item{\strong{For constrained models:}}{
-    Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have form
+    Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have the form
     \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi}}
     \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
     \itemize{
       \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
       \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is \eqn{(Mpd^2xq)}
       constraint matrix.
+    }
+  }
+  \item{\strong{For same_intercept models:}}{
+    Should have the form
+    \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\phi_{0}}}\strong{\eqn{\psi}}
+    \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
+    \itemize{
+      \item \strong{\eqn{\phi_{0}}}\eqn{= (\phi_{0,g1},...,\phi_{0,gg})} where
+        \eqn{\phi_{0,gi}} is the intercept/mean parameter for group \eqn{i} and
+        \eqn{g} is the number of groups.
+      \item If AR constraints are employed, \strong{\eqn{\psi}} is as for constrained
+        models, and if AR constraints are not employed, \strong{\eqn{\psi}}\eqn{ = }
+        (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
     }
   }
   \item{\strong{For structural GMVAR model:}}{
@@ -54,6 +67,8 @@ get_regime_means_int(
       \item{\strong{If AR parameters are constrained: }}{Replace \strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
       \strong{\eqn{\phi}}\eqn{_{M}} with \strong{\eqn{\psi}} \eqn{(qx1)} that satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
       \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}, as above.}
+      \item{\strong{If same_intercepts: }}{Replace \eqn{(\phi_{1,0},...,\phi_{M,0})} with \eqn{(\phi_{0,g1},...,\phi_{0,gg})},
+        as above.}
       \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
        the sign constraints.}
       \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
@@ -72,8 +87,8 @@ If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regim
 of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
 
-\item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}
+\item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
+parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

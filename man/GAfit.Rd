@@ -40,8 +40,8 @@ a single time series. \code{NA} values are not supported.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function}
 
-\item{parametrization}{\code{"mean"} or \code{"intercept"} determining whether the model is parametrized with regime means \eqn{\mu_{m}} or
-intercept parameters \eqn{\phi_{m,0}}, m=1,...,M.}
+\item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
+parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

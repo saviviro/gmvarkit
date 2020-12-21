@@ -195,7 +195,7 @@
 #' @export
 
 fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
-                     ncalls=round(10 + 9*log(M)), ncores=min(2, ncalls, parallel::detectCores()), maxit=500, seeds=NULL,
+                     ncalls=floor(10 + 30*log(M)), ncores=min(2, ncalls, parallel::detectCores()), maxit=500, seeds=NULL,
                      print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())

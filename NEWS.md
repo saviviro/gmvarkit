@@ -91,4 +91,5 @@
 
 # gmvarkit 1.3.2
 
+* The default number of estimation rounds was increased to 'floor(10 + 30*log(M))'.
 * Technical update to the estimation function.
