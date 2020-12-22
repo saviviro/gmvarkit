@@ -31,21 +31,29 @@ reform_data <- function(data, p) {
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, change_na=FALSE) {
-  if(is.null(constraints) && is.null(structural_pars)) {
+reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_intercepts=NULL, structural_pars=NULL, change_na=FALSE) {
+  if(is.null(constraints) && is.null(structural_pars) && is.null(same_intercepts)) {
     return(params)
-  } else if(is.null(constraints) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
+  } else if(is.null(constraints) && is.null(same_intercepts) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
     return(params)
   }
+
+  if(is.null(same_intercepts)) {
+    less_pars <- 0 # Number of parameters less compared to models without same interecept constraints
+  } else {
+    g <- length(same_intercepts) # Number groups with the same intercept/mean parameters
+    less_pars <- d*(M - g) # Number of parameters less compared to models without same interecept constraints
+  }
+
 
   # Obtain the AR coefficients from the constraints
   if(is.null(constraints)) { # For SGMVAR model with constrained structural parameters but no AR constraints
     q <- M*p*d^2
-    psi_expanded <- params[(d*M + 1):(d*M + d^2*p*M)] # AR coefficients (without constraints)
+    psi_expanded <- params[(d*M + 1 - less_pars):(d*M + d^2*p*M - less_pars)] # AR coefficients (without constraints)
     psiNA <- FALSE
   } else {
     q <- ncol(constraints)
-    psi <- params[(M*d + 1):(M*d + q)]
+    psi <- params[(M*d + 1 - less_pars):(M*d + q - less_pars)]
     if(change_na) {
       if(anyNA(psi)) {
         warning("Replaced some NA values with -9.999")
@@ -58,33 +66,50 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, structura
     psi_expanded <- constraints%*%psi
   }
 
+  # Obtain the intercept/mean parameters from the constrained parameter vector
+  if(is.null(same_intercepts)) {
+    if(is.null(structural_pars)) { # There is computationally more efficient way for structural models.
+      all_phi0 <- matrix(params[1:(d*M)], nrow=d, ncol=M) # params[((m - 1)*d + 1):(m*d)]
+    }
+  } else {
+    group_phi0 <- matrix(params[1:(d*g)], nrow=d, ncol=g) # Column for each group
+    all_phi0 <- matrix(NA, nrow=d, ncol=M) # Storage for all phi0
+    for(i1 in 1:g) {
+      all_phi0[,same_intercepts[[i1]]] <- group_phi0[,i1] # Ei toimi i1 koska voi ryhmät voi olla eri järkässä
+    }
+  }
+
   if(is.null(structural_pars)) { # Reduced form model
-    pars <- as.vector(vapply(1:M, function(m) c(params[((m - 1)*d + 1):(m*d)], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
-                                                params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1):(M*d + q + m*d*(d + 1)/2)]),
+    pars <- as.vector(vapply(1:M, function(m) c(all_phi0[,m], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
+                                                params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1 - less_pars):(M*d + q + m*d*(d + 1)/2 - less_pars)]),
                              numeric(p*d^2 + d + d*(d + 1)/2)))
   } else { # Structural model
     W <- structural_pars$W # Obtain the indices with zero constraints (the zeros don't exist in params)
     n_zeros <- sum(W == 0, na.rm=TRUE)
     new_W <- numeric(d^2)
-    W_pars <- params[(d*M + q + 1):(d*M + q + d^2 - n_zeros)]
+    W_pars <- params[(d*M + q + 1 - less_pars):(d*M + q + d^2 - n_zeros - less_pars)]
     new_W[W != 0 | is.na(W)] <- W_pars
 
     if(M > 1) {
       if(!is.null(structural_pars$C_lambda)) {
         r <- ncol(structural_pars$C_lambda)
-        gamma <- params[(d*M + q + d^2 - n_zeros + 1):(d*M + q + d^2 - n_zeros + r)]
+        gamma <- params[(d*M + q + d^2 - n_zeros + 1 - less_pars):(d*M + q + d^2 - n_zeros + r - less_pars)]
         if(change_na) {
           if(anyNA(gamma) && !psiNA) warning("Replaced some NA values with -9.999")
           gamma[is.na(gamma)] <- -9.999
         }
         lambdas <- structural_pars$C_lambda%*%gamma
       } else {
-        lambdas <- params[(d*M + q + d^2 - n_zeros + 1):(d*M + q + d^2 - n_zeros + d*(M - 1))]
+        lambdas <- params[(d*M + q + d^2 - n_zeros + 1 - less_pars):(d*M + q + d^2 - n_zeros + d*(M - 1) - less_pars)]
       }
     } else {
       lambdas <- numeric(0)
     }
-    pars <- c(params[1:(M*d)], psi_expanded, vec(new_W), lambdas)
+    if(is.null(same_intercepts)) {
+      pars <- c(params[1:(M*d)], psi_expanded, vec(new_W), lambdas)
+    } else {
+      pars <- c(as.vector(all_phi0), psi_expanded, vec(new_W), lambdas)
+    }
   }
 
   if(M == 1) {

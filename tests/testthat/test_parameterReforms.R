@@ -282,8 +282,8 @@ theta_122_int2 <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vech(Omega
 theta_122_int2_expanded <- c(phi10_122, vec(A11_122), vech(Omega1_122), phi20_122, vec(A21_122), vech(Omega2_122), alpha1_122)
 
 # p=1, M=2, d=2, constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122), same_intercepts=list(1:2)
-theta_122csL_int <-  c(phi10_122, vec(A11_122), vec(A21_122), vec(W_122), 0.5, alpha1_122)
-theta_122csL_int_expanded <- c(phi10_122, phi10_122, vec(A11_122), vec(A21_122), vec(W_122), 0.5, 0.5, alpha1_122)
+theta_122csL_int <-  c(phi10_122, vec(A11_122), vec(W_122), 0.5, alpha1_122)
+theta_122csL_int_expanded <- c(phi10_122, phi10_122, vec(A11_122), vec(A11_122), vec(W_122), 0.5, 0.5, alpha1_122)
 
 # p=2, M=2, d=2, constraints=C_222, same_intercepts=list(1:2)
 theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
@@ -296,7 +296,7 @@ theta_222csLAR_int_expanded <-  c(phi10_222, phi10_222, vec(A11_222), vec(A12_22
                                   vec(W_222), 0.2, 2*0.2, alpha1_222)
 
 # p=3, M=3, d=2, constraints=C_332, same_intercepts=list(1, 2:3)
-theta_332c_int <- c(phi10_332, phi20_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+theta_332c_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
                     vech(Omega3_332), alpha1_332, alpha2_332)
 theta_332c_int_expanded <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), phi20_332, vec(A11_332),
                              vec(A12_332), vec(A13_332), vech(Omega2_332), phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
@@ -342,7 +342,7 @@ theta_123csL_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A21_123),
 
 # p=1, M=2, d=3, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123) same_intercepts=list(1:2)
 theta_123csLAR_int <- c(phi10_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
-theta_123csLAR_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), vec(W_123), 1, 1, 2, alpha1_123)
+theta_123csLAR_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), vec(W_123), 1, 1, 2, alpha1_123)
 
 # p=2, M=1, d=3, constraints=C_213, same_intercepts=list(1)
 theta_213c_int <- c(phi10_213, vec(A11_213), vec(A12_213), vech(Omega1_213))
