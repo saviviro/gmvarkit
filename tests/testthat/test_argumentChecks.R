@@ -385,9 +385,20 @@ test_that("in_paramspace works correctly", {
   expect_false(in_paramspace(p=2, M=2, d=2, params=theta_222csLAR_3, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
   theta_112s_2 <- c(phi10_112, vec(A12_222), Wvec(W_112))
   expect_true(in_paramspace(p=1, M=1, d=2, params=theta_112s_2, structural_pars=list(W=W_112)))
+
+  # same_means
+  expect_false(in_paramspace(p=1, M=1, d=2, params=theta_112_int, same_means=list(1)))
+  expect_true(in_paramspace(p=1, M=2, d=2, params=theta_122_int, same_means=list(1:2)))
+  expect_true(in_paramspace(p=1, M=2, d=2, params=theta_122_int2, same_means=list(1, 2)))
+  expect_true(in_paramspace(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2)))
+  expect_true(in_paramspace(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)))
+  expect_false(in_paramspace(p=3, M=3, d=2, params=theta_332c_int, constraints=C_332, same_means=list(1, 2:3)))
+  expect_false(in_paramspace(p=1, M=2, d=3, params=theta_123_int, same_means=list(1:2)))
+  expect_true(in_paramspace(p=1, M=2, d=3, params=theta_123c_int, constraints=C_123, same_means=list(1:2)))
 })
 
 test_that("check_parameters works correctly", {
+
   expect_error(check_parameters(p=1, M=1, d=2, params=theta_112))
   expect_error(check_parameters(p=2, M=3, d=2, params=theta_222))
   expect_error(check_parameters(p=3, M=3, d=2, params=theta_332))
@@ -417,10 +428,26 @@ test_that("check_parameters works correctly", {
   theta_222csLAR_3 <- theta_222csLAR
   theta_222csLAR_3[17] <- -0.1
   expect_error(check_parameters(p=2, M=2, d=2, params=theta_222csLAR_3, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+
+  # Same means
+  expect_error(check_parameters(p=1, M=1, d=2, params=theta_112_int, same_means=list(1), parametrization="mean"))
+  expect_error(check_parameters(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1, 2), parametrization="mean"))
+  expect_error(check_parameters(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2), parametrization="intercept"))
+  expect_error(check_parameters(p=1, M=2, d=3, params=theta_123c_int, constraints=C_222, same_means=list(1:2), parametrization="mean"))
+  expect_error(check_parameters(p=1, M=2, d=3, params=theta_123csL_int, same_means=list(1:2), structural_pars=list(W=W_123, C_lambda=C_lambda_123), parametrization="mean"))
 })
 
 
 test_that("check_constraints works correctly", {
+  expect_error(check_constraints(p=2, M=2, d=2, same_means=1:2))
+  expect_error(check_constraints(p=1, M=1, d=2, same_means=1:2))
+  expect_error(check_constraints(p=2, M=2, d=2, same_means=list(1)))
+  expect_error(check_constraints(p=2, M=2, d=2, same_means=list(1, "2")))
+  expect_error(check_constraints(p=2, M=3, d=2, same_means=list(2:3)))
+  expect_error(check_constraints(p=3, M=2, d=2, same_means=list(1, 1:2)))
+  expect_error(check_constraints(p=1, M=1, d=2, same_means=list()))
+  expect_error(check_constraints(p=1, M=1, d=2, same_means=list(1:2)))
+
   expect_error(check_constraints(p=1, M=1, d=2, constraints=cbind(C_112, C_112)))
   expect_error(check_constraints(p=1, M=1, d=2, constraints=rbind(C_112, C_112)))
   expect_error(check_constraints(p=1, M=2, d=2, constraints=cbind(C_122[,1:3], rep(0, 8))))

@@ -360,7 +360,7 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
   check_same_means(parametrization=parametrization, same_means=same_means)
   data <- check_data(data, p)
   d <- ncol(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
