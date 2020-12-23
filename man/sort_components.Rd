@@ -96,7 +96,8 @@ Returns sorted parameter vector...
   to mixing weights into a decreasing order.
 }
 \details{
-Constrained parameter vectors are not supported (expect for constraints in W)!
+Constrained parameter vectors are not supported (expect for constraints in W but including
+  constraining some intercept/mena parameters to be the same among different regimes)!
   For structural models, the order of the first mixture component is fixed by construction,
   so the rest \eqn{m=2,...,M} mixture components are rearranged only by the mixing weight
   parameters.

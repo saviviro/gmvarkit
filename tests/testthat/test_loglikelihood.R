@@ -83,17 +83,37 @@ theta_112_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112, change_t
 theta_212_mu <- change_parametrization(p=2, M=1, d=2, params=theta_212, change_to="mean")
 theta_122_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122, change_to="mean")
 theta_222_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222, change_to="mean")
-
 theta_112sWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112sWC, structural_pars=list(W=W_112), change_to="mean")
+theta_122s_mu <- change_parametrization(p=1, M=1, d=2, params=theta_122s, structural_pars=list(W=W_122), change_to="mean")
 theta_222s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222), change_to="mean")
 
+# Same means
+mu_112 <- pick_phi0(p=1, M=1, d=2, params=theta_112_mu)
+mu_212 <- pick_phi0(p=2, M=1, d=2, params=theta_212_mu)
+mu_122 <- pick_phi0(p=1, M=2, d=2, params=theta_122_mu)
+mu_222 <- pick_phi0(p=2, M=2, d=2, params=theta_222_mu)
+mu_112sWC <- pick_phi0(p=1, M=1, d=2, params=theta_112sWC_mu, structural_pars=list(W=W_112))
+mu_122s <- pick_phi0(p=1, M=2, d=2, params=theta_122s_mu, structural_pars=list(W=W_122))
+mu_222s <- pick_phi0(p=2, M=2, d=2, params=theta_222s_mu, structural_pars=list(W=W_222))
+
+theta_112_int <- c(mu_112, vec(A11_112), vech(Omega1_112)) # same_means=list(1)
+theta_212_int <- c(mu_212, vec(A11_212), vec(A12_212), vech(Omega1_212)) # same_means=list(1)
+theta_122_int <- c(mu_122[,1], vec(A11_122), vec(A21_122), vech(Omega1_122), vech(Omega2_122), alpha1_122) # same_means=list(1:2)
+theta_122_int2 <- c(vec(mu_122), vec(A11_122), vec(A21_122), vech(Omega1_122), vech(Omega2_122), alpha1_122) # same_means=list(1, 2)
+theta_222_int <- c(mu_222[,1], vec(A11_222), vec(A12_222), vec(A21_222), vec(A22_222), vech(Omega1_222), vech(Omega2_222), alpha1_222) # same_means=list(1:2)
+theta_112sWC_int <- c(mu_112sWC, vec(A11_112), Wvec(W_112)) # structural_pars=list(W=W_112), same_means=list(1)
+theta_122s_int <- c(mu_122s[,1], vec(A11_122), vec(A21_122), vec(W_122), lambdas_122, alpha1_122) # structural_pars=list(W=W_122), same_means=list(1:2)
+theta_222s_int <- c(mu_222s[,1], vec(A11_222), vec(A12_222), vec(A21_222),
+                    vec(A22_222), vec(W_222), lambdas_222, alpha1_222)  # structural_pars=list(W=W_222), same_means=list(1:2)
 
 test_that("loglikelihood_int works correctly", {
+  # Regular
   expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112, conditional=FALSE), -7013.364, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=1, params=theta_212, conditional=FALSE), -1428.165, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122, conditional=FALSE), -30712.15, tolerance=1e-2)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222, conditional=FALSE), -1095.952, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222, conditional=TRUE), -1084.186, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=500*data, p=2, M=2, params=theta_222, conditional=FALSE), -4467536, tolerance=1)
 
   expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112_mu, conditional=FALSE, parametrization="mean"), -7013.364, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=1, params=theta_212_mu, conditional=FALSE, parametrization="mean"), -1428.165, tolerance=1e-3)
@@ -121,6 +141,24 @@ test_that("loglikelihood_int works correctly", {
                -7013.364, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222s_mu, structural_pars=list(W=W_222), conditional=FALSE, parametrization="mean"),
                -1095.952, tolerance=1e-3)
+
+  # same_means
+  expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112_int, parametrization="mean", same_means=list(1), conditional=FALSE),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=2, M=1, params=theta_212_int, parametrization="mean", same_means=list(1), conditional=FALSE),
+               -1428.165, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122_int, parametrization="mean", same_means=list(1:2), conditional=FALSE),
+               -31768.84, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122_int2, parametrization="mean", same_means=list(1, 2), conditional=FALSE),
+               -30712.15, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222_int, parametrization="mean", same_means=list(1:2), conditional=FALSE),
+               -1107.581, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112sWC_int, parametrization="mean", structural_pars=list(W=W_112), same_means=list(1), conditional=FALSE),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122s_int, parametrization="mean", structural_pars=list(W=W_122), same_means=list(1:2), conditional=FALSE),
+               -33079.93, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222s_int, parametrization="mean", structural_pars=list(W=W_222), same_means=list(1:2), conditional=FALSE),
+               -1107.581, tolerance=1e-3)
 })
 
 
@@ -175,7 +213,32 @@ W_222c2 <- matrix(WL_222c2[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222c2 <- WL_222c2[(2^2 + 1):length(WL_222c2)]
 theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # SGMVAR AR
 
+# Same means
+theta_112c_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112c, constraints=C_112, change_to="mean")
+theta_122c_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122c, constraints=C_122, change_to="mean")
+theta_222c_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222c, constraints=C_222, change_to="mean")
+theta_112csWAR_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112csWAR, constraints=C_112, structural_pars=list(W=W_112), change_to="mean")
+theta_122csLAR_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122csLAR, constraints=C_112, structural_pars=list(W=W_122, C_lambda=C_lambda_122), change_to="mean")
+theta_222c2s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222_c2s, constraints=C_222_2, structural_pars=list(W=W_222), change_to="mean")
+
+mu_112c <- theta_112c_mu[1:2]
+mu_122c <-  theta_122c_mu[1:4]
+mu_222c <-  theta_222c_mu[1:4]
+mu_112csWAR <- theta_112csWAR_mu[1:2]
+mu_122csLAR <- theta_122csLAR_mu[1:4]
+mu_222c2s <- theta_222c2s_mu[1:4]
+
+theta_112c_int <- c(mu_112c, vec(A11_112), vech(Omega1_112)) # same_means=list(1)
+theta_122c_int <- c(mu_122c, vec(A11_122), vech(Omega1_122), vech(Omega2_122), alpha1_122) # same_means=list(1, 2)
+theta_222c_int <- c(mu_222c[1:2], vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222) # same_means=list(1:2)
+
+theta_112csWAR_int <- c(mu_112c, vec(A11_112), Wvec(W_112)) # same_means=list(1), structural_pars=list(W=W_112)
+theta_122csLAR_int <- c(mu_122csLAR[1:2], vec(A11_122), vec(W_122), 1, alpha1_122) # same_means=list(1:2), structural_pars=list(W=W_122, C_lambda=C_lambda_122)
+theta_222c2s_int <- c(mu_222c2s[1:2], 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # constraints=C_222_2, same_means=list(1:2), structural_pars=list(W=W_222)
+
+
 test_that("loglikelihood_int works correctly for constrained models", {
+   # Regular
   expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112c, conditional=FALSE, constraints=C_112), -7013.364, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=1, params=theta_212c, conditional=FALSE, constraints=C_212), -1428.165, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122c, conditional=TRUE, constraints=C_122), -30639.31, tolerance=1e-2)
@@ -193,6 +256,27 @@ test_that("loglikelihood_int works correctly for constrained models", {
                                  structural_pars=list(W=W_222, C_lambda=C_lambda_222)), -1647.087, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222_c2s, conditional=TRUE, constraints=C_222_2,
                                  structural_pars=list(W=W_222)), -1096.98, tolerance=1e-2)
+  expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222c2s_mu, conditional=TRUE, constraints=C_222_2,
+                                 structural_pars=list(W=W_222), parametrization="mean"), -1096.98, tolerance=1e-2)
+
+  # Same means
+  expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112c_int, same_means=list(1), conditional=FALSE, constraints=C_112, parametrization="mean"),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122c_int, same_means=list(1, 2), conditional=FALSE, constraints=C_122, parametrization="mean"),
+               -30712.15, tolerance=1e-2)
+  expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222c_int, same_means=list(1:2), conditional=FALSE, constraints=C_222, parametrization="mean"),
+               -1107.581, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112csWAR_int, same_means=list(1), conditional=FALSE, constraints=C_112, structural_pars=list(W=W_112), parametrization="mean"),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), conditional=FALSE, constraints=C_122,
+                                 structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean"),
+               -34521.1, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=200*data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), conditional=FALSE, constraints=C_122,
+                                 structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean"),
+               -3583346, tolerance=1)
+  expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222c2s_int, same_means=list(1:2), conditional=FALSE, constraints=C_222_2,
+                                 structural_pars=list(W=W_222), parametrization="mean"),
+               -1121.216, tolerance=1e-3)
 })
 
 
@@ -214,6 +298,32 @@ test_that("user loglikelihood works correctly", {
                              structural_pars=list(W=W_222, C_lambda=C_lambda_222)), -1647.087, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=data, p=2, M=2, params=theta_222_c2s, conditional=TRUE, parametrization="intercept",
                                  constraints=C_222_2, structural_pars=list(W=W_222)), -1096.98, tolerance=1e-2)
+
+  # Same means
+  expect_equal(loglikelihood(data=data, p=1, M=1, params=theta_112c_int, same_means=list(1), conditional=FALSE, constraints=C_112, parametrization="mean"),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood(data=data, p=1, M=2, params=theta_122c_int, same_means=list(1, 2), conditional=FALSE, constraints=C_122, parametrization="mean"),
+               -30712.15, tolerance=1e-2)
+  expect_equal(loglikelihood(data=data, p=2, M=2, params=theta_222c_int, same_means=list(1:2), conditional=FALSE, constraints=C_222, parametrization="mean"),
+               -1107.581, tolerance=1e-3)
+  expect_equal(loglikelihood(data=data, p=1, M=1, params=theta_112csWAR_int, same_means=list(1), conditional=FALSE, constraints=C_112, structural_pars=list(W=W_112), parametrization="mean"),
+               -7013.364, tolerance=1e-3)
+  expect_equal(loglikelihood(data=data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), conditional=FALSE, constraints=C_122,
+                                 structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean"),
+               -34521.1, tolerance=1e-1)
+  expect_equal(loglikelihood(data=200*data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), conditional=FALSE, constraints=C_122,
+                                 structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean"),
+               -3583346, tolerance=1)
+  expect_equal(loglikelihood(data=data, p=2, M=2, params=theta_222c2s_int, same_means=list(1:2), conditional=FALSE, constraints=C_222_2,
+                                 structural_pars=list(W=W_222), parametrization="mean"),
+               -1121.216, tolerance=1e-3)
+  expect_error(loglikelihood(data=data, p=2, M=2, params=theta_222c2s_int, same_means=list(1:2), conditional=FALSE, constraints=C_222_2,
+                             structural_pars=list(W=W_222), parametrization="intercept"))
+
+  expect_equal(loglikelihood(data=data, p=2, M=2, params=theta_222_int, parametrization="mean", same_means=list(1:2), conditional=FALSE),
+               -1107.581, tolerance=1e-3)
+  expect_equal(loglikelihood(data=data, p=2, M=2, params=theta_222s_int, parametrization="mean", structural_pars=list(W=W_222), same_means=list(1:2), conditional=FALSE),
+               -1107.581, tolerance=1e-3)
 
 })
 
@@ -248,6 +358,31 @@ test_that("cond_moments works correctly", {
                             constraints=C_222_2, structural_pars=list(W=W_222), to_return="total_ccovs")[ , 2, 13],
                c(3.459987, 9.619985), tolerance=1e-5)
 
+  # Same means
+  expect_equal(cond_moments(data=data, p=1, M=1, params=theta_112c_int, same_means=list(1), constraints=C_112, parametrization="mean",
+                            to_return="regime_cmeans")[2, , 1],
+               c(7.42388, 103.95566), tolerance=1e-5)
+  expect_equal(cond_moments(data=data, p=1, M=2, params=theta_122c_int, same_means=list(1, 2), constraints=C_122, parametrization="mean", to_return="total_ccovs")[2, , 200],
+               c(3.56, 9.80), tolerance=1e-2)
+  expect_equal(cond_moments(data=data, p=2, M=2, params=theta_222c_int, same_means=list(1:2), constraints=C_222, parametrization="mean", to_return="total_cmeans")[1,],
+               c(2.5687, 112.4166), tolerance=1e-3)
+  expect_equal(cond_moments(data=data, p=1, M=1, params=theta_112csWAR_int, same_means=list(1), constraints=C_112, structural_pars=list(W=W_112), parametrization="mean",
+                            to_return="total_cmeans")[1, ],
+               c(6.172968, 105.106160), tolerance=1e-4)
+  expect_equal(cond_moments(data=data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), constraints=C_122,
+                             structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean", to_return="total_ccovs")[1, , 100],
+               c(5.708931, 3.695015), tolerance=1e-4)
+  expect_equal(cond_moments(data=200*data, p=1, M=2, params=theta_122csLAR_int, same_means=list(1:2), constraints=C_122,
+                             structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean", to_return="regime_cmeans")[1, , 2],
+               c(-6715.682, 20586.296), tolerance=1e-3)
+  expect_equal(cond_moments(data=data, p=2, M=2, params=theta_222c2s_int, same_means=list(1:2), constraints=C_222_2,
+                             structural_pars=list(W=W_222), parametrization="mean", to_return="total_ccovs")[, 2, 13],
+               c(3.459943, 9.619934), tolerance=1e-4)
+  expect_equal(cond_moments(data=data, p=2, M=2, params=theta_222_int, parametrization="mean", same_means=list(1:2), to_return="total_cmeans")[13,],
+               c(24.02782, 121.76034), tolerance=1e-4)
+  expect_equal(cond_moments(data=data, p=2, M=2, params=theta_222s_int, parametrization="mean", structural_pars=list(W=W_222), same_means=list(1:2),
+                            to_return="total_ccovs")[2, , 1],
+               c(1.392173, 7.112128), tolerance=1e-4)
 })
 
 

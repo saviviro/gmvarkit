@@ -246,6 +246,99 @@ theta_222_c2s_expanded <- c(phi10_222_c2, phi20_222_c2, vec(A11_222_c2), vec(A12
                             vec(W_222c2), lambdas_222c2, alpha1_222_c2)
 
 
+## Models with same_means
+
+# p=1, M=1, d=2, same_means=list(1)
+theta_112_int <- c(phi10_112, vec(A11_112), vech(Omega1_112))
+theta_112_int_expanded <- theta_112_int
+
+# p=1, M=2, d=2, same_means=list(1:2)
+theta_122_int <- c(phi10_122, vec(A11_122), vec(A21_122), vech(Omega1_122), vech(Omega2_122), alpha1_122)
+theta_122_int_expanded <- c(phi10_122, vec(A11_122), vech(Omega1_122), phi10_122, vec(A21_122), vech(Omega2_122), alpha1_122)
+
+# p=1, M=2, d=2, same_means=list(1, 2)
+theta_122_int2 <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vech(Omega1_122), vech(Omega2_122), alpha1_122)
+theta_122_int2_expanded <- c(phi10_122, vec(A11_122), vech(Omega1_122), phi20_122, vec(A21_122), vech(Omega2_122), alpha1_122)
+
+# p=1, M=2, d=2, constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122), same_means=list(1:2)
+theta_122csL_int <-  c(phi10_122, vec(A11_122), vec(W_122), 0.5, alpha1_122)
+theta_122csL_int_expanded <- c(phi10_122, phi10_122, vec(A11_122), vec(A11_122), vec(W_122), 0.5, 0.5, alpha1_122)
+
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+theta_222c_int_expanded <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), phi10_222, vec(A11_222), vec(A12_222),
+                             vech(Omega2_222), alpha1_222)
+
+# p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
+theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
+theta_222csLAR_int_expanded <-  c(phi10_222, phi10_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222),
+                                  vec(W_222), 0.2, 2*0.2, alpha1_222)
+
+# p=3, M=3, d=2, constraints=C_332, same_means=list(1, 2:3)
+theta_332c_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+                    vech(Omega3_332), alpha1_332, alpha2_332)
+theta_332c_int_expanded <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), phi20_332, vec(A11_332),
+                             vec(A12_332), vec(A13_332), vech(Omega2_332), phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
+                             vech(Omega3_332), alpha1_332, alpha2_332)
+
+# p=3, M=3, d=2, constraints=C_332, same_means=list(2, c(1, 3))
+theta_332c_int2 <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+                     vech(Omega3_332), alpha1_332, alpha2_332)
+theta_332c_int2_expanded <- c(phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), phi10_332, vec(A11_332),
+                              vec(A12_332), vec(A13_332), vech(Omega2_332), phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
+                              vech(Omega3_332), alpha1_332, alpha2_332)
+
+# p=3, M=3, d=2, constraints=C_332, same_means=list(1:3)
+theta_332c_int3 <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+                     vech(Omega3_332), alpha1_332, alpha2_332)
+theta_332c_int3_expanded <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), phi10_332, vec(A11_332),
+                              vec(A12_332), vec(A13_332), vech(Omega2_332), phi10_332, vec(A11_332), vec(A12_332), vec(A13_332),
+                              vech(Omega3_332), alpha1_332, alpha2_332)
+
+# p=3, M=3, d=2, constraints=C_332, structural_pars=list(W=W_332), same_means=list(c(1, 3), 2)
+theta_332csWAR_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), Wvec(W_332), lambdas2_332,
+                        lambdas3_332, alpha1_332, alpha2_332)
+theta_332csWAR_int_expanded <- c(phi10_332, phi20_332, phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A11_332),
+                                 vec(A12_332), vec(A13_332), vec(A11_332), vec(A12_332), vec(A13_332), vec(W_332), lambdas2_332,
+                                 lambdas3_332, alpha1_332, alpha2_332)
+
+# p=3, M=3, d=2, structural_pars=list(W=W_332, C_lambda=C_lambda_332), same_means=list(1:2, 3)
+theta_332csWL_int <- c(phi10_332, phi30_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A21_332), vec(A22_332), vec(A23_332),
+                       vec(A31_332), vec(A32_332), vec(A33_332), Wvec(W_332), 1, 2, alpha1_332, alpha2_332)
+theta_332csWL_int_expanded <- c(phi10_332, phi10_332, phi30_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A21_332), vec(A22_332), vec(A23_332),
+                                vec(A31_332), vec(A32_332), vec(A33_332), vec(W_332), 1, 1, 2, 2, alpha1_332, alpha2_332)
+
+# p=3, M=3, d=2, constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), same_means=list(2:3, 1)
+theta_332csWLAR_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), Wvec(W_332), 1, 2,
+                         alpha1_332, alpha2_332)
+theta_332csWLAR_int_expanded <- c(phi20_332, phi10_332, phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A11_332), vec(A12_332), vec(A13_332),
+                                  vec(A11_332), vec(A12_332), vec(A13_332), vec(W_332), 1, 1, 2, 2, alpha1_332, alpha2_332)
+
+# p=1, M=2, d=3, same_means=list(1:2)
+theta_123_int <- c(phi10_123, vec(A11_123), vec(A21_123), vech(Omega1_123), vech(Omega2_123), alpha1_123)
+theta_123_int_expanded <- c(phi10_123, vec(A11_123), vech(Omega1_123), phi10_123, vec(A21_123), vech(Omega2_123), alpha1_123)
+
+# p=1, M=2, d=3, constraints=C_123, same_means=list(1:2)
+theta_123c_int <- c(phi10_123, vec(A11_123), vech(Omega1_123), vech(Omega2_123), alpha1_123)
+theta_123c_int_expanded <- c(phi10_123, vec(A11_123), vech(Omega1_123), phi10_123, vec(A11_123), vech(Omega2_123), alpha1_123)
+
+# p=1, M=2, d=3, structural_pars=list(W=W_123, C_lambda=C_lambda_123) same_means=list(1:2)
+theta_123csL_int <- c(phi10_123, vec(A11_123), vec(A21_123), vec(W_123), 1, 2, alpha1_123)
+theta_123csL_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A21_123), vec(W_123), 1, 1, 2, alpha1_123)
+
+# p=1, M=2, d=3, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123) same_means=list(1:2)
+theta_123csLAR_int <- c(phi10_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
+theta_123csLAR_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), vec(W_123), 1, 1, 2, alpha1_123)
+
+# p=2, M=1, d=3, constraints=C_213, same_means=list(1)
+theta_213c_int <- c(phi10_213, vec(A11_213), vec(A12_213), vech(Omega1_213))
+theta_213c_int_expanded <- theta_213c_int
+
+# p=2, M=1, d=3, constraints=C_213, structural_pars=list(W=W_213), same_means=list(1)
+theta_213csWAR_int <- c(phi10_213, vec(A11_213), vec(A12_213), Wvec(W_213))
+theta_213csWAR_int_expanded <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_213))
+
+
 test_that("is_stationary works correctly", {
   expect_false(is_stationary(p=1, M=1, d=2, params=theta_112))
   expect_true(is_stationary(p=2, M=2, d=2, params=theta_222))
@@ -369,6 +462,11 @@ test_that("check_data works correctly", {
   expect_error(check_data(data=eurusd, p=nrow(eurusd)))
 })
 
+test_that("check_same_means works correctly", {
+  expect_error(check_same_means(parametrization="intercept", same_means=list(1:2)))
+  check_same_means(parametrization="mean", same_means=list(1:2))
+})
+
 test_that("check_pMd works correctly", {
   expect_error(check_pMd(p=1, M=1, d=1))
   expect_error(check_pMd(p=1, M=1.2, d=2))
@@ -407,6 +505,26 @@ theta_212c <- c(phi10_212, vec(A11_212), vec(A12_212), vech(Omega1_212))
 theta_212csWAR <- c(phi10_212, vec(A11_212), vec(A11_212), Wvec(W_212)) # SGMVAR W and AR
 
 test_that("n_params works correctly", {
+  # same_means
+  expect_equal(n_params(p=1, M=1, d=2, same_means=list(1)), length(theta_112_int))
+  expect_equal(n_params(p=1, M=2, d=2, same_means=list(1:2)), length(theta_122_int))
+  expect_equal(n_params(p=1, M=2, d=2, same_means=list(1, 2)), length(theta_122_int2))
+  expect_equal(n_params(p=1, M=2, d=2, same_means=list(1:2), constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122)), length(theta_122csL_int))
+  expect_equal(n_params(p=2, M=2, d=2, same_means=list(1:2), constraints=C_222), length(theta_222c_int))
+  expect_equal(n_params(p=2, M=2, d=2, same_means=list(1:2), constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)), length(theta_222csLAR_int))
+  expect_equal(n_params(p=3, M=3, d=2, constraints=C_332, same_means=list(1, 2:3)), length(theta_332c_int))
+  expect_equal(n_params(p=3, M=3, d=2, constraints=C_332, same_means=list(2, c(1, 3))), length(theta_332c_int2))
+  expect_equal(n_params(p=3, M=3, d=2, constraints=C_332, same_means=list(1:3)), length(theta_332c_int3))
+  expect_equal(n_params(p=3, M=3, d=2, constraints=C_332, structural_pars=list(W=W_332), same_means=list(c(1, 3), 2)), length(theta_332csWAR_int))
+  expect_equal(n_params(p=3, M=3, d=2, structural_pars=list(W=W_332, C_lambda=C_lambda_332), same_means=list(1:2, 3)), length(theta_332csWL_int))
+  expect_equal(n_params(p=3, M=3, d=2, constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), same_means=list(2:3, 1)), length(theta_332csWLAR_int))
+  expect_equal(n_params(p=1, M=2, d=3, same_means=list(1:2)), length(theta_123_int))
+  expect_equal(n_params(p=1, M=2, d=3, constraints=C_123, same_means=list(1:2)), length(theta_123c_int))
+  expect_equal(n_params(p=1, M=2, d=3, structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)), length(theta_123csL_int))
+  expect_equal(n_params(p=1, M=2, d=3, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)), length(theta_123csLAR_int))
+  expect_equal(n_params(p=2, M=1, d=3, constraints=C_213, same_means=list(1)), length(theta_213c_int))
+  expect_equal(n_params(p=2, M=1, d=3, constraints=C_213, structural_pars=list(W=W_213), same_means=list(1)), length(theta_213csWAR_int))
+
   expect_equal(n_params(p=1, M=1, d=2), length(theta_112))
   expect_equal(n_params(p=1, M=2, d=2), length(theta_122))
   expect_equal(n_params(p=2, M=2, d=2), length(theta_222))

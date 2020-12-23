@@ -23,21 +23,21 @@
 #'     }
 #'     \item{\strong{For constrained models:}}{
 #'       Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have the form
-#'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi}}
-#'       \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi},}
+#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
 #'       \itemize{
 #'         \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
 #'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is \eqn{(Mpd^2xq)}
 #'         constraint matrix.
 #'       }
 #'     }
-#'     \item{\strong{For same_intercept models:}}{
+#'     \item{\strong{For same_means models:}}{
 #'       Should have the form
-#'       \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\phi_{0}},}\strong{\eqn{\psi}}
-#'       \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\mu},}\strong{\eqn{\psi},}
+#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
 #'       \itemize{
-#'         \item \strong{\eqn{\phi_{0}}}\eqn{= (\phi_{0,g1},...,\phi_{0,gg})} where
-#'           \eqn{\phi_{0,gi}} is the intercept/mean parameter for group \eqn{i} and
+#'         \item \strong{\eqn{\mu}}\eqn{= (\mu_{1},...,\mu_{g})} where
+#'           \eqn{\mu_{i}} is the mean parameter for group \eqn{i} and
 #'           \eqn{g} is the number of groups.
 #'         \item If AR constraints are employed, \strong{\eqn{\psi}} is as for constrained
 #'           models, and if AR constraints are not employed, \strong{\eqn{\psi}}\eqn{ = }
@@ -55,7 +55,7 @@
 #'         \item{\strong{If AR parameters are constrained: }}{Replace \strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
 #'         \strong{\eqn{\phi}}\eqn{_{M}} with \strong{\eqn{\psi}} \eqn{(qx1)} that satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
 #'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}, as above.}
-#'         \item{\strong{If same_intercepts: }}{Replace \eqn{(\phi_{1,0},...,\phi_{M,0})} with \eqn{(\phi_{0,g1},...,\phi_{0,gg})},
+#'         \item{\strong{If same_means: }}{Replace \eqn{(\phi_{1,0},...,\phi_{M,0})} with \eqn{(\mu_{1},...,\mu_{g})},
 #'           as above.}
 #'         \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
 #'          the sign constraints.}
@@ -86,11 +86,12 @@
 #'   For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 #'   [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 #'   Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.
-#' @param same_intercepts Restricted the intercept/mean parameters of some regimes to be the same? Provide a list of numeric vectors
-#'   such that each numeric vector contains the regimes that should share the common intercept/mean parameters. For instance, if
-#'   \code{M=3}, the argument \code{list(1, 2:3)} restricts the intercept/mean parameters of the second and third regime to be
-#'   the same but the first regime has freely estimated intercept/mean. Ignore or set to \code{NULL} if interecept/mean parameters
-#'   should not be restricted to be same among any regimes.
+#' @param same_means Restricted the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+#'   such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
+#'   \code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
+#'   the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
+#'   should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
+#'   that is, when \code{parametrization="mean"}.}
 #' @param structural_pars If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 #'   the following elements:
 #'   \itemize{
@@ -142,7 +143,7 @@
 #'  }
 
 loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                              same_intercepts=NULL, structural_pars=NULL,
+                              same_means=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans", "total_cmeans", "total_ccovs"),
                               check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
@@ -155,7 +156,8 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
   # Collect parameter values
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+  check_same_means(parametrization=parametrization, same_means=same_means)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
@@ -352,18 +354,19 @@ get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_
 #' @export
 
 loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                          structural_pars=NULL, minval=NA, stat_tol=1e-3, posdef_tol=1e-8) {
+                          same_means=NULL, structural_pars=NULL, minval=NA, stat_tol=1e-3, posdef_tol=1e-8) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
+  check_same_means(parametrization=parametrization, same_means=same_means)
   data <- check_data(data, p)
   d <- ncol(data)
   check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
-  loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
-                    constraints=constraints, structural_pars=structural_pars, to_return="loglik", check_params=TRUE,
-                    minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
+  loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
+                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return="loglik",
+                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 
 
@@ -402,20 +405,21 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
 #'   to_return="total_ccovs")
 #' @export
 
-cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL,
+cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
                          structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs"),
                          stat_tol=1e-3, posdef_tol=1e-8) {
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
   parametrization <- match.arg(parametrization)
+  check_same_means(parametrization=parametrization, same_means=same_means)
   to_return <- match.arg(to_return)
   data <- check_data(data, p)
   d <- ncol(data)
   check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
-  loglikelihood_int(data, p, M, params, conditional=TRUE, parametrization=parametrization,
-                    constraints=constraints, structural_pars=structural_pars, to_return=to_return, check_params=TRUE,
+  loglikelihood_int(data=data, p=p, M=M, params=params, conditional=TRUE, parametrization=parametrization,
+                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return=to_return, check_params=TRUE,
                     minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 

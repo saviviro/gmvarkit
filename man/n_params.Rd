@@ -4,7 +4,14 @@
 \alias{n_params}
 \title{Calculate the number of parameters in GMVAR model parameter vector}
 \usage{
-n_params(p, M, d, constraints = NULL, structural_pars = NULL)
+n_params(
+  p,
+  M,
+  d,
+  constraints = NULL,
+  same_means = NULL,
+  structural_pars = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

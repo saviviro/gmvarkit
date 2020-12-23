@@ -31,20 +31,19 @@ reform_data <- function(data, p) {
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 
-reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_intercepts=NULL, structural_pars=NULL, change_na=FALSE) {
-  if(is.null(constraints) && is.null(structural_pars) && is.null(same_intercepts)) {
+reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, change_na=FALSE) {
+  if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
     return(params)
-  } else if(is.null(constraints) && is.null(same_intercepts) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
+  } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
     return(params)
   }
 
-  if(is.null(same_intercepts)) {
+  if(is.null(same_means)) {
     less_pars <- 0 # Number of parameters less compared to models without same interecept constraints
   } else {
-    g <- length(same_intercepts) # Number groups with the same intercept/mean parameters
+    g <- length(same_means) # Number groups with the same mean parameters
     less_pars <- d*(M - g) # Number of parameters less compared to models without same interecept constraints
   }
-
 
   # Obtain the AR coefficients from the constraints
   if(is.null(constraints)) { # For SGMVAR model with constrained structural parameters but no AR constraints
@@ -66,16 +65,16 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_inte
     psi_expanded <- constraints%*%psi
   }
 
-  # Obtain the intercept/mean parameters from the constrained parameter vector
-  if(is.null(same_intercepts)) {
+  # Obtain the mean parameters from the constrained parameter vector
+  if(is.null(same_means)) {
     if(is.null(structural_pars)) { # There is computationally more efficient way for structural models.
       all_phi0 <- matrix(params[1:(d*M)], nrow=d, ncol=M) # params[((m - 1)*d + 1):(m*d)]
     }
   } else {
     group_phi0 <- matrix(params[1:(d*g)], nrow=d, ncol=g) # Column for each group
-    all_phi0 <- matrix(NA, nrow=d, ncol=M) # Storage for all phi0
+    all_phi0 <- matrix(NA, nrow=d, ncol=M) # Storage for all phi0 (=mean parameters in this case)
     for(i1 in 1:g) {
-      all_phi0[,same_intercepts[[i1]]] <- group_phi0[,i1] # Ei toimi i1 koska voi ryhmät voi olla eri järkässä
+      all_phi0[,same_means[[i1]]] <- group_phi0[,i1]
     }
   }
 
@@ -105,7 +104,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_inte
     } else {
       lambdas <- numeric(0)
     }
-    if(is.null(same_intercepts)) {
+    if(is.null(same_means)) {
       pars <- c(params[1:(M*d)], psi_expanded, vec(new_W), lambdas)
     } else {
       pars <- c(as.vector(all_phi0), psi_expanded, vec(new_W), lambdas)
@@ -208,7 +207,8 @@ form_boldA <- function(p, M, d, all_A) {
 #'   to mixing weights into a decreasing order.
 #'
 #' @inheritParams is_stationary
-#' @details Constrained parameter vectors are not supported (expect for constraints in W)!
+#' @details Constrained parameter vectors are not supported (expect for constraints in W but including
+#'   constraining some intercept/mena parameters to be the same among different regimes)!
 #'   For structural models, the order of the first mixture component is fixed by construction,
 #'   so the rest \eqn{m=2,...,M} mixture components are rearranged only by the mixing weight
 #'   parameters.
@@ -294,13 +294,17 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
 #'   it's assumed that \code{params} is intercept-parametrized.
 #' @return Returns parameter vector described in \code{params}, but with parametrization changed from intercept to mean
 #'   (when \code{change_to==mean}) or from mean to intercept (when \code{change_to==intercept}).
+#' @details Parametrization cannot be changed for models with same_means constraints!
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
 
-change_parametrization <- function(p, M, d, params, constraints=NULL, structural_pars=NULL, change_to=c("intercept", "mean")) {
+change_parametrization <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL,
+                                   change_to=c("intercept", "mean")) {
+  stopifnot(is.null(same_means))
   re_params <- params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars) # Parameters in regular form
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means,
+                                    structural_pars=structural_pars) # Parameters in regular form
   change_to <- match.arg(change_to)
   Id <- diag(nrow=d)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -339,7 +343,7 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, structural
 #'     \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
 #'   }
 #' @return Returns parameter vector with \code{m}:th regime changed to \code{regime_pars}.
-#' @details Does not currently support models with AR or lambda parameter constraints.
+#' @details Does not currently support models with AR, mean, or lambda parameter constraints.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
