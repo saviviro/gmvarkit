@@ -69,6 +69,9 @@ Returns a 4D array containing the coefficient matrices of the all components. Co
   from the given parameter vector so that they are arranged in a 4D array with the fourth dimension
   indicating each component and third dimension indicating each lag.
 }
+\details{
+Does not support constrained parameter vectors.
+}
 \section{Warning}{
 
  No argument checks!

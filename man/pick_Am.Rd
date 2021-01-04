@@ -105,6 +105,9 @@ Returns a 3D array containing the coefficient matrices of the given component.
   from the given parameter vector so that they are arranged in a 3D array with the
   third dimension indicating each lag.
 }
+\details{
+Does not support constrained parameter vectors.
+}
 \section{Warning}{
 
  No argument checks!

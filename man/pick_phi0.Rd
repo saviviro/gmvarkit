@@ -67,6 +67,9 @@ Returns a \eqn{(dxM)} matrix containing \eqn{\phi_{m,0}} in the m:th column or
 \description{
 \code{pick_phi0} picks the intercept or mean parameters from the given parameter vector.
 }
+\details{
+Does not support constrained parameter vectors.
+}
 \section{Warning}{
 
  No argument checks!

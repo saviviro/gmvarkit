@@ -68,6 +68,9 @@ Returns a \eqn{((pd^2+d)xM)} matrix containing \eqn{(\phi_{m,0}, vec(A_{m,1}),..
 \code{pick_all_phi0_A} picks the intercept or mean parameters and vectorized coefficient
   matrices from the given parameter vector.
 }
+\details{
+Does not support constrained parameter vectors.
+}
 \section{Warning}{
 
  No argument checks!

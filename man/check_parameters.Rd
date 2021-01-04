@@ -9,6 +9,7 @@ check_parameters(
   M,
   d,
   params,
+  parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
@@ -88,6 +89,9 @@ If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regim
 \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
+
+\item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
+parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

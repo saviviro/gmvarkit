@@ -69,6 +69,9 @@ Returns a 3D array containing the covariance matrices of the given model. Coeffi
  from the given parameter vector so that they are arranged in a 3D array with the third
  dimension indicating each component.
 }
+\details{
+Does not support constrained parameter vectors.
+}
 \section{Warning}{
 
  No argument checks!
