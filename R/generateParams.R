@@ -10,10 +10,10 @@
 #' @inherit in_paramspace references
 
 random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale,
-                       W_scale, lambda_scale) {
-  scale_A <- ifelse(is.null(constraints),
-                    1 + log(2*mean(c((p - 0.2)^(1.25), d))),
-                    1 + (sum(constraints)/(M*d^2))^0.85)
+                       W_scale, lambda_scale, ar_scale2=1) {
+  scale_A <- ar_scale2*ifelse(is.null(constraints),
+                              1 + log(2*mean(c((p - 0.2)^(1.25), d))),
+                              1 + (sum(constraints)/(M*d^2))^0.85)
   g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
   if(is.null(constraints)) {
     if(is.null(structural_pars)) {

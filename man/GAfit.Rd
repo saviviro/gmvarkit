@@ -22,6 +22,7 @@ GAfit(
   W_scale,
   lambda_scale,
   ar_scale = 0.2,
+  ar_scale2 = 1,
   regime_force_scale = 1,
   red_criteria = c(0.05, 0.01),
   pre_smart_mu_prob = 0,
@@ -183,6 +184,12 @@ is considered.}
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically proposed in construction
 of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
 initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.}
+
+\item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
+random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
+(in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
+but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
+candidates.}}
 
 \item{regime_force_scale}{a non-negative real number specifying how much should natural selection favor individuals
 with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favoring or large

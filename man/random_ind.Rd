@@ -9,12 +9,14 @@ random_ind(
   M,
   d,
   constraints = NULL,
+  same_means = NULL,
+  structural_pars = NULL,
   mu_scale,
   mu_scale2,
   omega_scale,
   W_scale,
   lambda_scale,
-  structural_pars = NULL
+  ar_scale2 = 1
 )
 }
 \arguments{
@@ -32,6 +34,21 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+    should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
@@ -83,20 +100,11 @@ is considered.}
   that if lambdas are constrained in some other way than restricting some of them to be identical, this parameter
   should be adjusted accordingly in order to the estimation succeed!}
 
-\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
-the following elements:
-\itemize{
-  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
-    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
-    negative sign constraint, and zero indicating that the element is constrained to zero.
-  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
-    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
-    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
-    should not be constrained.
-}
-See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
-a time-varying diagonal matrix with positive diagonal entries).}
+\item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
+random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
+(in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
+but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
+candidates.}}
 }
 \value{
 Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}

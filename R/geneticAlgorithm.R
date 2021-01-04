@@ -113,6 +113,11 @@
 #' @param ar_scale a positive real number adjusting how large AR parameter values are typically proposed in construction
 #'   of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
 #'   initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.
+#' @param ar_scale2 a positive real number adjusting how large AR parameter values are typically proposed in some
+#'   random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
+#'   (in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
+#'   but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
+#'   candidates.}
 #' @param regime_force_scale a non-negative real number specifying how much should natural selection favor individuals
 #'   with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favoring or large
 #'   number for heavy favoring. Without any favoring the genetic algorithm gets more often stuck in an area of the
@@ -166,7 +171,7 @@
 
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
-                  lambda_scale, ar_scale=0.2, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00,
+                  lambda_scale, ar_scale=0.2, ar_scale2=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00,
                   to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and premilinary checks
@@ -225,6 +230,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   }
   if(length(ar_scale) != 1 | ar_scale <= 0) {
     stop("ar_scale must be positive and have length one")
+  }
+  if(length(ar_scale2) != 1 | ar_scale2 <= 0) {
+    stop("ar_scale2 must be positive and have length one")
+  } else if(ar_scale2 > 1.5) {
+    warning("Large ar_scale2 might lead to failure of the estimation process")
   }
   if(length(regime_force_scale) != 1 | regime_force_scale < 0) {
     stop("regime_force_scale should be non-negative real number")
@@ -433,7 +443,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
                                                                                    mu_scale=mu_scale, mu_scale2=mu_scale2,
                                                                                    omega_scale=omega_scale, W_scale=W_scale,
-                                                                                   lambda_scale=lambda_scale,
+                                                                                   lambda_scale=lambda_scale, ar_scale2=ar_scale2,
                                                                                    structural_pars=structural_pars), numeric(npars))
       } else { # For stationarity with algorithm (slower but can skip stationarity test), Ansley and Kohn (1986)
         stat_mu <- TRUE
