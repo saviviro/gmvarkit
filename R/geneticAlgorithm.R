@@ -169,12 +169,13 @@
 #'  }
 #'  @export
 
-GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
-                  ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL, mu_scale, mu_scale2, omega_scale, W_scale,
-                  lambda_scale, ar_scale=0.2, ar_scale2=1, regime_force_scale=1, red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00,
-                  to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
+GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"),
+                  constraints=NULL, same_means=NULL, structural_pars=NULL,
+                  ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL,
+                  mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale=0.2, ar_scale2=1, regime_force_scale=1,
+                  red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
-  # Required values and premilinary checks
+  # Required values and preliminary checks
   set.seed(seed)
   to_return <- match.arg(to_return)
   parametrization <- match.arg(parametrization)
@@ -182,8 +183,8 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
 
   # Defaults and checks
   if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu have to be positive integers")
@@ -246,15 +247,33 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     G <- numeric(0)
     for(i1 in 1:nattempts) {
       if(is.null(constraints)) {
-        inds <- replicate(popsize, random_ind2(p=p, M=M, d=d, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale, ar_scale=ar_scale,
-                                               W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+        inds <- replicate(popsize, random_ind2(p=p, M=M, d=d,
+                                               same_means=same_means,
+                                               structural_pars=structural_pars,
+                                               mu_scale=mu_scale,
+                                               mu_scale2=mu_scale2,
+                                               omega_scale=omega_scale,
+                                               ar_scale=ar_scale,
+                                               W_scale=W_scale,
+                                               lambda_scale=lambda_scale))
       } else {
-        inds <- replicate(popsize, random_ind(p=p, M=M, d=d, constraints=constraints, mu_scale=mu_scale, mu_scale2=mu_scale2, omega_scale=omega_scale,
-                                              W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+        inds <- replicate(popsize, random_ind(p=p, M=M, d=d,
+                                              constraints=constraints,
+                                              same_means=same_means,
+                                              structural_pars=structural_pars,
+                                              mu_scale=mu_scale,
+                                              mu_scale2=mu_scale2,
+                                              omega_scale=omega_scale,
+                                              W_scale=W_scale,
+                                              ar_scale2=ar_scale2,
+                                              lambda_scale=lambda_scale))
       }
-      ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2], conditional=conditional,
-                                                                   parametrization="mean", constraints=constraints, structural_pars=structural_pars,
-                                                                   check_params=TRUE, to_return="loglik", minval=minval),numeric(1))
+      ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M, params=inds[,i2],
+                                                                   conditional=conditional, parametrization="mean",
+                                                                   constraints=constraints, same_means=same_means,
+                                                                   structural_pars=structural_pars,
+                                                                   check_params=TRUE, to_return="loglik",
+                                                                   minval=minval), numeric(1))
       G <- cbind(G, inds[, ind_loks > minval]) # Take good enough individuals
       if(ncol(G) >= popsize) {
         G <- G[, 1:popsize]
@@ -263,7 +282,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
         if(length(G) == 0) {
           stop("Failed to create initial population with good enough individuals. Scaling the individual series so that the AR coefficients (of a VAR model) will not be very large (preferably less than one) may solve the problem. If needed, another package may be used to fit linear VARs so see which scalings produce relatively small AR coefficient estimates.")
         } else {
-          G <- G[,sample.int(ncol(G), size=popsize, replace=TRUE)]
+          G <- G[, sample.int(ncol(G), size=popsize, replace=TRUE)]
         }
       }
     }
@@ -271,12 +290,12 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     stopifnot(is.list(initpop))
     for(i1 in 1:length(initpop)) {
       ind <- initpop[[i1]]
-      tryCatch(check_parameters(p=p, M=M, d=d, params=ind, constraints=constraints, structural_pars=structural_pars),
+      tryCatch(check_parameters(p=p, M=M, d=d, params=ind, constraints=constraints, same_means=same_means, structural_pars=structural_pars),
                error=function(e) stop(paste("Problem with individual", i1, "in the initial population: "), e))
-      if(parametrization == "intercept") {
+      if(parametrization == "intercept") { # This is never the case when !is.null(same_means)
         ind <- change_parametrization(p=p, M=M, d=d, params=ind, constraints=constraints, structural_pars=structural_pars, change_to="mean")
       }
-      if(is.null(constraints)) {
+      if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
         initpop[[i1]] <- sort_components(p=p, M=M, d=d, params=ind, structural_pars=structural_pars)
       } else {
         initpop[[i1]] <- ind
@@ -313,8 +332,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     # Calculate log-likelihoods and fitness inheritance. Use minval if values smaller than that.
     if(i1 == 1) {
       for(i2 in 1:popsize) {
-        loks_and_mw <- loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                         constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
+        loks_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=G[,i2],
+                                         conditional=conditional, parametrization="mean",
+                                         constraints=constraints, same_means=same_means,
+                                         structural_pars=structural_pars,
+                                         to_return="loglik_and_mw",
                                          check_params=TRUE, minval=minval)
         fill_lok_and_red(i1, i2, loks_and_mw)
       }
@@ -349,13 +371,21 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
             redundants[i1, i2] <- survivor_redundants[i2]
           } else {
             if(stat_mu == TRUE & mutate[i2] == 1) {
-              loks_and_mw <- tryCatch(loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                                        constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
-                                                        check_params=FALSE, minval=minval), error=function(e) minval)
+              loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M, params=G[,i2],
+                                                        conditional=conditional, parametrization="mean",
+                                                        constraints=constraints, same_means=same_means,
+                                                        structural_pars=structural_pars,
+                                                        to_return="loglik_and_mw",
+                                                        check_params=FALSE, minval=minval),
+                                      error=function(e) minval)
             } else {
-              loks_and_mw <- tryCatch(loglikelihood_int(data, p, M, params=G[,i2], conditional=conditional, parametrization="mean",
-                                                        constraints=constraints, structural_pars=structural_pars, to_return="loglik_and_mw",
-                                                        check_params=TRUE, minval=minval), error=function(e) minval)
+              loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M, params=G[,i2],
+                                                        conditional=conditional, parametrization="mean",
+                                                        constraints=constraints, same_means=same_means,
+                                                        structural_pars=structural_pars,
+                                                        to_return="loglik_and_mw",
+                                                        check_params=TRUE, minval=minval),
+                                      error=function(e) minval)
             }
             fill_lok_and_red(i1, i2, loks_and_mw)
          }
@@ -411,8 +441,11 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     best_index0 <- which(logliks == max(logliks), arr.ind=TRUE)
     best_index <- best_index0[order(best_index0[,1], decreasing=FALSE)[1],] # First generation when the best loglik occurred (because of fitness inheritance)
     best_ind <- generations[, best_index[2], best_index[1]]
-    best_mw <- loglikelihood_int(data, p, M, params=best_ind, conditional=conditional, parametrization="mean",
-                                 constraints=constraints, structural_pars=structural_pars, to_return="mw",
+    best_mw <- loglikelihood_int(data=data, p=p, M=M, params=best_ind,
+                                 conditional=conditional, parametrization="mean",
+                                 constraints=constraints, same_means=same_means,
+                                 structural_pars=structural_pars,
+                                 to_return="mw",
                                  check_params=FALSE, minval=minval)
     which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1))) # Which regimes are wasted
 
@@ -440,18 +473,27 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     if(i1 <= smart_mu & length(which_mutate) >= 1 & !pre_smart_mu) { # Random mutations
       if(!is.null(constraints) | runif(1, min=1e-6, max=1-1e-6) > 0.5) { # Regular, can be nonstationary
         stat_mu <- FALSE
-        H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d, constraints=constraints,
-                                                                                   mu_scale=mu_scale, mu_scale2=mu_scale2,
-                                                                                   omega_scale=omega_scale, W_scale=W_scale,
-                                                                                   lambda_scale=lambda_scale, ar_scale2=ar_scale2,
-                                                                                   structural_pars=structural_pars), numeric(npars))
+        H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d,
+                                                                                   constraints=constraints,
+                                                                                   same_means=same_means,
+                                                                                   structural_pars=structural_pars,
+                                                                                   mu_scale=mu_scale,
+                                                                                   mu_scale2=mu_scale2,
+                                                                                   omega_scale=omega_scale,
+                                                                                   W_scale=W_scale,
+                                                                                   lambda_scale=lambda_scale,
+                                                                                   ar_scale2=ar_scale2), numeric(npars))
       } else { # For stationarity with algorithm (slower but can skip stationarity test), Ansley and Kohn (1986)
         stat_mu <- TRUE
-        H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M, d=d, mu_scale=mu_scale,
-                                                                                    mu_scale2=mu_scale2, omega_scale=omega_scale,
-                                                                                    ar_scale=ar_scale, W_scale=W_scale,
-                                                                                    lambda_scale=lambda_scale,
-                                                                                    structural_pars=structural_pars), numeric(npars))
+        H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M, d=d,
+                                                                                    same_means=same_means,
+                                                                                    structural_pars=structural_pars,
+                                                                                    mu_scale=mu_scale,
+                                                                                    mu_scale2=mu_scale2,
+                                                                                    omega_scale=omega_scale,
+                                                                                    ar_scale=ar_scale,
+                                                                                    W_scale=W_scale,
+                                                                                    lambda_scale=lambda_scale), numeric(npars))
       }
     } else if(length(which_mutate) >= 1) { # Smart mutations
       stat_mu <- FALSE
@@ -472,9 +514,9 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
 
       ## 'Smart mutation': mutate close to a well fitting individual. We obviously don't mutate close to
       # redundant regimes but draw them at random ('rand_to_use' in what follows).
-      if(!is.null(constraints) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5 | !is.null(structural_pars)) {
+      if(!is.null(constraints) | !is.null(same_means) | !is.null(structural_pars) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) {
         # The first option for smart mutations: smart mutate to 'alt_ind' which is the best fitting individual
-        # with least redundant regimes.
+        # with the least redundant regimes.
         # Note that best_ind == alt_ind when length(which_redundant) <= length(which_redundant_alt).
         ind_to_use <- alt_ind
         rand_to_use <- which_redundant_alt
@@ -519,31 +561,37 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
       }
 
       # Smart mutations
-      H2[,which_mutate] <- vapply(1:length(which_mutate), function(i2) smart_ind(p, M, d, params=ind_to_use, constraints=constraints,
-                                                                                 accuracy=accuracy[i2], which_random=rand_to_use,
-                                                                                 mu_scale=mu_scale, mu_scale2=mu_scale2,
-                                                                                 omega_scale=omega_scale, ar_scale=ar_scale,
-                                                                                 W_scale=W_scale, lambda_scale=lambda_scale,
-                                                                                 structural_pars=structural_pars), numeric(npars))
+      H2[,which_mutate] <- vapply(1:length(which_mutate), function(i2) smart_ind(p=p, M=M, d=d,
+                                                                                 params=ind_to_use,
+                                                                                 constraints=constraints,
+                                                                                 same_means=same_means,
+                                                                                 structural_pars=structural_pars,
+                                                                                 accuracy=accuracy[i2],
+                                                                                 which_random=rand_to_use,
+                                                                                 mu_scale=mu_scale,
+                                                                                 mu_scale2=mu_scale2,
+                                                                                 omega_scale=omega_scale,
+                                                                                 ar_scale=ar_scale,
+                                                                                 ar_scale2=ar_scale2,
+                                                                                 W_scale=W_scale,
+                                                                                 lambda_scale=lambda_scale), numeric(npars))
     }
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
-    if(is.null(constraints) && is.null(structural_pars$C_lambda)) {
+    if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
       H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M, d=d, params=H2[,i2], structural_pars=structural_pars), numeric(npars))
     }
 
     # Save the results and set up new generation
     G <- H2
   }
-
   if(to_return == "best_ind") {
     ret <- best_ind
   } else {
     ret <- alt_ind
   }
-
   # GA always optimizes with mean parametrization. Return intercept-parametrized estimate if parametrization=="intercept".
-  if(parametrization == "mean") {
+  if(parametrization == "mean") { # This is always the case with same_means
     return(ret)
   } else {
     return(change_parametrization(p=p, M=M, d=d, params=ret, constraints=constraints, structural_pars=structural_pars, change_to="intercept"))

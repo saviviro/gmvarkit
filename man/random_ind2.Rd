@@ -8,13 +8,14 @@ random_ind2(
   p,
   M,
   d,
+  same_means = NULL,
+  structural_pars = NULL,
   mu_scale,
   mu_scale2,
   omega_scale,
   ar_scale = 1,
   W_scale,
-  lambda_scale,
-  structural_pars = NULL
+  lambda_scale
 )
 }
 \arguments{
@@ -23,6 +24,28 @@ random_ind2(
 \item{M}{a positive integer specifying the number of mixture components.}
 
 \item{d}{the number of time series in the system.}
+
+\item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
+\code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
+the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
+should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
+that is, when \code{parametrization="mean"}.}}
+
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+the following elements:
+\itemize{
+  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
+    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
+    negative sign constraint, and zero indicating that the element is constrained to zero.
+  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
+    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
+    should not be constrained.
+}
+See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
@@ -77,21 +100,6 @@ is considered.}
   As with omega_scale and W_scale, this argument should be adjusted carefully if specified by hand. \strong{NOTE}
   that if lambdas are constrained in some other way than restricting some of them to be identical, this parameter
   should be adjusted accordingly in order to the estimation succeed!}
-
-\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
-the following elements:
-\itemize{
-  \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
-    unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
-    negative sign constraint, and zero indicating that the element is constrained to zero.
-  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
-    parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
-    must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
-    should not be constrained.
-}
-See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
-a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}

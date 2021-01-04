@@ -12,6 +12,11 @@ C_lambda_122 <- matrix(1, nrow=1)
 params122s <- random_ind2(p=1, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1,
                           structural_pars=list(W=W_122, C_lambda=C_lambda_122))
 
+params222s_sm <- random_ind2(p=2, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1,
+                             same_means=list(1:2),
+                             structural_pars=list(W=W_122, C_lambda=C_lambda_122))
+
+
 test_that("generate parameters don't throw errors", {
   test_length0 <- function(x, length_x) expect_equal(length(x), length_x)
   test_length0(random_ind(p=2, M=3, d=2, mu_scale=1:2, mu_scale2=1:2, omega_scale=1:2), 41)
@@ -19,17 +24,24 @@ test_that("generate parameters don't throw errors", {
                           structural_pars=list(W=chol(tcrossprod(matrix(rnorm(3*3), nrow=3))))), 36)
   test_length0(random_ind(p=1, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1,
                           structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 18)
+  test_length0(random_ind(p=2, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1, same_means=list(1:2),
+                          structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 24)
+
   test_length0(smart_ind(p=1, M=2, d=2, params=params122, which_random=1, mu_scale=1:2, mu_scale2=1:2, omega_scale=1:2), 19)
   test_length0(smart_ind(p=1, M=2, d=2, params=params122s, which_random=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2,
                          lambda_scale=2, structural_pars=list(W=W_122, C_lambda=C_lambda_122)), 18)
   test_length0(smart_ind(p=3, M=1, d=3, params=params313s, which_random=1, mu_scale=1:2, mu_scale2=1:2, W_scale=1:3,
                          lambda_scale=1:2, structural_pars=list(W=W_313)), 36)
+  test_length0(smart_ind(p=2, M=2, d=2, params=params222s_sm, which_random=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2,
+                         lambda_scale=2, same_means=list(1:2), structural_pars=list(W=W_122, C_lambda=C_lambda_122)), 24)
 
   test_length0(random_ind2(p=3, M=1, d=3, mu_scale=1:3, mu_scale2=1:3, omega_scale=1:3), 36)
   test_length0(random_ind2(p=3, M=1, d=3, mu_scale=1:3, mu_scale2=1:3, W_scale=1:3, lambda_scale=1:3,
                            structural_pars=list(W=chol(tcrossprod(matrix(rnorm(3*3), nrow=3))))), 36)
   test_length0(random_ind2(p=1, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1,
                            structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 18)
+  test_length0(random_ind2(p=2, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1, same_means=list(1:2),
+                           structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 24)
 
   test_length0(random_coefmats(d=2, how_many=1, scale=1), 4)
   test_length0(random_coefmats2(p=2, d=3), 18)
