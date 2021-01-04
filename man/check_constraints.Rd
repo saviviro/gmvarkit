@@ -29,7 +29,7 @@ For example, to restrict the AR-parameters to be the same for all regimes, set \
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
-\item{same_means}{Restricted the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+\item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
 such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
 \code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
 the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters

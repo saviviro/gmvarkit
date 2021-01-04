@@ -10,7 +10,7 @@ check_same_means(parametrization, same_means)
 \item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
 parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
-\item{same_means}{Restricted the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+\item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
 such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
 \code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
 the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters

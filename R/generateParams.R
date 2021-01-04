@@ -9,32 +9,45 @@
 #'   in the other functions, for instance, in the function \code{loglikelihood}.
 #' @inherit in_paramspace references
 
-random_ind <- function(p, M, d, constraints=NULL, mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
+random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale,
+                       W_scale, lambda_scale) {
   scale_A <- ifelse(is.null(constraints),
                     1 + log(2*mean(c((p - 0.2)^(1.25), d))),
                     1 + (sum(constraints)/(M*d^2))^0.85)
+  g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
   if(is.null(constraints)) {
     if(is.null(structural_pars)) {
-      x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-                                               random_coefmats(d=d, how_many=p, scale=scale_A),
-                                               random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d+1)/2)))
-    } else {
-      x <- c(rnorm(d*M, mean=mu_scale, sd=mu_scale2), as.vector(replicate(n=M, random_coefmats(d=d, how_many=p, scale=scale_A))),
+      if(is.null(same_means)) { # No AR constraints, reduced form, no same_means
+        x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
+                                                 random_coefmats(d=d, how_many=p, scale=scale_A),
+                                                 random_covmat(d=d, omega_scale=omega_scale)), numeric(p*d^2 + d + d*(d+1)/2)))
+      } else { # No AR constraints, reduced form, same_means
+        x <- c(rnorm(d*g, mean=mu_scale, sd=mu_scale2),
+               replicate(n=M, expr=random_coefmats(d=d, how_many=p, scale=scale_A)),
+               replicate(n=M, expr=random_covmat(d=d, omega_scale=omega_scale)))
+      }
+    } else { # No AR constraints, structural model, possibly with same_means
+      x <- c(rnorm(d*g, mean=mu_scale, sd=mu_scale2),
+             replicate(n=M, random_coefmats(d=d, how_many=p, scale=scale_A)),
              random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
     }
-  } else {
+  } else { # AR constraints employed
     q <- ncol(constraints)
     psi <- rnorm(q, mean=0, sd=0.5/scale_A) # random psi
-    all_phi0 <- rnorm(d*M, mean=mu_scale, sd=mu_scale2) # as.vector(replicate(n=M, rnorm(d, mean=mu_scale, sd=mu_scale2)))
+    all_phi0 <- rnorm(d*g, mean=mu_scale, sd=mu_scale2)
     if(is.null(structural_pars)) {
-      x <- c(all_phi0, psi, as.vector(replicate(n=M, random_covmat(d=d, omega_scale=omega_scale))))
+      x <- c(all_phi0, psi, replicate(n=M, random_covmat(d=d, omega_scale=omega_scale)))
     } else {
       x <- c(all_phi0, psi, random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
     }
   }
   if(M > 1) {
     alphas <- runif(n=M)
-    return(c(x, (alphas[order(alphas, decreasing=TRUE, method="radix")]/sum(alphas))[-M]))
+    if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
+      # alphas not ordered if certain constraints are employed because the constrained parameter vector won't be reordered
+      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
+    }
+    return(c(x, (alphas/sum(alphas))[-M]))
   } else {
     return(x)
   }

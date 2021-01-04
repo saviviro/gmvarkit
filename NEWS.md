@@ -91,5 +91,6 @@
 
 # gmvarkit 1.3.2
 
+* New feature: possibility to constrain the (unconditional) mean parameters to the same among some regimes with the argument 'same_means'. This feature is available for mean-parametrized models only (due to technical reasons).
 * The default number of estimation rounds was increased to 'floor(10 + 30*log(M))'.
 * Technical update to the estimation function.
