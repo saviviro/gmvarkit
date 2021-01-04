@@ -73,21 +73,19 @@ quantile_residuals <- function(gmvar) {
   M <- gmvar$model$M
   d <- gmvar$model$d
   data <- gmvar$data
-  constraints <- gmvar$model$constraints
   structural_pars <- gmvar$model$structural_pars
   n_obs <- nrow(data)
   T_obs <- n_obs - p
 
   # Collect parameter values
   params <- gmvar$params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=gmvar$model$constraints,
+                                    same_means=gmvar$model$same_means, structural_pars=structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(gmvar$model$parametrization == "mean") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
+    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
-                                    structural_pars=structural_pars)
-  structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-
   all_mu <- get_regime_means(gmvar)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -197,11 +195,12 @@ quantile_residuals <- function(gmvar) {
 #' @inherit quantile_residuals return references
 
 quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL,
-                                   structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
+                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
   lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                   parametrization=parametrization, constraints=constraints,
-                                  structural_pars=structural_pars, to_return="loglik_and_mw",
-                                  check_params=TRUE, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                                  same_means=same_means, structural_pars=structural_pars,
+                                  to_return="loglik_and_mw", check_params=TRUE, minval=NA,
+                                  stat_tol=stat_tol, posdef_tol=posdef_tol)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
   mod <- structure(list(data=data,
@@ -211,6 +210,7 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                                    conditional=conditional,
                                    parametrization=parametrization,
                                    constraints=constraints,
+                                   same_means=same_means,
                                    structural_pars=structural_pars),
                         params=params,
                         std_errors=rep(NA, npars),

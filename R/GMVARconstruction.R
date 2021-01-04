@@ -93,7 +93,8 @@
 #' @export
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                  structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE, stat_tol=1e-3, posdef_tol=1e-8) {
+                  same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
+                  stat_tol=1e-3, posdef_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
@@ -109,10 +110,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
       d <- ncol(data)
     }
   }
-  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  check_parameters(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars,
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_parameters(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=constraints,
+                   same_means=same_means, structural_pars=structural_pars,
                    stat_tol=stat_tol, posdef_tol=posdef_tol)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
 
   if(is.null(data)) {
     lok_and_mw <- list(loglik=NA, mw=NA)
@@ -120,11 +122,17 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     qresiduals <- NA
   } else {
     if(npars >= nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
-    lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
-                                    parametrization=parametrization, constraints=constraints, structural_pars=structural_pars,
-                                    to_return="loglik_and_mw", check_params=FALSE, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
-    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, conditional=conditional,
-                                         parametrization=parametrization, constraints=constraints, structural_pars=structural_pars)
+    lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params,
+                                    conditional=conditional, parametrization=parametrization,
+                                    constraints=constraints, same_means=same_means,
+                                    structural_pars=structural_pars,
+                                    to_return="loglik_and_mw",
+                                    check_params=FALSE, minval=NA,
+                                    stat_tol=stat_tol, posdef_tol=posdef_tol)
+    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params,
+                                         conditional=conditional, parametrization=parametrization,
+                                         constraints=constraints, same_means=same_means,
+                                         structural_pars=structural_pars)
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
@@ -133,8 +141,10 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
       warning("Approximate standard errors can't be calculated")
       std_errors <- rep(NA, npars)
     } else {
-      std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
-                                             constraints=constraints, structural_pars=structural_pars,
+      std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params,
+                                             conditional=conditional, parametrization=parametrization,
+                                             constraints=constraints, same_means=same_means,
+                                             structural_pars=structural_pars,
                                              minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1),
                                              stat_tol=stat_tol, posdef_tol=posdef_tol),
                              error=function(e) {
@@ -151,9 +161,13 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     total_cmeans <- NA
     total_ccovs <- NA
   } else {
-    get_cm <- function(to_return) loglikelihood_int(data, p, M, params, conditional=conditional, parametrization=parametrization,
-                                                    constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                                                    to_return=to_return, minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
+    get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params,
+                                                    conditional=conditional, parametrization=parametrization,
+                                                    constraints=constraints, same_means=same_means,
+                                                    structural_pars=structural_pars,
+                                                    check_params=TRUE,
+                                                    to_return=to_return, minval=NA,
+                                                    stat_tol=stat_tol, posdef_tol=posdef_tol)
     regime_cmeans <- get_cm("regime_cmeans")
     total_cmeans <- get_cm("total_cmeans")
     total_ccovs <- get_cm("total_ccovs")
@@ -166,6 +180,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                             conditional=conditional,
                             parametrization=parametrization,
                             constraints=constraints,
+                            same_means=same_means,
                             structural_pars=structural_pars),
                  params=params,
                  std_errors=std_errors,
@@ -178,8 +193,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                                   class="logLik",
                                   df=npars),
                  IC=IC,
-                 uncond_moments=uncond_moments_int(p=p, M=M, d=d, params=params, parametrization=parametrization,
-                                                   constraints=constraints, structural_pars=structural_pars),
+                 uncond_moments=uncond_moments_int(p=p, M=M, d=d, params=params,
+                                                   parametrization=parametrization,
+                                                   constraints=constraints,
+                                                   same_means=same_means,
+                                                   structural_pars=structural_pars),
                  all_estimates=NULL,
                  all_logliks=NULL,
                  which_converged=NULL,
@@ -252,9 +270,9 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
   check_gmvar(gmvar)
   GMVAR(data=data, p=gmvar$model$p, M=gmvar$model$M, params=gmvar$params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
-        structural_pars=gmvar$model$structural_pars, calc_cond_moments=calc_cond_moments,
-        calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
-        posdef_tol=gmvar$num_tols$posdef_tol)
+        same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
+        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors,
+        stat_tol=gmvar$num_tols$stat_tol, posdef_tol=gmvar$num_tols$posdef_tol)
 }
 
 
@@ -314,6 +332,9 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 
 swap_parametrization <- function(gmvar) {
   check_gmvar(gmvar)
+  if(!is.null(gmvar$model$same_means)) {
+    stop("Cannot change parametrization to intercept is the mean parameters are constrained")
+  }
   change_to <- ifelse(gmvar$model$parametrization == "intercept", "mean", "intercept")
   new_params <- change_parametrization(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
                                        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
@@ -372,7 +393,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   }
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
+        constraints=gmvar$model$constraints, same_mean=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
         calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
 }
@@ -430,7 +451,9 @@ gmvar_to_sgmvar <- function(gmvar) {
   if(M > 2) stop("Only models with at most two regimes are supported!")
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints)
+  same_means <- gmvar$model$same_means
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints,
+                                    same_means=same_means)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=NULL)
   if(M == 1) {
     W <- matrix(diag_Omegas(Omega1=all_Omega[, , 1]), nrow=d, ncol=d, byrow=FALSE)
@@ -447,12 +470,17 @@ gmvar_to_sgmvar <- function(gmvar) {
   }
 
   # Create SGMVAR parameter vector
-  all_phi0 <- as.vector(pick_phi0(p=p, M=M, d=d, params=params))
+  g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
+  if(is.null(same_means)) {
+    all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=NULL)
+  } else {
+    all_phi0 <- gmvar$params[1:(d*g)]
+  }
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
   if(is.null(constraints)) {
     all_A <- as.vector(pick_allA(p=p, M=M, d=d, params=params))
   } else {
-    all_A <- gmvar$params[(d*M + 1):(d*M + ncol(constraints))] # \psi
+    all_A <- gmvar$params[(d*g + 1):(d*g + ncol(constraints))] # \psi
   }
   new_params <- c(all_phi0, all_A, vec(W), lambdas, alphas[-M])
   new_W <- matrix(NA, nrow=d, ncol=d)
@@ -461,7 +489,7 @@ gmvar_to_sgmvar <- function(gmvar) {
   # Construct the SGMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
-        parametrization=gmvar$model$parametrization, constraints=constraints,
+        parametrization=gmvar$model$parametrization, constraints=constraints, same_means=same_means,
         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
 }
@@ -513,8 +541,10 @@ reorder_W_columns <- function(gmvar, perm) {
   d <- gmvar$model$d
   stopifnot(length(perm) == d && all(perm %in% 1:d) && length(unique(perm)) == d)
   constraints <- gmvar$model$constraints
+  same_means <- gmvar$model$same_means
   structural_pars <- gmvar$model$structural_pars
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints,
+                                    same_means=same_means, structural_pars=structural_pars)
   W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
@@ -532,7 +562,7 @@ reorder_W_columns <- function(gmvar, perm) {
   # Construct the SGMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
-        parametrization=gmvar$model$parametrization, constraints=constraints,
+        parametrization=gmvar$model$parametrization, constraints=constraints, same_means=same_means,
         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
 }
@@ -585,8 +615,10 @@ swap_W_signs <- function(gmvar, which_to_swap) {
   stopifnot(length(which_to_swap) <= d && length(which_to_swap) >= 1 && all(which_to_swap %in% 1:d)
             && length(unique(which_to_swap)) == length(which_to_swap))
   constraints <- gmvar$model$constraints
+  same_means <- gmvar$model$same_means
   structural_pars <- gmvar$model$structural_pars
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=constraints,
+                                    same_means=same_means, structural_pars=structural_pars)
   W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
   # Create the new parameter vector
@@ -602,7 +634,7 @@ swap_W_signs <- function(gmvar, which_to_swap) {
   # Construct the SGMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
-        parametrization=gmvar$model$parametrization, constraints=constraints,
+        parametrization=gmvar$model$parametrization, constraints=constraints, same_means=same_means,
         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
 }
@@ -647,7 +679,8 @@ swap_W_signs <- function(gmvar, which_to_swap) {
 update_numtols <- function(gmvar, stat_tol=1e-3, posdef_tol=1e-8) {
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
+        constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
+        structural_pars=gmvar$model$structural_pars,
         calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE), stat_tol=stat_tol,
         posdef_tol=posdef_tol)
 }

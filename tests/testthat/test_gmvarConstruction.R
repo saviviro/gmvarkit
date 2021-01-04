@@ -45,6 +45,22 @@ W_122 <- matrix(WL_122[1:(2^2)], nrow=2, byrow=FALSE)
 C_lambda_122 <- matrix(c(7, 1), nrow=2)
 theta_122csLAR <- c(phi10_122, phi20_122, vec(A11_122), vec(W_122), 1, alpha1_122)
 
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+C_222 <- rbind_diags(p=2, M=2, d=2)
+phi10_222 <- c(1.03, 2.36)
+A11_222 <- matrix(c(1.25, 0.06, 0.04, 1.34), nrow=2, byrow=FALSE)
+A12_222 <- matrix(c(-0.29, -0.08, -0.05, -0.36), nrow=2, byrow=FALSE)
+Omega1_222 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE)
+Omega2_222 <- matrix(c(5.88, 3.56, 3.56, 9.80), nrow=2, byrow=FALSE)
+alpha1_222 <- 0.37
+
+theta_222c_int <- c(-5, 123, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+
+# p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
+WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
+W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
+C_lambda_222 <- matrix(c(1, 2), nrow=2)
+theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
 
 test_that("GMVAR works correctly", {
   mod122 <- GMVAR(data, p=1, M=2, params=params122)
@@ -58,6 +74,13 @@ test_that("GMVAR works correctly", {
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
   expect_equal(mod212csW$params, theta_212csW)
   expect_equal(mod122csLAR$params, theta_122csLAR)
+
+  # Same_means
+  mod222c_int <- GMVAR(data, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+  mod222csLAR_int <- GMVAR(data, p=2, M=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+                           structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
+  expect_equal(mod222c_int$params, theta_222c_int)
+  expect_equal(mod222csLAR_int$params, theta_222csLAR_int)
 })
 
 
@@ -71,6 +94,11 @@ test_that("add_data works correctly", {
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
   mod122csLAR_2 <- add_data(data=data, gmvar=mod122csLAR)
   expect_equal(mod122csLAR_2$data, data)
+
+  # Same means
+  mod222c_int <- GMVAR(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+  mod222c_int2 <- add_data(data=data, gmvar=mod222c_int)
+  expect_equal(mod222c_int2$data, data)
 })
 
 
@@ -121,11 +149,18 @@ params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
 mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 mod222cs <- gmvar_to_sgmvar(mod222c)
 
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+mod222c_int <- GMVAR(data, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+mod222cs_int <- gmvar_to_sgmvar(mod222c_int)
+
 test_that("gmvar_to_sgmvar works correctly", {
   expect_equal(mod122s$params, c(0.623, -0.129, 3.245, 7.913, 0.959, 0.089, -0.006, 1.006, 0.952, -0.037, -0.019, 0.943,
                                  1.31216, 0.87892, -0.15571, 2.2431, 3.99732, 1.79808, 0.789), tolerance=1e-3)
   expect_equal(mod222cs$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, 0.89382,
                                   0.71976, -0.36753, 2.16401, 7.14351, 1.30222, 0.368), tolerance=1e-3)
+  expect_equal(mod222cs_int$params,
+               c(-5.0000000, 123.0000000, 1.2500000, 0.0600000, 0.0400000, 1.3400000, -0.2900000, -0.0800000, -0.0500000,
+                 -0.3600000, 0.8924620, 0.7180539, -0.3653923, 2.1643472, 7.1638990, 1.3035363, 0.3700000), tolerance=1e-6)
 })
 
 
@@ -138,21 +173,34 @@ diag(W112) <- c(1, 1)
 mod112 <- GMVAR(data, p=1, M=1, params=params112, structural_pars=list(W=W112))
 mod112_2 <- reorder_W_columns(mod112, perm=2:1)
 
+# p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222), same_means=list(1:2)
+theta_222csAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, 0.4, alpha1_222)
+mod222csAR_int <- GMVAR(data, p=2, M=2, params=theta_222csAR_int, parametrization="mean",
+                        constraints=C_222, structural_pars=list(W=W_222), same_means=list(1:2))
+mod222csAR_int2 <- reorder_W_columns(mod222csAR_int, perm=2:1)
+
+
 test_that("reorder_W_columns works correctly", {
   expect_equal(mod222cs2$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, -0.36753,
                                    2.16401, 0.89382, 0.71976, 1.30222, 7.14351, 0.368), tolerance=1e-3)
   expect_equal(mod112_2$params, c(0.89978, 1.70757, 0.98944, 0.00264, -0.00696, 0.98661, 0.45293, 2.944, 1.96105, 0.45293), tolerance=1e-3)
-
+  expect_equal(mod222csAR_int2$params,
+               c(1.0300000, 2.3600000, 1.2500000, 0.0600000, 0.0400000, 1.3400000, -0.2900000, -0.0800000, -0.0500000, -0.3600000, 0.3653923,
+                 -2.1643472, -0.8924620, -0.7180539, 0.4000000, 0.2000000, 0.3700000), tolerance=1e-6)
 })
 
 mod222cs3 <- swap_W_signs(mod222cs, which_to_swap=1:2)
 mod112_3 <- swap_W_signs(mod112, which_to_swap=2)
+mod222csAR_int3 <- swap_W_signs(mod222csAR_int, which_to_swap=1)
 
 test_that("swap_W_signs works correctly", {
   expect_equal(mod222cs3$params, c(1.031, 2.356, 1.786, 3, 1.25, 0.06, 0.036, 1.335, -0.29, -0.083, -0.047, -0.356, -0.89382,
                                    -0.71976, 0.36753, -2.16401, 7.14351, 1.30222, 0.368), tolerance=1e-3)
   expect_equal(mod112_3$params, c(0.89978, 1.70757, 0.98944, 0.00264, -0.00696, 0.98661, 1.96105, 0.45293, -0.45293, -2.944),
                tolerance=1e-3)
+  expect_equal(mod222csAR_int3$params,
+               c(1.0300000, 2.3600000, 1.2500000, 0.0600000, 0.0400000, 1.3400000, -0.2900000, -0.0800000, -0.0500000, -0.3600000,
+                 0.8924620, 0.7180539, 0.3653923, -2.1643472, 0.2000000, 0.4000000, 0.3700000), tolerance=1e-6)
 })
 
 

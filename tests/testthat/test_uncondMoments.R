@@ -218,6 +218,16 @@ theta_112cs_mu_exp <- reform_constrained_pars(p=1, M=1, d=2, params=theta_112cs_
 theta_222cs_mu_exp <- reform_constrained_pars(p=2, M=2, d=2, params=theta_222cs_mu, constraints=C_222,
                                               structural_pars=list(W=W_222, C_lambda_222))
 
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+theta_222c_int_expanded <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), phi10_222, vec(A11_222), vec(A12_222),
+                             vech(Omega2_222), alpha1_222)
+
+# p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
+theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
+theta_222csLAR_int_expanded <-  c(phi10_222, phi10_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222),
+                                  vec(W_222), 0.2, 2*0.2, alpha1_222)
+
 
 test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112, parametrization="intercept", constraints=NULL),
@@ -288,6 +298,13 @@ test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222cs_mu, parametrization="mean", constraints=C_222,
                                     structural_pars=list(W=W_222, C_lambda=C_lambda_222)),
                calc_mu(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+
+  # Same_means
+  expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2)),
+               unname(cbind(phi10_222, phi10_222)))
+  expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+                                    structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)),
+               unname(cbind(phi10_222, phi10_222)))
 })
 
 
@@ -322,6 +339,19 @@ test_that("get_regime_autocovs_int works correctly", {
                c(-0.582898, -1.038395, -1.413783), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=1, M=2, d=3, params=theta_123csLAR, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123))[, 1, 2, 1],
                c(0.2987136, 0.5610925, 0.8093760), tolerance=1e-6)
+
+  # Same_means
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2))[, 2, 2, 1],
+               c(-48.59455, 246.67447), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2))[, 1, 1, 2],
+               c(111.265016, 7.133962), tolerance=1e-5)
+
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222,
+                                       structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 2, 1, 2],
+               c(-21.57249, 97.57641), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222,
+                                       structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 1, 2, 1],
+               c(29.21410, -47.35956), tolerance=1e-5)
 })
 
 
@@ -384,6 +414,18 @@ test_that("uncond_moments_int works correctly", {
                c(4.24, 133.92), tolerance=1e-2)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR, parametrization="intercept", constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222))$autocors[, 2, 1],
                c(0.2277718, 1.0000000), tolerance=1e-6)
+
+  # Same_means
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))$uncond_mean,
+               c(1.03, 2.36), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))$autocors[, 1, 2],
+               c(0.97148078, -0.08139881), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+                                  structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$uncond_mean,
+               c(1.03, 2.36), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+                                  structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$autocors[, 2, 1],
+               c(-0.6139921, 1.0000000), tolerance=1e-6)
 })
 
 
@@ -392,66 +434,42 @@ test_that("non_int uncond moment functions work", {
   mod112csWAR <- GMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
   mod222csLAR <- GMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
                        structural_pars=list(W=W_222, C_lambda=C_lambda_222))
+  mod222c_int <- GMVAR(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
 
   unc122 <- uncond_moments(mod122)
   unc112csWAR <- uncond_moments(mod112csWAR)
   unc222csLAR <- uncond_moments(mod222csLAR)
+  unc222c_int <- uncond_moments(mod222c_int)
 
   expect_equal(unc122, uncond_moments_int(p=1, M=2, d=2, params=theta_122), tolerance=1e-6)
   expect_equal(unc112csWAR, uncond_moments_int(p=1, M=1, d=2, params=theta_112csWAR,
-                                          structural_pars=list(W=W_112)), tolerance=1e-6)
+                                               structural_pars=list(W=W_112)), tolerance=1e-6)
   expect_equal(unc222csLAR$autocovs[1, 2, ], c(27.91380, 27.59758, 27.16074), tolerance=1e-4)
   expect_equal(unc222csLAR$autocors[2, , 1], c(0.2277718, 1.0000000), tolerance=1e-4)
   expect_equal(unc222csLAR$uncond_mean, c(4.24, 133.92), tolerance=1e-4)
+  expect_equal(unc222c_int,
+               uncond_moments_int(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2)),
+               tolerance=1e-6)
 
   reg_means122 <- get_regime_means(mod122)
   reg_means112csWAR <- get_regime_means(mod112csWAR)
   reg_means222csLAR <- get_regime_means(mod222csLAR)
+  reg_means222c_int <- get_regime_means(mod222c_int)
 
   expect_equal(reg_means122[2, ], c(2.553492, 3.210253), tolerance=1e-5)
   expect_equal(reg_means112csWAR[, 1], c(1.571661, 3.718636), tolerance=1e-5)
   expect_equal(reg_means222csLAR[, 2], c(9.666667, 140.333333), tolerance=1e-5)
+  expect_equal(reg_means222c_int[, 2], c(1.03, 2.36), tolerance=1e-5)
 
   reg_autocovs122 <- get_regime_autocovs(mod122)
   reg_autocovs112csWAR <- get_regime_autocovs(mod112csWAR)
   reg_autocovs222csLAR <- get_regime_autocovs(mod222csLAR)
+  reg_autocovs222c_int <- get_regime_autocovs(mod222c_int)
 
   expect_equal(reg_autocovs122[2 ,2 ,1 , ], c(5.258146, 9.877770), tolerance=1e-5)
   expect_equal(reg_autocovs112csWAR[1, ,2 , 1], c(0.2477767, 0.2201706), tolerance=1e-5)
   expect_equal(reg_autocovs222csLAR[1, , 2, 2], c(9.302809, -21.716886), tolerance=1e-5)
+  expect_equal(reg_autocovs222c_int[, 2, 2, 1], c(-48.59455, 246.67447), tolerance=1e-5)
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

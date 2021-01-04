@@ -82,6 +82,12 @@ mod_323 <- GMVAR(p=3, M=2, d=3, params=theta_323, conditional=FALSE, parametriza
 sim_323 <- simulateGMVAR(mod_323, nsimu=500)$sample
 mod_323 <- add_data(data=sim_323, gmvar=mod_323)
 
+# p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
+theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
+mod_222csLAR_int <- GMVAR(data, p=2, M=2, params=theta_222csLAR_int, conditional=TRUE, parametrization="mean",
+                          constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
+
+# Get quantile residuals
 res_112 <- quantile_residuals(mod_112)
 res_222 <- quantile_residuals(mod_222)
 res_222c <- quantile_residuals(mod_222c)
@@ -93,6 +99,9 @@ res_142_mean <- quantile_residuals(mod_142_mean)
 res_112s <- quantile_residuals(mod_112s)
 res_222s <- quantile_residuals(mod_222s)
 res_222csLAR <- quantile_residuals(mod_222csLAR)
+
+res222csLAR_int <- quantile_residuals(mod_222csLAR_int)
+
 
 test_that("quantile_residuals works correctly", {
   expect_equal(res_112[1,], c(0.7421619, -2.3382223), tolerance=1e-6)
@@ -127,14 +136,20 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res_222s, res_222, tol=1e-6)
   expect_equal(res_222csLAR[1,], c(0.1658934, -0.2827984), tol=1e-6)
   expect_equal(res_222csLAR[250,], c(-0.7458269, -0.8943336), tol=1e-6)
+
+  # Same_means
+  expect_equal(res222csLAR_int[c(1, 5, 100, 200)], c(1.2904864, 2.6818951, 2.3194764, 0.1348595), tolerance=1e-6)
 })
 
 test_that("quantile_residuals_int works correctly", {
   qr112 <- quantile_residuals_int(data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
   qr222csLAR <- quantile_residuals_int(data, p=2, M=2, params=theta_222cs, conditional=TRUE, parametrization="intercept",
                                        constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222))
+  qr222csLAR_int <- quantile_residuals_int(data, p=2, M=2, params=theta_222csLAR_int, conditional=TRUE, parametrization="mean",
+                                           constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
   expect_equal(qr112, res_112, tol=1e-6)
   expect_equal(qr222csLAR, res_222csLAR, tol=1e-6)
+  expect_equal(qr222csLAR_int[1:3], c(1.290486, 2.472298, 5.088865), tolerance=1e-6)
 })
 
 

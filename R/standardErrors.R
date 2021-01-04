@@ -9,14 +9,14 @@
 #' @inherit in_paramspace_int references
 
 standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"),
-                            constraints=NULL, structural_pars=NULL, minval, stat_tol=1e-3, posdef_tol=1e-8) {
-
+                            constraints=NULL, same_means=NULL, structural_pars=NULL, minval,
+                            stat_tol=1e-3, posdef_tol=1e-8) {
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
-                               constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                               to_return="loglik", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol),
+                               constraints=constraints, same_means=same_means, structural_pars=structural_pars,
+                               check_params=TRUE, to_return="loglik", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol),
              error=function(e) NA)
   }
 
@@ -94,7 +94,8 @@ print_std_errors <- function(gmvar, digits=3) {
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
   pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints,
-                                  structural_pars=gmvar$model$structural_pars, change_na=TRUE)
+                                  same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
+                                  change_na=TRUE)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)

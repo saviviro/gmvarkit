@@ -71,6 +71,9 @@ W_222c2 <- matrix(WL_222c2[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222c2 <- WL_222c2[(2^2 + 1):length(WL_222c2)]
 theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # SGMVAR AR
 
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+#theta_222c_int <- c(-5, 123, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+
 test_that("standard_errors works correctly", {
   expect_equal(standard_errors(data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
                                constraints=C_222, minval=-99999),
