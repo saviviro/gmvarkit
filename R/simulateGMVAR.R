@@ -130,7 +130,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
                                     same_means=gmvar$model$same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(gmvar$model$parametrization == "mean") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL, same_means=NULL,
+    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
 

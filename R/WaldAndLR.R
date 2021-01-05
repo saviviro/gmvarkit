@@ -70,10 +70,15 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
   # Calculate Hessian matrix at the estimate
   minval <- get_minval(gmvar$data)
   loglik_fn <- function(pars) {
-    tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=pars, conditional=gmvar$model$conditional,
-                               parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
-                               structural_pars=gmvar$model$structural_pars, check_params=TRUE,
-                               to_return="loglik", minval=minval, stat_tol=gmvar$num_tols$stat_tol,
+    tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=pars,
+                               conditional=gmvar$model$conditional,
+                               parametrization=gmvar$model$parametrization,
+                               constraints=gmvar$model$constraints,
+                               same_means=gmvar$model$same_means,
+                               structural_pars=gmvar$model$structural_pars,
+                               check_params=TRUE,
+                               to_return="loglik", minval=minval,
+                               stat_tol=gmvar$num_tols$stat_tol,
                                posdef_tol=gmvar$num_tols$posdef_tol),
              error=function(e) {
                print(paste("Failed to evualuate log-likelihood function in the approximation of Hessian matrix:", e))

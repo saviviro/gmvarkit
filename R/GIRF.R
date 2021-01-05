@@ -113,7 +113,7 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
   if(!is.null(init_values)) R2 <- 1
   if(!is.null(seeds) && length(seeds) != R2) stop("The argument 'seeds' needs be NULL or a vector of length 'R2'")
   stopifnot(length(init_regimes) <= M && all(init_regimes %in% 1:M) && length(unique(init_regimes)) == length(init_regimes))
-  stopifnot(!is.null(gmvar$model$structural_pars))
+  if(is.null(gmvar$model$structural_pars)) stop("Only structural models are supported")
   stopifnot(length(ci) > 0 && all(ci > 0 & ci < 1))
 
   if(missing(shock_size)) {

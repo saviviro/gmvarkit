@@ -55,6 +55,15 @@ pred222 <- predict.gmvar(mod_222, n_ahead=2, n_simu=10, pi=c(0.95, 0.80), plot_r
 pred123 <- predict.gmvar(mod_123, n_ahead=1, n_simu=10, pi=0.99, pi_type="upper", pred_type="median", plot_res=FALSE)
 tmp222 <- unname(pred222$pred[2,])
 
+# p=1 M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
+C_mat <- rbind(diag(2*2^2), diag(2*2^2))
+params_222cm <- c(-9.12048853805255, 123.142757183508, 1.2658425363326, 0.0675545389606989, 0.0331264235657607,
+                  1.33370494344656, -0.285882557831441, -0.0769144929653558, -0.0382772162867802, -0.351635998882842,
+                  5.8625623309659, 3.57488618757834, 9.70846346569286, 0.869261580580846, -0.248703862116217,
+                  5.17613656742281, 0.439575388572472)
+mod_222cm <- GMVAR(data, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
+set.seed(1); pred222cm <- predict.gmvar(mod_222cm, n_ahead=2, nsimu=1, pi=0.9, pi_type="two-sided", pred_type="mean", plot_res=FALSE)
+
 test_that("predict works correctly", {
    expect_equal(predict.gmvar(mod_112, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(2.625171, 145.951650), tolerance=1e-5)
    expect_equal(predict.gmvar(mod_222c, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(2.643673, 144.594839), tolerance=1e-5)
@@ -64,11 +73,13 @@ test_that("predict works correctly", {
    expect_equal(pred222$pred_ints[, 3, 2], c(147.5922, 150.4961), tolerance=1e-3)
    expect_equal(pred222$mix_pred_ints[, 1, 1], c(0.005081765, 0.002005220), tolerance=1e-3)
 
-
    expect_equal(unname(pred123$pred[1,]), c(-9.203200, 2.321089, 1.795961), tolerance=1e-5)
    expect_equal(pred123$pred_ints[ , 1, ], c(-8.012776, 3.149987, 3.413862), tolerance=1e-5)
    expect_equal(unname(pred123$mix_pred[1 ,]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
    expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
+
+   expect_equal(unname(pred222cm$pred[2,]), c(1.303948, 143.158982), tolerance=1e-5)
+   expect_equal(unname(pred222cm$pred_ints[2, 2, ]), c(7.594892, 151.985248), tolerance=1e-5)
 })
 
 # p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)

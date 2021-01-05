@@ -104,23 +104,34 @@ predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), p
     M <- gmvar$model$M
     d <- gmvar$model$d
     constraints <- gmvar$model$constraints
+    same_means <- gmvar$model$same_means
     structural_pars <- gmvar$model$structural_pars
 
     params <- gmvar$params
     n_obs <- nrow(data)
-    mw <- loglikelihood_int(data, p, M, params=params, conditional=gmvar$model$conditional,
-                            constraints=constraints, structural_pars=structural_pars,
-                            to_return="mw_tplus1", stat_tol=gmvar$num_tols$stat_tol,
+    mw <- loglikelihood_int(data, p, M,
+                            params=params,
+                            conditional=gmvar$model$conditional,
+                            parametrization=gmvar$model$parametrization,
+                            constraints=constraints,
+                            same_means=same_means,
+                            structural_pars=structural_pars,
+                            to_return="mw_tplus1",
+                            stat_tol=gmvar$num_tols$stat_tol,
                             posdef_tol=gmvar$num_tols$posdef_tol)
     mw <- mw[nrow(mw),]
 
     # Collect parameter values
+    params <- reform_constrained_pars(p=p, M=M, d=d,
+                                      params=params,
+                                      constraints=constraints,
+                                      same_means=same_means,
+                                      structural_pars=structural_pars)
+    structural_pars <- get_unconstrained_structural_pars(structural_pars)
     if(gmvar$model$parametrization == "mean") {
-      params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
+      params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
                                        structural_pars=structural_pars, change_to="intercept")
     }
-    params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
-    structural_pars <- get_unconstrained_structural_pars(structural_pars)
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 

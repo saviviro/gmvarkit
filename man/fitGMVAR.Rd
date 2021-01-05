@@ -201,7 +201,7 @@ colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model: 10 estimation rounds with seeds set
 # for reproducibility
-fit12 <- fitGMVAR(data, p=1, M=4, ncalls=10, seeds=1:10)
+fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 plot(fit12)
 summary(fit12)

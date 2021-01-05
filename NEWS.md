@@ -93,5 +93,5 @@
 
 * New feature: possibility to constrain the (unconditional) mean parameters to the same among some regimes with the argument 'same_means'. This feature is available for mean-parametrized models only (due to technical reasons).
 * The default number of estimation rounds was increased to 'floor(10 + 30*log(M))'.
-* Minor changes related estimation with the genetic algorithm (the estimation results might be different with this version, if AR or lambda constraints are employed).
-* Technical update to the estimation function.
+* Some changes related to estimation with the genetic algorithm (the estimation results might be different with this version, if AR or lambda constraints are employed).
+* Fixed a bug in the predict method that appeared in the very rare cases when one uses the exact one-step conditional mean without confidence intervals as the the prediction method with mean-parametrization.

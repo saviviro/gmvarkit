@@ -393,7 +393,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   }
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, same_mean=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
+        constraints=gmvar$model$constraints, same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
         calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
 }

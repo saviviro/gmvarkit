@@ -50,7 +50,7 @@ cond_moment_plot <- function(gmvar, which_moment=c("mean", "variance"), grid=FAL
   } else {
     total_moments <- t(vapply(1:dim(gmvar$total_ccovs)[3], function(i1) diag(gmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
     params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
-                                      structural_pars=gmvar$model$structural_pars)
+                                      same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars)
     omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gmvar$model$structural_pars))
     vars <- vapply(1:M, function(m) diag(omegas[, , m]), numeric(d)) # Regs in cols, d in rows
     mw_x_reg <- lapply(1:d, function(d1) t(t(gmvar$mixing_weights)*vars[d1,])) # [[d]][t, m]
