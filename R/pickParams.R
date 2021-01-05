@@ -230,7 +230,7 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
 #' @inheritParams pick_Am
-#' @details Models with AR or lambda parameter constraints are currently not supported.
+#' @details Models with AR, mean, or lambda parameter constraints are currently not supported.
 #' @return
 #'   \describe{
 #'     \item{For reduced form models:}{returns length \eqn{pd^2+d+d(d+1)/2} vector containing
@@ -278,7 +278,9 @@ get_boldA_eigens <- function(gmvar) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params,
+                                    constraints=gmvar$model$constraints,
+                                    same_means=gmvar$model$same_means,
                                     structural_pars=gmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -312,7 +314,9 @@ get_omega_eigens <- function(gmvar) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params,
+                                    constraints=gmvar$model$constraints,
+                                    same_means=gmvar$model$same_means,
                                     structural_pars=gmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)

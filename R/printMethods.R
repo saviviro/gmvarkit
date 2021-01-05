@@ -28,26 +28,31 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   d <- gmvar$model$d
   IC <- gmvar$IC
   constraints <- gmvar$model$constraints
+  same_means <- gmvar$model$same_means
   structural_pars <- gmvar$model$structural_pars
   all_mu <- round(get_regime_means(gmvar), digits)
   params <- gmvar$params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+                                   same_means=same_means, structural_pars=structural_pars)
   if(gmvar$model$parametrization == "mean") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=constraints,
-                                     structural_pars=structural_pars, change_to="intercept")
+    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
+                                     same_means=NULL, structural_pars=structural_pars,
+                                     change_to="intercept")
   }
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
-                                  structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
-  all_A <- pick_allA(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
-  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
-  alphas <- pick_alphas(p=p, M=M, d=d, params=pars)
+  all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
   cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
       ifelse(gmvar$model$conditional, "conditional", "exact"),
       "log-likelihood,",
       ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
+      ifelse(is.null(same_means),
+             ifelse(is.null(constraints), "no AR parameter constraints", "AR parameters constrained"),
+             ifelse(is.null(constraints), "mean paremeters constrained, no AR parameter constraints",
+                                          "mean parameters constrained, AR parameters constrained")), "\n")
   cat("\n")
 
   if(summary_print) {
@@ -107,7 +112,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   }
   if(!is.null(structural_pars)) {
     cat("Structural parameters:\n")
-    W <- format_value(pick_W(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
+    W <- format_value(pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
 
     tmp <- c(rep(" ", times=d - 1), ",")
     df2 <- data.frame(left_brackets, W=W[,1])
@@ -117,7 +122,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     }
     df2 <- cbind(df2, right_brackets)
     if(M > 1) {
-      lambdas <- format_value(pick_lambdas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
+      lambdas <- format_value(pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars))
       tmp <- c(rep(" ", times=d - 1), ",")
       lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE) # Column for each regime
       for(i1 in 1:(M - 1)) {

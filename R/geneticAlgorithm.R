@@ -183,6 +183,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
+  check_same_means(parametrization=parametrization, same_means=same_means)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
 

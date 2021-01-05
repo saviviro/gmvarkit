@@ -70,3 +70,17 @@ test_that("predict works correctly", {
    expect_equal(unname(pred123$mix_pred[1 ,]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
    expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
 })
+
+# p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
+C_mat <- rbind(diag(2*2^2), diag(2*2^2))
+params_222cm <- c(-9.12048853805255, 123.142757183508, 1.2658425363326, 0.0675545389606989, 0.0331264235657607,
+                  1.33370494344656, -0.285882557831441, -0.0769144929653558, -0.0382772162867802, -0.351635998882842,
+                  5.8625623309659, 3.57488618757834, 9.70846346569286, 0.869261580580846, -0.248703862116217,
+                  5.17613656742281, 0.439575388572472)
+mod_222cm <- GMVAR(data, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
+
+test_that("summary method works correctly", {
+  sum222cm <- summary(mod_222cm)
+  expect_equal(sum222cm$abs_boldA_eigens[3,], c(0.3984175, 0.3984175), tolerance=1e-5)
+  expect_equal(sum222cm$omega_eigens[1:4], c(11.8447678, 3.7262580, 5.1904506, 0.8549476), tolerance=1e-5)
+})

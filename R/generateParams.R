@@ -211,9 +211,11 @@ random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale
                             numeric(p*d^2 + d + d*(d + 1)/2)))
   } else { # Structural model or same_means
    g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
+   n_covmats <- ifelse(is.null(structural_pars), M, 1) # Only one covmat for structural models (that includes all lambdas)
    x <- c(rnorm(d*g, mean=mu_scale, sd=mu_scale2),
           replicate(n=M, random_coefmats2(p=p, d=d, ar_scale=ar_scale)),
-          random_covmat(d=d, M=M, omega_scale=omega_scale, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
+          replicate(n=n_covmats,
+                    random_covmat(d=d, M=M, omega_scale=omega_scale, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)))
   }
   if(M > 1) {
     alphas <- runif(n=M)

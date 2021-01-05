@@ -462,6 +462,6 @@ check_null_data <- function(gmvar) {
 
 check_same_means <- function(parametrization, same_means) {
   if(parametrization == "intercept" && !is.null(same_means)) {
-    stop("The same_means constraints are available for models with mean-parametrization only!")
+    stop("The same_means constraints are available for models with mean-parametrization only (parametrization='mean')")
   }
 }

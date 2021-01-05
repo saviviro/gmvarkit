@@ -182,6 +182,12 @@
 #' fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
 #' fit22c
 #'
+#' # GMVAR(2,2) model with autoregressive parameters and the mean
+#' # parameters restricted to be the same for both regimes
+#' # (only the covariance matrix varies)
+#' fit22cm <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+#'  constraints=C_mat, same_means=list(1:2), ncores=4, ncalls=16)
+#'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes and non-diagonl elements
 #' # the coefficient matrices constrained to zero. Estimation
@@ -194,9 +200,9 @@
 #' }
 #' @export
 
-fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, structural_pars=NULL,
-                     ncalls=floor(10 + 30*log(M)), ncores=min(2, ncalls, parallel::detectCores()), maxit=500, seeds=NULL,
-                     print_res=TRUE, ...) {
+fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
+                     structural_pars=NULL, ncalls=floor(10 + 30*log(M)), ncores=min(2, ncalls, parallel::detectCores()),
+                     maxit=500, seeds=NULL, print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
@@ -206,7 +212,9 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
+  check_same_means(parametrization=parametrization, same_means=same_means)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
@@ -229,10 +237,12 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
-                                                              constraints=constraints, structural_pars=structural_pars, seed=seeds[i1], ...), cl=cl)
+                                                              constraints=constraints, same_means=same_means, structural_pars=structural_pars,
+                                                              seed=seeds[i1], ...), cl=cl)
 
-  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data, p, M, params=GAresults[[i1]], conditional=conditional,
-                                                          parametrization=parametrization, constraints=constraints,
+  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data, p, M, params=GAresults[[i1]],
+                                                          conditional=conditional, parametrization=parametrization,
+                                                          constraints=constraints, same_means=same_means,
                                                           structural_pars=structural_pars, check_params=TRUE,
                                                           to_return="loglik", minval=minval), numeric(1))
 
@@ -249,8 +259,10 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   ### Optimization with the variable metric algorithm###
   loglik_fn <- function(params) {
-    tryCatch(loglikelihood_int(data, p, M, params=params, conditional=conditional, parametrization=parametrization,
-                               constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
+    tryCatch(loglikelihood_int(data, p, M, params=params,
+                               conditional=conditional, parametrization=parametrization,
+                               constraints=constraints, same_means=same_means,
+                               structural_pars=structural_pars, check_params=TRUE,
                                to_return="loglik", minval=minval), error=function(e) minval)
   }
 
@@ -267,10 +279,11 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1))
 
-  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=NEWTONresults[[i1]]$par, conditional=conditional,
-                                                          parametrization=parametrization, constraints=constraints,
-                                                          structural_pars=structural_pars, check_params=TRUE, to_return="loglik",
-                                                          minval=minval), numeric(1))
+  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=NEWTONresults[[i1]]$par,
+                                                          conditional=conditional, parametrization=parametrization,
+                                                          constraints=constraints, same_means=same_means,
+                                                          structural_pars=structural_pars, check_params=TRUE,
+                                                          to_return="loglik", minval=minval), numeric(1))
   if(print_res) {
     cat("Results from the variable metric algorithm:\n")
     print_loks()
@@ -281,17 +294,18 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   all_estimates <- lapply(NEWTONresults, function(x) x$par)
   best_fit <- NEWTONresults[[which(loks == max(loks))[1]]]
   params <- best_fit$par
-  if(is.null(constraints) && is.null(structural_pars$C_lambda)) {
+  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
     params <- sort_components(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
   }
   if(best_fit$convergence == 1) {
     message("Iteration limit was reached when estimating the best fitting individual! Consider further estimation with the function 'iterate_more'")
   }
-  mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
-                                      parametrization=parametrization, constraints=constraints,
-                                      structural_pars=structural_pars, to_return="mw", check_params=TRUE,
-                                      minval=NULL)
+  mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params,
+                                      conditional=conditional, parametrization=parametrization,
+                                      constraints=constraints, same_means=same_means,
+                                      structural_pars=structural_pars, to_return="mw",
+                                      check_params=TRUE, minval=NULL)
   if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
     message("At least one of the mixture components in the estimated model seems to be wasted!")
   }
@@ -299,11 +313,13 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   ### Wrap up ###
   cat("Calculating approximate standard errors...\n")
-  ret <- GMVAR(data=data, p=p, M=M, d=d, params=params, conditional=conditional, parametrization=parametrization,
-               constraints=constraints, structural_pars=structural_pars, calc_std_errors=TRUE)
+  ret <- GMVAR(data=data, p=p, M=M, d=d, params=params,
+               conditional=conditional, parametrization=parametrization,
+               constraints=constraints, same_means=same_means,
+               structural_pars=structural_pars, calc_std_errors=TRUE)
   ret$all_estimates <- all_estimates
   ret$all_logliks <- loks
-  ret$which_converger <- converged
+  ret$which_converged <- converged
 
   cat("Finished!\n")
   ret
@@ -387,9 +403,10 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
   fn <- function(params) {
     tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=params,
                                conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-                               constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
-                               check_params=TRUE, to_return="loglik",
-                               minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol),
+                               constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
+                               structural_pars=gmvar$model$structural_pars, check_params=TRUE,
+                               to_return="loglik", minval=minval,
+                               stat_tol=stat_tol, posdef_tol=posdef_tol),
              error=function(e) minval)
   }
   gr <- function(params) {
@@ -401,8 +418,9 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
 
   GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=res$par,
         conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
-        calc_std_errors=calc_std_errors, stat_tol=stat_tol, posdef_tol=posdef_tol)
+        constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
+        structural_pars=gmvar$model$structural_pars, calc_std_errors=calc_std_errors,
+        stat_tol=stat_tol, posdef_tol=posdef_tol)
 }
 
 

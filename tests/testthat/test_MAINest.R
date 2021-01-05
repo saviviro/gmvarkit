@@ -8,6 +8,8 @@ test_that("fitGMVAR does not throw errors", {
    W_112 <- matrix(c(1, -1, NA, 1), nrow=2)
    tmp <- suppressMessages(fitGMVAR(data, p=1, M=1, structural_pars=list(W=W_112),
                                     ncalls=1, ncores=1, maxit=1, seeds=1, print_res=FALSE, ngen=2))
+   tmp <- suppressMessages(fitGMVAR(data, p=1, M=2, conditional=FALSE, structural_pars=list(W=W_112), same_means=list(1:2),
+                                    parametrization="mean", ncalls=1, ncores=1, maxit=1, seeds=1, print_res=FALSE, ngen=1))
    expect_true(TRUE)
 })
 

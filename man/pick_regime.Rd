@@ -108,7 +108,7 @@ a time-varying diagonal matrix with positive diagonal entries).}
 \code{pick_regime} picks the regime-parameters from the given parameter vector.
 }
 \details{
-Models with AR or lambda parameter constraints are currently not supported.
+Models with AR, mean, or lambda parameter constraints are currently not supported.
 }
 \section{Warning}{
 

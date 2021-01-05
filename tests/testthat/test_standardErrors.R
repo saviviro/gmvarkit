@@ -71,8 +71,12 @@ W_222c2 <- matrix(WL_222c2[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222c2 <- WL_222c2[(2^2 + 1):length(WL_222c2)]
 theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # SGMVAR AR
 
-# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
-#theta_222c_int <- c(-5, 123, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+## p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
+C_mat <- rbind(diag(2*2^2), diag(2*2^2))
+params_222cm <- c(-9.12048853805255, 123.142757183508, 1.2658425363326, 0.0675545389606989, 0.0331264235657607,
+                  1.33370494344656, -0.285882557831441, -0.0769144929653558, -0.0382772162867802, -0.351635998882842,
+                  5.8625623309659, 3.57488618757834, 9.70846346569286, 0.869261580580846, -0.248703862116217,
+                  5.17613656742281, 0.439575388572472)
 
 test_that("standard_errors works correctly", {
   expect_equal(standard_errors(data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
@@ -95,4 +99,11 @@ test_that("standard_errors works correctly", {
                                constraints=C_222_2, structural_pars=list(W=W_222c2), minval=-99999),
                c(0.058447, 0.875092, 0.204019, 0.992678, 0.057246, 0.059366, 0.058941, 0.060121, NA, 0.24881,
                  0.308266, 0.382079, NA, 0.201883, 0.572563), tolerance=1e-2)
+
+  # Same_means
+  expect_equal(standard_errors(data, p=2, M=2, params=params_222cm, conditional=TRUE, parametrization="mean",
+                               constraints=C_mat, same_means=list(1:2), minval=-99999),
+               c(5.65699691, 14.55107385, 0.06494907, 0.09540929, 0.03515466, 0.06032848, 0.06475830, 0.09546348,
+                 0.03533626, 0.06107803, 0.74041185, 0.72118921, 1.16976089, 0.14426045, 0.26732233, 0.79159544,
+                 0.12665061), tolerance=1e-2)
 })

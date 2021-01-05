@@ -11,6 +11,7 @@ fitGMVAR(
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
+  same_means = NULL,
   structural_pars = NULL,
   ncalls = floor(10 + 30 * log(M)),
   ncores = min(2, ncalls, parallel::detectCores()),
@@ -41,6 +42,13 @@ contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
 [\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
+\code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
+the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
+should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
+that is, when \code{parametrization="mean"}.}}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 the following elements:
@@ -229,6 +237,12 @@ fit22s
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
 fit22c
+
+# GMVAR(2,2) model with autoregressive parameters and the mean
+# parameters restricted to be the same for both regimes
+# (only the covariance matrix varies)
+fit22cm <- fitGMVAR(data, p=2, M=2, parametrization="mean",
+ constraints=C_mat, same_means=list(1:2), ncores=4, ncalls=16)
 
 # GMVAR(2,2) model with autoregressive parameters restricted
 # to be the same for both regimes and non-diagonl elements

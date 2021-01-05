@@ -42,6 +42,8 @@ test_that("generate parameters don't throw errors", {
                            structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 18)
   test_length0(random_ind2(p=2, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1, same_means=list(1:2),
                            structural_pars=list(W=tcrossprod(matrix(rnorm(2*2), nrow=2)), C_lambda=matrix(1, nrow=1))), 24)
+  test_length0(random_ind2(p=1, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale=1:2, lambda_scale=1, omega_scale=1:2,
+                           structural_pars=NULL, same_means=list(1:2)), 17)
 
   test_length0(random_coefmats(d=2, how_many=1, scale=1), 4)
   test_length0(random_coefmats2(p=2, d=3), 18)
