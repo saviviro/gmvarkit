@@ -53,6 +53,12 @@ colnames(data) <- colnames(eurusd)
 fit <- fitGMVAR(data, p=2, M=2, ncalls=16, seeds=1:16, ncores=4)
 fit
 
+# Estimate a GMVAR(2,2) model with the unconditional means of the two regimes 
+# restricted to be the same:
+fitm <- fitGMVAR(data, p=2, M=2, parametrization="mean", same_means=list(1:2),
+                 ncalls=16, seeds=1:16, ncores=4)
+fitm
+
 # Estimate a GMVAR(2,2) model with autoregressive parameters restricted to be the same for all regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=16, seeds=1:16, ncores=4)
