@@ -236,6 +236,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
     stop("There are dublicates in which_pars")
   }
   constraints <- gmvar$model$constraints
+  same_means <- gmvar$model$same_means
   structural_pars <- gmvar$model$structural_pars
   npars <- length(which_pars)
 
@@ -251,7 +252,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
   # In order to get the labels right, we first determine which indeces in params
   # correspond to which parameters: different procedure for constrained models.
   if(is.null(constraints)) {
-    if(is.null(structural_pars)) {
+    if(is.null(structural_pars) && is.null(same_means)) {
       all_q <- rep(d^2*p + d + d*(d + 1)/2, M) # Length of (phi_0m, \bold{phi_m}, sigma_m) for each m.
       cum_q <- c(0, cumsum(all_q)) # After this index, a new regime starts; after the last one the mixing weights start
     } else { # Structural model
@@ -267,22 +268,23 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
   }
 
   for(i1 in which_pars) { # Go though the parameters
-
     pars <- params
     range <- abs(scale*pars[i1])
     vals <- seq(from=pars[i1] - range, to=pars[i1] + range, length.out=precission) # Loglik to be evaluated at these values of the parameter considered
     logliks <- vapply(vals, function(val) {
       new_pars <- pars
       new_pars[i1] <- val # Change the single parameter value
-      loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars, conditional=gmvar$model$conditional,
-                        parametrization=parametrization, constraints=constraints,
-                        structural_pars=structural_pars, check_params=TRUE, minval=NA,
+      loglikelihood_int(data=gmvar$data, p=p, M=M, params=new_pars,
+                        conditional=gmvar$model$conditional, parametrization=parametrization,
+                        constraints=constraints, same_means=same_means,
+                        structural_pars=structural_pars,
+                        check_params=TRUE, minval=NA,
                         stat_tol=stat_tol, posdef_tol=posdef_tol)
     }, numeric(1))
 
     # In order to get the labels right, we first determine which parameter is in question.
     # We consider constrained and structural models separately.
-    if(is.null(constraints) && is.null(structural_pars)) {
+    if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
       if(i1 <= max(cum_q)) { # phi and sigma parameters first
         m <- sum(i1 > cum_q) # Which regime are we considering
         if(i1 > cum_q[m + 1] - d*(d + 1)/2 && i1 <= cum_q[m + 1]) { # Omega params
@@ -295,11 +297,10 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
         } else if(i1 <= max(cum_q)) { # The phi parameters (or mean + AR parameters)
           if(i1 > cum_q[m] && i1 <= cum_q[m] + d) { # phi_{m,0} or mean parameters
             pos <- i1 - cum_q[m] # Which time series? 1,..,d
-            mylist <- list(foo=paste0(m, ",0"), foo2=pos)
             if(parametrization == "intercept") {
-              main <- substitute(phi[foo](foo2), mylist)
+              main <- substitute(phi[foo](foo2), list(foo=paste0(m, ",0"), foo2=pos))
             } else {
-              main <- substitute(mu[foo](foo2), mylist)
+              main <- substitute(mu[foo](foo2), list(foo=m, foo2=pos))
             }
           } else {  # The elements of A_m1,...,A_mp
             pos1 <- i1 - (cum_q[m] + d) # Position in vec(A_m1),...,vec(A_mp)
@@ -316,23 +317,24 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
             m <- i1 - max(cum_q)
             main <- substitute(alpha[foo], list(foo=m))
       }
-    } else { ## If AR parameters are constrained or a structural model is considered
+    } else { ## If AR parameters are constrained, mean parameters are constrained, or a structural model is considered
       last_covmat_par_index <- length(params) - (M - 1)
+      g <- ifelse(is.null(same_means), M, length(same_means)) # Number groups with the same mean parameters
+      less_pars <- d*(M - g) # Number of parameters less compared to models without same mean constraints
 
-      if(i1 <= M*d + q) { # phi_{m,0} and AR parameters
-        if(i1 <= M*d) { # phi_{m,0}
-          cum_d <- c(0, cumsum(rep(d, M))) # The index after which regime changes
-          m <- sum(i1 > cum_d)
+      if(i1 <= M*d + q - less_pars) { # phi_{m,0} and AR parameters
+        if(i1 <= M*d - less_pars) { # phi_{m,0}
+          cum_d <- c(0, cumsum(rep(d, times=g))) # The index after which regime changes
+          m <- sum(i1 > cum_d) # Which regime?
           pos <- i1 - cum_d[m] # Which time series?
-          mylist <- list(foo=paste0(m, ",0"), foo2=pos)
-          if(parametrization == "intercept") {
-            main <- substitute(phi[foo](foo2), mylist)
+          if(parametrization == "intercept") { # This is never the case with same_means
+            main <- substitute(phi[foo](foo2), list(foo=paste0(m, ",0"), foo2=pos))
           } else {
-            main <- substitute(mu[foo](foo2), mylist)
+            main <- substitute(mu[foo](foo2), list(foo=m, foo2=pos))
           }
         } else { # The AR parameters
           if(is.null(constraints)) { # Structural model with AR parameters not constrained
-            cum_q <- d*M + c(0, cumsum(rep(d^2*p, M))) # The index after which the regime changes
+            cum_q <- d*M - less_pars + c(0, cumsum(rep(d^2*p, M))) # The index after which the regime changes
             m <- sum(i1 > cum_q)
             pos1 <- i1 - cum_q[m] # Position in vec(A_m1),...,vec(A_mp)
             cum_a <- c(0, cumsum(rep(d^2, times=p))) # the index after which new matrix A_m,p starts in vec(A_m1),...,vec(A_mp)
@@ -349,7 +351,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
         }
       } else if(i1 <= last_covmat_par_index) { # Covariance matrix parameters
         if(is.null(structural_pars)) { # Reduced form models, vech(Omega_1),...,vech(Omega_M)
-          cum_s <- M*d + q + c(0, cumsum(rep(d*(d + 1)/2, times=M))) # Index after which regime changes
+          cum_s <- M*d - less_pars + q + c(0, cumsum(rep(d*(d + 1)/2, times=M))) # Index after which regime changes
           m <- sum(i1 > cum_s)
           i1 - cum_s[1] # Position in vech(Omega_1),...,vech(Omega_M)
           pos <- i1 - cum_s[m] # position in vech(Omega_m)
@@ -359,11 +361,11 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
           row_ind <- row_inds[pos] # At which row of Omega_m we are
           main <- substitute(Omega[foo](foo2), list(foo=m, foo2=paste0(row_ind, ", ", col_ind)))
         } else { # Structural models: W and lambdas
-          if(i1 <=  M*d + q + d^2 - n_zeros) { # W parameters
+          if(i1 <= M*d - less_pars + q + d^2 - n_zeros) { # W parameters
             n_zeros_in_each_column <- vapply(1:d, function(i2) sum(W_const[,i2] == 0, na.rm=TRUE), numeric(1))
             zero_positions <- lapply(1:d, function(i2) (1:d)[W_const[,i2] == 0 & !is.na(W_const[,i2])]) # Zero constraint positions in each column
             cum_wc <- c(0, cumsum(d - n_zeros_in_each_column)) # Index in W parameters after which a new column in W starts
-            posw <- i1 - (M*d + q) # Index in W parameters
+            posw <- i1 - (M*d - less_pars + q) # Index in W parameters
             col_ind <- sum(posw > cum_wc)
             while(TRUE) {
               if(W_row_ind[col_ind] %in% zero_positions[[col_ind]]) {
@@ -376,12 +378,12 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
             W_row_ind[col_ind] <- W_row_ind[col_ind] + 1
           } else { # lambda parameters
             if(is.null(structural_pars$C_lambda)) { # Lambdas are not constraints
-              cum_lamb <- M*d + q + d^2 - n_zeros + c(0, cumsum(rep(d, times=M))) # Index after which the regime changes
+              cum_lamb <- M*d - less_pars + q + d^2 - n_zeros + c(0, cumsum(rep(d, times=M))) # Index after which the regime changes
               m <- sum(i1 > cum_lamb) + 1
               pos <- i1 - cum_lamb[m - 1] # which i=1,...,d in lambda_{mi}
               main <- substitute(lambda[foo](foo2), list(foo=m, foo2=pos))
             } else { # Lambdas are constrained
-              pos <- i1 - (M*d + q + d^2 - n_zeros)
+              pos <- i1 - (M*d - less_pars + q + d^2 - n_zeros)
               main <- substitute(gamma(foo), list(foo=pos))
             }
           }

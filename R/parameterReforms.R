@@ -39,10 +39,10 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_mean
   }
 
   if(is.null(same_means)) {
-    less_pars <- 0 # Number of parameters less compared to models without same interecept constraints
+    less_pars <- 0 # Number of parameters less compared to models without same mean constraints
   } else {
     g <- length(same_means) # Number groups with the same mean parameters
-    less_pars <- d*(M - g) # Number of parameters less compared to models without same interecept constraints
+    less_pars <- d*(M - g) # Number of parameters less compared to models without same mean constraints
   }
 
   # Obtain the AR coefficients from the constraints
