@@ -134,58 +134,45 @@ g_ac2 <- get_g(2); dim_g_ac2 <- 2*2^2 #lag*d^2
 
 test_that("get_test_Omega works correctly", {
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
-                              constraints=NULL, g=g_norm, dim_g=dim_g_norm)[1,],
+                              constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[1,],
                c(0.7057628, 2.2848667, 8.6067786, 0.9472146, -7.4855476, 42.0832749), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
-                              constraints=NULL, g=g_norm, dim_g=dim_g_norm)[,6],
+                              constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[,6],
                c(-0.2246738, 0.2367933, -1.3629537, 2.5325211, -7.5225937, 38.2535773), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
-                              constraints=C_222c, g=g_norm, dim_g=dim_g_norm)[3,],
+                              constraints=C_222c, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[3,],
                c(1.5549257, 4.5538484, 28.3233066, 0.4093669, -0.6562638, 0.4822259), tolerance=1e-4)
 
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
-                              constraints=NULL, g=g_ac1, dim_g=dim_g_ac1)[,1],
+                              constraints=NULL, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[,1],
                c(1.0143162, -0.2785037, -0.1520407, 0.4920706), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
-                              constraints=NULL, g=g_ac2, dim_g=dim_g_ac2)[5,],
+                              constraints=NULL, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[5,],
                c(0.26554361, -0.04612983, 0.41599389, 0.84506916, 1.18335341, 0.02087973, 0.23315441, 1.08043135), tolerance=1e-4)
 
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
-                              constraints=NULL, g=g_ac1, dim_g=dim_g_ac1)[4,],
+                              constraints=NULL, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[4,],
                c(0.06105453, 0.03487609, 0.03182064, 0.30107295), tolerance=1e-3)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
-                              constraints=NULL, g=g_ac2, dim_g=dim_g_ac2)[8,],
+                              constraints=NULL, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[8,],
                c(-0.03558556, -0.07470666, -0.07362958, -0.27822363, 0.17240094, -0.01494992, 0.11873980, 1.05340983), tolerance=1e-3)
 
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
-                              constraints=C_222c, g=g_ac1, dim_g=dim_g_ac1)[2,],
+                              constraints=C_222c, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[2,],
                c(0.19084136, 0.85543945, 0.09623485, -0.18203186), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
-                              constraints=C_222c, g=g_ac2, dim_g=dim_g_ac2)[,2],
+                              constraints=C_222c, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[,2],
                c(0.19172737, 0.85825300, 0.09773145, -0.18278803, 0.03803171, -0.07227835, -0.07058063, -0.08615313), tolerance=1e-4)
 
   # SGMVAR
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
-                              constraints=NULL, structural_pars=list(W=W_112), g=g_norm, dim_g=dim_g_norm)[2,],
+                              constraints=NULL, same_means=NULL, structural_pars=list(W=W_112), g=g_norm, dim_g=dim_g_norm)[2,],
                c(2.284867, 21.283539, 51.544341, 1.723343, 15.281678, -16.989623), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
-                              constraints=NULL, structural_pars=list(W=W_112), g=g_ac1, dim_g=dim_g_ac1)[4,],
+                              constraints=NULL, same_means=NULL, structural_pars=list(W=W_112), g=g_ac1, dim_g=dim_g_ac1)[4,],
                c(0.4927337, -3.5265900, 0.9979045, 94.4919253), tolerance=1e-4)
   expect_equal(get_test_Omega(data=data, p=2, M=2, params=theta_222s, conditional=TRUE, parametrization="intercept",
-                              constraints=NULL, structural_pars=list(W=W_222), g=g_ac2, dim_g=dim_g_ac2)[,8],
+                              constraints=NULL, same_means=NULL, structural_pars=list(W=W_222), g=g_ac2, dim_g=dim_g_ac2)[,8],
                c(-0.03558556, -0.07470666, -0.07362959, -0.27822363, 0.17240094, -0.01494992, 0.11873980, 1.05340983), tolerance=1e-4)
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
 

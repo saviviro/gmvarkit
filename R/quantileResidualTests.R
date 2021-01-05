@@ -75,11 +75,6 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
-  conditional <- gmvar$model$conditional
-  parametrization <- gmvar$model$parametrization
-  constraints <- gmvar$model$constraints
-  structural_pars <- gmvar$model$structural_pars
-  params <- gmvar$params
   data <- gmvar$data
   n_obs <- nrow(data)
   T_obs <- n_obs - p
@@ -105,9 +100,14 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_
         message(paste("Can't perform conditional heteroskedasticity test for lag", which_lag, because_of))
       }
     }
-    omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M, params=params, conditional=conditional,
-                                   parametrization=parametrization, constraints=constraints,
-                                   structural_pars=structural_pars, g=g, dim_g=dim_g, stat_tol=stat_tol,
+    omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M,
+                                   params=gmvar$params,
+                                   conditional=gmvar$model$conditional,
+                                   parametrization=gmvar$model$parametrization,
+                                   constraints=gmvar$model$constraints,
+                                   same_means=gmvar$model$same_means,
+                                   structural_pars=gmvar$model$structural_pars,
+                                   g=g, dim_g=dim_g, stat_tol=stat_tol,
                                    posdef_tol=posdef_tol),
                     error=function(e) {
                       print_message(which_test, which_lag, because_of="because of numerical problems")
@@ -255,7 +255,7 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_
 #' @return Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen 2010}.
 #' @inherit quantile_residuals references
 
-get_test_Omega <- function(data, p, M, params, conditional, parametrization, constraints, structural_pars=NULL, g, dim_g,
+get_test_Omega <- function(data, p, M, params, conditional, parametrization, constraints, same_means, structural_pars=NULL, g, dim_g,
                            stat_tol=1e-3, posdef_tol=1e-8) {
 
   n_obs <- nrow(data)
@@ -267,15 +267,16 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   g_fn <- function(pars) {
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=pars, conditional=conditional,
                                          parametrization=parametrization, constraints=constraints,
-                                         structural_pars=structural_pars, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                                         same_means=same_means, structural_pars=structural_pars,
+                                         stat_tol=stat_tol, posdef_tol=posdef_tol)
     g(qresiduals) # a row for each t=1,...,T and column for each output of g
   }
 
   # Function used to calculate gradient for log-likelihood
   loglik_fn <- function(pars) {
     loglikelihood_int(data, p, M, params=pars, conditional=conditional, parametrization=parametrization,
-                      constraints=constraints, structural_pars=structural_pars, check_params=TRUE,
-                      to_return="terms", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                      constraints=constraints, same_means=same_means, structural_pars=structural_pars,
+                      check_params=TRUE, to_return="terms", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
   }
 
   npars <- length(params)
