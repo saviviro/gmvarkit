@@ -187,6 +187,25 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
 
+  # For structural models, determine whether W constraints such that W and lambdas can be sorted for better estimation
+  if(is.null(structural_pars) || !is.null(structural_pars$C_lambda)) {
+    sort_structural_pars <- FALSE
+  } else {
+    W <- structural_pars$W
+    constrained_rows <- apply(W, MARGIN=1, FUN=function(x) !all(is.na(x)))
+    if(sum(constrained_rows) > 1) { # Overidentifying constraints employed
+      sort_structural_pars <- FALSE
+    } else if(sum(constrained_rows) == 0) { # No constraints on W: can be sorted
+      sort_structural_pars <- TRUE
+    } else { # one constrained row: can be sorted if they all have the same sign constraint
+      if(all(W[constrained_rows,] > 0) || all(W[constrained_rows,] < 0)) {
+        sort_structural_pars <- TRUE
+      } else {
+        sort_structural_pars <- FALSE
+      }
+    }
+  }
+
   # Defaults and checks
   if(!all_pos_ints(c(ngen, smart_mu))) stop("Arguments ngen and smart_mu have to be positive integers")
   if(missing(popsize)) {
@@ -577,6 +596,13 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                                                                                  W_scale=W_scale,
                                                                                  lambda_scale=lambda_scale), numeric(npars))
     }
+
+    # If structural model is considered without overidentifying constraints on the W matrix and without constraints
+    # on the lambda parameters, sort the columns of the W matrix by sorting the lambdas of the second regime to
+    # increasing order. This gives statistical identification for structural models without overidentifying constraints.
+   # if(sort_structural_pars) {
+  #    H2 <- vapply(1:popsize, function(i2) sort_W_and_lambdas(p=p, M=M, d=d, params=H2[,i2]), numeric(npars))
+   # }
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
     if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {

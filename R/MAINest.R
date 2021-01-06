@@ -13,6 +13,12 @@
 #' @param print_res should summaries of estimation results be printed?
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
+#'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,
+#'  specify your W matrix is \code{structural_pars} to be such that it contains the same sign constraints in a single row
+#'  (e.g. a row of ones) and leave the other elements as \code{NA}. In this way, the genetic algorithm works the best.
+#'  The ordering and signs of the columns of the W matrix can be changed afterwards with the functions
+#'  \code{reorder_W_columns} and \code{swap_W_signs}.
+#'
 #'  Because of complexity and high multimodality of the log-likelihood function, it's \strong{not certain} that the estimation
 #'  algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in
 #'  some local maximum or saddle point instead. Therefore, a (sometimes large) number of estimation rounds is required
@@ -156,8 +162,14 @@
 #' # constraints.
 #' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=16, seeds=1:16)
+#'   ncalls=16, seeds=1:16, ncores=4)
 #' fit12s
+#'
+#' # Structural GMVAR(2, 2) model identified statistically only
+#' W_222 <- matrix(c(1, NA, 1, NA), nrow=2)
+#' fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
+#'   ncalls=16, seeds=1:16, ncores=4)
+#' fit22s
 #'
 #' # GMVAR(2,2) model with mean parametrization
 #' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",

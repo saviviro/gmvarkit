@@ -282,6 +282,48 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
 }
 
 
+#' @title Sort the columns of W matrix by sorting the lambda parameters of the second regime to increasing order
+#'
+#' @description \code{sort_W_and_lambdas} sorts the columns of W matrix by sorting the lambda parameters of
+#'  the second regime to increasing order.
+#'
+#' @inheritParams is_stationary
+#' @details Only structural models are supported (but there is no need to provide
+#'  structural_pars).
+#'  \strong{This function does not sort the constraints of the W matrix but just sorts
+#'  the columns of the W matrix and the lambda parameters.} It is mainly used in the genetic
+#'  algorithm to assist estimation with better identification when the constraints are not
+#'  itself strong for identification of the parameters (but are invariant to different orderings
+#'  of the columns of the W matrix).
+#'
+#'  Before using this function, make sure the parameter vector is sortable: the constraints on
+#'  the W matrix is invariant to different orderings of the columns, there are no zero restrictions,
+#'  and there are no constraints on the lambda parameters.
+#' @return Returns the sorted parameter vector (that implies the same reduced form model).
+#' @section Warning:
+#'  No argument checks!
+#' @references
+#'  \itemize{
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
+#'  }
+
+sort_W_and_lambdas <- function(p, M, d, params) {
+  if(M == 1) return(params)
+  # The last M - 1 parameters are alphas, after that, the last d^2 + d*(M - 1) params
+  # are the W and lambda parameters.
+  W_and_lambda_inds <- (length(params) - (d^2 + d*(M - 1)) - (M - 1) + 1):(length(params) - (M - 1))
+  W_and_lambdas <- params[W_and_lambda_inds]
+  W <- matrix(W_and_lambdas[1:(d^2)], nrow=d, ncol=d, byrow=FALSE)
+  lambdas <- matrix(W_and_lambdas[(d^2 + 1):length(W_and_lambdas)], nrow=d, ncol=M - 1, byrow=FALSE)
+  new_order <- order(lambdas[,1], decreasing=FALSE) # Increasing order for second regime lambdas
+  W <- W[,new_order] # Columns to the new order
+  lambdas <- lambdas[new_order,] # Rows to the new order
+  params[W_and_lambda_inds] <- c(W, lambdas)
+  params
+}
+
+
 #' @title Change parametrization of a parameter vector
 #'
 #' @description \code{change_parametrization} changes the parametrization of the given parameter
