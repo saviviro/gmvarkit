@@ -247,3 +247,91 @@ uncond_moments <- function(gmvar) {
                      parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
                      same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars)
 }
+
+
+
+
+#' @title Calculate the initial (lag zero)  dp-dimensional autocovariance matrix of p consecutive
+#'  observations of VAR process
+#'
+#' @description \code{VAR_init_acov} calculate the initial (lag zero) dp-dimensional autocovariance
+#'  matrix of a VAR process (that is, for p consecutive observations) by taking advantage of the algorithm
+#'  proposed by McElroy (2017).
+#'
+#' @inheritParams loglikelihood_int
+#' @param all_Am HERE PARAMETERS
+#' @param Omega_m the dxd error term covarian
+#' @details Copyright (2015) Tucker McElroy
+#'
+#'	This program is free software; you can redistribute it and/or
+#'	modify it under the terms of the GNU General Public License
+#'	as published by the Free Software Foundation; either version 2
+#'	of the License, or (at your option) any later version.
+#'
+#'	This program is distributed in the hope that it will be useful,
+#'	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'	GNU General Public License for more details.
+#'
+#'	You should have received a copy of the GNU General Public License
+#'	along with this program; if not, write to the Free Software
+#'	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#' @references HERE THE REFERENCE
+
+VAR_init_acov <- function(p, d, all_Am, Omega_m) {
+  # all_Am = all_A[, , , m]
+  # sigma = all_Omega[, , m] = Omega_m
+
+  # The K commutator matrix
+  Kcommut <- function(vect, d, n) matrix(t(matrix(vect, nrow=d, ncol=n)), ncol=1)
+  Kmat <- apply(diag(d^2), MARGIN=1, FUN=Kcommut, d, d)
+
+  # Step 1: vectorized error term covariance matrix for lag zero
+  gamMAvec <- matrix(Omega_m, nrow=d^2, ncol=1)
+
+  # Step 2: error term versus y_t covariance matrix for lag zero
+  Amat <- array(0, dim=c(d^2, p + 1, d^2, 2*p + 1))
+  Arow <- diag(d^2)
+  for(i1 in 1:p) { # TÄTÄ VOI NOPEUTTAA ALUSTAMALLA Arow:n CBINDAAMISEN SIJAAN
+    Arow <- cbind(-1*diag(d)%x%all_Am[, , i1], Arow) # Kronecker product
+  }
+  for(i1 in 1:(p + 1)) {
+    Amat[, i1, , i1:(i1 + p)] <- Arow
+  }
+  newA <- array(Amat[, 1:(p + 1), , 1:p], dim=c(d^2, p + 1, d^2, p))
+  for(i1 in 1:(p + 1)) {
+    for(i2 in 1:p) {
+      newA[, i1, , i2] <- newA[, i1, , i2]%*%Kmat
+    }
+  }
+  Amat <- cbind(matrix(Amat[, , , p + 1], nrow=d^2*(p + 1), ncol=d^2),
+                matrix(Amat[, , , (p + 2):(2*p + 1)], nrow=d^2*(p + 1), ncol=d^2*(p)) + matrix(newA[, , , p:1], nrow=d^2*(p + 1), ncol=d^2*(p)))
+
+  Bmat <- array(0, dim=c(d^2, 1, d^2, p + 1))
+  Brow <- diag(d^2)
+  for(i1 in 1:p) { # TÄTÄ VOI NOPEUTTAA ALUSTAMALLA Brow:n CBINDAAMISEN SIJAAN
+    Brow <- cbind(Brow, -1*all_Am[, , i1] %x% diag(d))
+  }
+  Bmat[, 1, , 1:(1 + p)] <- Brow
+  Bmat <- matrix(Bmat[, , , 1], nrow=d^2, ncol=d^2)
+  #Bmat <- matrix(Bmat, nrow=d^2, ncol=d^2)
+#  Binv <- solve(Bmat)
+  gamMix <- solve(Bmat, gamMAvec) #Binv%*%gamMAvec
+
+  # Step 3: we pad Gamma_WX(0) with zeros
+  gamMixTemp <- c(gamMix, rep(0, times=p*d^2))
+
+  # Step 4: compute the Gamma_XX(h) autocovariances for lags h=0,...,p
+  gamARMA <- solve(Amat, gamMixTemp)
+  gamMix <- array(gamMix, dim=c(d, d, 1))
+  gamARMA <- array(gamARMA, dim=c(d, d, p + 1))
+  gamARMA <- gamARMA[, , 1:p]
+
+  # After obtaining the autocovariances for lags h=0,...,p-1,
+  # we construct the dp-dimensional covariance matrix for p consecutive
+  # observations of a VAR process.
+
+  # FILL IN
+
+  gamARMA
+}
