@@ -279,6 +279,7 @@ uncond_moments <- function(gmvar) {
 #' @references HERE THE REFERENCE
 
 VAR_init_acov <- function(p, d, all_Am, Omega_m) {
+  # VAIHDA NIMI KUVAAVAMMAKSI?
   # all_Am = all_A[, , , m]
   # sigma = all_Omega[, , m] = Omega_m
 
