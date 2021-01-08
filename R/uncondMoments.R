@@ -249,52 +249,44 @@ uncond_moments <- function(gmvar) {
 }
 
 
-
-
-#' @title Calculate the initial (lag zero)  dp-dimensional autocovariance matrix of p consecutive
-#'  observations of VAR process
+#' @title Calculate the dp-dimensional covariance matrix of p consecutive
+#'  observations of a VAR process
 #'
-#' @description \code{VAR_init_acov} calculate the initial (lag zero) dp-dimensional autocovariance
-#'  matrix of a VAR process (that is, for p consecutive observations) by taking advantage of the algorithm
-#'  proposed by McElroy (2017).
+#' @description \code{VAR_pcovmat} calculate the dp-dimensional covariance matrix of p consecutive
+#'  observations of a VAR process with the algorithm proposed by McElroy (2017).
 #'
 #' @inheritParams loglikelihood_int
-#' @param all_Am HERE PARAMETERS
-#' @param Omega_m the dxd error term covarian
-#' @details Copyright (2015) Tucker McElroy
-#'
-#'	This program is free software; you can redistribute it and/or
-#'	modify it under the terms of the GNU General Public License
-#'	as published by the Free Software Foundation; either version 2
-#'	of the License, or (at your option) any later version.
-#'
-#'	This program is distributed in the hope that it will be useful,
-#'	but WITHOUT ANY WARRANTY; without even the implied warranty of
-#'	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#'	GNU General Public License for more details.
-#'
-#'	You should have received a copy of the GNU General Public License
-#'	along with this program; if not, write to the Free Software
-#'	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-#' @references HERE THE REFERENCE
+#' @param all_Am \code{[d, d, p]} array containing the AR coefficient matrices
+#' @param Omega_m the dxd error term covariance matrix
+#' @details
+#'  Most of the code in this function is adapted from the one provided in the
+#'  supplementary material of McElroy (2017). Reproduced under GNU General
+#'  Public License, Copyright (2015) Tucker McElroy.
+#' @references
+#'  \itemize{
+#'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
+#'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
+#'  }
 
-VAR_init_acov <- function(p, d, all_Am, Omega_m) {
-  # VAIHDA NIMI KUVAAVAMMAKSI?
-  # all_Am = all_A[, , , m]
-  # sigma = all_Omega[, , m] = Omega_m
+VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
+  # all_Am = all_A[, , , m] #
+  # Omega_m = all_Omega[, , m]
 
-  # The K commutator matrix
-  Kcommut <- function(vect, d, n) matrix(t(matrix(vect, nrow=d, ncol=n)), ncol=1)
-  Kmat <- apply(diag(d^2), MARGIN=1, FUN=Kcommut, d, d)
+  # The K commutation matrix
+  Kcommut <- function(vect) matrix(t(matrix(vect, nrow=d, ncol=d)), ncol=1)
+  Kmat <- apply(diag(d^2), MARGIN=1, FUN=Kcommut)
 
   # Step 1: vectorized error term covariance matrix for lag zero
   gamMAvec <- matrix(Omega_m, nrow=d^2, ncol=1)
 
   # Step 2: error term versus y_t covariance matrix for lag zero
   Amat <- array(0, dim=c(d^2, p + 1, d^2, 2*p + 1))
-  Arow <- diag(d^2)
-  for(i1 in 1:p) { # TÄTÄ VOI NOPEUTTAA ALUSTAMALLA Arow:n CBINDAAMISEN SIJAAN
-    Arow <- cbind(-1*diag(d)%x%all_Am[, , i1], Arow) # Kronecker product
+  Arow <-  matrix(nrow=d^2, ncol=d^2*(p + 1))
+  start_inds <- seq(from=ncol(Arow) - d^2 + 1, to=1, by=-d^2)
+  end_inds <- seq(from=ncol(Arow), to=d^2, by=-d^2)
+  Arow[,start_inds[1]:end_inds[1]] <- diag(d^2)
+  for(i1 in 1:p) {
+    Arow[,start_inds[i1 + 1]:end_inds[i1 + 1]] <- -1*diag(d)%x%all_Am[, , i1]
   }
   for(i1 in 1:(p + 1)) {
     Amat[, i1, , i1:(i1 + p)] <- Arow
@@ -306,33 +298,54 @@ VAR_init_acov <- function(p, d, all_Am, Omega_m) {
     }
   }
   Amat <- cbind(matrix(Amat[, , , p + 1], nrow=d^2*(p + 1), ncol=d^2),
-                matrix(Amat[, , , (p + 2):(2*p + 1)], nrow=d^2*(p + 1), ncol=d^2*(p)) + matrix(newA[, , , p:1], nrow=d^2*(p + 1), ncol=d^2*(p)))
+                matrix(Amat[, , , (p + 2):(2*p + 1)], nrow=d^2*(p + 1), ncol=d^2*(p)) + matrix(newA[, , , p:1], nrow=d^2*(p + 1), ncol=d^2*p))
 
   Bmat <- array(0, dim=c(d^2, 1, d^2, p + 1))
-  Brow <- diag(d^2)
-  for(i1 in 1:p) { # TÄTÄ VOI NOPEUTTAA ALUSTAMALLA Brow:n CBINDAAMISEN SIJAAN
-    Brow <- cbind(Brow, -1*all_Am[, , i1] %x% diag(d))
+  Brow <-  matrix(nrow=d^2, ncol=d^2*(p + 1))
+  start_inds <- rev(start_inds)
+  end_inds <- rev(end_inds)
+  Brow[,start_inds[1]:end_inds[1]] <- diag(d^2)
+  for(i1 in 1:p) {
+    Brow[,start_inds[i1 + 1]:end_inds[i1 + 1]] <- -1*diag(d)%x%all_Am[, , i1]
   }
   Bmat[, 1, , 1:(1 + p)] <- Brow
-  Bmat <- matrix(Bmat[, , , 1], nrow=d^2, ncol=d^2)
-  #Bmat <- matrix(Bmat, nrow=d^2, ncol=d^2)
-#  Binv <- solve(Bmat)
-  gamMix <- solve(Bmat, gamMAvec) #Binv%*%gamMAvec
+  gamMix <- solve(matrix(Bmat[, , , 1], nrow=d^2, ncol=d^2), gamMAvec)
 
-  # Step 3: we pad Gamma_WX(0) with zeros
+  # Step 3: we pad out Gamma_WX(0) with zeros
   gamMixTemp <- c(gamMix, rep(0, times=p*d^2))
 
   # Step 4: compute the Gamma_XX(h) autocovariances for lags h=0,...,p
-  gamARMA <- solve(Amat, gamMixTemp)
-  gamMix <- array(gamMix, dim=c(d, d, 1))
-  gamARMA <- array(gamARMA, dim=c(d, d, p + 1))
-  gamARMA <- gamARMA[, , 1:p]
+  gamVAR <- array(array(solve(Amat, gamMixTemp), dim=c(d, d, p + 1))[, , 1:p], dim=c(d, d, p))
 
   # After obtaining the autocovariances for lags h=0,...,p-1,
   # we construct the dp-dimensional covariance matrix for p consecutive
   # observations of a VAR process.
 
-  # FILL IN
+  # gamVAR contains lag=0 autocovariance in [, , 1], and lag=i in [, , i + 1].
+  # Moreover, we use Gamma_Y(-h) = t(Gamma_Y(h)) and store the transposes
+  # (as taking transpose multiple times uses more computation time):
+  tgamVAR <- array(dim=c(d, d, p))
+  for(i1 in 1:p) {
+    tgamVAR[, , i1] <- t(gamVAR[, , i1])
+  }
 
-  gamARMA
+  # Finally, we fill in the covariance matrix for p consecutive observations
+  # of the VAR process:
+  Sigma_m <- matrix(nrow=d*p, ncol=d*p)
+  start_inds <- seq(from=1, to=d*(p - 1) + 1, by=d)
+  end_inds <- seq(from=d, to=d*p, by=d)
+  for(i1 in 1:p) { # Go through row blocks
+    for(i2 in 1:p) { # Go through column blocks
+      # If i1 end_ind is larger than i2 end_ind, we consider blocks below block
+      # diagonal (use transpose), and if i1 end_ind is smaller than i2 end_ind,
+      # we consider blocks above block diagonal. If i1 end_ind == i2 end_ind,
+      # we are at the block diagonal.
+      if(end_inds[i1] > end_inds[i2]) { # Below diagonal, use transpose
+        Sigma_m[start_inds[i1]:end_inds[i1], start_inds[i2]:end_inds[i2]] <- tgamVAR[, , abs(i1 - i2) + 1]
+      } else {
+        Sigma_m[start_inds[i1]:end_inds[i1], start_inds[i2]:end_inds[i2]] <- gamVAR[, , abs(i1 - i2) + 1]
+      }
+    }
+  }
+  Sigma_m
 }

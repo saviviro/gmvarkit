@@ -192,8 +192,8 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 
   # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39))
   I_dp2 <- diag(nrow=(d*p)^2)
-  ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
-  ZER_right <- matrix(0, nrow=d, ncol=d*(p-1))
+  ZER_lower <- matrix(0, nrow=d*(p - 1), ncol=d*p)
+  ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
   Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
   chol_Sigmas <- array(NA, dim=c(d*p, d*p, M))
   for(m in 1:M) {
