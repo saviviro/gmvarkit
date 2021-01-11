@@ -135,11 +135,13 @@
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
-#'            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'    \item Lütkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
-#'            \emph{Springer}.
+#'          \emph{Springer}.
+#'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
+#'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
-#'      paper, available as arXiv:2007.04713.
+#'          paper, available as arXiv:2007.04713.
 #'  }
 
 loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
@@ -190,7 +192,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
     all_phi0 <- vapply(1:M, function(m) (Id - rowSums(all_A[, , , m, drop=FALSE], dims=2))%*%mu[,m], numeric(d))
   }
 
-  # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39))
+  # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39) or the algorithm proposed by McElroy 2017)
   Sigmas <- get_Sigmas(p=p, M=M, d=d, all_A=all_A, all_boldA=all_boldA, all_Omega=all_Omega) # Store the (dpxdp) covariance matrices
   chol_Sigmas <- array(NA, dim=c(d*p, d*p, M))
   for(m in 1:M) {
@@ -264,7 +266,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 #' @details Note that we index the time series as \eqn{-p+1,...,0,1,...,T} as in Kalliovirta et al. (2016).
 #' @return Returns the mixing weights a matrix of the same dimension as \code{log_mvnvalues} so
 #'   that the t:th row is for the time point t and m:th column is for the regime m.
-#' @inherit loglikelihood_int references
+#' @inherit in_paramspace_int references
 #' @seealso \code{\link{loglikelihood_int}}
 
 get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0=FALSE) {

@@ -33,7 +33,7 @@
 #'   }
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
-#' @inherit in_paramspace_int references
+#' @inherit loglikelihood_int references
 #' @examples
 #'  \donttest{
 #'  # These examples use the data 'eurusd' which comes with the
@@ -159,7 +159,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
     }
   }
 
-  # Calculate the covariance matrices Sigma_{m,p} (Lütkepohl 2005, eq. (2.1.39))
+  # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39) or the algorithm proposed by McElroy 2017)
   Sigmas <- get_Sigmas(p=p, M=M, d=d, all_A=all_A, all_boldA=all_boldA, all_Omega=all_Omega) # Store the (dpxdp) covariance matrices
   inv_Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store inverses of the (dpxdp) covariance matrices
   det_Sigmas <- numeric(M) # Store determinants of the (dpxdp) covariance matrices

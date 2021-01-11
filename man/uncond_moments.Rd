@@ -54,11 +54,13 @@ uncond_moments(mod222s)
 \references{
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
-           \emph{Journal of Econometrics}, \strong{192}, 485-498.
+         \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Lütkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
-           \emph{Springer}.
+         \emph{Springer}.
+   \item McElroy T. 2017. Computation of vector ARMA autocovariances.
+         \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
+         paper, available as arXiv:2007.04713.
  }
 }
 \seealso{

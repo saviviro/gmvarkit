@@ -44,7 +44,7 @@
 #'   very close to the boundary (this is used to ensure numerical stability in estimation of the model parameters).
 #' @section Warning:
 #'  No argument checks!
-#' @inherit loglikelihood_int references
+#' @inherit in_paramspace_int references
 
 is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL, tolerance=1e-3) {
   if(is.null(all_boldA)) {
