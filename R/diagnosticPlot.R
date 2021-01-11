@@ -102,18 +102,18 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
   }
   if(type == "ac" || type == "all") {
     waitifall()
-    par(mar=c(2.3, 2.5, 3.5, 2.5))
-    acf(qres, lag.max=maxlag, plot=TRUE)
+    par(mar=c(2.3, 2.8, 3.5, 1.0))
+    acf(qres, lag.max=maxlag, plot=TRUE, ylab="")
   }
   if(type == "ch" || type == "all") {
     waitifall()
-    par(mar=c(2.3, 2.5, 3.5, 2.5))
-    acf(qres^2, lag.max=maxlag, plot=TRUE)
+    par(mar=c(2.3, 2.8, 3.5, 1.0))
+    acf(qres^2, lag.max=maxlag, plot=TRUE, ylab="")
   }
   if(type == "norm" || type == "all") {
     waitifall()
     d <- gmvar$model$d
-    par(mfrow=c(2, d), mar=c(2.5, 2.5, 2.1, 1.1))
+    par(mfrow=c(2, d), mar=c(2.5, 2.8, 2.1, 1.0))
     for(i1 in 1:d) {
       hs <- hist(qres[,i1], breaks="Scott", probability=TRUE, col="skyblue", plot=TRUE,
                  main=colnames(qres)[i1], ylim=c(0, 0.5))
