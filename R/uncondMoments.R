@@ -256,6 +256,7 @@ uncond_moments <- function(gmvar) {
 #'  observations of a VAR process with the algorithm proposed by McElroy (2017).
 #'
 #' @inheritParams loglikelihood_int
+#' @inheritParams is_stationary
 #' @param all_Am \code{[d, d, p]} array containing the AR coefficient matrices
 #' @param Omega_m the dxd error term covariance matrix
 #' @details
@@ -360,9 +361,8 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
 #'  whenever it reduces the computation time.
 #'
 #' @inheritParams is_stationary
-#' @inheritParams VAR_pcovmat
-#' @param all_Am \code{[d, d, p]} array containing the AR coefficient matrices
-#' @param Omega_m the dxd error term covariance matrix
+#' @inheritParams form_boldA
+#' @param all_Omega a \code{[d, d, M]} array containing the covariance matrix Omegas
 #' @details
 #'  Calculates the dp-dimensional covariance matrix using the formula (2.1.39) in Lütkepohl (2005) when
 #'  \code{d*p < 12} and using the algorithm proposed by McElroy (2017) otherwise.
@@ -383,7 +383,7 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
 
 get_Sigmas <- function(p, M, d, all_A, all_boldA, all_Omega) {
   Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
-  if(d*p < 12) {
+  if(d*p < 12) { # d*p < 12
     # Calculate the covariance matrices Sigma_{m,p} using the equation (2.1.39) in Lütkepohl (2005).
     I_dp2 <- diag(nrow=(d*p)^2)
     ZER_lower <- matrix(0, nrow=d*(p - 1), ncol=d*p)
@@ -394,11 +394,11 @@ get_Sigmas <- function(p, M, d, all_A, all_boldA, all_Omega) {
       Sigma_m <- solve(kronmat, vec(sigma_epsm))
       Sigmas[, , m] <- Sigma_m
     }
-  } else { # d*p >= 12
-    # Calculate the covariance matrices Sigma_{m,p} using the algorithm proposed my McElroy (2017).
-    for(m in 1:M) {
-      Sigmas[, , m] <- VAR_pcovmat(p=p, d=d, all_Am=all_A[, , , m], Omega_m=all_Omega[, , m])
-    }
-  }
+ } else { # d*p >= 12
+   # Calculate the covariance matrices Sigma_{m,p} using the algorithm proposed my McElroy (2017).
+   for(m in 1:M) {
+     Sigmas[, , m] <- VAR_pcovmat(p=p, d=d, all_Am=all_A[, , , m], Omega_m=all_Omega[, , m])
+   }
+ }
   Sigmas
 }

@@ -89,9 +89,11 @@
 
 * Bug fix which required that Brobdingnag was added back to the imported packages. There was in some rare cases a problem with the exact log-likelihood function that was introduced in the version 1.3.0 (the fix was introduced in the same day as the bug, however).
 
-# gmvarkit 1.3.2
+# gmvarkit 1.4.0
 
+* Major speed improvement (when d*p > 12)!
 * New feature: possibility to constrain the (unconditional) mean parameters to the same among some regimes with the argument 'same_means'. This feature is available for mean-parametrized models only (due to technical reasons).
 * The default number of estimation rounds was increased to 'floor(10 + 30*log(M))'.
+* Added more adjustable parameters to the genetic algorithm.
 * Some changes related to estimation with the genetic algorithm (the estimation results might be different with this version, if AR or lambda constraints are employed, or in some cases when there are no overidentifying constraints in the W matrix). 
 * Fixed a bug in the predict method that appeared in the very rare cases when one uses the exact one-step conditional mean without confidence intervals as the the prediction method with mean-parametrization.

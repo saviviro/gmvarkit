@@ -23,6 +23,7 @@ GAfit(
   W_scale,
   lambda_scale,
   ar_scale = 0.2,
+  upper_ar_scale = 1,
   ar_scale2 = 1,
   regime_force_scale = 1,
   red_criteria = c(0.05, 0.01),
@@ -191,7 +192,11 @@ is considered.}
 
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically proposed in construction
 of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
-initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.}
+initial population, a new scale is drawn from \code{(0, 0.)} uniform distribution in each iteration.}
+
+\item{upper_ar_scale}{the upper bound for \code{ar_scale} parameter (see above) in the random mutations. Setting
+this too high might lead to failure in proposing new parameters that are well enough inside the parameter space,
+and especially with large \code{p} one might want to try smaller upper bound (e.g., 0.5).}
 
 \item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
 random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients

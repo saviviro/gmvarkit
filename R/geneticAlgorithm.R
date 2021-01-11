@@ -112,7 +112,10 @@
 #'   should be adjusted accordingly in order to the estimation succeed!
 #' @param ar_scale a positive real number adjusting how large AR parameter values are typically proposed in construction
 #'   of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
-#'   initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.
+#'   initial population, a new scale is drawn from \code{(0, 0.)} uniform distribution in each iteration.
+#' @param upper_ar_scale the upper bound for \code{ar_scale} parameter (see above) in the random mutations. Setting
+#'  this too high might lead to failure in proposing new parameters that are well enough inside the parameter space,
+#'  and especially with large \code{p} one might want to try smaller upper bound (e.g., 0.5).
 #' @param ar_scale2 a positive real number adjusting how large AR parameter values are typically proposed in some
 #'   random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
 #'   (in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
@@ -172,7 +175,7 @@
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL,
-                  mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale=0.2, ar_scale2=1, regime_force_scale=1,
+                  mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale=0.2, upper_ar_scale=1, ar_scale2=1, regime_force_scale=1,
                   red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and preliminary checks
@@ -489,7 +492,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     mutate <- rbinom(n=popsize, size=1, prob=mu_rates)
     which_mutate <- which(mutate == 1)
     pre_smart_mu <- runif(1, min=1e-6, max=1-1e-6) < pre_smart_mu_prob
-    ar_scale <- runif(1, min=1e-6, max=1-1e-6) # Random AR scale
+    ar_scale <- runif(1, min=1e-6, max=upper_ar_scale - 1e-6) # Random AR scale
     if(i1 <= smart_mu & length(which_mutate) >= 1 & !pre_smart_mu) { # Random mutations
       if(!is.null(constraints) | runif(1, min=1e-6, max=1-1e-6) > 0.5) { # Regular, can be nonstationary
         stat_mu <- FALSE

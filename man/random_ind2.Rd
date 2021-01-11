@@ -67,7 +67,7 @@ structural model is considered.}
 
 \item{ar_scale}{a positive real number adjusting how large AR parameter values are typically proposed in construction
 of the initial population: larger value implies larger coefficients (in absolute value). After construction of the
-initial population, a new scale is drawn from \eqn{(0,1)} uniform distribution in each iteration.}
+initial population, a new scale is drawn from \code{(0, 0.)} uniform distribution in each iteration.}
 
 \item{W_scale}{a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
 random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently

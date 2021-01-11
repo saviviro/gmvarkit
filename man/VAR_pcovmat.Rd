@@ -10,6 +10,8 @@ VAR_pcovmat(p, d, all_Am, Omega_m)
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 
+\item{d}{the number of time series in the system.}
+
 \item{all_Am}{\code{[d, d, p]} array containing the AR coefficient matrices}
 
 \item{Omega_m}{the dxd error term covariance matrix}

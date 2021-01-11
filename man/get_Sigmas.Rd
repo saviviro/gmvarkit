@@ -14,12 +14,12 @@ get_Sigmas(p, M, d, all_A, all_boldA, all_Omega)
 
 \item{d}{the number of time series in the system.}
 
+\item{all_A}{4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.}
+
 \item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
 
-\item{all_Am}{\code{[d, d, p]} array containing the AR coefficient matrices}
-
-\item{Omega_m}{the dxd error term covariance matrix}
+\item{all_Omega}{a \code{[d, d, M]} array containing the covariance matrix Omegas}
 }
 \value{
 Returns a \code{[dp, dp, M]} array containing the dp-dimensional covariance matrices for each regime.
