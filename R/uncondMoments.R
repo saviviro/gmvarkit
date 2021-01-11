@@ -262,6 +262,7 @@ uncond_moments <- function(gmvar) {
 #'  Most of the code in this function is adapted from the one provided in the
 #'  supplementary material of McElroy (2017). Reproduced under GNU General
 #'  Public License, Copyright (2015) Tucker McElroy.
+#' @return Returns the (dp x dp) covariance matrix.
 #' @references
 #'  \itemize{
 #'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
@@ -269,7 +270,7 @@ uncond_moments <- function(gmvar) {
 #'  }
 
 VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
-  # all_Am = all_A[, , , m] #
+  # all_Am = all_A[, , , m]
   # Omega_m = all_Omega[, , m]
 
   # The K commutation matrix
@@ -348,4 +349,56 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
     }
   }
   Sigma_m
+}
+
+
+#' @title Calculate the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}} in the mixing weights
+#'  of the GMVAR model.
+#'
+#' @description \code{get_Sigmas} calculates the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}}
+#'  in the mixing weights of the GMVAR model so that the algorithm proposed by McElroy (2017) employed
+#'  whenever it reduces the computation time.
+#'
+#' @inheritParams is_stationary
+#' @inheritParams VAR_pcovmat
+#' @param all_Am \code{[d, d, p]} array containing the AR coefficient matrices
+#' @param Omega_m the dxd error term covariance matrix
+#' @details
+#'  Calculates the dp-dimensional covariance matrix using the formula (2.1.39) in Lütkepohl (2005) when
+#'  \code{d*p < 12} and using the algorithm proposed by McElroy (2017) otherwise.
+#'
+#'  The code in the implementation of the McElroy's (2017) algorithm (in the function \code{VAR_pcovmat}) is
+#'  adapted from the one provided in the supplementary material of McElroy (2017). Reproduced under GNU General
+#'  Public License, Copyright (2015) Tucker McElroy.
+#' @return Returns a \code{[dp, dp, M]} array containing the dp-dimensional covariance matrices for each regime.
+#' @references
+#'  \itemize{
+#'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
+#'            \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'    \item Lütkepohl H. 2005. New Introduction to Multiple Time Series Analysis,
+#'            \emph{Springer}.
+#'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
+#'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
+#'  }
+
+get_Sigmas <- function(p, M, d, all_A, all_boldA, all_Omega) {
+  Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
+  if(d*p < 12) {
+    # Calculate the covariance matrices Sigma_{m,p} using the equation (2.1.39) in Lütkepohl (2005).
+    I_dp2 <- diag(nrow=(d*p)^2)
+    ZER_lower <- matrix(0, nrow=d*(p - 1), ncol=d*p)
+    ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
+    for(m in 1:M) {
+      kronmat <- I_dp2 - kronecker(all_boldA[, , m], all_boldA[, , m])
+      sigma_epsm <- rbind(cbind(all_Omega[, , m], ZER_right), ZER_lower)
+      Sigma_m <- solve(kronmat, vec(sigma_epsm))
+      Sigmas[, , m] <- Sigma_m
+    }
+  } else { # d*p >= 12
+    # Calculate the covariance matrices Sigma_{m,p} using the algorithm proposed my McElroy (2017).
+    for(m in 1:M) {
+      Sigmas[, , m] <- VAR_pcovmat(p=p, d=d, all_Am=all_A[, , , m], Omega_m=all_Omega[, , m])
+    }
+  }
+  Sigmas
 }

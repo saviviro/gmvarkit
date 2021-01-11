@@ -191,16 +191,9 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   }
 
   # Calculate the covariance matrices Sigma_{m,p} (Lutkepohl 2005, eq. (2.1.39))
-  I_dp2 <- diag(nrow=(d*p)^2)
-  ZER_lower <- matrix(0, nrow=d*(p - 1), ncol=d*p)
-  ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
-  Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
+  Sigmas <- get_Sigmas(p=p, M=M, d=d, all_A=all_A, all_boldA=all_boldA, all_Omega=all_Omega) # Store the (dpxdp) covariance matrices
   chol_Sigmas <- array(NA, dim=c(d*p, d*p, M))
   for(m in 1:M) {
-    kronmat <- I_dp2 - kronecker(all_boldA[, , m], all_boldA[, , m])
-    sigma_epsm <- rbind(cbind(all_Omega[, , m], ZER_right), ZER_lower)
-    Sigma_m <- solve(kronmat, vec(sigma_epsm))
-    Sigmas[, , m] <- Sigma_m
     chol_Sigmas[, , m] <- chol(Sigmas[, , m]) # Take Cholesky here to avoid unnecessary warnings from mvnfast::dmvn
   }
 

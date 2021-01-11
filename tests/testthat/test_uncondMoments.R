@@ -489,6 +489,7 @@ alt_pcovmat <- function(p, d, all_A, all_Omega) {
 params112 <- c(-0.114, 4.704, 0.23, -0.522, 0.014, 0.217, 0.04, -0.047, 1.649)
 all_A112 <- pick_allA(p=1, M=1, d=2, params=params112)
 all_Omega112 <- pick_Omegas(p=1, M=1, d=2, params=params112)
+all_boldA112 <- form_boldA(p=1, M=1, d=2, all_A=all_A112)
 
 params115 <- c(0.936, 3.738, 4.135, 9.663, 3.955, -0.579, -0.009, -0.187, 0.019, -0.241, -0.02, -0.128, -0.036,
                -0.167, -0.218, 0.042, -0.259, -0.029, -0.03, -0.133, 0.377, -0.321, 0.017, -0.205, -0.29, -0.01,
@@ -505,6 +506,7 @@ params213 <- c(1.076, 1.777, -1.985, -0.141, 0.234, 0.088, -0.311, 0.112, 0.234,
                -0.104, 0.067, 0.075, 0.454, -0.249, 0.034, -0.247, -0.231, 0.499, -0.218, -1.044, 0.422, 0.986, 3.175)
 all_A213 <- pick_allA(p=2, M=1, d=3, params=params213)
 all_Omega213 <- pick_Omegas(p=2, M=1, d=3, params=params213)
+all_boldA213 <- form_boldA(p=2, M=1, d=3, all_A=all_A213)
 
 params312 <- c(0.712, 4.819, -0.147, 0.365, -0.159, -0.055, 0.52, -0.257, -0.057, -0.313, 0.373, 0.182, -0.109,
                -0.111, 1.326, -0.895, 0.66)
@@ -522,6 +524,7 @@ params714 <- c(2.211, 3.498, 5.362, 4.747, -0.114, -0.073, -0.138, 0.186, -0.062
                -0.064, 0.132, -0.062, 0.251, -0.042, 0.681, -0.328, 0.944, 0.585, 2.154, 0.684, -2.075, 4.601, -1.727, 3.392)
 all_A714 <- pick_allA(p=7, M=1, d=4, params=params714)
 all_Omega714 <- pick_Omegas(p=7, M=1, d=4, params=params714)
+all_boldA714 <- form_boldA(p=7, M=1, d=4, all_A=all_A714)
 
 params516 <- c(2.374, 1.078, 6.947, 6.636, -0.355, -0.25, -0.078, -0.088, -0.544, -0.115, 0.017, 0.209, 0.012, 0.39, 0.076,
                0.051, -0.052, 0.208, -0.247, 0.032, -0.13, -0.062, 0.739, 0.271, -0.029, 0.092, -0.142, 0.023, 0.176, 0.207,
@@ -563,20 +566,8 @@ params314 <- c(-0.888, 3.587, 1.846, 6.059, 0.54, 0.847, -0.409, -0.053, -1.328,
 all_A314 <- pick_allA(p=3, M=1, d=4, params=params314)
 all_Omega314 <- pick_Omegas(p=3, M=1, d=4, params=params314)
 
+
 test_that("VAR_pcovmat works correctly", {
-  expect_equal(VAR_pcovmat(p=4, d=2, all_Am=all_A412[, , , 1], Omega_m=all_Omega412[, , 1]),
-               alt_pcovmat(p=4, d=2, all_A=all_A412, all_Omega=all_Omega412), tolerance=1e-5)
-
-  expect_equal(VAR_pcovmat(p=4, d=3, all_Am=all_A413[, , , 1], Omega_m=all_Omega413[, , 1]),
-               alt_pcovmat(p=4, d=3, all_A=all_A413, all_Omega=all_Omega413), tolerance=1e-5)
-
-  expect_equal(VAR_pcovmat(p=5, d=2, all_Am=all_A512[, , , 1], Omega_m=all_Omega512[, , 1]),
-               alt_pcovmat(p=5, d=2, all_A=all_A512, all_Omega=all_Omega512), tolerance=1e-5)
-
-  expect_equal(VAR_pcovmat(p=3, d=4, all_Am=all_A314[, , , 1], Omega_m=all_Omega314[, , 1]),
-               alt_pcovmat(p=3, d=4, all_A=all_A314, all_Omega=all_Omega314), tolerance=1e-5)
-
-
   expect_equal(VAR_pcovmat(p=1, d=2, all_Am=array(all_A112[, , , 1], dim=c(2, 2, 1)), Omega_m=all_Omega112[, , 1]),
                alt_pcovmat(p=1, d=2, all_A=all_A112, all_Omega=all_Omega112), tolerance=1e-5)
 
@@ -597,4 +588,28 @@ test_that("VAR_pcovmat works correctly", {
 
   expect_equal(VAR_pcovmat(p=5, d=6, all_Am=all_A516[, , , 1], Omega_m=all_Omega516[, , 1]),
                alt_pcovmat(p=5, d=6, all_A=all_A516, all_Omega=all_Omega516), tolerance=1e-5)
+
+  expect_equal(VAR_pcovmat(p=4, d=2, all_Am=all_A412[, , , 1], Omega_m=all_Omega412[, , 1]),
+               alt_pcovmat(p=4, d=2, all_A=all_A412, all_Omega=all_Omega412), tolerance=1e-5)
+
+  expect_equal(VAR_pcovmat(p=4, d=3, all_Am=all_A413[, , , 1], Omega_m=all_Omega413[, , 1]),
+               alt_pcovmat(p=4, d=3, all_A=all_A413, all_Omega=all_Omega413), tolerance=1e-5)
+
+  expect_equal(VAR_pcovmat(p=5, d=2, all_Am=all_A512[, , , 1], Omega_m=all_Omega512[, , 1]),
+               alt_pcovmat(p=5, d=2, all_A=all_A512, all_Omega=all_Omega512), tolerance=1e-5)
+
+  expect_equal(VAR_pcovmat(p=3, d=4, all_Am=all_A314[, , , 1], Omega_m=all_Omega314[, , 1]),
+               alt_pcovmat(p=3, d=4, all_A=all_A314, all_Omega=all_Omega314), tolerance=1e-5)
+})
+
+
+test_that("get_Sigmas works correctly", {
+  expect_equal(get_Sigmas(p=1, M=1, d=2, all_A=all_A112, all_Omega=all_Omega112, all_boldA=all_boldA112),
+               array(alt_pcovmat(p=1, d=2, all_A=all_A112, all_Omega=all_Omega112), dim=c(2, 2, 1)), tolerance=1e-5)
+
+  expect_equal(get_Sigmas(p=2, M=1, d=3, all_A=all_A213, all_Omega=all_Omega213, all_boldA=all_boldA213),
+               array(alt_pcovmat(p=2, d=3, all_A=all_A213, all_Omega=all_Omega213), dim=c(6, 6, 1)), tolerance=1e-5)
+
+  expect_equal(get_Sigmas(p=7, M=1, d=4, all_A=all_A714, all_Omega=all_Omega714, all_boldA=all_boldA714),
+               array(alt_pcovmat(p=7, d=4, all_A=all_A714, all_Omega=all_Omega714), dim=c(28, 28, 1)), tolerance=1e-5)
 })

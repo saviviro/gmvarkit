@@ -5,6 +5,7 @@ library(gmvarkit)
 
 ## A(M)(p)_(p)(M)(d), only d=2 in the example time series
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+set.seed(1); data2 <- cbind(data, round(rnorm(nrow(data), 3)))
 
 # p=1, M=1, d=2
 phi10_112 <- c(1.03, 2.36)
@@ -87,6 +88,39 @@ theta_112sWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112sWC, st
 theta_122s_mu <- change_parametrization(p=1, M=1, d=2, params=theta_122s, structural_pars=list(W=W_122), change_to="mean")
 theta_222s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222), change_to="mean")
 
+# p=4, M=1, d=3, data2
+theta_413 <- c(0.955, 1.968, 5.832, 0.384, 0.895, 1.519, 1.175, 0.067, -0.68, 1.517, -0.654, -0.237, -1.343, -1.188, -0.403,
+              0.98, -0.285, -1.787, 0.546, -0.545, -1.633, 0.277, -0.33, 2.037, 0.563, 1.126, -1.264, 0.179, 2.345, -1.126,
+              -0.152, -0.82, 0.428, -0.332, 1.776, -0.976, -0.256, 0.374, -0.82, 1.964, -0.42, 0.798, 3.931, -0.436, 0.404)
+
+# p=4, M=2, d=3, data2
+theta_423 <- c(3.402, 1.922, 5.069, -0.414, -1.492, 1.286, -0.351, 1.074, -0.613, 0.504, 0.386, -0.193, 1.751, 0.754, -0.118,
+               -1.15, -1.44, -0.301, -0.048, 0.229, -0.575, 0.444, 1.361, -0.128, 1.267, 0.48, 1.709, -0.7, -0.247, 0.295,
+               -0.553, -0.332, 0.243, 0.478, 1.026, 0.157, -0.591, -0.648, -1.037, 0.388, -0.464, -0.408, 0.689, 1.137, 4.44,
+               1.717, 3.82, 4.153, -1.21, -0.002, -0.061, 0.898, -0.349, 0.269, -0.228, -0.55, -0.38, 0.031, 1.835, -0.561,
+               1.542, 0.19, -0.257, -0.212, -0.014, -0.244, 0.556, -0.07, 0.048, 0.929, -1.442, 0.508, -0.383, -0.122, -0.515,
+               0.3, -1.578, -0.12, 0.33, -1.092, 0.21, -0.371, -0.634, 0.613, 0.26, -0.536, -0.009, 1.414, -0.158, 0.109, 0.822)
+
+# p=7, M=2, d=2
+theta_722 <- c(0.93, 1.505, -0.74, 1.106, -0.304, 2.488, 0.107, -2.008, -2.701, -2.937, 2.696, -0.594, 2.472, 2.991, 1.15, 2.901,
+               -0.63, -5.265, -2.446, -0.921, 4.506, 5.536, -0.109, -0.302, -3.8, -1.724, 0.023, -0.137, 0.664, -0.214, 1.875,
+               -0.795, 0.501, -0.001, 0.664, 3.122, 2.272, -0.125, -1.659, -2.756, 1.051, -1.534, -2.175, -0.832, -11.509, 2.103,
+               1.778, 4.395, 20.155, -0.55, 3.99, -4.606, -16.731, -2.187, -9.805, 2.456, 8.306, 3.297, 11.725, -0.494, -1.857,
+               -1.317, -4.49, 1.542, -0.15, 0.291, 0.601)
+
+# p=6, M=3, d=2
+theta_632 <- c(-0.476, 1.711, -0.686, 0.786, 0.663, -0.668, 1.299, 0.204, 0.198, -0.276, 1.582, -0.379, -1.283, 0.614, 0.425, 1.522,
+               -0.951, 1.032, -0.231, 1.743, 0.167, -1.887, -0.309, 0.15, 0.089, -1.959, 0.907, 0.985, 2.304, 1.082, 1.835, 0.24,
+               -0.373, 1.39, 0.618, 0.787, -1.068, 0.508, 1.358, 1.416, 0.443, -1.82, -0.103, -0.729, 0.674, 0.236, 0.218, -1.159,
+               0.131, 0.508, 0.332, 0.53, 0.285, -0.35, 0.354, 0.023, -0.106, 3.524, 0.419, -0.002, -1.14, -0.544, 1.281, 2.777,
+               -1.086, -2.576, -1.891, -3.575, 1.624, 0.173, 2.726, 4.498, -0.005, -0.975, -3.034, -3.234, 1.349, 1.182, 2.611, 1.811,
+               -0.743, 0.358, -1.082, 0.037, 1.51, -0.558, 1.022, 0.461, 0.353)
+
+# p=8, M=1, d=2
+theta_812 <- c(2.54, 1.341, -0.316, -0.405, -0.181, 0.744, 0.505, -0.795, -0.221, 0.109, 1.382, 1.453, -0.659, -1.004, 0.44, 0.314,
+               0.437, 1.082, -2.219, -0.177, 1.155, -0.081, -0.663, 0.478, -0.869, -0.114, 0.881, -0.098, -0.868, 0.448, 0.308, -0.535,
+               0.122, 0.165, 0.051, 0.086, 3.732)
+
 # Same means
 mu_112 <- pick_phi0(p=1, M=1, d=2, params=theta_112_mu)
 mu_212 <- pick_phi0(p=2, M=1, d=2, params=theta_212_mu)
@@ -124,6 +158,13 @@ test_that("loglikelihood_int works correctly", {
   expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=FALSE, parametrization="intercept"), -20948.16, tolerance=1e-2)
   expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="intercept"), -20947.31, tolerance=1e-2)
   expect_equal(loglikelihood_int(data=data, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="mean"), -30299.49, tolerance=1e-2)
+
+  # p*d >= 12
+  expect_equal(loglikelihood_int(data=data2, p=4, M=1, params=theta_413, conditional=FALSE), -223585.4, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=data2, p=4, M=2, params=theta_423, conditional=FALSE), -176134.4, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=data, p=7, M=2, params=theta_722, conditional=FALSE), -119265.1, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=data, p=6, M=3, params=theta_632, conditional=FALSE), -181090, tolerance=1)
+  expect_equal(loglikelihood_int(data=data, p=8, M=1, params=theta_812, conditional=FALSE), -188731, tolerance=1)
 
   # SGMVAR
   expect_equal(loglikelihood_int(data=data, p=1, M=1, params=theta_112sWC, structural_pars=list(W=W_112), conditional=FALSE),

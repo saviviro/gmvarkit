@@ -14,6 +14,9 @@ VAR_pcovmat(p, d, all_Am, Omega_m)
 
 \item{Omega_m}{the dxd error term covariance matrix}
 }
+\value{
+Returns the (dp x dp) covariance matrix.
+}
 \description{
 \code{VAR_pcovmat} calculate the dp-dimensional covariance matrix of p consecutive
  observations of a VAR process with the algorithm proposed by McElroy (2017).
