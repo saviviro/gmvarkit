@@ -97,7 +97,10 @@
 * Added more adjustable parameters to the genetic algorithm.
 * Some changes related to estimation with the genetic algorithm (the estimation results might be different with this version, if AR or lambda constraints are employed, or in some cases when there are no overidentifying constraints in the W matrix). 
 * Fixed a bug in the predict method that appeared in the very rare cases when one uses the exact one-step conditional mean without confidence intervals as the the prediction method with mean-parametrization.
+* In this version, the estimation results with a given seed are different to those in the previous one due to a hidden problem that was introduced. 
 
 # gmvarkit 1.4.1
 
-* Fixed CRACN check issues.
+* Fixed CRACN check issues and examples regarding LR and Wald tests.
+* Fixed a problem in the estimation procedure that was introduced in the previous version and made also a minor adjustment that should slightly enhance the estimation of the models.
+* In this version, the estimation results with a given seed are different to those in the previous versions due to the updates (see above).

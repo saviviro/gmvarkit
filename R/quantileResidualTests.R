@@ -47,7 +47,7 @@
 #' # so the test results are the same.
 #' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=10, seeds=1:10)
+#'   ncalls=40, seeds=1:40, ncores=4)
 #' qrtests12s <- quantile_residual_tests(fit12s)
 #' qrtests12s
 #'

@@ -176,7 +176,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
                   constraints=NULL, same_means=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL,
                   mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale=0.2, upper_ar_scale=1, ar_scale2=1, regime_force_scale=1,
-                  red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0.00, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
+                  red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and preliminary checks
   set.seed(seed)
@@ -603,9 +603,9 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     # If structural model is considered without overidentifying constraints on the W matrix and without constraints
     # on the lambda parameters, sort the columns of the W matrix by sorting the lambdas of the second regime to
     # increasing order. This gives statistical identification for structural models without overidentifying constraints.
-   # if(sort_structural_pars) {
-  #    H2 <- vapply(1:popsize, function(i2) sort_W_and_lambdas(p=p, M=M, d=d, params=H2[,i2]), numeric(npars))
-   # }
+    if(sort_structural_pars) {
+      H2 <- vapply(1:popsize, function(i2) sort_W_and_lambdas(p=p, M=M, d=d, params=H2[,i2]), numeric(npars))
+    }
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
     if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
