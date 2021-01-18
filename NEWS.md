@@ -102,5 +102,5 @@
 # gmvarkit 1.4.1
 
 * Fixed CRACN check issues and examples regarding LR and Wald tests.
-* Fixed a problem in the estimation procedure that was introduced in the previous version and made also a minor adjustment that should slightly enhance the estimation of the models.
+* Fixed a problem in the estimation procedure that was introduced in the previous version and made also a minor adjustment that should slightly enhance the estimation of some structural models models.
 * In this version, the estimation results with a given seed are different to those in the previous versions due to the updates (see above).
