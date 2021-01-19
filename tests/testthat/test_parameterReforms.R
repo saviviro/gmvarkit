@@ -539,24 +539,28 @@ test_that("sort_components works correctly", {
   expect_equal(sort_components(p=1, M=2, d=3, params=theta_123_2),  c(upsilon2_123, upsilon1_123, 1-alpha1_123_2))
   expect_equal(sort_components(p=2, M=1, d=3, params=theta_213), theta_213)
 
-  # SGMVAR
-  expect_equal(sort_components(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W=W_122)), theta_122s)
+  # SGMVAR (redecompose_Omegas is tested in matcal and should work)
+  expect_equal(sort_components(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W=W_122)),
+               c(phi20_122, phi10_122, vec(A21_122),  vec(A11_122), redecompose_Omegas(M=2, d=2, W=W_122, lambdas=lambdas_122, perm=2:1),
+                 1-alpha1_122), tolerance=1e-3)
   expect_equal(sort_components(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W=W_332)), theta_332s)
   expect_equal(sort_components(p=3, M=3, d=2, params=theta_332s_2, structural_pars=list(W=W_332)),
-               c(phi10_332, phi30_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
-                 vec(A31_332), vec(A32_332), vec(A33_332), vec(A21_332), vec(A22_332), vec(A23_332),
-                 Wvec(W_332), lambdas3_332, lambdas2_332, alpha1_332_2, 1 - alpha1_332_2 - alpha2_332_2))
-  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s, structural_pars=list(W=W_342)),
-               c(phi10_342, phi40_342, phi30_342, phi20_342, phi1_342, phi4_342, phi3_342, phi2_342,
-                 Wvec(W_342), lambdas4_342, lambdas3_342, lambdas2_342,
-                 alpha1_342, 1 - alpha2_342 - alpha1_342 - alpha3_342, alpha3_342))
-  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s_2, structural_pars=list(W=W_342)),
-               c(phi10_342, phi30_342, phi20_342, phi40_342, phi1_342, phi3_342, phi2_342, phi4_342,
-                 Wvec(W_342), lambdas3_342, lambdas2_342, lambdas4_342, alpha1_342_2, alpha3_342_2, alpha2_342_2))
-  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s_3, structural_pars=list(W=W_342)),
-               c(phi10_342, phi20_342, phi40_342, phi30_342, phi1_342, phi2_342, phi4_342, phi3_342,
-                 Wvec(W_342), lambdas2_342, lambdas4_342, lambdas3_342,
-                 alpha1_342_3, alpha2_342_3, 1 - alpha1_342_3 - alpha2_342_3 - alpha3_342_3))
+               c(phi30_332, phi20_332, phi10_332, vec(A31_332), vec(A32_332), vec(A33_332),
+                 vec(A21_332), vec(A22_332), vec(A23_332), vec(A11_332), vec(A12_332), vec(A13_332),
+                 Wvec(redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(lambdas2_332, lambdas3_332), perm=c(3, 2, 1))),
+                 1 - alpha1_332_2 - alpha2_332_2, alpha2_332_2), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s, structural_pars=list(W=W_342)), # perm=c(4, 3, 2, 1)
+               c(phi40_342, phi30_342, phi20_342, phi10_342, phi4_342, phi3_342, phi2_342, phi1_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(4, 3, 2, 1))),
+                 1 - alpha1_342 - alpha2_342 - alpha3_342, alpha3_342, alpha2_342), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s_2, structural_pars=list(W=W_342)), # perm=c(3, 2, 1, 4)
+               c(phi30_342, phi20_342, phi10_342, phi40_342, phi3_342, phi2_342, phi1_342, phi4_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(3, 2, 1, 4))),
+                 alpha3_342_2, alpha2_342_2, alpha1_342_2), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s_3, structural_pars=list(W=W_342)), # perm=c(2, 1, 4, 3)
+               c(phi20_342, phi10_342, phi40_342, phi30_342, phi2_342, phi1_342, phi4_342, phi3_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(2, 1, 4, 3))),
+                 alpha2_342_3, alpha1_342_3, 1 - alpha1_342_3 - alpha2_342_3 - alpha3_342_3), tolerance=1e-3)
 })
 
 
@@ -769,9 +773,9 @@ test_that("sort_and_standardize_alphas works correctly", {
   expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6)), c(0.6, 0.3, 0.1))
 
   expect_equal(sort_and_standardize_alphas(alphas=c(8, 2), structural_pars=list(1)), c(0.8, 0.2))
-  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.7), structural_pars=list(1)), c(0.3, 0.7))
-  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), structural_pars=list(1)), c(0.3, 0.6, 0.1))
-  expect_equal(sort_and_standardize_alphas(alphas=c(3, 2, 5), structural_pars=list(1)), c(0.3, 0.5, 0.2))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.7), structural_pars=list(1)), c(0.7, 0.3))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), structural_pars=list(1)), c(0.6, 0.3, 0.1))
+  expect_equal(sort_and_standardize_alphas(alphas=c(3, 2, 5), structural_pars=list(1)), c(0.5, 0.3, 0.2))
 })
 
 

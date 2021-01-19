@@ -209,9 +209,10 @@ form_boldA <- function(p, M, d, all_A) {
 #' @inheritParams is_stationary
 #' @details Constrained parameter vectors are not supported (expect for constraints in W but including
 #'   constraining some mean parameters to be the same among different regimes)!
-#'   For structural models, the order of the first mixture component is fixed by construction,
-#'   so the rest \eqn{m=2,...,M} mixture components are rearranged only by the mixing weight
-#'   parameters.
+#'   For structural models, sorting the regimes in a decreasing order requires re-parametrizing the
+#'   decomposition of the covariance matrices if the first regime changes. As a result, the sorted
+#'   parameter vector will differ from the given one not only by the ordering of the elements but
+#'   also by some of the parameter values.
 #' @return Returns sorted parameter vector...
 #'   \describe{
 #'     \item{\strong{For reduced form GMVAR model:}}{
@@ -225,12 +226,13 @@ form_boldA <- function(p, M, d, all_A) {
 #'        }
 #'     }
 #'     \item{\strong{For structural GMVAR model:}}{
-#'      ...with \eqn{\alpha_{2}>...>\alpha_{M}}, that has form
+#'      ...with \eqn{\alpha_{1}>...>\alpha_{M}}, that has form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
 #'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
 #'       \itemize{
 #'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
 #'       }
+#'       \strong{Note that if the first regime changes as a result of the sorting, the W and lambda parameters change (see details)!}
 #'     }
 #'   }
 #'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
@@ -248,7 +250,7 @@ form_boldA <- function(p, M, d, all_A) {
 sort_components <- function(p, M, d, params, structural_pars=NULL) {
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
 
-  if(is.null(structural_pars)) { # Reduced form model: sort all components by mixing weights
+  if(is.null(structural_pars)) { # Reduced form model
     ord <- order(alphas, decreasing=TRUE, method="radix")
     if(all(ord == 1:M)) {
       return(params)
@@ -259,24 +261,32 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
       pars <- vapply(1:M, function(m) params[(qm[m] + 1):(qm[m] + q)], numeric(q))
       return(c(pars, alphas[ord][-M]))
     }
-  } else { # Structural model: sort the component 2,...,M by mixing weights (M > 2)
-    if(M < 3) return(params)
-    ord <- order(alphas[-1], decreasing=TRUE, method="radix")
-    if(all(ord == 1:(M - 1))) {
+  } else { # Structural model
+    if(M == 1) return(params)
+    ord <- order(alphas, decreasing=TRUE, method="radix")
+    if(all(ord == 1:M)) {
       return(params)
     } else {
       n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
       phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-      A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE)
+      A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE) # [, m]
       lambdas <- matrix(params[(d*M + d^2*p*M + d^2 - n_zeros + 1):(d*M + d^2*p*M + d^2 - n_zeros + d*(M - 1))],
                         nrow=d, byrow=FALSE)
-      sort_pars <- function(parmat) c(parmat[,1], as.vector(parmat[,-1][,ord]))
-      new_phi0 <- sort_pars(phi0)
-      new_allA <- sort_pars(A)
-      new_lambdas <- as.vector(lambdas[,ord])
-      new_W <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)]
-      new_alphas <- c(alphas[1], alphas[-1][ord])[-M]
-      return(c(new_phi0, new_allA, new_W, new_lambdas, new_alphas))
+      W_const <- as.vector(structural_pars$W)
+      W_const[is.na(W_const)] <- 1 # Insert arbitrary non-NA and non-zero constraint where was NA
+      old_W <- rep(0, times=d^2) # Include non-parametrized zeros here
+      old_W[W_const != 0] <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)] # Zeros where there are zero constaints
+    #  new_W_and_lambdas <- redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord) # Reorder and possibly recompose the covariance matrices
+    #  sort_pars <- function(parmat) as.vector(parmat[, ord])
+    #  new_phi0 <- sort_pars(phi0)
+    # new_allA <- sort_pars(A)
+     # new_lambdas <- as.vector(lambdas[,ord])
+     # new_W <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)]
+     # new_alphas <- c(alphas[1], alphas[-1][ord])[-M]
+      return(c(phi0[, ord], # sorted phi0/mu7 parameters
+               A[, ord], # sorted AR parameters
+               Wvec(redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
+               alphas[ord][-M])) # sorted alphas, excluding the M:th one.
     }
   }
 }
@@ -435,18 +445,17 @@ regime_distance <- function(regime_pars1, regime_pars2) {
 }
 
 
-#' @title Sort mixing weight parameters in a decreasing order so that for structural models
-#'   the first parameter is not sorted. Also standardizes the parameters to sum to one.
+#' @title Sort mixing weight parameters in a decreasing order and standardize them
+#'  to sum to one.
 #'
 #' @description \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
-#'  order so that for structural models the first parameter is not sorted. Also standardizes
-#'  the parameters to sum to one. Does not sort if AR constraints, lambda constraints, or same means are employed.
-#'  Also standardizes the parameters to sum to one.
+#'  order and standardizes them to sum to one. Does not sort if AR constraints, lambda constraints,
+#'  or same means are employed.
 #'
 #' @inheritParams loglikelihood_int
-#' @param alphas mixing weights parameters alphas, INCLUDING the one for the M:th regime (that is
+#' @param alphas mixing weights parameters alphas, \strong{INCLUDING} the one for the M:th regime (that is
 #'  not parametrized in the model). Don't need to be standardized to sum to one.
-#' @return Returns the given alphas in a (M x 1) vector sorted in decreasing order and the sum standardized to one.
+#' @return Returns the given alphas in a (M x 1) vector sorted in decreasing order and their sum standardized to one.
 #'  If AR constraints, lambda constraints, or same means are employed, does not sort but standardizes the alphas
 #'  to sum to one.
 #' @section Warning:
@@ -454,13 +463,7 @@ regime_distance <- function(regime_pars1, regime_pars2) {
 
 sort_and_standardize_alphas <- function(alphas, constraints=NULL, same_means=NULL, structural_pars=NULL) {
   if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
-    if(is.null(structural_pars)) { # Sort for all regimes
-      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
-    } else { # Sort for regimes 2,...,M
-      if(length(alphas) > 2) { # M = length(alphas)
-        alphas <- c(alphas[1], alphas[2:length(alphas)][order(alphas[2:length(alphas)], decreasing=TRUE, method="radix")])
-      }
-    }
+    alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
   }
   alphas/sum(alphas)
 }

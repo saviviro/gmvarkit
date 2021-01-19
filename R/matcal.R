@@ -176,6 +176,8 @@ diag_Omegas <- function(Omega1, Omega2) {
 #'   "new W" and "new lambdas" are constitute the new decomposition with the order of the covariance
 #'   matrices given by the argument \code{perm}. Notice that if the first element of \code{perm}
 #'   is one, the W matrix will be the same and the lambdas are just re-ordered.
+#'
+#'   \strong{Note that unparametrized zero elements ARE present in the returned W!}
 #' @section Warning:
 #'  No argument checks! Does not work with dimension \eqn{d=1} or with only
 #'  one mixture component \eqn{M=1}.
