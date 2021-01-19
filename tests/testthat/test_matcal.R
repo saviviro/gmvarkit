@@ -1,4 +1,4 @@
-context("Vectorization operators")
+context("matcal")
 library(gmvarkit)
 
 a1 <- 1
@@ -73,3 +73,91 @@ test_that("diag_Omegas works correctly", {
   expect_equal(tcrossprod(W3), Omega1_3, tol=1e-6)
   expect_equal(W3%*%tcrossprod(Lambda3, W3), Omega2_3, tol=1e-6)
 })
+
+get_Omega <- function(M, d, W, lambdas, which, W_and_lambdas=NULL) {
+  if(!is.null(W_and_lambdas)) {
+    W <- W_and_lambdas[1:d^2]
+    lambdas <- W_and_lambdas[(d^2 + 1):length(W_and_lambdas)]
+  }
+  W <- matrix(W, nrow=d, ncol=d, byrow=FALSE)
+  if(which == 1) {
+    return(tcrossprod(W))
+  }
+  lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)
+  W%*%tcrossprod(diag(lambdas[, which - 1]), W)
+}
+
+# Md
+W22 <- 1:4
+lambdas22 <- 1:2
+Omega22_1 <- get_Omega(M=2, d=2, W=W22, lambdas=lambdas22, which=1)
+Omega22_2 <- get_Omega(M=2, d=2, W=W22, lambdas=lambdas22, which=2)
+
+W23 <- 1:9
+lambdas23 <- 1:3
+Omega23_1 <- get_Omega(M=2, d=3, W=W23, lambdas=lambdas23, which=1)
+Omega23_2 <- get_Omega(M=2, d=3, W=W23, lambdas=lambdas23, which=2)
+
+W32 <- (1:4)/2
+lambdas32 <- (1:4)/5
+Omega32_1 <- get_Omega(M=3, d=2, W=W32, lambdas=lambdas32, which=1)
+Omega32_2 <- get_Omega(M=3, d=2, W=W32, lambdas=lambdas32, which=2)
+Omega32_3 <- get_Omega(M=3, d=2, W=W32, lambdas=lambdas32, which=3)
+
+W33 <- (1:9)/2
+lambdas33 <- (1:6)/4
+Omega33_1 <- get_Omega(M=3, d=3, W=W33, lambdas=lambdas33, which=1)
+Omega33_2 <- get_Omega(M=3, d=3, W=W33, lambdas=lambdas33, which=2)
+Omega33_3 <- get_Omega(M=3, d=3, W=W33, lambdas=lambdas33, which=3)
+
+test_that("redecompose_Omegas works correctly", {
+  # M=2, d=2
+  decomp22_1 <- redecompose_Omegas(M=2, d=2, W=W22, lambdas=lambdas22, perm=1:2)
+  decomp22_2 <- redecompose_Omegas(M=2, d=2, W=W22, lambdas=lambdas22, perm=2:1)
+
+  expect_equal(get_Omega(M=2, d=2, W_and_lambdas=decomp22_1, which=1), Omega22_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=2, d=2, W_and_lambdas=decomp22_1, which=2), Omega22_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=2, d=2, W_and_lambdas=decomp22_2, which=1), Omega22_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=2, d=2, W_and_lambdas=decomp22_2, which=2), Omega22_1, tolerance=1e-6)
+
+  # M=2, d=3
+  decomp23 <- redecompose_Omegas(M=2, d=3, W=W23, lambdas=lambdas23, perm=2:1)
+
+  expect_equal(get_Omega(M=2, d=3, W_and_lambdas=decomp23, which=1), Omega23_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=2, d=3, W_and_lambdas=decomp23, which=2), Omega23_1, tolerance=1e-6)
+
+  # M=3, d=2
+  decomp32_1 <- redecompose_Omegas(M=3, d=2, W=W32, lambdas=lambdas32, perm=c(1, 3, 2))
+  decomp32_2 <- redecompose_Omegas(M=3, d=2, W=W32, lambdas=lambdas32, perm=c(2, 3, 1))
+  decomp32_3 <- redecompose_Omegas(M=3, d=2, W=W32, lambdas=lambdas32, perm=c(3, 2, 1))
+
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_1, which=1), Omega32_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_1, which=2), Omega32_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_1, which=3), Omega32_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_2, which=1), Omega32_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_2, which=2), Omega32_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_2, which=3), Omega32_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_3, which=1), Omega32_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_3, which=2), Omega32_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=2, W_and_lambdas=decomp32_3, which=3), Omega32_1, tolerance=1e-6)
+
+  # M=3, d=3
+  decomp33_1 <- redecompose_Omegas(M=3, d=3, W=W33, lambdas=lambdas33, perm=c(3, 1, 2))
+  decomp33_2 <- redecompose_Omegas(M=3, d=3, W=W33, lambdas=lambdas33, perm=c(1, 3, 2))
+  decomp33_3 <- redecompose_Omegas(M=3, d=3, W=W33, lambdas=lambdas33, perm=c(2, 1, 3))
+  decomp33_4 <- redecompose_Omegas(M=3, d=3, W=W33, lambdas=lambdas33, perm=c(1, 2, 3))
+
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_1, which=1), Omega33_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_1, which=2), Omega33_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_1, which=3), Omega33_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_2, which=1), Omega33_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_2, which=2), Omega33_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_2, which=3), Omega33_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_3, which=1), Omega33_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_3, which=2), Omega33_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_3, which=3), Omega33_3, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_4, which=1), Omega33_1, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_4, which=2), Omega33_2, tolerance=1e-6)
+  expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_4, which=3), Omega33_3, tolerance=1e-6)
+})
+

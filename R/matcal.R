@@ -156,14 +156,14 @@ diag_Omegas <- function(Omega1, Omega2) {
 #' @title In the decomposition of the covariance matrices (Muirhead, 1982, Theorem A9.9), change
 #'   the order of the covariance matrices.
 #'
-#' @description \code{re_decompose_Omegas} exchanges the order of the covariance matrices in
+#' @description \code{redecompose_Omegas} exchanges the order of the covariance matrices in
 #'   the decomposition of Muirhead (1982, Theorem A9.9) and returns the new decomposition.
 #'
 #' @inheritParams is_stationary
 #' @param W a length \code{d^2} vector containing the vectorized W matrix.
 #' @param lambdas a length \code{d*(M-1)} vector of the form \strong{\eqn{\lambda_{2}}}\eqn{,...,}\strong{\eqn{\lambda_{M}}}
 #'   where \strong{\eqn{\lambda_{m}}}\eqn{=(\lambda_{m1},...,\lambda_{md})}
-#' @param new_perm a vector of length \code{M} giving the new order of the covarince matrices
+#' @param perm a vector of length \code{M} giving the new order of the covarince matrices
 #'   (relative to the current order)
 #' @details We consider the following decomposition of positive definite covariannce matrices:
 #'  \eqn{\Omega_1 = WW'}, \eqn{\Omega_m = W\Lambda_{m}W'}, \eqn{m=2,..,M} where \eqn{\Lambda_{m} = diag(\lambda_{m1},...,\lambda_{md})}
@@ -174,7 +174,7 @@ diag_Omegas <- function(Omega1, Omega2) {
 #' @return Returns a \eqn{d^2 + (M - 1)*d x 1} vector of the form \code{c(vec(new_W), new_lambdas)}
 #'   where the lambdas parameters are in the regimewise order (first regime 2, then 3, etc) and the
 #'   "new W" and "new lambdas" are constitute the new decomposition with the order of the covariance
-#'   matrices given by the argument \code{new_perm}. Notice that if the first element of \code{new_perm}
+#'   matrices given by the argument \code{perm}. Notice that if the first element of \code{perm}
 #'   is one, the W matrix will be the same and the lambdas are just re-ordered.
 #' @section Warning:
 #'  No argument checks! Does not work with dimension \eqn{d=1} or with only
@@ -195,29 +195,29 @@ diag_Omegas <- function(Omega1, Omega2) {
 #'
 #'  # Reorder the covariance matrices in the decomposition so that now
 #'  # the first covariance matrix is Omega2:
-#'  decomp2 <- re_decompose_Omegas(d=d, M=M, W=vec(W), lambdas=lambdas,
-#'                                 new_perm=2:1)
+#'  decomp2 <- redecompose_Omegas(M=M, d=d, W=vec(W), lambdas=lambdas,
+#'                                perm=2:1)
 #'  new_W <- matrix(decomp2[1:d^2], nrow=d, ncol=d)
 #'  new_lambdas <- decomp2[(d^2 + 1):length(decomp2)]
 #'  tcrossprod(new_W) # = Omega2
 #'  new_W%*%tcrossprod(diag(new_lambdas), new_W) # = Omega1
 #' @export
 
-re_decompose_Omegas <- function(d, M, W, lambdas, new_perm=1:M) {
-  if(all(new_perm == 1:M)) {
+redecompose_Omegas <- function(M, d, W, lambdas, perm=1:M) {
+  if(all(perm == 1:M)) {
     return(c(W, lambdas))
-  } else if(new_perm[1] == 1) {
-    new_lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)[, new_perm[2:M]]
+  } else if(perm[1] == 1) {
+    new_lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)[, perm[2:M] - 1]
     return(c(W, new_lambdas))
   }
   # If the first covariance matrix changes, the decomposition needs to be reparametrized.
   lambdas <- cbind(rep(1, d), # Lambda matrix of the first regime is always identity matrix
                    matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)) # [, m], m=1, ..., M
 
-  new_W <- matrix(W, nrow=d, ncol=d, byrow=FALSE)%*%diag(sqrt(lambdas[, new_perm[1]]))
+  new_W <- matrix(W, nrow=d, ncol=d, byrow=FALSE)%*%diag(sqrt(lambdas[, perm[1]]))
   new_lambdas <- matrix(nrow=d, ncol=M - 1)
   for(i1 in 1:(M - 1)) {
-    new_lambdas[, i1] <- diag(diag(1/lambdas[, new_perm[1]])%*%diag(lambdas[, new_perm[i1 + 1]]))
+    new_lambdas[, i1] <- diag(diag(1/lambdas[, perm[1]])%*%diag(lambdas[, perm[i1 + 1]]))
   }
   c(vec(new_W), vec(new_lambdas))
 }
