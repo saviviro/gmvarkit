@@ -757,13 +757,21 @@ test_that("sort_W_and_lambdas works correctly", {
 })
 
 
+test_that("sort_and_standardize_alphas works correctly", {
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), constraints=1), c(0.3, 0.1, 0.6))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.2, 0.5), same_means=1), c(0.3, 0.2, 0.5))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.2, 0.5), structural_pars=list(W=1, C_lambda=1)), c(0.3, 0.2, 0.5))
+  expect_equal(sort_and_standardize_alphas(alphas=c(3, 1, 6), constraints=1), c(0.3, 0.1, 0.6))
 
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.9, 0.1)), c(0.9, 0.1))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.4, 0.6)), c(0.6, 0.4))
+  expect_equal(sort_and_standardize_alphas(alphas=c(4, 6)), c(0.6, 0.4))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6)), c(0.6, 0.3, 0.1))
 
-
-
-
-
-
-
+  expect_equal(sort_and_standardize_alphas(alphas=c(8, 2), structural_pars=list(1)), c(0.8, 0.2))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.7), structural_pars=list(1)), c(0.3, 0.7))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), structural_pars=list(1)), c(0.3, 0.6, 0.1))
+  expect_equal(sort_and_standardize_alphas(alphas=c(3, 2, 5), structural_pars=list(1)), c(0.3, 0.5, 0.2))
+})
 
 

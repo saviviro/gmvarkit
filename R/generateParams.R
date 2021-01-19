@@ -43,11 +43,9 @@ random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pa
   }
   if(M > 1) {
     alphas <- runif(n=M)
-    if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
-      # alphas not ordered if certain constraints are employed because the constrained parameter vector won't be reordered
-      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
-    }
-    return(c(x, (alphas/sum(alphas))[-M]))
+    alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=constraints, same_means=same_means,
+                                          structural_pars=structural_pars)
+    return(c(x, alphas[-M]))
   } else {
     return(x)
   }
@@ -170,7 +168,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
       pars <- c(phi0_pars, AR_pars, covmat_pars)
     }
     if(M > 1) {
-      alphas <- abs(rnorm(M, mean=alphas, sd=0.2))
+      alphas <- abs(rnorm(M, mean=alphas, sd=0.1))
       return(c(pars, (alphas/sum(alphas))[-M]))
     } else {
       return(pars)
@@ -223,11 +221,9 @@ random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale
   }
   if(M > 1) {
     alphas <- runif(n=M)
-    if(is.null(structural_pars$C_lambda) && is.null(same_means)) {
-      # Alphas are ordered only in the absence of certain constraints, as constrained parameter vectors won't be reordered
-      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
-    }
-    return(c(x, (alphas/sum(alphas))[-M]))
+    alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=NULL, same_means=same_means,
+                                          structural_pars=structural_pars)
+    return(c(x, alphas[-M]))
   } else {
     return(x)
   }

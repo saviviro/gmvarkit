@@ -434,3 +434,33 @@ regime_distance <- function(regime_pars1, regime_pars2) {
   sqrt(crossprod(regime_pars1/scales1 - regime_pars2/scales2))
 }
 
+
+#' @title Sort mixing weight parameters in a decreasing order so that for structural models
+#'   the first parameter is not sorted. Also standardizes the parameters to sum to one.
+#'
+#' @description \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
+#'  order so that for structural models the first parameter is not sorted. Also standardizes
+#'  the parameters to sum to one. Does not sort if AR constraints, lambda constraints, or same means are employed.
+#'  Also standardizes the parameters to sum to one.
+#'
+#' @inheritParams loglikelihood_int
+#' @param alphas mixing weights parameters alphas, INCLUDING the one for the M:th regime (that is
+#'  not parametrized in the model). Don't need to be standardized to sum to one.
+#' @return Returns the given alphas in a (M x 1) vector sorted in decreasing order and the sum standardized to one.
+#'  If AR constraints, lambda constraints, or same means are employed, does not sort but standardizes the alphas
+#'  to sum to one.
+#' @section Warning:
+#'  No argument checks!
+
+sort_and_standardize_alphas <- function(alphas, constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
+    if(is.null(structural_pars)) { # Sort for all regimes
+      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
+    } else { # Sort for regimes 2,...,M
+      if(length(alphas) > 2) { # M = length(alphas)
+        alphas <- c(alphas[1], alphas[2:length(alphas)][order(alphas[2:length(alphas)], decreasing=TRUE, method="radix")])
+      }
+    }
+  }
+  alphas/sum(alphas)
+}
