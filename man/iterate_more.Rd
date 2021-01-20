@@ -53,7 +53,7 @@ colnames(data) <- colnames(eurusd)
 
 # GMVAR(1,2) model, only 5 iterations of the variable metric
 # algorithm
-fit12 <- fitGMVAR(data, p=1, M=2, maxit=5)
+fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, maxit=5, seeds=7)
 fit12
 
 # Iterate more:
@@ -63,9 +63,9 @@ fit12_2
 # Structural GMVAR(1,2) model identified with sign
 # constraints. Only 10 iterations of the variable metric
 # algorithm
-W_122 <- matrix(c(1, -1, 1, 1), nrow=2)
+W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-  ncalls=16, maxit=10, seeds=1:16)
+  ncalls=1, maxit=10, seeds=1)
 fit12s
 
 # Iterate more:
@@ -76,21 +76,13 @@ fit12s_2
 # to be the same for all regimes, only 10 iterations of the
 # variable metric algorithm
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, maxit=10)
+fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=1, maxit=10,
+                   seeds=1)
 fit22c
 
 # Iterate more:
 fit22c_2 <- iterate_more(fit22c)
 fit22c_2
-
-# GMVAR(3,2) model, only 10 iterations of the variable metric
-# algorithm
-fit32 <- fitGMVAR(data, p=3, M=2, maxit=10)
-fit32
-
-# Iterate more:
-fit32_2 <- iterate_more(fit32)
-fit32_2
 }
 }
 \references{

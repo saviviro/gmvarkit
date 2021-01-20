@@ -218,13 +218,13 @@ profile_logliks(fit12)
 # constraints.
 W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-  ncalls=12, seeds=1:12, ncores=4)
+  ncalls=12, seeds=1:12)
 fit12s
 
 # Structural GMVAR(2, 2) model identified statistically only
 W_222 <- matrix(c(1, NA, 1, NA), nrow=2)
 fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-  ncalls=8, seeds=11:18, ncores=4)
+  ncalls=8, seeds=11:18)
 fit22s
 
 # Structural GMVAR(2,2) model with the lambda parameters restricted
@@ -236,20 +236,20 @@ fit22s
 W_222 <- matrix(c(1, NA, 0, 1), nrow=2)
 C_lambda_222 <- matrix(c(1, 1), nrow=2)
 fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222, C_lambda=C_lambda_222),
-  ncalls=20, seeds=1:20, ncores=4)
+  ncalls=20, seeds=1:20)
 fit22s
 
 # GMVAR(2,2) model with autoregressive parameters restricted
 # to be the same for both regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
+fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=10, seeds=1:10)
 fit22c
 
 # GMVAR(2,2) model with autoregressive parameters and the mean
 # parameters restricted to be the same for both regimes
 # (only the covariance matrix varies)
 fit22cm <- fitGMVAR(data, p=2, M=2, parametrization="mean",
- constraints=C_mat, same_means=list(1:2), ncores=4, ncalls=16)
+ constraints=C_mat, same_means=list(1:2), ncalls=16)
 fit22cm
 
 # GMVAR(2,2) model with autoregressive parameters restricted
@@ -260,7 +260,7 @@ tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
  nrow=2*2^2, byrow=FALSE)
 C_mat2 <- rbind(tmp, tmp)
 fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2,
-                    ncalls=10, ncores=4, seeds=1:10)
+                    ncalls=10, seeds=1:10)
 fit22c2
 }
 }
