@@ -197,7 +197,7 @@ diag_Omegas <- function(Omega1, Omega2) {
 #'
 #'  # Reorder the covariance matrices in the decomposition so that now
 #'  # the first covariance matrix is Omega2:
-#'  decomp2 <- redecompose_Omegas(M=M, d=d, W=as.vetor(W), lambdas=lambdas,
+#'  decomp2 <- redecompose_Omegas(M=M, d=d, W=as.vector(W), lambdas=lambdas,
 #'                                perm=2:1)
 #'  new_W <- matrix(decomp2[1:d^2], nrow=d, ncol=d)
 #'  new_lambdas <- decomp2[(d^2 + 1):length(decomp2)]
