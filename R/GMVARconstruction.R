@@ -370,16 +370,16 @@ swap_parametrization <- function(gmvar) {
 #' # GMVAR(1,2) model
 #' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=2, seeds=7:8)
 #' fit12
-#' fit12_2 <- alt_gmvar(fit12, which_round=1)
+#' fit12_2 <- alt_gmvar(fit12, which_largest=2)
 #' fit12_2
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints.
 #' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=2, seeds=c(1, 42))
+#'                    ncalls=2, seeds=1:2)
 #' fit12s
-#' fit12s_2 <- alt_gmvar(fit12s, which_largest=2)
+#' fit12s_2 <- alt_gmvar(fit12s, which_round=2)
 #' fit12s_2
 #' }
 #' @export
@@ -436,7 +436,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
 #' colnames(data) <- colnames(eurusd)
 #'
 #' # Reduced form GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=3)
+#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
 #'
 #' # Form a structural model based on the reduced form model:
 #' mod12s <- gmvar_to_sgmvar(fit12)

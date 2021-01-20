@@ -196,18 +196,14 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' # constraints.
 #' W_122 <- matrix(c(1, -1, 1, 1), nrow=2)
 #' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'   ncalls=10, seeds=1:10)
+#'                    ncalls=10, seeds=1:10)
 #' profile_logliks(fit12s)
-#'
-#' # GMVAR(2,2) model with mean parametrization
-#' fit22 <- fitGMVAR(data, p=2, M=2, parametrization="mean",
-#'                   ncalls=16, seeds=11:26)
-#' profile_logliks(fit22)
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat)
+#' fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
+#'                    ncalls=10, seeds=1:10)
 #' profile_logliks(fit22c)
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
@@ -216,7 +212,8 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
 #'  nrow=2*2^2, byrow=FALSE)
 #' C_mat2 <- rbind(tmp, tmp)
-#' fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2)
+#' fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2,
+#'                     ncalls=10, seeds=1:10)
 #' profile_logliks(fit22c2)
 #' }
 #' @export

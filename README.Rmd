@@ -49,7 +49,7 @@ colnames(data) <- colnames(eurusd)
 ## Reduced form GMVAR model ##
 
 # Estimate a GMVAR(2, 2) model: 16 estimation rounds and seeds for reproducible results
-fit <- fitGMVAR(data, p=2, M=2, ncalls=16, seeds=1:16, ncores=4)
+fit <- fitGMVAR(data, p=2, M=2, ncalls=40, seeds=1:40, ncores=4)
 fit
 
 # Estimate a GMVAR(2, 2) model with autoregressive parameters restricted to be the same for all regimes
@@ -107,6 +107,10 @@ fit22s_3
 
 fit22s_4 <- swap_W_signs(fit22s_3, which_to_swap=1)
 fit22s_4
+
+all.equal(fit22s$loglik, fit22s_2$loglik)
+all.equal(fit22s$loglik, fit22s_3$loglik)
+all.equal(fit22s$loglik, fit22s_4$loglik)
 
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
