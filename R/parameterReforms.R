@@ -276,14 +276,7 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
       W_const[is.na(W_const)] <- 1 # Insert arbitrary non-NA and non-zero constraint where was NA
       old_W <- rep(0, times=d^2) # Include non-parametrized zeros here
       old_W[W_const != 0] <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)] # Zeros where there are zero constaints
-    #  new_W_and_lambdas <- redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord) # Reorder and possibly recompose the covariance matrices
-    #  sort_pars <- function(parmat) as.vector(parmat[, ord])
-    #  new_phi0 <- sort_pars(phi0)
-    # new_allA <- sort_pars(A)
-     # new_lambdas <- as.vector(lambdas[,ord])
-     # new_W <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)]
-     # new_alphas <- c(alphas[1], alphas[-1][ord])[-M]
-      return(c(phi0[, ord], # sorted phi0/mu7 parameters
+      return(c(phi0[, ord], # sorted phi0/mu parameters
                A[, ord], # sorted AR parameters
                Wvec(redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
                alphas[ord][-M])) # sorted alphas, excluding the M:th one.

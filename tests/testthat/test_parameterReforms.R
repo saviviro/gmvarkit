@@ -522,6 +522,41 @@ theta_342s_3 <- c(phi10_342, phi20_342, phi30_342, phi40_342, phi1_342, phi2_342
 alpha1_123_2 <- 0.3
 theta_123_2 <- c(upsilon1_123, upsilon2_123, alpha1_123_2)
 
+# p=1, M=3, d=3, structural_pars=list(W=W_133)
+W_133 <- matrix(c(1, 2, 0, 4, 5, 6, 0, 8, 9), nrow=3)
+phi10_133 <- c(0.388, 2.682, -0.388)
+phi20_133 <- c(2.433, 5.961, 1.898)
+phi30_133 <- c(-0.044, 3.139, 2.595)
+A11_133 <- c(0.412, 0.03, 0.117, 0.005, -0.141, 0.038, -0.309, 0.252, 0.043)
+A21_133 <- c(0.395, 0.088, -0.108, 0.111, -0.183, -0.227, 0.053, -0.087, 0.007)
+A31_133 <- c(0.015, -0.114, -0.111, -0.027, 0.227, -0.275, 0.118, 0.064, 0.198)
+W_133pars_with0 <- c(0.215, 0.302, 0, 0.384, 0.986, 1.421, 0, 1.296, 0.684)
+lambdas2_133 <- c(1.277, 0.573, 1.225)
+lambdas3_133 <- c(0.947, 1.241, 0.084)
+alpha1_133_1 <- 0.5; alpha2_133_1 <- 0.1 # perm=c(1, 3, 2)
+alpha1_133_2 <- 0.3; alpha2_133_2 <- 0.5 # perm=c(2, 1, 3)
+alpha1_133_3 <- 0.1; alpha2_133_3 <- 0.2 # perm=c(3, 2, 1)
+alpha1_133_4 <- 0.2; alpha2_133_4 <- 0.1 # perm=c(3, 1, 2)
+
+theta_133s_1 <- c(phi10_133, phi20_133, phi30_133,
+                  A11_133, A21_133, A31_133,
+                  Wvec(W_133pars_with0), lambdas2_133, lambdas3_133,
+                  alpha1_133_1, alpha2_133_1)
+theta_133s_2 <- c(phi10_133, phi20_133, phi30_133,
+                  A11_133, A21_133, A31_133,
+                  Wvec(W_133pars_with0), lambdas2_133, lambdas3_133,
+                  alpha1_133_2, alpha2_133_2)
+theta_133s_3 <- c(phi10_133, phi20_133, phi30_133,
+                  A11_133, A21_133, A31_133,
+                  Wvec(W_133pars_with0), lambdas2_133, lambdas3_133,
+                  alpha1_133_3, alpha2_133_3)
+theta_133s_4 <- c(phi10_133, phi20_133, phi30_133,
+                  A11_133, A21_133, A31_133,
+                  Wvec(W_133pars_with0), lambdas2_133, lambdas3_133,
+                  alpha1_133_4, alpha2_133_4)
+
+set.seed(1); DAT3 <- matrix(round(rnorm(150), 3), ncol=3)
+
 test_that("sort_components works correctly", {
   expect_equal(sort_components(p=1, M=1, d=2, params=theta_112), theta_112)
   expect_equal(sort_components(p=1, M=2, d=2, params=theta_122), c(upsilon2_122, upsilon1_122, 1-alpha1_122))
@@ -561,6 +596,36 @@ test_that("sort_components works correctly", {
                c(phi20_342, phi10_342, phi40_342, phi30_342, phi2_342, phi1_342, phi4_342, phi3_342,
                  Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(2, 1, 4, 3))),
                  alpha2_342_3, alpha1_342_3, 1 - alpha1_342_3 - alpha2_342_3 - alpha3_342_3), tolerance=1e-3)
+
+  # p=1, M=3, d=3
+  expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_1, structural_pars=list(W=W_133)), # # perm=c(1, 3, 2)
+               c(phi10_133, phi30_133, phi20_133, A11_133, A31_133, A21_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(1, 3, 2))),
+                 alpha1_133_1, 1-alpha1_133_1-alpha2_133_1), tolerance=1e-3)
+  expect_equal(loglikelihood(data=DAT3, p=1, M=3, params=sort_components(p=1, M=3, d=3, params=theta_133s_1, structural_pars=list(W=W_133)),
+                             structural_pars=list(W=W_133), conditional=FALSE),
+               loglikelihood(data=DAT3, p=1, M=3, params=theta_133s_1, structural_pars=list(W=W_133), conditional=FALSE), tolerance=1e-3)
+  expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_2, structural_pars=list(W=W_133)), # # perm=c(2, 1, 3)
+               c(phi20_133, phi10_133, phi30_133, A21_133, A11_133, A31_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(2, 1, 3))),
+                 alpha2_133_2, alpha1_133_2), tolerance=1e-3)
+  expect_equal(loglikelihood(data=DAT3, p=1, M=3, params=sort_components(p=1, M=3, d=3, params=theta_133s_2, structural_pars=list(W=W_133)),
+                             structural_pars=list(W=W_133), conditional=FALSE),
+               loglikelihood(data=DAT3, p=1, M=3, params=theta_133s_2, structural_pars=list(W=W_133), conditional=FALSE), tolerance=1e-3)
+  expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_3, structural_pars=list(W=W_133)), # # perm=c(3, 2, 1)
+               c(phi30_133, phi20_133, phi10_133, A31_133, A21_133, A11_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(3, 2, 1))),
+                 1-alpha2_133_3-alpha1_133_3, alpha2_133_3), tolerance=1e-3)
+  expect_equal(loglikelihood(data=DAT3, p=1, M=3, params=sort_components(p=1, M=3, d=3, params=theta_133s_3, structural_pars=list(W=W_133)),
+                             structural_pars=list(W=W_133), conditional=FALSE),
+               loglikelihood(data=DAT3, p=1, M=3, params=theta_133s_3, structural_pars=list(W=W_133), conditional=FALSE), tolerance=1e-3)
+  expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_4, structural_pars=list(W=W_133)), # # perm=c(3, 1, 2)
+               c(phi30_133, phi10_133, phi20_133, A31_133, A11_133, A21_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(3, 1, 2))),
+                 1-alpha2_133_4-alpha1_133_4, alpha1_133_4), tolerance=1e-3)
+  expect_equal(loglikelihood(data=DAT3, p=1, M=3, params=sort_components(p=1, M=3, d=3, params=theta_133s_4, structural_pars=list(W=W_133)),
+                             structural_pars=list(W=W_133), conditional=FALSE),
+               loglikelihood(data=DAT3, p=1, M=3, params=theta_133s_4, structural_pars=list(W=W_133), conditional=FALSE), tolerance=1e-3)
 })
 
 
