@@ -75,10 +75,11 @@
 #'  sim222 <- simulateGMVAR(mod222, nsimu=5, ntimes=10000)
 #'
 #'  # Point forecast + 95% prediction intervals:
-#'  apply(sim222$sample, 1:2, quantile, probs=c(0.025, 0.5, 0.972))
+#'  apply(sim222$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))
 #'
 #'  # Similar forecast for the mixing weights:
-#'  apply(sim222$mixing_weights, 1:2, quantile, probs=c(0.025, 0.5, 0.972))
+#'  apply(sim222$mixing_weights, MARGIN=1:2, FUN=quantile,
+#'        probs=c(0.025, 0.5, 0.972))
 #'
 #'
 #'  # GMVAR(2,2), d=2 model with AR parameters restricted to be

@@ -2,8 +2,8 @@
 % Please edit documentation in R/parameterReforms.R
 \name{sort_and_standardize_alphas}
 \alias{sort_and_standardize_alphas}
-\title{Sort mixing weight parameters in a decreasing order so that for structural models
-  the first parameter is not sorted. Also standardizes the parameters to sum to one.}
+\title{Sort mixing weight parameters in a decreasing order and standardize them
+ to sum to one.}
 \usage{
 sort_and_standardize_alphas(
   alphas,
@@ -13,7 +13,7 @@ sort_and_standardize_alphas(
 )
 }
 \arguments{
-\item{alphas}{mixing weights parameters alphas, INCLUDING the one for the M:th regime (that is
+\item{alphas}{mixing weights parameters alphas, \strong{INCLUDING} the one for the M:th regime (that is
 not parametrized in the model). Don't need to be standardized to sum to one.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
@@ -48,15 +48,14 @@ See Virolainen (2020) for the conditions required to identify the shocks and for
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns the given alphas in a (M x 1) vector sorted in decreasing order and the sum standardized to one.
+Returns the given alphas in a (M x 1) vector sorted in decreasing order and their sum standardized to one.
  If AR constraints, lambda constraints, or same means are employed, does not sort but standardizes the alphas
  to sum to one.
 }
 \description{
 \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
- order so that for structural models the first parameter is not sorted. Also standardizes
- the parameters to sum to one. Does not sort if AR constraints, lambda constraints, or same means are employed.
- Also standardizes the parameters to sum to one.
+ order and standardizes them to sum to one. Does not sort if AR constraints, lambda constraints,
+ or same means are employed.
 }
 \section{Warning}{
 

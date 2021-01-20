@@ -29,35 +29,35 @@
 #'  colnames(data) <- colnames(eurusd)
 #'
 #'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
-#'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
-#'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=20, seeds=1:20)
-#'  fit222s
+#'  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
+#'  fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W22),
+#'                     ncalls=1, seeds=4)
+#'  fit22s
 #'
 #'  # Test whether the lambda parameters (of the second regime) are identical:
-#'  # fit222s has parameter vector of length 26 with the lambda parameters
+#'  # fit22s has parameter vector of length 26 with the lambda parameters
 #'  # in elements 24 and 25.
 #'  A <- matrix(c(rep(0, times=23), 1, -1, 0), nrow=1, ncol=26)
 #'  c <- 0
-#'  Wald_test(fit222s, A=A, c=c)
+#'  Wald_test(fit22s, A=A, c=c)
 #'
 #'  # Test whether the off-diagonal elements of the first regime's first
 #'  # AR coefficient matrix (A_11) are both zero:
-#'  # fit222s has parameter vector of length 26 and the off-diagonal elements
+#'  # fit22s has parameter vector of length 26 and the off-diagonal elements
 #'  # of the 1st regime's 1st AR coefficient matrix are in the elements 6 and 7.
 #'  A <- rbind(c(rep(0, times=5), 1, rep(0, times=20)),
 #'             c(rep(0, times=6), 1, rep(0, times=19)))
 #'  c <- c(0, 0)
-#'  Wald_test(fit222s, A=A, c=c)
+#'  Wald_test(fit22s, A=A, c=c)
 #'
 #' # Test whether the diagonal elements of the first AR coefficient
 #' # matrix of the second regime are identical:
-#' # fit222s has parameter vector of length 26 with the diagonal elements of the
+#' # fit22s has parameter vector of length 26 with the diagonal elements of the
 #' # first A-matrix of the second regime are in elements 13 and 16.
 #' A <- matrix(c(rep(0, times=12), 1, 0, 0, -1, rep(0, times=26 - 16)),
 #'             nrow=1, ncol=26)
 #' c <- 0
-#' Wald_test(fit222s, A=A, c=c)
+#' Wald_test(fit22s, A=A, c=c)
 #' }
 #' @export
 
@@ -141,19 +141,18 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'  colnames(data) <- colnames(eurusd)
 #'
 #'  # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
-#'  W_222 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
-#'  fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'                      ncalls=1, seeds=65)
+#'  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
+#'  fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W22),
+#'                     ncalls=1, seeds=4)
 #'
 #'  # The same model but the AR coefficients restricted to be the same
 #'  # in both regimes:
 #'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#'  fit222sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
-#'                       structural_pars=list(W=W_222),
-#'                       ncalls=1, seeds=1)
+#'  fit22sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
+#'                      structural_pars=list(W=W22), ncalls=1, seeds=1)
 #'
 #'  # Test the AR constraints with likelihood ratio test:
-#'  LR_test(fit222s, fit222sc)
+#'  LR_test(fit22s, fit22sc)
 #'  }
 #' @export
 

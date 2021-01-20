@@ -147,7 +147,7 @@ Throws an informative error if there is something wrong with the parameter vecto
 # GMVAR(1, 1), d=2 model:
 params112 <- c(1.07, 127.71, 0.99, 0.00, -0.01, 1.00, 4.05,
   2.22, 8.87)
-check_parameters(p=1, M=1, d=2, params=params11)
+check_parameters(p=1, M=1, d=2, params=params112)
 
 # GMVAR(2, 2), d=2 model:
 params222 <- c(1.39, -0.77, 1.31, 0.14, 0.09, 1.29, -0.39,
@@ -164,7 +164,8 @@ params222c <- c(1.03, 2.36, 1.79, 3.00, 1.25, 0.06,0.04,
  5.88, 3.56, 9.80, 1.37)
 check_parameters(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 
-# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints
+# (no error):
 params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)

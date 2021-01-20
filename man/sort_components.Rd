@@ -74,12 +74,13 @@ Returns sorted parameter vector...
        }
     }
     \item{\strong{For structural GMVAR model:}}{
-     ...with \eqn{\alpha_{2}>...>\alpha_{M}}, that has form
+     ...with \eqn{\alpha_{1}>...>\alpha_{M}}, that has form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
       \itemize{
         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
       }
+      \strong{Note that if the first regime changes as a result of the sorting, the W and lambda parameters change (see details)!}
     }
   }
   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
@@ -98,9 +99,10 @@ Returns sorted parameter vector...
 \details{
 Constrained parameter vectors are not supported (expect for constraints in W but including
   constraining some mean parameters to be the same among different regimes)!
-  For structural models, the order of the first mixture component is fixed by construction,
-  so the rest \eqn{m=2,...,M} mixture components are rearranged only by the mixing weight
-  parameters.
+  For structural models, sorting the regimes in a decreasing order requires re-parametrizing the
+  decomposition of the covariance matrices if the first regime changes. As a result, the sorted
+  parameter vector will differ from the given one not only by the ordering of the elements but
+  also by some of the parameter values.
 }
 \section{Warning}{
 

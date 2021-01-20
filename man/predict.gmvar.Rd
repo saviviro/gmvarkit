@@ -68,7 +68,7 @@ data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
 # GMVAR(2,2) model
-fit22 <- fitGMVAR(data, p=2, M=2, ncalls=12, seeds=42:53)
+fit22 <- fitGMVAR(data, p=2, M=2, ncalls=1, seeds=39)
 p1 <- predict(fit22, n_ahead=20, pred_type="median")
 p1
 p2 <- predict(fit22, n_ahead=10, nt=20, lty=1)
@@ -78,7 +78,7 @@ p3 <- predict(fit22, n_ahead=10, pi=c(0.99, 0.90, 0.80, 0.70),
 p3
 
 # GMVAR(1,2) model
-fit12 <- fitGMVAR(data, p=1, M=2)
+fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
 p1 <- predict(fit12, n_ahead=1, pred_type="cond_mean",
               plot_res=FALSE)
 p1

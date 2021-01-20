@@ -26,6 +26,8 @@ Returns a \eqn{d^2 + (M - 1)*d x 1} vector of the form \code{c(vec(new_W), new_l
   "new W" and "new lambdas" are constitute the new decomposition with the order of the covariance
   matrices given by the argument \code{perm}. Notice that if the first element of \code{perm}
   is one, the W matrix will be the same and the lambdas are just re-ordered.
+
+  \strong{Note that unparametrized zero elements ARE present in the returned W!}
 }
 \description{
 \code{redecompose_Omegas} exchanges the order of the covariance matrices in
