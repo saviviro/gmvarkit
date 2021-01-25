@@ -43,7 +43,7 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
 
 \examples{
 \donttest{
-#'  ## These are long running examples that use parallel computing!
+ ## These are long running examples that use parallel computing!
  ## The below examples take around 1 minute to run.
 
  # Load the data
