@@ -35,7 +35,6 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
 #' @inherit loglikelihood_int references
 #' @examples
-#'  \donttest{
 #'  # These examples use the data 'eurusd' which comes with the
 #'  # package, but in a scaled form.
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -64,7 +63,7 @@
 #'  plot.ts(sim222s$sample)
 #'
 #'  ## FORECASTING EXAMPLE ##
-#'  # Forecast 5-steps-ahead, 10000 sets of simulations with initial
+#'  # Forecast 5-steps-ahead, 500 sets of simulations with initial
 #'  # values from the data:
 #'  # GMVAR(2,2), d=2 model with mean-parametrization:
 #'  params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
@@ -72,7 +71,7 @@
 #'    0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
 #'    9.838, 0.740)
 #'  mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-#'  sim222 <- simulateGMVAR(mod222, nsimu=5, ntimes=10000)
+#'  sim222 <- simulateGMVAR(mod222, nsimu=5, ntimes=500)
 #'
 #'  # Point forecast + 95% prediction intervals:
 #'  apply(sim222$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))
@@ -94,7 +93,6 @@
 #'  plot.ts(sim222c$sample)
 #'  ts.plot(sim222c$mixing_weights, col=c("blue", "red"), lty=2)
 #'  plot(sim222c$component, type="l")
-#'  }
 #' @export
 
 simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {

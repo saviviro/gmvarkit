@@ -45,6 +45,7 @@ The purpose of \code{iterate_more} is to provide a simple and convenient tool to
 \examples{
 \donttest{
 ## These are long running examples that use parallel computing!
+## Running the below examples takes approximately 2 minutes
 
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form.
@@ -59,30 +60,6 @@ fit12
 # Iterate more:
 fit12_2 <- iterate_more(fit12)
 fit12_2
-
-# Structural GMVAR(1,2) model identified with sign
-# constraints. Only 10 iterations of the variable metric
-# algorithm
-W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-  ncalls=1, maxit=10, seeds=1)
-fit12s
-
-# Iterate more:
-fit12s_2 <- iterate_more(fit12s)
-fit12s_2
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes, only 10 iterations of the
-# variable metric algorithm
-C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=1, maxit=10,
-                   seeds=1)
-fit22c
-
-# Iterate more:
-fit22c_2 <- iterate_more(fit22c)
-fit22c_2
 }
 }
 \references{

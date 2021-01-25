@@ -26,6 +26,7 @@ The main purpose of \code{print_std_errors} is to provide a convenient tool to m
 \examples{
 \donttest{
 ## These are long running examples that use parallel computing!
+## The below examples take around 20 seconds to run.
 
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form.
@@ -36,28 +37,6 @@ colnames(data) <- colnames(eurusd)
 fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
 fit12
 print_std_errors(fit12)
-
-# GMVAR(2,2) model
-fit22 <- fitGMVAR(data, p=2, M=2, ncalls=1, seeds=39)
-fit22
-print_std_errors(fit22)
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes
-C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
-fit22c
-print_std_errors(fit22c)
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes and non-diagonl elements
-# the coefficient matrices constrained to zero.
-tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
- nrow=2*2^2, byrow=FALSE)
-C_mat2 <- rbind(tmp, tmp)
-fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2, ncalls=1, seeds=3)
-fit22c2
-print_std_errors(fit22c2)
 }
 }
 \references{

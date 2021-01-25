@@ -48,7 +48,7 @@ colnames(data) <- colnames(eurusd)
 
 ## Reduced form GMVAR model ##
 
-# Estimate a GMVAR(2, 2) model: 16 estimation rounds and seeds for reproducible results
+# Estimate a GMVAR(2, 2) model: 40 estimation rounds and seeds for reproducible results
 fit <- fitGMVAR(data, p=2, M=2, ncalls=40, seeds=1:40, ncores=4)
 fit
 

@@ -60,39 +60,44 @@
 #' @examples
 #'  \donttest{
 #'  # These are long-running examples that use parallel computing.
+#'  # It takes approximately 30 seconds to run all the below examples.
+#'
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #'  colnames(data) <- colnames(eurusd)
 #'
 #'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#'  params222s <- c(1.428, -0.808, 1.029, 5.84, 1.314, 0.145, 0.094, 1.292,
-#'    -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272,
-#'    -0.074, 0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7, 1.44, 0.742)
-#'  W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#'  mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
-#'  mod222s
+#'  params22s <- c(1.386, -0.766, 1.005, 5.928, 1.314, 0.145, 0.094, 1.292,
+#'   -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
+#'    0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.001, 1.44, 0.741)
+#'  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#'  mod22s <- GMVAR(data, p=2, M=2, params=params22s,
+#'   structural_pars=list(W=W_22))
+#'  mod22s
 #'  # Alternatively, use:
-#'  # fit222s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_222),
-#'  #                     ncalls=20, seeds=1:20)
+#'  # fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
+#'  #                    ncalls=40, seeds=1:40)
 #'  # To obtain an estimated version of the same model.
 #'
 #'  # Estimating the GIRFs of both structural shocks with default arguments
 #'  # (initial values are drawn from the stationary distribution of the process,
 #'  # 30 periods ahead, confidence levels 0.95 and 0.8):
-#'  girf1 <- GIRF(mod222s)
+#'  girf1 <- GIRF(mod22s, N=12, R1=100, R2=100)
 #'  girf1
 #'  plot(girf1)
 #'
 #'  # Estimating the GIRF of the second shock only, 36 periods ahead
 #'  # and shock size 1, initial values drawn from the stationary distribution
 #'  # of the first regime, confidence level 0.9:
-#'  girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=36, init_regimes=1, ci=0.9)
+#'  girf2 <- GIRF(mod22s, which_shocks=2, shock_size=1, N=12, init_regimes=1,
+#'                ci=0.9, R1=100, R2=100)
 #'  plot(girf2)
 #'
-#'  # Estimating the GIRFs of both structural shocks, shock sizes 1 and 3, N=50 periods ahead,
-#'  # estimation based on 1000 Monte Carlo simulations, and fixed initial values given
-#'  # by the last p observations of the data:
-#'  girf3 <- GIRF(mod222s, shock_size=c(1, 3), N=50, R1=1000, init_values=mod222s$data)
+#'  # Estimating the GIRFs of both structural shocks, shock sizes 1 and 3, N=20
+#'  # periods ahead, estimation based on 200 Monte Carlo simulations, and fixed
+#'  # initial values given by the last p observations of the data:
+#'  girf3 <- GIRF(mod22s, shock_size=c(1, 3), N=20, R1=200,
+#'                init_values=mod22s$data)
 #'  plot(girf3)
 #'  }
 #' @export

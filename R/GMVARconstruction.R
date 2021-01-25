@@ -294,17 +294,6 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #' colnames(data) <- colnames(eurusd)
 #'
-#' # GMVAR(1,2), d=2 model:
-#' params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-#'  0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-#'  3.982, 12.135, 0.789)
-#' mod122 <- GMVAR(data, p=1, M=2, params=params122)
-#' mod122 # intercept parametrization
-#'
-#' mod122_2 <- swap_parametrization(mod122)
-#' mod122_2 # mean parametrization
-#'
-#'
 #' # GMVAR(2,2), d=2 model:
 #' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
 #'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
@@ -363,6 +352,8 @@ swap_parametrization <- function(gmvar) {
 #' @examples
 #' \donttest{
 #' # These are long running examples and use parallel computing
+#' # Running the below examples takes approximately 20 seconds.
+#'
 #' data(eurusd, package="gmvarkit")
 #' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 #' colnames(data) <- colnames(eurusd)
@@ -372,15 +363,6 @@ swap_parametrization <- function(gmvar) {
 #' fit12
 #' fit12_2 <- alt_gmvar(fit12, which_largest=2)
 #' fit12_2
-#'
-#' # Structural GMVAR(1,2) model identified with sign
-#' # constraints.
-#' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-#' fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-#'                    ncalls=2, seeds=1:2)
-#' fit12s
-#' fit12s_2 <- alt_gmvar(fit12s, which_round=2)
-#' fit12s_2
 #' }
 #' @export
 
@@ -436,10 +418,14 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
 #' colnames(data) <- colnames(eurusd)
 #'
 #' # Reduced form GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
+#' params12 <- c(0.622, -0.128, 0.959, 0.089, -0.006, 1.006, 1.747, 0.805,
+#'  5.805, 3.257, 7.921, 0.952, -0.037, -0.019, 0.943, 6.925, 3.981, 12.135,
+#'   0.789)
+#' mod12 <- GMVAR(data, p=1, M=2, params=params12)
 #'
 #' # Form a structural model based on the reduced form model:
-#' mod12s <- gmvar_to_sgmvar(fit12)
+#' mod12s <- gmvar_to_sgmvar(mod12)
+#' mod12s
 #' }
 #' @export
 

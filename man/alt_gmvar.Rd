@@ -43,6 +43,8 @@ It's sometimes useful to examine other estimates than the one with the highest l
 \examples{
 \donttest{
 # These are long running examples and use parallel computing
+# Running the below examples takes approximately 20 seconds.
+
 data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
@@ -52,15 +54,6 @@ fit12 <- fitGMVAR(data, p=1, M=2, ncalls=2, seeds=7:8)
 fit12
 fit12_2 <- alt_gmvar(fit12, which_largest=2)
 fit12_2
-
-# Structural GMVAR(1,2) model identified with sign
-# constraints.
-W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-                   ncalls=2, seeds=1:2)
-fit12s
-fit12s_2 <- alt_gmvar(fit12s, which_round=2)
-fit12s_2
 }
 }
 \references{

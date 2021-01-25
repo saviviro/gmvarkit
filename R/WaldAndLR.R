@@ -23,6 +23,8 @@
 #' @inherit in_paramspace_int references
 #' @examples
 #' \donttest{
+#'  ## These are long running examples that use parallel computing!
+#'  ## The below examples take around 40 seconds to run.
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
@@ -49,15 +51,6 @@
 #'             c(rep(0, times=6), 1, rep(0, times=19)))
 #'  c <- c(0, 0)
 #'  Wald_test(fit22s, A=A, c=c)
-#'
-#' # Test whether the diagonal elements of the first AR coefficient
-#' # matrix of the second regime are identical:
-#' # fit22s has parameter vector of length 26 with the diagonal elements of the
-#' # first A-matrix of the second regime are in elements 13 and 16.
-#' A <- matrix(c(rep(0, times=12), 1, 0, 0, -1, rep(0, times=26 - 16)),
-#'             nrow=1, ncol=26)
-#' c <- 0
-#' Wald_test(fit22s, A=A, c=c)
 #' }
 #' @export
 
@@ -135,6 +128,9 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #' @inherit in_paramspace_int references
 #' @examples
 #' \donttest{
+#'  ## These are long running examples that use parallel computing!
+#'  ## The below examples take around 1 minute to run.
+#'
 #'  # Load the data
 #'  data(eurusd, package="gmvarkit")
 #'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])

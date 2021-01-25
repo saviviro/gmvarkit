@@ -82,41 +82,27 @@ The red vertical line points the estimate.
 }
 \examples{
 \donttest{
+# Running all the below examples takes approximately 2 minutes.
+
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form (similar to Kalliovirta et al. 2016).
 data(eurusd, package="gmvarkit")
 data <- cbind(10*eurusd[,1], 100*eurusd[,2])
 colnames(data) <- colnames(eurusd)
 
-# GMVAR(1,2) model: 10 estimation rounds with seeds set
-# for reproducibility
+# GMVAR(1,2) model
 fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
 fit12
 profile_logliks(fit12)
 
 # Structural GMVAR(1,2) model identified with sign
-# constraints.
+# constraints: model build based on inaccurate hand-given estimates.
 W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-                   ncalls=1, seeds=1)
+params12s <- c(0.62, -0.13, 3.25, 7.92, 0.96, 0.09, -0.01, 1.01, 0.95, -0.04,
+               -0.02, 0.94, 1.31, 0.88, -0.16, 2.24, 4, 1.8, 0.79)
+fit12s <- GMVAR(data, p=1, M=2, params=params12s,
+                structural_pars=list(W=W_122))
 profile_logliks(fit12s)
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for both regimes
-C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
-                   ncalls=1, seeds=1)
-profile_logliks(fit22c)
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for both regimes and non-diagonl elements
-# the coefficient matrices constrained to zero.
-tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
- nrow=2*2^2, byrow=FALSE)
-C_mat2 <- rbind(tmp, tmp)
-fit22c2 <- fitGMVAR(data, p=2, M=2, constraints=C_mat2,
-                    ncalls=1, seeds=3)
-profile_logliks(fit22c2)
 }
 }
 \references{

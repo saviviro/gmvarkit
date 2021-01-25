@@ -79,6 +79,7 @@ heteroskedasticity tests.
 \examples{
 \donttest{
 ## These are long running examples that use parallel computing!
+## The below examples take about 30 seconds to run.
 
 # These examples use the data 'eurusd' which comes with the
 # package, but in a scaled form.
@@ -92,22 +93,16 @@ qrtests12
 plot(qrtests12)
 
 # Structural GMVAR(1,2) model identified with sign
-# constraints. The sign constraints (which fully identify
-# the shocks) are in line with the reduced form model,
-# so the test results are the same.
+# constraints and build with hand-specified parameter values.
+# Tests based on simulation procedure with nsimu=1000:
 W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-fit12s <- fitGMVAR(data, p=1, M=2, structural_pars=list(W=W_122),
-  ncalls=1, seeds=1)
-qrtests12s <- quantile_residual_tests(fit12s)
+params12s <- c(0.624, -0.127, 3.248, 7.916, 0.959, 0.089, -0.006, 1.006,
+ 0.952, -0.037, -0.019, 0.943, 1.312, 0.879, -0.155, 2.243, 3.997,
+ 1.798, 0.788)
+fit12s <- GMVAR(data, p=1, M=2, params=params12s,
+                structural_pars=list(W=W_122))
+qrtests12s <- quantile_residual_tests(fit12s, nsimu=1000)
 qrtests12s
-
-# GMVAR(2,2) model with autoregressive parameters restricted
-# to be the same for all regimes: tests with the simulation procedure
-# employed
-C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fit22c <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
-qrtests22c <- quantile_residual_tests(fit22c, lags_ac=4, nsimu=10000)
-qrtests22c
 }
 }
 \references{
