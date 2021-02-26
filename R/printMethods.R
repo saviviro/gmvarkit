@@ -322,7 +322,7 @@ print.girf <- function(x, ..., digits=2, N_to_print) {
 
   for(i1 in 1:length(girf_res)) {
     if(i1 > 1) cat("------------------------\n")
-    cat(paste0("The GIRF of shock ", i1, ":"), "\n")
+    cat(paste0("The GIRF of shock ", girf$shocks[i1], ":"), "\n")
     girf_i1 <- girf$girf_res[[i1]]
     for(i2 in 1:dim(girf_i1$conf_ints)[3]) {
       cat(paste0("The response of ", dimnames(girf_i1$conf_ints)[[3]][i2], ":"), "\n")
