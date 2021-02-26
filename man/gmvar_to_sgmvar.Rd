@@ -4,10 +4,12 @@
 \alias{gmvar_to_sgmvar}
 \title{Switch from two-regime reduced form GMVAR model to a structural GMVAR model.}
 \usage{
-gmvar_to_sgmvar(gmvar)
+gmvar_to_sgmvar(gmvar, calc_std_errors = TRUE)
 }
 \arguments{
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+
+\item{calc_std_errors}{should approximate standard errors be calculated?}
 }
 \value{
 Returns an object of class \code{'gmvar'} defining a structural GMVAR model based on a

@@ -111,3 +111,4 @@
 
 * Print and summary methods for gmvar objects now display the number of parameters and observations.
 * Now also iterate_more and and alt_gmvar return the results from all estimation rounds.
+* There is now possibility to choose not to calculate approximate standard errors when using gmvar_to_sgmvar, becuase it is computationally demanding for large models.

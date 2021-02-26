@@ -395,6 +395,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
 #' @description \code{gmvar_to_sgmvar} constructs SGMVAR model based on a reduced form GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
+#' @inheritParams GMVAR
 #' @details The switch is made by simultaneously diagonalizing the two error term covariance matrices
 #'   with a well known matrix decomposition (Muirhead, 1982, Theorem A9.9) and then normalizing the
 #'   diagonal of the matrix W positive (which implies positive diagonal of the B-matrix). Models with
@@ -438,8 +439,9 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
 #' }
 #' @export
 
-gmvar_to_sgmvar <- function(gmvar) {
+gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
   check_gmvar(gmvar)
+  if(is.null(gmvar$data)) calc_std_errors <- FALSE
   if(!is.null(gmvar$model$structural_pars)) stop("Only reduced form models are supported!")
   p <- gmvar$model$p
   M <- gmvar$model$M
@@ -482,7 +484,6 @@ gmvar_to_sgmvar <- function(gmvar) {
   diag(new_W) <- rep(1, times=d)
 
   # Construct the SGMVAR model based on the obtained structural parameters
-  calc_std_errors <- ifelse(all(is.na(gmvar$std_errors)) || is.null(gmvar$data), FALSE, TRUE)
   GMVAR(data=gmvar$data, p=p, M=M, d=d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=gmvar$model$parametrization, constraints=constraints, same_means=same_means,
         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
