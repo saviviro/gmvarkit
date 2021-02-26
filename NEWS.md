@@ -106,3 +106,7 @@
 * Updated some of the examples so that the running time fpr all of them is now shorter.
 * The genetic algorithm now sorts regimes of the structural models by mixing weight parameters to decreasing order by redecomposing the error term covariance matrices if the first regime changes (before, only regimes 2,..,M were sorted). As a result, the MLE is now found with higher probability in each estimation round.
 * In this version, the estimation results with a given seed are different to those in the previous versions due to the updates (see above).
+
+# gmvarkit 1.4.2
+
+* Print and summary methods for gmvar objects now display the number of parameters and observations.

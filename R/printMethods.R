@@ -32,6 +32,8 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   structural_pars <- gmvar$model$structural_pars
   all_mu <- round(get_regime_means(gmvar), digits)
   params <- gmvar$params
+  npars <- length(params)
+  T_obs <- ifelse(is.null(gmvar$data), NA, nrow(gmvar$data))
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
                                    same_means=same_means, structural_pars=structural_pars)
   if(gmvar$model$parametrization == "mean") {
@@ -45,7 +47,9 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
   cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
-  cat(paste0("p = ", p, ", M = ", M, ","),
+  cat(paste0(" p = ", p, ", M = ", M, ", d = ", d, ","),
+      paste0("#parameters = " , npars, ","),
+      ifelse(is.na(T_obs), "\n", paste0("#observations = ", T_obs, " x ", d, ",\n")),
       ifelse(gmvar$model$conditional, "conditional", "exact"),
       "log-likelihood,",
       ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
@@ -59,7 +63,7 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     all_boldA_eigens <- get_boldA_eigens(gmvar)
     all_omega_eigens <- get_omega_eigens(gmvar)
     form_val2 <- function(txt, val) paste(txt, format_value(val))
-    cat(paste(form_val2("log-likelihood:", gmvar$loglik),
+    cat(paste(form_val2(" log-likelihood:", gmvar$loglik),
                     form_val2("AIC:", IC$AIC),
                     form_val2("HQIC:", IC$HQIC),
                     form_val2("BIC:", IC$BIC),
@@ -67,15 +71,15 @@ print.gmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   }
 
   plus <- c("+", rep(" ", d-1))
-  Y <- paste0("Y", 1:d)
+  Y <- paste0("y", 1:d)
   tmp_names <- paste0("tmp", 1:(p*(d + 2) + d + 2))
 
   for(m in seq_len(M)) {
     count <- 1
     cat(paste("Regime", m), "\n")
     if(summary_print) {
-      cat(paste("Modulus of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[,m]), collapse=", ")),"\n")
-      cat(paste("Cov. matrix 'Omega' eigenvalues: ", paste0(format_value(all_omega_eigens[,m]), collapse=", ")),"\n")
+      cat(paste("Moduli of 'bold A' eigenvalues: ", paste0(format_value(all_boldA_eigens[,m]), collapse=", ")),"\n")
+      cat(paste("Cov. matrix 'Omega' eigenvalues:", paste0(format_value(all_omega_eigens[,m]), collapse=", ")),"\n")
     }
     cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n\n")
