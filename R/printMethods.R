@@ -317,12 +317,12 @@ print.girf <- function(x, ..., digits=2, N_to_print) {
   if(length(girf$which_cumulative) > 0) {
     cat(paste0("The responses of the variable(s) ",
                paste0(dimnames(girf$girf_res[[1]]$point_est)[[2]][girf$which_cumulative], collapse=", "),
-               " were accumulated."), "\n\n")
+               " were cumulated."), "\n\n")
   }
 
   for(i1 in 1:length(girf_res)) {
     if(i1 > 1) cat("------------------------\n")
-    cat(paste0("The GIRF of variable ", i1, ":"), "\n")
+    cat(paste0("The GIRF of shock ", i1, ":"), "\n")
     girf_i1 <- girf$girf_res[[i1]]
     for(i2 in 1:dim(girf_i1$conf_ints)[3]) {
       cat(paste0("The response of ", dimnames(girf_i1$conf_ints)[[3]][i2], ":"), "\n")
