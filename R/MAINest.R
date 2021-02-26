@@ -343,6 +343,7 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
   ret$all_logliks <- gmvar$all_logliks
   ret$which_converged <- gmvar$which_converged
   if(!is.null(gmvar$which_round)) {
+    ret$which_round <- gmvar$which_round
     ret$all_estimates[[gmvar$which_round]] <- ret$params
     ret$all_logliks[gmvar$which_round] <- ret$loglik
     ret$which_converged[gmvar$which_round] <- res$convergence == 0
