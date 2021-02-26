@@ -110,3 +110,4 @@
 # gmvarkit 1.4.2
 
 * Print and summary methods for gmvar objects now display the number of parameters and observations.
+* Now also iterate_more and and alt_gmvar return the results from all estimation rounds.

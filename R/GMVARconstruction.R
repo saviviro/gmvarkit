@@ -201,6 +201,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
                  all_estimates=NULL,
                  all_logliks=NULL,
                  which_converged=NULL,
+                 which_round=NULL,
                  num_tols=list(stat_tol=stat_tol,
                                posdef_tol=posdef_tol)),
             class="gmvar")
@@ -373,11 +374,19 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
     stopifnot(which_largest >= 1 || which_largest <= length(gmvar$all_estimates))
     which_round <- order(gmvar$all_logliks, decreasing=TRUE)[which_largest]
   }
-  GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
-        conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-        constraints=gmvar$model$constraints, same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
-        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
-        posdef_tol=gmvar$num_tols$posdef_tol)
+  ret <- GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
+               conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
+               constraints=gmvar$model$constraints, same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
+               calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
+               posdef_tol=gmvar$num_tols$posdef_tol)
+
+  ret$all_estimates <- gmvar$all_estimates
+  ret$all_logliks <- gmvar$all_logliks
+  ret$which_converged <- gmvar$which_converged
+  if(!is.null(gmvar$which_round)) {
+   ret$which_round <- which_round
+  }
+  ret
 }
 
 
