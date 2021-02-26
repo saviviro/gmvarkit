@@ -268,7 +268,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ret$all_logliks <- loks
   ret$which_converged <- converged
   ret$which_round <- which_best_fit # Which estimation round induced the largest log-likelihood?
-
+  warn_eigens(ret)
   cat("Finished!\n")
   ret
 }
@@ -348,6 +348,7 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
     ret$all_logliks[gmvar$which_round] <- ret$loglik
     ret$which_converged[gmvar$which_round] <- res$convergence == 0
   }
+  warn_eigens(ret)
   ret
 }
 

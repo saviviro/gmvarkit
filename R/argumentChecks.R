@@ -466,3 +466,38 @@ check_same_means <- function(parametrization, same_means) {
     stop("The same_means constraints are available for models with mean-parametrization only (parametrization='mean')")
   }
 }
+
+
+#' @title Warn about near-unit-roots in some regimes
+#'
+#' @description \code{warn_ar_roots} warns if the model contains near-unit-roots in some regimes
+#'
+#' @inheritParams simulateGMVAR
+#' @param tol if eigenvalue is closer than \code{tol} to its bound, a warning is thrown
+#' @details Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
+#'  some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
+#' @return Doesn't return anything.
+
+warn_eigens <- function(gmvar, tol=0.002) {
+  boldA_eigens <- get_boldA_eigens(gmvar)
+  omega_eigens <- get_omega_eigens(gmvar)
+  near_nonstat <- vapply(1:gmvar$model$M, function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
+  near_singular <- vapply(1:gmvar$model$M, function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
+  if(any(near_nonstat)) {
+    my_string1 <- ifelse(sum(near_nonstat) == 1,
+                        paste("Regime", which(near_nonstat),"has near-unit-roots! "),
+                        paste("Regimes", paste(which(near_nonstat), collapse=" and ") ,"have near-unit-roots! "))
+  } else {
+    my_string1 <- NULL
+  }
+  if(any(near_singular)) {
+    my_string2 <- ifelse(sum(near_singular) == 1,
+                         paste("Regime", which(near_singular),"has near-singular error term covariance matrix! "),
+                         paste("Regimes", paste(which(near_singular), collapse=" and ") ,"have near-singular error term covariance matrices! "))
+  } else {
+    my_string2 <- NULL
+  }
+  if(any(near_nonstat) || any(near_singular)) {
+    warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest local maximum with the function 'alt_gmvar' by adjusting its argument 'which_largest'."))
+  }
+}

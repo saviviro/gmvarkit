@@ -386,6 +386,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   if(!is.null(gmvar$which_round)) {
    ret$which_round <- which_round
   }
+  warn_eigens(ret)
   ret
 }
 
