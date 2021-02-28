@@ -108,10 +108,9 @@ is considered.}
   should be adjusted accordingly in order to the estimation succeed!}
 
 \item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
-random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
-(in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
-but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
-candidates.}}
+random mutations (if AR constraints are employed, in all random mutations): larger value implies \strong{smaller} coefficients
+(in absolute value). \strong{Values larger than 1 can be used if the AR coefficients are expected to be very small.
+If set smaller than 1, be careful as it might lead to failure in the creation of stationary parameter candidates}}
 }
 \value{
 Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}

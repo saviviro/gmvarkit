@@ -199,10 +199,9 @@ this too high might lead to failure in proposing new parameters that are well en
 and especially with large \code{p} one might want to try smaller upper bound (e.g., 0.5).}
 
 \item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
-random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
-(in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
-but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
-candidates.}}
+random mutations (if AR constraints are employed, in all random mutations): larger value implies \strong{smaller} coefficients
+(in absolute value). \strong{Values larger than 1 can be used if the AR coefficients are expected to be very small.
+If set smaller than 1, be careful as it might lead to failure in the creation of stationary parameter candidates}}
 
 \item{regime_force_scale}{a non-negative real number specifying how much should natural selection favor individuals
 with less regimes that have almost all mixing weights (practically) at zero. Set to zero for no favoring or large

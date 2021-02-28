@@ -123,10 +123,9 @@ of the initial population: larger value implies larger coefficients (in absolute
 initial population, a new scale is drawn from \code{(0, 0.)} uniform distribution in each iteration.}
 
 \item{ar_scale2}{a positive real number adjusting how large AR parameter values are typically proposed in some
-random mutations (if AR constraints are employed, in all random mutations): larger value implies larger coefficients
-(in absolute value). \strong{Values smaller than 1 can be used if the AR coefficients are expected to be very small,
-but values larger than 1 are generally not recommended as it might lead to failure in creation of stationary parameter
-candidates.}}
+random mutations (if AR constraints are employed, in all random mutations): larger value implies \strong{smaller} coefficients
+(in absolute value). \strong{Values larger than 1 can be used if the AR coefficients are expected to be very small.
+If set smaller than 1, be careful as it might lead to failure in the creation of stationary parameter candidates}}
 
 \item{W_scale}{a size \eqn{(dx1)} strictly positive vector partly specifying the scale and variability of the
 random covariance matrices in random mutations. The elements of the matrix \eqn{W} are drawn independently
