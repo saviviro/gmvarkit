@@ -113,4 +113,5 @@
 * Now also iterate_more and and alt_gmvar return the results from all estimation rounds.
 * There is now possibility to choose not to calculate approximate standard errors when using gmvar_to_sgmvar, becuase it is computationally demanding for large models.
 * Fixed a bug in the GIRF print method: it sometimes referred to wrong shocks when GIRF was estimated for only a subset of the shocks or the shocks were not in an increasing order.
+* Fixed a bug in that caused an error in some functions when the model was adjusted to have smaller stationarity/posdef tolerance than the default one and the model was outside the default tolerance.
 * Now fitGMVAR, iterate_more, and alt_gmvar warn if some regime has near-unit-roots or near-singular error term covariance matrix.

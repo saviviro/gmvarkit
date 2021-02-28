@@ -226,6 +226,7 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                         num_tols=list(stat_tol=stat_tol,
                                       posdef_tol=posdef_tol)),
                    class="gmvar")
+
   quantile_residuals(mod)
 }
 

@@ -132,7 +132,8 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params,
                                          conditional=conditional, parametrization=parametrization,
                                          constraints=constraints, same_means=same_means,
-                                         structural_pars=structural_pars)
+                                         structural_pars=structural_pars, stat_tol=stat_tol,
+                                         posdef_tol=posdef_tol)
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
