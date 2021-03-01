@@ -10,7 +10,7 @@ profile_logliks(
   scale = 0.02,
   nrows,
   ncols,
-  precission = 200,
+  precision = 200,
   stat_tol = 0.001,
   posdef_tol = 1e-08
 )
@@ -57,7 +57,7 @@ the estimate plus-minus \code{abs(scale*estimate)}.}
 \item{ncols}{how many columns should be in the plot-matrix? The default is \code{ceiling(length(which_pars)/nrows)}.
 Note that \code{nrows*ncols} should not be smaller than the length of \code{which_pars}.}
 
-\item{precission}{at how many points should each profile log-likelihood be evaluated at?}
+\item{precision}{at how many points should each profile log-likelihood be evaluated at?}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the

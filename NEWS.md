@@ -116,3 +116,5 @@
 * Fixed a bug in that caused an error in some functions when the model was adjusted to have smaller stationarity/posdef tolerance than the default one and the model was outside the default tolerance.
 * Now fitGMVAR, iterate_more, and alt_gmvar warn if some regime has near-unit-roots or near-singular error term covariance matrix.
 * Fixed the documentation for the argument ar_scale2.
+* Fixed the argument "precission" in profile_logliks to "precision".
+

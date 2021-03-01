@@ -169,7 +169,7 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' @param nrows how many rows should be in the plot-matrix? The default is \code{max(ceiling(log2(length(which_pars)) - 1), 1)}.
 #' @param ncols how many columns should be in the plot-matrix? The default is \code{ceiling(length(which_pars)/nrows)}.
 #'   Note that \code{nrows*ncols} should not be smaller than the length of \code{which_pars}.
-#' @param precission at how many points should each profile log-likelihood be evaluated at?
+#' @param precision at how many points should each profile log-likelihood be evaluated at?
 #' @details When the number of parameters is large, it might be better to plot a smaller number of profile
 #'  log-likelihood functions at a time using the argument \code{which_pars}.
 #'
@@ -204,7 +204,7 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' }
 #' @export
 
-profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, precission=200, stat_tol=1e-3, posdef_tol=1e-8) {
+profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, precision=200, stat_tol=1e-3, posdef_tol=1e-8) {
   check_gmvar(gmvar)
   check_null_data(gmvar)
   p <- gmvar$model$p
@@ -253,7 +253,7 @@ profile_logliks <- function(gmvar, which_pars, scale=0.02, nrows, ncols, preciss
   for(i1 in which_pars) { # Go though the parameters
     pars <- params
     range <- abs(scale*pars[i1])
-    vals <- seq(from=pars[i1] - range, to=pars[i1] + range, length.out=precission) # Loglik to be evaluated at these values of the parameter considered
+    vals <- seq(from=pars[i1] - range, to=pars[i1] + range, length.out=precision) # Loglik to be evaluated at these values of the parameter considered
     logliks <- vapply(vals, function(val) {
       new_pars <- pars
       new_pars[i1] <- val # Change the single parameter value
