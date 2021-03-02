@@ -95,5 +95,5 @@ p1 <- predict(mod222s, n_ahead=10, n_simu=500)
  }
 }
 \seealso{
-\code{\link{GIRF}}
+\code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulateGMVAR}}
 }

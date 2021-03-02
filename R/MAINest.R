@@ -71,7 +71,7 @@
 #'    \code{predict} and \code{plot}.
 #' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
-#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
+#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
 #'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
 #'   \code{\link{update_numtols}}
 #' @references
@@ -147,8 +147,7 @@
 #' @export
 
 fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                     structural_pars=NULL, ncalls=floor(10 + 30*log(M)), ncores=min(2, ncalls, parallel::detectCores()),
-                     maxit=500, seeds=NULL, print_res=TRUE, ...) {
+                     structural_pars=NULL, ncalls=floor(10 + 30*log(M)), ncores=2, maxit=500, seeds=NULL, print_res=TRUE, ...) {
 
   on.exit(closeAllConnections())
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")

@@ -27,7 +27,7 @@
 #'    \item{$mix_pred}{Point forecasts for the mixing weights}
 #'    \item{mix_pred_int}{Individual prediction intervals for mixing weights, as \code{[, , m]}, m=1,..,M.}
 #'  }
-#' @seealso \code{\link{GIRF}}
+#' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulateGMVAR}}
 #' @inherit in_paramspace_int references
 #' @examples
 #' # These examples use the data 'eurusd' which comes with the

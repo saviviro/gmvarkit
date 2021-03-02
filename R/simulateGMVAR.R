@@ -32,7 +32,7 @@
 #'      \code{[, , i]} indicates the i:th set of simulations.}
 #'   }
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
-#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
+#'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}, \code{\link{GFEVD}}
 #' @inherit loglikelihood_int references
 #' @examples
 #'  # These examples use the data 'eurusd' which comes with the
@@ -118,7 +118,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   structural_pars <- gmvar$model$structural_pars
   if(!all_pos_ints(c(nsimu, ntimes))) stop("Arguments n and ntimes must be positive integers")
   if(!is.null(init_values)) {
-    if(!is.matrix(init_values)) stop("init_values must be numeric matrix")
+    if(!is.matrix(init_values)) stop("init_values must be a numeric matrix")
     if(anyNA(init_values)) stop("init_values contains NA values")
     if(ncol(init_values) != d | nrow(init_values) < p) stop("init_values must contain d columns and at least p rows")
   }

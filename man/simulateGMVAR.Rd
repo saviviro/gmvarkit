@@ -130,5 +130,5 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
 }
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
- \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}
+ \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}, \code{\link{GFEVD}}
 }

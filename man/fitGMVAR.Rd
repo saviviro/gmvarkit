@@ -14,7 +14,7 @@ fitGMVAR(
   same_means = NULL,
   structural_pars = NULL,
   ncalls = floor(10 + 30 * log(M)),
-  ncores = min(2, ncalls, parallel::detectCores()),
+  ncores = 2,
   maxit = 500,
   seeds = NULL,
   print_res = TRUE,
@@ -221,7 +221,7 @@ fit22c2
 \seealso{
 \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
-  \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
+  \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
   \code{\link{update_numtols}}
 }

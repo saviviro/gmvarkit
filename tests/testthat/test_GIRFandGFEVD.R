@@ -1,4 +1,4 @@
-context("GIRF")
+context("GIRF and GFEVD")
 library(gmvarkit)
 
 # NOTE that some elements of these tests use random elements obtained from simulation algorithms
