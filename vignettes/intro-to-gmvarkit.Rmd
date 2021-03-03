@@ -342,6 +342,8 @@ The list `structural_pars` should contain at least the element `W` which is a $(
 If the number of regimes is two ($M=2$), a structural model can be build based on a reduced form model because the matrix decomposition used in the simultaneous diagonalization of the error term covariance matrices always exists. This can be done with function `gmvar_to_sgmvar` which should be supplied with the reduced form model and it returns a corresponding structural model. After creating the structural model, the columns of $W$ can be reordered ex-post with the function `reorder_W_columns` which also reorders all $\lambda_{mi}$ accordingly and hence the resulting model will conincide with the original reduced form model. Also, all signs any column of $W$ can be swapped ex-post with the function `swap_W_signs`.
 
 ## Impulse response analysis
+
+### Generalized impulse response function
 Following Koop et al. (1996) and Kilian & Lütkepohl (2017), we consider the generalized impulse response function (GIRF) defined as
 \begin{equation}\label{eq:girf}
 \text{GIRF}(n,\delta_j,\mathcal{F}_{t-1}) = \text{E}[y_{t+n}|\delta_j,\mathcal{F}_{t-1}] - \text{E}[y_{t+n}|\mathcal{F}_{t-1}],
@@ -360,9 +362,20 @@ Because estimating the GIRF and confidence intervals for it is computationally d
 
 As final remarks, note that the objects returned by the GIRF function have their own plot and print methods. Also, cumulative impulse responses of the specified variables can be obtained directly by specifying the argument `which_cumulative` in the function `GIRF`.
 
+### Generalized forecast error variance decomposition
+Following Lanne and Nyberg (2016), we consider the generalized forecast error variance decomposition (GFEVD) that is defined for variable $i$, shock $j$, and horizon $n$ as
+$$
+\text{GFEVD}(n,y_{it}, \delta_j,\mathcal{F}_{t-1}) = \frac{\sum_{l=0}^n\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i^2}{\sum_{k=1}^d\sum_{l=0}^n\text{GIRF}(l,\delta_k,\mathcal{F}_{t-1})_i^2},
+$$
+where $n$ is the chosen and $\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i$ is the $i$th element of the related GIRF (see also the notation described for GIRF in the previous section). That is, the GFEVD is the same as the conventional forecast error variance decomposition but with GIRFs in the place of conventional impulse response functions. Because the GFEVDs sum to unity, they can be interpreted in a similar manner to the conventional FEVD as the relative importance of the shocks to the forecast error variance. 
+
+# More documentation
+See the readme file for a simple example how to use `gmvarkit`.
+
 ## References
 * Lanne, M. and Lütkepohl, H. (2010). Structural vector autoregressions with nonnormal residuals. _Journal of Business & Economic Statistics_, 28(1):159–168.
 * Lanne, M., Lütkepohl, H., and Maciejowsla, K. (2010). Structural vector autoregressions with markov switching. _Journal of Economic Dynamics and Control_, 34(2):121–131.
+* Lanne M. and Nyberg H. 2016. Generalized Forecast Error Variance Decomposition for Linear and Nonlineae Multivariate Models. _Oxford Bulletin of Economics and Statistics_, 78(4), 595-603.
 * Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture vector autoregression. _Journal of Econometrics_, __192__, 485-498.
 * Kalliovirta L. and Saikkonen P. (2010)  Reliable Residuals for Multivariate Nonlinear Time Series Models. _Unpublished Revision of HECER Discussion Paper No. 247_.
 * Kilian, L. and Lütkepohl, H. (2017). Structural Vector Autoregressive Analysis. Cambridge University Press, Cambridge, 1st edition.

@@ -248,7 +248,7 @@ plot.gfevd <- function(x, ...) {
     # Add shock legengs
     ylim_ajd <- ifelse(n_shocks < 500, 0.02*n_shocks, 0.01*n_shocks)
     colpal2 <- grDevices::adjustcolor(colpal, alpha.f=3)
-    xtext_adj <- 0.4 - gfevd$N/150
+    xtext_adj <- ifelse(gfevd$N < 10, 0.75 - gfevd$N^(-1/3), 0.4 - gfevd$N/150)
     text(x=rep(gfevd$N + xtext_adj, n_shocks), y=seq(from=1, to=1 - 0.02*n_shocks, length.out=n_shocks),
          labels=paste("Shock", 1:n_shocks),
          col=colpal2, pos=4, font=2, cex=0.8, xpd=TRUE)

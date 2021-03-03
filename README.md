@@ -49,7 +49,7 @@ colnames(data) <- colnames(eurusd)
 
 ## Reduced form GMVAR model ##
 
-# Estimate a GMVAR(2, 2) model: 16 estimation rounds and seeds for reproducible results
+# Estimate a GMVAR(2, 2) model: 40 estimation rounds and seeds for reproducible results
 fit <- fitGMVAR(data, p=2, M=2, ncalls=40, seeds=1:40, ncores=4)
 fit
 
@@ -74,6 +74,9 @@ print_std_errors(fitc)
 get_foc(fitc) # The first order condition
 get_soc(fitc) # The second order condition (eigenvalues of approximated Hessian)
 profile_logliks(fitc) # Profile log-likelihood functions
+
+# Note: models can be built based the results from any estimation round 
+# conveniently with the function 'alt_gmvar'.
 
 # Quantile residual diagnostics
 diagnostic_plot(fitc) # type=c("all", "series", "ac", "ch", "norm")
@@ -124,6 +127,25 @@ girf2 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), init_regimes=1, R1=200, R2=200)
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
 girf3 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
+
+# Estimate generalized forecast error variance decmposition (GFEVD) with the
+# initial values being all possible lenght p the histories in the data:
+gfevd1 <- GFEVD(fit22s, N=48, R1=100, initval_type="data", ncores=4)
+plot(gfevd1)
+
+# Estimate GFEVD with the initial values generated from the stationary
+# distribution of the second regime:
+gfevd2 <- GFEVD(fit22s, N=48, R1=100, R2=100, initval_type="random",
+                init_regimes=2, ncores=4)
+plot(gfevd2)
+
+# Estimate GFEVD with fixed starting values that are the unconditional mean
+# of the process: 
+myvals <- rbind(fit22s$uncond_moments$uncond_mean,
+                fit22s$uncond_moments$uncond_mean)
+gfevd3 <- GFEVD(fit22s, N=48, R1=250, initval_type="fixed",
+                init_values=myvals, ncores=4)
+plot(gfevd3)
 
 # Test with Wald test whether the diagonal elements of the first AR coefficient
 # matrix of the second regime are identical:
