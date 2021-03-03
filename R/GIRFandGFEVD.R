@@ -228,6 +228,8 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
 #'        \code{init_values}.}
 #'   }
 #' @param R2 the number of initial values to be drawn if \code{initval_type="random"}.
+#' @param include_mixweights should the GFEVD be estimated for the mixing weights as well? Note that this is
+#'   ignored if \code{M=1} and if \code{M=2} the GFEVD will be the same for both regime's mixing weights.
 #' @param seeds a numeric vector containing the random number generator seed for estimation
 #'   of each GIRF. Should have the length...
 #'   \itemize{
@@ -274,28 +276,36 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
 #'  mod22s <- GMVAR(data, p=2, M=2, params=params22s,
 #'   structural_pars=list(W=W_22))
 #'  mod22s
-#'  # Alternatively, use:
-#'  # fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
-#'  #                    ncalls=40, seeds=1:40)
-#'  # To obtain an estimated version of the same model.
+#'
+#'  ## NOTE: Use larger R1 is empirical applications! Small R1 is used
+#'  ## Below only to fasten the execution time of the examples.
 #'
 #'  # Estimating the GFEVD using all possible histories in the data as the
 #'  # initial values:
-#'  gfevd1 <- GFEVD(mod22s, N=30, R1=100, plot=FALSE, include_mixweights=TRUE)
+#'  gfevd1 <- GFEVD(mod22s, N=24, R1=20, initval_type="data")
 #'  gfevd1
 #'  plot(gfevd1)
 #'
 #'  # Estimate GFEVD with the initial values generated from the stationary
 #'  # distribution of the process:
+#'  gfevd2 <- GFEVD(mod22s, N=24, R1=20, R2=100, initval_type="random")
+#'  gfevd2
+#'  plot(gfevd2)
 #'
-#'
-#'  # Estimate GFEVD with fixed hand specified initial values:
+#'  # Estimate GFEVD with fixed hand specified initial values. We use the
+#'  # unconditional mean of the process:
+#'  myvals <- rbind(mod22s$uncond_moments$uncond_mean,
+#'                  mod22s$uncond_moments$uncond_mean)
+#'  gfevd3 <- GFEVD(mod22s, N=36, R1=50, initval_type="fixed",
+#'   init_values=myvals, include_mixweights=TRUE)
+#'  gfevd3
+#'  plot(gfevd3)
 #'  }
 #' @export
 
 GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "fixed"), R1=250, R2=250,
                   init_regimes=NULL, init_values=NULL, which_cumulative=numeric(0), include_mixweights=FALSE,
-                  ncores=2, plot=TRUE, seeds=NULL) {
+                  ncores=2, seeds=NULL) {
   on.exit(closeAllConnections())
   initval_type <- match.arg(initval_type)
   p <- gmvar$model$p
@@ -413,6 +423,5 @@ GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "f
                         seeds=seeds,
                         gmvar=gmvar),
                    class="gfevd")
-  if(plot) plot(ret)
   ret
 }

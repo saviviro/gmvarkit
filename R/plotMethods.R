@@ -203,13 +203,11 @@ plot.girf <- function(x, add_grid=FALSE, ...) {
 
 #' @describeIn GFEVD plot method
 #' @inheritParams print.gfevd
-#' @param smooth Should the GFEVD plot be smooth (\code{TRUE})
-#'   or "bar plot" type (\code{FALSE})?
 #' @param ... currently not used.
 #' @inherit GFEVD references
 #' @export
 
-plot.gfevd <- function(x, smooth=FALSE, ...) {
+plot.gfevd <- function(x, ...) {
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
 
@@ -224,19 +222,11 @@ plot.gfevd <- function(x, smooth=FALSE, ...) {
   plot_gfevd <- function(var_ind, main) {
 
     one_gfevd <- gfevd_res[, , var_ind] # [horizon, shock]
-    upper_ints <- cbind(rep(1, times=nrow(one_gfevd)),
-                        one_gfevd[, 2:ncol(one_gfevd)])
-    lower_ints <- cbind(one_gfevd[, 2:ncol(one_gfevd)],
-                        rep(0, times=nrow(one_gfevd)))
-    if(smooth) {
-      rbind_ints <- function(ints) rbind(ints[1,], ints, ints[nrow(ints),])
-      upper_ints <- rbind_ints(upper_ints) # Add extra values the beginning and the end to fill in the figure
-      lower_ints <- rbind_ints(lower_ints)
-      x_points <- c(-0.5, 0:(gfevd$N), gfevd$N + 0.5)
-    } else { # Bar plot type
-      x_points <- seq(from=-0.5, to=gfevd$N + 0.5, by=1)
-
-    }
+    mycums <- as.matrix(1 - apply(one_gfevd[, 1:(ncol(one_gfevd) - 1), drop=FALSE], MARGIN=1, FUN=cumsum))
+    if(ncol(mycums) > 1) mycums <- t(mycums)
+    upper_ints <- cbind(rep(1, times=nrow(one_gfevd)), mycums)
+    lower_ints <- cbind(mycums,rep(0, times=nrow(one_gfevd)))
+    x_points <- seq(from=-0.5, to=gfevd$N + 0.5, by=1)
 
     # Plot the template
     colpal <- grDevices::adjustcolor(grDevices::topo.colors(ncol(one_gfevd)), alpha.f=0.3)
@@ -248,14 +238,10 @@ plot.gfevd <- function(x, smooth=FALSE, ...) {
 
     # Go through the shocks
     for(i1 in 1:ncol(one_gfevd)) {
-      if(smooth) {
-        polygon(x=c(x_points, rev(x_points)), y=c(upper_ints[,i1], rev(lower_ints[,i1])), col=colpal[i1], border=NA)
-      } else { # Bar plot type
-        for(i2 in 1:(length(x_points) - 1)) {
-          polygon(x=c(x_points[c(i2, i2 + 1)], x_points[c(i2 + 1, i2)]),
-                  y=c(upper_ints[c(i2, i2), i1], lower_ints[c(i2, i2), i1]),
-                  col=colpal[i1], border=NA)
-        }
+      for(i2 in 1:(length(x_points) - 1)) {
+        polygon(x=c(x_points[c(i2, i2 + 1)], x_points[c(i2 + 1, i2)]),
+                y=c(upper_ints[c(i2, i2), i1], lower_ints[c(i2, i2), i1]),
+                col=colpal[i1], border=NA)
       }
     }
 
@@ -263,16 +249,17 @@ plot.gfevd <- function(x, smooth=FALSE, ...) {
     ylim_ajd <- ifelse(n_shocks < 500, 0.02*n_shocks, 0.01*n_shocks)
     colpal2 <- grDevices::adjustcolor(colpal, alpha.f=3)
     xtext_adj <- 0.4 - gfevd$N/150
-    text(x=rep(gfevd$N + xtext_adj, n_shocks), y=c(1, 1 - 0.02*n_shocks, length.out=n_shocks), labels=paste("Shock", 1:n_shocks),
+    text(x=rep(gfevd$N + xtext_adj, n_shocks), y=seq(from=1, to=1 - 0.02*n_shocks, length.out=n_shocks),
+         labels=paste("Shock", 1:n_shocks),
          col=colpal2, pos=4, font=2, cex=0.8, xpd=TRUE)
 
   }
 
   # Loop through the GFEVDs
   for(i1 in 1:n_gfevds) {
-    grDevices::devAskNewPage(TRUE)
+    if(i1 > 1) grDevices::devAskNewPage(TRUE)
     plot_gfevd(var_ind=i1, main=ifelse(i1 <= n_shocks,
-                                       paste("GFEVD for variable", varnames[i1]),
+                                       paste("GFEVD for ", varnames[i1]),
                                        paste("GFEVD for regime", i1 - n_shocks, "mix. weight")))
 
   }
