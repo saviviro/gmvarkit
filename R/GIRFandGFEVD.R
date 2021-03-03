@@ -200,7 +200,8 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
                         init_regimes=init_regimes,
                         init_values=init_values,
                         include_mixweights=include_mixweights,
-                        seeds=seeds),
+                        seeds=seeds,
+                        gmvar=gmvar),
                    class="girf")
   if(plot) plot(ret)
   ret
@@ -280,7 +281,7 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
 #'
 #'  # Estimating the GFEVD using all possible histories in the data as the
 #'  # initial values:
-#'  gfevd1 <- GFEVD(mod22s, N=24, R1=100, plot=FALSE, include_mixweights=TRUE)
+#'  gfevd1 <- GFEVD(mod22s, N=30, R1=100, plot=FALSE, include_mixweights=TRUE)
 #'  gfevd1
 #'  plot(gfevd1)
 #'
@@ -409,7 +410,8 @@ GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "f
                         init_regimes=init_regimes,
                         init_values=init_values,
                         include_mixweights=include_mixweights,
-                        seeds=seeds),
+                        seeds=seeds,
+                        gmvar=gmvar),
                    class="gfevd")
   if(plot) plot(ret)
   ret
