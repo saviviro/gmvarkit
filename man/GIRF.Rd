@@ -10,7 +10,7 @@
 GIRF(
   gmvar,
   which_shocks,
-  shock_size,
+  shock_size = 1,
   N = 30,
   R1 = 250,
   R2 = 250,
@@ -35,11 +35,10 @@ GIRF(
 and elements in \eqn{1,...,d} specifying the structural shocks for which the GIRF
 should be estimated.}
 
-\item{shock_size}{a vector with the same length as \code{which_shocks} specifying
-the size of each structural shock. Alternatively, is a scalar value that specifies a
-common shock size for all structural shocks. By default, the shock size is
-one, which is then amplified by the B-matrix according to the conditional standard deviation
-of the model.}
+\item{shock_size}{a scalar value specifying the common size for all scalar components of the structural shock.
+Note that the conditional covariance matrix of the structural shock is an identity matrix
+and that the (generalized) impulse responses may not be symmetric to the sign and size of
+the shock.}
 
 \item{N}{a positive integer specifying the horizon how far ahead should the generalized
 impulse responses be calculated.}

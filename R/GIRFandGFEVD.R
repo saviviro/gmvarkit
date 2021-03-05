@@ -8,11 +8,10 @@
 #' @param which_shocks a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
 #'   and elements in \eqn{1,...,d} specifying the structural shocks for which the GIRF
 #'   should be estimated.
-#' @param shock_size a vector with the same length as \code{which_shocks} specifying
-#'   the size of each structural shock. Alternatively, is a scalar value that specifies a
-#'   common shock size for all structural shocks. By default, the shock size is
-#'   one, which is then amplified by the B-matrix according to the conditional standard deviation
-#'   of the model.
+#' @param shock_size a scalar value specifying the common size for all scalar components of the structural shock.
+#'   Note that the conditional covariance matrix of the structural shock is an identity matrix
+#'   and that the (generalized) impulse responses may not be symmetric to the sign and size of
+#'   the shock.
 #' @param N a positive integer specifying the horizon how far ahead should the generalized
 #'   impulse responses be calculated.
 #' @param R1 the number of repetitions used to estimate GIRF for each initial value.
@@ -102,7 +101,7 @@
 #'  }
 #' @export
 
-GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL,
+GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL,
                  which_cumulative=numeric(0), ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
                  plot=TRUE, seeds=NULL) {
   on.exit(closeAllConnections())
@@ -122,11 +121,9 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
   stopifnot(all(init_regimes %in% 1:M))
   init_regimes <- unique(init_regimes)
   stopifnot(length(ci) > 0 && all(ci > 0 & ci < 1))
-  if(missing(shock_size)) {
-    shock_size <- rep(1, times=length(which_shocks))
-  } else {
-    stopifnot(length(shock_size) == length(which_shocks) | length(shock_size) == 1)
-    if(length(shock_size) == 1) shock_size <- rep(shock_size, times=length(which_shocks))
+  if(length(shock_size) != 1) {
+    warning("The argument shock_size should be a numeric scalar. Using the first value.")
+    shock_size <- shock_size[1]
   }
   if(length(which_cumulative) > 0) {
     which_cumulative <- unique(which_cumulative)
@@ -140,7 +137,6 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
                                                                                                     init_regimes=init_regimes,
                                                                                                     include_mixweights=include_mixweights))
   }
-
 
   if(ncores > parallel::detectCores()) {
     ncores <- parallel::detectCores()
@@ -161,7 +157,7 @@ GIRF <- function(gmvar, which_shocks, shock_size, N=30, R1=250, R2=250, init_reg
 
   for(i1 in 1:length(which_shocks)) {
     cat(paste0("Estimating GIRFs for structural shock ", which_shocks[i1], "..."), "\n")
-    GIRF_shocks[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(shock_numb=which_shocks[i1], shock_size=shock_size[i1], seed=seeds[i2]), cl=cl)
+    GIRF_shocks[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(shock_numb=which_shocks[i1], shock_size=shock_size, seed=seeds[i2]), cl=cl)
   }
   parallel::stopCluster(cl=cl)
 

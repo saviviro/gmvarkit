@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 ```
 
 ## Introduction
-The package `gmvarkit` contains tools to estimate and analyze both reduced form and structural Gaussian mixture vector autoregressive (GMVAR) models (Kalliovirta, Meitz, and Saikkonen, 2016, and Virolainen, 2020). In this vignette, we first define the reduced form GMVAR model, briefly discuss some of its properties, and explain how to use the functions in `gmvarkit` to estimate the model, examine the estimates, check its adequacy with quantile residual diagnostics, simulate from the process, and forecast future observations of the process. Then, we define the structural GMVAR model, discuss its identification, and explain how to use the functions in `gmvarkit` to estimate generalized impulse response function and to test hypotheses regarding the paremeters. Most of the functions work with both, reduced form and structural models, but particularly the one for estimating generalized impulse response function accomodates structural models only. 
+The package `gmvarkit` contains tools to estimate and analyze both reduced form and structural Gaussian mixture vector autoregressive (GMVAR) models (Kalliovirta, Meitz, and Saikkonen, 2016, and Virolainen, 2020). In this vignette, we first define the reduced form GMVAR model, briefly discuss some of its properties, and explain how to use the functions in `gmvarkit` to estimate the model, examine the estimates, check its adequacy with quantile residual diagnostics, simulate from the process, forecast future observations of the process, and test hypotheses regarding the model parameters. Then, we define the structural GMVAR model, discuss its identification, and explain how to use the functions in `gmvarkit` to estimate generalized impulse response function and generalized forecast error variance decomposition. Most of the functions work with both, reduced form and structural models, but particularly the ones for estimating generalized impulse response function and generalized forecast error variance decomposition accommodates structural models only. 
 
 For more comprehensive discussion on the reduced form model, see the cited article by Kalliovirta, Meitz, and Saikkonen (2016), and for the structural model, see the cited unpublished manuscript by Virolainen (2020). For a shorter introduction and demonstration on how to use `gmvarkit`, see the readme file.
 
@@ -367,7 +367,17 @@ Following Lanne and Nyberg (2016), we consider the generalized forecast error va
 $$
 \text{GFEVD}(n,y_{it}, \delta_j,\mathcal{F}_{t-1}) = \frac{\sum_{l=0}^n\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i^2}{\sum_{k=1}^d\sum_{l=0}^n\text{GIRF}(l,\delta_k,\mathcal{F}_{t-1})_i^2},
 $$
-where $n$ is the chosen and $\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i$ is the $i$th element of the related GIRF (see also the notation described for GIRF in the previous section). That is, the GFEVD is the same as the conventional forecast error variance decomposition but with GIRFs in the place of conventional impulse response functions. Because the GFEVDs sum to unity, they can be interpreted in a similar manner to the conventional FEVD as the relative importance of the shocks to the forecast error variance. 
+where $n$ is the chosen and $\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i$ is the $i$th element of the related GIRF (see also the notation described for GIRF in the previous section). That is, the GFEVD is otherwise similar to the conventional forecast error variance decomposition but with GIRFs in the place of conventional impulse response functions. Because the GFEVDs sum to unity (for each variable), they can be interpreted in a similar manner to the conventional FEVD as relative importance of the shocks to the forecast error variance. 
+
+In `gmvarkit`, the GFEVD can be estimated with the function `GFEVD`. As with the GIRF, the GFEVD is dependent on the initial values. The type of the initial values is set with the argument `initval_type`, and there are three options:
+
+(1) "data" which estimates the GIRFs for all possible length $p$ histories in the data and then the GIRFs in the GFEVD are obtained as the sample mean over those GIRFs.
+
+(2) "random" which generates the initial values from the stationary distribution of the process or from the mixture of the stationary distributions of some specific regime(s) with the relative mixing proportions given by the mixing weight parameters. The initial regimes can be set with the argument `init_regimes`. The GIRFs in the GFEVD are obtained as the sample mean over the GIRFs estimated for the different random initial values.
+
+(3) "fixed" which estimates the GIRFs for a single fixed initial value that is set with the argument `init_ values`.
+
+The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument `shock_size`. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument `which_cumulative`. Finally, note that the GFEVD objects have their own plot and print methods.
 
 # More documentation
 See the readme file for a simple example how to use `gmvarkit`.

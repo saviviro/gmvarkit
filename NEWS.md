@@ -116,6 +116,7 @@
 * Fixed a bug in the GIRF print method: it sometimes referred to wrong shocks when GIRF was estimated for only a subset of the shocks or the shocks were not in an increasing order.
 * Fixed a bug in that caused an error in some functions when the model was adjusted to have smaller stationarity/posdef tolerance than the default one and the model was outside the default tolerance.
 * Now fitGMVAR, iterate_more, and alt_gmvar warn if some regime has near-unit-roots or near-singular error term covariance matrix.
+* Now the argument shock_size in GIRF should be a scalar value.
 * Fixed the documentation for the argument ar_scale2.
 * Fixed the argument "precission" in profile_logliks to "precision".
 
