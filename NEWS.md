@@ -117,6 +117,7 @@
 * Fixed a bug in that caused an error in some functions when the model was adjusted to have smaller stationarity/posdef tolerance than the default one and the model was outside the default tolerance.
 * Now fitGMVAR, iterate_more, and alt_gmvar warn if some regime has near-unit-roots or near-singular error term covariance matrix.
 * Now the argument shock_size in GIRF should be a scalar value.
+* Fixed a bug in the estimation algorithm that occurred when estimating structural models. This might have caused an error or just the model not to estimate that well. A small adjustment was also done. Because there was a change in the algorithm, the structural model estimations done with the previous versions are generally not reproducible with this version.
 * Fixed the documentation for the argument ar_scale2.
 * Fixed the argument "precission" in profile_logliks to "precision".
 

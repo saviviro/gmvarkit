@@ -143,7 +143,13 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
           }
         }, numeric(d*(d + 1)/2)))
       } else { # Structural model, possibly with same_means
-        if(any(which_random == 1)) {
+        # For the covarince matrix parameters, there is the problem that the parameters of the first regime (W)
+        # affect the covariance matrices of the other regimes as well. So using random W messes up the covariance
+        # matrices of the other regimes too even if the lambda-parameters are "smart mutated". For this reason,
+        # if the first regime is "redundant" and randomly mutated, with probability 0.5 all the covariance matrix parameters
+        # will be random, and with probability 0.5 the W parameters will be smart but lambda parameters of redundant
+        # regimes are still random.
+        if(any(which_random == 1)  && runif(1) < 0.5) {
           # If first regime is random, then W must be random so the lambdas may as well be random too.
           covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
         } else { # First regime is smart
@@ -160,7 +166,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
           # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
           for(m in 2:M) {
             if(any(which_random == m)) {
-              covmat_pars[(length(covmat_pars) - d*(M - 1) + d*(m - 2) + 1):(length(covmat_pars) - d*(M - 1) + d*(m - 2) + d)] <- rnorm(n=d, mean=0, sd=lambda_scale[m - 1])
+              covmat_pars[(length(covmat_pars) - d*(M - 1) + d*(m - 2) + 1):(length(covmat_pars) - d*(M - 1) + d*(m - 2) + d)] <- abs(rnorm(n=d, mean=0, sd=lambda_scale[m - 1]))
             }
           }
         }

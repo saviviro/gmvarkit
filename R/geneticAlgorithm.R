@@ -174,7 +174,8 @@
 GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL,
-                  mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale=0.2, upper_ar_scale=1, ar_scale2=1, regime_force_scale=1,
+                  mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale,
+                  ar_scale=0.2, upper_ar_scale=1, ar_scale2=1, regime_force_scale=1,
                   red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
 
   # Required values and preliminary checks
@@ -418,7 +419,6 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     logliks[i1, which(logliks[i1,] < minval)] <- minval
     redundants[i1, which(logliks[i1,] <= minval)] <- M
 
-
     ## Selection and the reproduction pool ##
     if(length(unique(logliks[i1,])) == 1) {
       choosing_probs <- rep(1, popsize) # If all individuals are the same, the surviving probability weight is 1.
@@ -442,7 +442,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     ## Cross-overs ##
     # Individually adaptive cross-over rates as described by Patnaik and Srinivas (1994) with the modification of
     # setting the crossover rate to be at least 0.4 for all individuals (so that the best genes mix in the population too).
-    indeces <- seq(1, popsize - 1, by=2)
+    indeces <- seq(from=1, to=popsize - 1, by=2)
     parent_max <- vapply(indeces, function(i2) max(survivor_liks[i2], survivor_liks[i2+1]), numeric(1))
     co_rates <- vapply(1:length(indeces), function(i2) max(min((max_lik - parent_max[i2])/(max_lik - mean_lik), 1), 0.4), numeric(1))
 
@@ -493,7 +493,7 @@ GAfit <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "
     pre_smart_mu <- runif(1, min=1e-6, max=1-1e-6) < pre_smart_mu_prob
     ar_scale <- runif(1, min=1e-6, max=upper_ar_scale - 1e-6) # Random AR scale
     if(i1 <= smart_mu & length(which_mutate) >= 1 & !pre_smart_mu) { # Random mutations
-      if(!is.null(constraints) | runif(1, min=1e-6, max=1-1e-6) > 0.5) { # Regular, can be nonstationary
+      if(!is.null(constraints) | runif(1, min=1e-6, max=1 - 1e-6) > 0.5) { # Regular, can be nonstationary
         stat_mu <- FALSE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M, d=d,
                                                                                    constraints=constraints,
