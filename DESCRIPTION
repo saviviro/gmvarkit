@@ -4,7 +4,8 @@ Version: 1.4.2
 Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
 Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
     Gaussian mixture vector autoregressive (GMVAR) model, quantile residual tests, graphical diagnostics,
-    simulations, forecasting, and estimation of generalized impulse response function.
+    simulations, forecasting, and estimation of generalized impulse response function and generalized 
+    forecast error variance decomposition.
     Leena Kalliovirta, Mika Meitz, Pentti Saikkonen (2016) <doi:10.1016/j.jeconom.2016.02.012>,
     Savi Virolainen (2020) <arXiv:2007.04713>.
 Depends: R (>= 3.6.0)
