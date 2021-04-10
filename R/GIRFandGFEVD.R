@@ -5,6 +5,7 @@
 #'  a structural GMVAR model.
 #'
 #' @inheritParams simulateGMVAR
+#' @inheritParams fitGMVAR
 #' @param which_shocks a numeric vector of length at most \eqn{d} (\code{=ncol(data)})
 #'   and elements in \eqn{1,...,d} specifying the structural shocks for which the GIRF
 #'   should be estimated.
@@ -103,8 +104,8 @@
 
 GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL,
                  which_cumulative=numeric(0), ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
-                 plot=TRUE, seeds=NULL) {
-  on.exit(closeAllConnections())
+                 plot=TRUE, seeds=NULL, close_connections=TRUE) {
+  if(close_connections) on.exit(closeAllConnections())
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
@@ -301,8 +302,8 @@ GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_r
 
 GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "fixed"), R1=250, R2=250,
                   init_regimes=NULL, init_values=NULL, which_cumulative=numeric(0), include_mixweights=FALSE,
-                  ncores=2, seeds=NULL) {
-  on.exit(closeAllConnections())
+                  ncores=2, seeds=NULL, close_connections=TRUE) {
+  if(close_connections) on.exit(closeAllConnections())
   initval_type <- match.arg(initval_type)
   p <- gmvar$model$p
   M <- gmvar$model$M

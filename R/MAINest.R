@@ -11,7 +11,7 @@
 #' @param seeds a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
 #' @param print_res should summaries of estimation results be printed?
-#' @param close_connections should \code{closeAllConnections()} be run on exit? Set FALSE when using from Rmarkdown.
+#' @param close_connections should \code{closeAllConnections()} be run on exit? Set \code{FALSE} when using from Rmarkdown.
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
 #'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,

@@ -18,10 +18,6 @@ in_paramspace_int(
 )
 }
 \arguments{
-\item{p}{a positive integer specifying the autoregressive order of the model.}
-
-\item{M}{a positive integer specifying the number of mixture components.}
-
 \item{d}{the number of time series in the system.}
 
 \item{params}{a real valued vector specifying the parameter values.
