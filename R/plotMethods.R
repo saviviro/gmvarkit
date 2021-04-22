@@ -183,11 +183,11 @@ plot.girf <- function(x, add_grid=FALSE, ...) {
     abline(h=0, lty=3, col="red")
   }
 
-  # Loop through the variables
+  # Loop through the shocks
   for(i1 in 1:n_girf) {
     girf_i1 <- girf_res[[i1]]
 
-    # Plot the GIRF of variable i1
+    # Plot the GIRF of shocks i1
     par(mar=c(0, 5, 3, 2))
     plot_girf(resp_ind=1, main=paste("Shock", girf$shocks[i1]), ylab=resp_names[1])
     par(mar=c(0, 5, 0, 2))
