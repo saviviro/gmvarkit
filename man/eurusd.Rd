@@ -3,7 +3,7 @@
 \docType{data}
 \name{eurusd}
 \alias{eurusd}
-\title{Euro area and U.S. long-term government bond yields and Euro-U.S. dollar exchange rate.}
+\title{Euro area and U.S. long-term government bond yields and Euro-U.S. dollar exchange rate}
 \format{
 A numeric matrix of class \code{'ts'} with 252 rows and 2 columns with one time series in each column:
 \describe{

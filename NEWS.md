@@ -121,4 +121,5 @@
 * Fixed the documentation for the argument ar_scale2.
 * Fixed the argument "precission" in profile_logliks to "precision".
 * Now fitGMVAR, GFEVD, and GIRF don't call closeAllConnections: instead, they only close the connections they opened.
+* Added new datasets: usamone_prec and usamone
 
