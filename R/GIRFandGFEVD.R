@@ -104,8 +104,7 @@
 
 GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL,
                  which_cumulative=numeric(0), ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
-                 plot=TRUE, seeds=NULL, close_connections=TRUE) {
-  if(close_connections) on.exit(closeAllConnections())
+                 plot=TRUE, seeds=NULL) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
@@ -151,6 +150,7 @@ GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_r
 
   ### Calculate the GIRFs ###
   cl <- parallel::makeCluster(ncores)
+  on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
   parallel::clusterExport(cl, ls(environment(GIRF)), envir = environment(GIRF)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(mvnfast), library(pbapply)))
 
@@ -302,8 +302,7 @@ GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_r
 
 GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "fixed"), R1=250, R2=250,
                   init_regimes=NULL, init_values=NULL, which_cumulative=numeric(0), include_mixweights=FALSE,
-                  ncores=2, seeds=NULL, close_connections=TRUE) {
-  if(close_connections) on.exit(closeAllConnections())
+                  ncores=2, seeds=NULL) {
   initval_type <- match.arg(initval_type)
   p <- gmvar$model$p
   M <- gmvar$model$M
@@ -362,6 +361,7 @@ GFEVD <- function(gmvar, shock_size=1, N=30, initval_type=c("data", "random", "f
 
   ### Calculate the GIRFs ###
   cl <- parallel::makeCluster(ncores)
+  on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
   parallel::clusterExport(cl, ls(environment(GFEVD)), envir = environment(GFEVD)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(mvnfast), library(pbapply)))
 

@@ -11,7 +11,6 @@
 #' @param seeds a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
 #' @param print_res should summaries of estimation results be printed?
-#' @param close_connections should \code{closeAllConnections()} be run on exit? Set \code{FALSE} when using from Rmarkdown.
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
 #'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,
@@ -148,10 +147,8 @@
 #' @export
 
 fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                     structural_pars=NULL, ncalls=floor(10 + 30*log(M)), ncores=2, maxit=500, seeds=NULL, print_res=TRUE,
-                     close_connections=TRUE, ...) {
+                     structural_pars=NULL, ncalls=floor(10 + 30*log(M)), ncores=2, maxit=500, seeds=NULL, print_res=TRUE, ...) {
 
-  if(close_connections) on.exit(closeAllConnections())
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
   stopifnot(length(ncalls) == 1)
   if(!is.null(seeds) && length(seeds) != ncalls) stop("The argument 'seeds' should be NULL or a vector of length 'ncalls'")
@@ -179,6 +176,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   ### Optimization with the genetic algorithm ###
   cl <- parallel::makeCluster(ncores)
+  on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
   parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 

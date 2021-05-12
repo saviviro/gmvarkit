@@ -116,9 +116,9 @@
 * Fixed a bug in the GIRF print method: it sometimes referred to wrong shocks when GIRF was estimated for only a subset of the shocks or the shocks were not in an increasing order.
 * Fixed a bug in that caused an error in some functions when the model was adjusted to have smaller stationarity/posdef tolerance than the default one and the model was outside the default tolerance.
 * Now fitGMVAR, iterate_more, and alt_gmvar warn if some regime has near-unit-roots or near-singular error term covariance matrix.
-* Added argument "close_connections" to functions fitGMVAR, GIRF, and GFEVD. Set to FALSE when calling the functions from Rmarkdown to prevent an error. 
 * Now the argument shock_size in GIRF should be a scalar value.
 * Fixed a bug in the estimation algorithm that occurred when estimating structural models. This might have caused an error or just the model not to estimate that well. A small adjustment was also done. Because there was a change in the algorithm, the structural model estimations done with the previous versions are generally not reproducible with this version.
 * Fixed the documentation for the argument ar_scale2.
 * Fixed the argument "precission" in profile_logliks to "precision".
+* Now fitGMVAR, GFEVD, and GIRF don't call closeAllConnections: instead, they only close the connections they opened.
 

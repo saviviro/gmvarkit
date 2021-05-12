@@ -18,7 +18,6 @@ fitGMVAR(
   maxit = 500,
   seeds = NULL,
   print_res = TRUE,
-  close_connections = TRUE,
   ...
 )
 }
@@ -76,8 +75,6 @@ a time-varying diagonal matrix with positive diagonal entries).}
 or \code{NULL} for not initializing the seed. Exists for creating reproducible results.}
 
 \item{print_res}{should summaries of estimation results be printed?}
-
-\item{close_connections}{should \code{closeAllConnections()} be run on exit? Set \code{FALSE} when using from Rmarkdown.}
 
 \item{...}{additional settings passed to the function \code{GAfit} employing the genetic algorithm.}
 }
