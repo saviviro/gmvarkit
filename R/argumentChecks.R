@@ -65,6 +65,7 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #' @description \code{in_paramspace_int} checks whether the parameter vector lies in the parameter
 #'   space.
 #'
+#' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
 #' @param alphas (Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
 #' @param all_Omega 3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.
