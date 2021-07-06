@@ -381,6 +381,7 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
                calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gmvar$num_tols$stat_tol,
                posdef_tol=gmvar$num_tols$posdef_tol)
 
+  # Pass the estimation results to the new object
   ret$all_estimates <- gmvar$all_estimates
   ret$all_logliks <- gmvar$all_logliks
   ret$which_converged <- gmvar$which_converged

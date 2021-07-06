@@ -42,6 +42,7 @@
 #' @param seeds a length \code{R2} vector containing the random number generator seed for estimation
 #'   of each GIRF. A single number of an initial value is specified.
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
+#' @param ... parameters passed to the plot method \code{plot.girf} that plots the results.
 #' @details The model needs to be structural in order for this function to be applicable. A structural
 #'   GMVAR model can be estimated by specifying the argument \code{structural_pars} in the function \code{fitGMVAR}.
 #'
@@ -93,10 +94,10 @@
 #'                ci=0.9, R1=100, R2=100)
 #'  plot(girf2)
 #'
-#'  # Estimating the GIRFs of both structural shocks, shock sizes 1 and 3, N=20
-#'  # periods ahead, estimation based on 200 Monte Carlo simulations, and fixed
-#'  # initial values given by the last p observations of the data:
-#'  girf3 <- GIRF(mod22s, shock_size=c(1, 3), N=20, R1=200,
+#'  # Estimating the GIRFs of both structural shocks, negative one standard
+#'  # error shock, N=20 periods ahead, estimation based on 200 Monte Carlo simulations,
+#'  # and fixed initial values given by the last p observations of the data:
+#'  girf3 <- GIRF(mod22s, shock_size=-1, N=20, R1=200,
 #'                init_values=mod22s$data)
 #'  plot(girf3)
 #'  }
@@ -104,7 +105,7 @@
 
 GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:gmvar$model$M, init_values=NULL,
                  which_cumulative=numeric(0), ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
-                 plot=TRUE, seeds=NULL) {
+                 plot=TRUE, seeds=NULL, ...) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
@@ -200,7 +201,7 @@ GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_r
                         seeds=seeds,
                         gmvar=gmvar),
                    class="girf")
-  if(plot) plot(ret)
+  if(plot) plot(ret, ...)
   ret
 }
 
