@@ -165,6 +165,8 @@ plot.girf <- function(x, add_grid=FALSE, margs, ...) {
                max(0.4, 0.4 + log(0.31 + log(ngirfs))),
                max(0.35, 0.35 + log(0.31 + log(nresps))/6),
                max(0.1, 0.1 + log(0.31 + log(ngirfs))/10))
+    if(ngirfs == 1) margs[2] <- 0.3
+    margs <- vapply(1:length(margs), function(i1) min(margs[i1], 1), numeric(1))
   } else {
     stopifnot(all(margs > 0))
   }
