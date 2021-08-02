@@ -95,6 +95,7 @@
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
                   same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
                   stat_tol=1e-3, posdef_tol=1e-8) {
+
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
