@@ -121,7 +121,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     IC <- data.frame(AIC=NA, HQIC=NA, BIC=NA)
     qresiduals <- NA
   } else {
-    if(npars >= nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
+    if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
     lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params,
                                     conditional=conditional, parametrization=parametrization,
                                     constraints=constraints, same_means=same_means,

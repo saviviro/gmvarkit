@@ -126,3 +126,4 @@
 # gmvarkit 1.4.3
 
 * Updated the plot method for class girf objects.
+* The function GMVAR now throws an error if there are more parameters in the model than d*nrow(data).
