@@ -80,9 +80,9 @@
 #'  #                    ncalls=40, seeds=1:40)
 #'  # To obtain an estimated version of the same model.
 #'
-#'  # Estimating the GIRFs of both structural shocks with default arguments
-#'  # (initial values are drawn from the stationary distribution of the process,
-#'  # 30 periods ahead, confidence levels 0.95 and 0.8):
+#'  # Estimating the GIRFs of both structural shocks with initial values
+#'  # drawn from the stationary distribution of the process,
+#'  # 12 periods ahead, confidence levels 0.95 and 0.8:
 #'  girf1 <- GIRF(mod22s, N=12, R1=100, R2=100)
 #'  girf1
 #'  plot(girf1)
