@@ -9,7 +9,7 @@
 #' @keywords internal
 
 format_valuef <- function(digits) {
-  function(x) format(round(x, digits), nsmall=digits)
+  function(x) tryCatch(format(round(x, digits), nsmall=digits), error=function(e) x)
 }
 
 

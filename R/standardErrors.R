@@ -73,6 +73,7 @@ print_std_errors <- function(gmvar, digits=3) {
   M <- gmvar$model$M
   d <- gmvar$model$d
   constraints <- gmvar$model$constraints
+  parametrization <- gmvar$model$parametrization
   pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints,
                                   same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
                                   change_na=TRUE)
@@ -83,13 +84,13 @@ print_std_errors <- function(gmvar, digits=3) {
     all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   } else {
     # No standard errors for cov. mats. as the model is parametrized with W and lambdas
-    all_Omega <- array(NA, dim=c(d, d, M))
+    all_Omega <- array(" ", dim=c(d, d, M))
   }
   alphas <- pick_alphas(p=p, M=M, d=d, params=pars)
   alphas[M] <- NA
-  if(gmvar$model$parametrization == "mean") {
+  if(parametrization == "mean") {
     all_mu <- all_phi0_or_mu
-    all_phi0 <- matrix(NA, nrow=d, ncol=M)
+    all_phi0 <- matrix(" ", nrow=d, ncol=M)
   } else {
     all_mu <- matrix(NA, nrow=d, ncol=M)
     all_phi0 <- all_phi0_or_mu
@@ -100,7 +101,7 @@ print_std_errors <- function(gmvar, digits=3) {
     # each row (no multiplications or summations).
     if(any(constraints != 1 & constraints != 0) | any(rowSums(constraints) > 1)) {
       sep_AR <- TRUE # The AR parameter std errors must be printed separately
-      all_A <- array(NA, dim=c(d, d, p, M))
+      all_A <- array(" ", dim=c(d, d, p, M))
       AR_stds <- gmvar$std_errors[(M*d + 1):(M*d + ncol(constraints))] # Constrained AR param std errors
     } else {
       sep_AR <- FALSE
@@ -113,7 +114,7 @@ print_std_errors <- function(gmvar, digits=3) {
   cat(paste0("p = ", p, ", M = ", M, ","),
       ifelse(gmvar$model$conditional, "conditional", "exact"),
       "log-likelihood,",
-      ifelse(gmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
+      ifelse(parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
       ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
   cat("\n")
   cat("APPROXIMATE STANDARD ERRORS\n\n")
@@ -127,8 +128,9 @@ print_std_errors <- function(gmvar, digits=3) {
   for(m in seq_len(M)) {
     count <- 1
     cat(paste("Regime", m), "\n")
-    cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
-    cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n\n")
+    if(m < M) cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
+    if(parametrization == "mean") cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n")
+    cat("\n")
     df <- data.frame(Y=Y,
                      eq=c("=", rep(" ", d - 1)),
                      eq=left_brackets,

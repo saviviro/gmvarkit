@@ -135,8 +135,7 @@
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes and non-diagonal elements
-#' # the coefficient matrices constrained to zero. Estimation
-#' # with only 10 estimation rounds.
+#' # the coefficient matrices constrained to zero.
 #' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
 #'  nrow=2*2^2, byrow=FALSE)
 #' C_mat2 <- rbind(tmp, tmp)
