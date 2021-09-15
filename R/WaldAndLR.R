@@ -17,7 +17,17 @@
 #'
 #'   Finally, note that this function does \strong{not} check whether the specified constraints are feasible (e.g. whether
 #'   the implied constrained model would be stationary or have positive definite error term covariance matrices).
-#' @return Returns an object of class \eqn{'wald'} containing the test statistic and the related p-value.
+#' @return A list with class "htest" containing the following components:
+#'   \item{statistic}{the value of the Wald statistics.}
+#'   \item{parameter}{the degrees of freedom of the Wald statistic.}
+#'   \item{p.value}{the p-value of the test.}
+#'   \item{alternative}{a character string describing the alternative hypothesis.}
+#'   \item{method}{a character string indicating the type of the test (Wald test).}
+#'   \item{data.name}{a character string giving the names of the supplied model, constraint matrix A, and vector c.}
+#'   \item{gmvar}{the supplied argument gmvar.}
+#'   \item{A}{the supplied argument A.}
+#'   \item{c}{the supplied argument c.}
+#'   \item{h}{the supplied argument h.}
 #' @seealso \code{\link{LR_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
@@ -97,14 +107,18 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
   p_value <- pchisq(test_stat, df=df, lower.tail=FALSE)
 
   # Return
-  structure(list(gmvar=gmvar,
+  dname <- paste0(deparse(substitute(gmvar)),", ", deparse(substitute(A)), ", ", deparse(substitute(c)))
+  structure(list(statistic=c("W"=test_stat),
+                 parameter=c("df"=df),
+                 p.value=p_value,
+                 alternative="the true parameter theta does not satisfy A%*%theta = c",
+                 data.name=dname,
+                 method="Wald test",
+                 gmvar=gmvar,
                  A=A,
                  c=c,
-                 df=df,
-                 test_stat=test_stat,
-                 df=df,
-                 p_value=p_value),
-            class="wald")
+                 h=h),
+            class="htest")
 }
 
 
@@ -122,7 +136,15 @@ Wald_test <- function(gmvar, A, c, h=6e-6) {
 #'   of the unconstrained and constrained parameter spaces.
 #'
 #'   Note that this function does \strong{not} verify that the two models are actually nested.
-#' @return Returns an object of class \eqn{'lr'} containing the test statistic and the related p-value.
+#' @return A list with class "htest" containing the following components:
+#'   \item{statistic}{the value of the likelihood ratio statistics.}
+#'   \item{parameter}{the degrees of freedom of the likelihood ratio statistic.}
+#'   \item{p.value}{the p-value of the test.}
+#'   \item{alternative}{a character string describing the alternative hypothesis.}
+#'   \item{method}{a character string indicating the type of the test (likelihood ratio test).}
+#'   \item{data.name}{a character string giving the names of the supplied models, gsmar1 and gsmar2.}
+#'   \item{gmvar1}{the supplied argument gmvar1}
+#'   \item{gmvar2}{the supplied argument gmvar2}
 #' @seealso \code{\link{Wald_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
@@ -162,12 +184,17 @@ LR_test <- function(gmvar1, gmvar2) {
   df <- length(gmvar1$params) - length(gmvar2$params)
   p_value <- pchisq(test_stat, df=df, lower.tail=FALSE)
 
-  structure(list(gmvar1=gmvar1,
-                 gmvar2=gmvar2,
-                 test_stat=test_stat,
-                 df=df,
-                 p_value=p_value),
-            class="lr")
+  # Return
+  dname <- paste(deparse(substitute(gmvar1)), "and", deparse(substitute(gmvar2)))
+  structure(list(statistic=c("LR"=test_stat),
+                 parameter=c("df"=df),
+                 p.value=p_value,
+                 alternative=paste("the true parameter does not satisfy the constraints imposed in", deparse(substitute(gmvar2))),
+                 data.name=dname,
+                 method="Likelihood ratio test",
+                 gmvar1=gmvar1,
+                 gmvar2=gmvar2),
+            class="htest")
 }
 
 

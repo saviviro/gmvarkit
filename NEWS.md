@@ -127,6 +127,7 @@
 
 * The function GIRF now allows to scale the GIRFs of some shocks to normalize the magnitude of the instantaneous movement of some variable.
 * Updated the plot method for class girf objects.
+* Re-used the class 'htest' for the objects returned by the functions Wald_test and LR_test.
 * Removed confusing NAs from the standard error prints when the related statistics are not parametrized in the first place. 
 * The function GMVAR now throws an error if there are more parameters in the model than d*nrow(data).
 * Internal functions are now removed from the user manual. 
