@@ -83,3 +83,4 @@ a time-varying diagonal matrix with positive diagonal entries).}
   from (scaled) Wishart distribution for reduced form models and the parameters \eqn{W},\eqn{\lambda_1,...,\lambda_M}
   for structural models (from normal distributions).
 }
+\keyword{internal}

@@ -143,6 +143,7 @@
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'          paper, available as arXiv:2007.04713.
 #'  }
+#' @keywords internal
 
 loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
                               same_means=NULL, structural_pars=NULL,
@@ -268,6 +269,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
 #'   that the t:th row is for the time point t and m:th column is for the regime m.
 #' @inherit in_paramspace_int references
 #' @seealso \code{\link{loglikelihood_int}}
+#' @keywords internal
 
 get_alpha_mt <- function(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0=FALSE) {
   if(M == 1) {
@@ -429,6 +431,7 @@ cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mea
 #' @details Note that for conditional models with different autoregressive order p the
 #'  information criteria values are \strong{NOT} comparable.
 #' @return Returns a data frame containing the information criteria values.
+#' @keywords internal
 
 get_IC <- function(loglik, npars, obs) {
   AIC <- -2*loglik + 2*npars

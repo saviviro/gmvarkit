@@ -164,3 +164,4 @@ Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residu
      paper, available as arXiv:2007.04713.
  }
 }
+\keyword{internal}

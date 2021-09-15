@@ -73,6 +73,7 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
 \seealso{
 \code{\link{Wald_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},

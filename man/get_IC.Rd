@@ -23,3 +23,4 @@ Returns a data frame containing the information criteria values.
 Note that for conditional models with different autoregressive order p the
  information criteria values are \strong{NOT} comparable.
 }
+\keyword{internal}

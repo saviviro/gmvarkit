@@ -9,6 +9,7 @@
 #'   \eqn{y_{i}=(y_{1i},...,y_{di})} \eqn{(dx1)}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 reform_data <- function(data, p) {
   d <- ncol(data)
@@ -30,6 +31,7 @@ reform_data <- function(data, p) {
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, change_na=FALSE) {
   if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
@@ -132,6 +134,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_mean
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -168,6 +171,7 @@ reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
 #'   again in any further function calls as this will create bugs. Sign constraints are irrelevant in this context.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 get_unconstrained_structural_pars <- function(structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -192,6 +196,7 @@ get_unconstrained_structural_pars <- function(structural_pars=NULL) {
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
+#' @keywords internal
 
 form_boldA <- function(p, M, d, all_A) {
   I_all <- diag(nrow=d*(p - 1))
@@ -246,6 +251,7 @@ form_boldA <- function(p, M, d, all_A) {
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 sort_components <- function(p, M, d, params, structural_pars=NULL) {
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
@@ -310,6 +316,7 @@ sort_components <- function(p, M, d, params, structural_pars=NULL) {
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'  }
+#' @keywords internal
 
 sort_W_and_lambdas <- function(p, M, d, params) {
   if(M == 1) return(params)
@@ -343,6 +350,7 @@ sort_W_and_lambdas <- function(p, M, d, params) {
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
+#' @keywords internal
 
 change_parametrization <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL,
                                    change_to=c("intercept", "mean")) {
@@ -392,6 +400,7 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, same_means
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 change_regime <- function(p, M, d, params, m, regime_pars, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -422,6 +431,7 @@ change_regime <- function(p, M, d, params, m, regime_pars, structural_pars=NULL)
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 regime_distance <- function(regime_pars1, regime_pars2) {
   dist_fun <- function(x) {
@@ -453,6 +463,7 @@ regime_distance <- function(regime_pars1, regime_pars2) {
 #'  to sum to one.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 sort_and_standardize_alphas <- function(alphas, constraints=NULL, same_means=NULL, structural_pars=NULL) {
   if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {

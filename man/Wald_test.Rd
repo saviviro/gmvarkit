@@ -86,6 +86,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
 \seealso{
 \code{\link{LR_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},

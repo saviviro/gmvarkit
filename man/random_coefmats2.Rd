@@ -33,3 +33,4 @@ The coefficient matrices are generated using the algorithm proposed by Ansley
       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
  }
 }
+\keyword{internal}

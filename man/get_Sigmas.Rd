@@ -47,3 +47,4 @@ Calculates the dp-dimensional covariance matrix using the formula (2.1.39) in LÃ
          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
  }
 }
+\keyword{internal}

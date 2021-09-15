@@ -161,3 +161,4 @@ Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen
      paper, available as arXiv:2007.04713.
  }
 }
+\keyword{internal}

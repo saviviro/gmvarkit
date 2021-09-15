@@ -18,6 +18,7 @@ girf1 <- GIRF(mod222s, N=2, R2=2, R1=2, seeds=1:2, plot=FALSE)
 girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
               include_mixweights=FALSE, init_values=mod222s$data, ci=0.1, plot=FALSE)
 girf3 <- GIRF(mod222s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot=FALSE)
+girf4 <- GIRF(mod222s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot=FALSE)
 
 test_that("GIRF works correctly", {
   expect_equal(unname(girf1$girf_res[[1]]$point_est[3,]), c(2.7647446, 2.6555342, -0.2440685, 0.2440685), tolerance=1e-4)
@@ -33,6 +34,9 @@ test_that("GIRF works correctly", {
   expect_equal(unname(girf3$girf_res[[1]]$point_est[,2]), c(1.307096, 3.234228, 5.572740), tolerance=1e-4)
   expect_equal(unname(girf3$girf_res[[1]]$conf_ints[1, 2, ]), c(1.643883, 1.307096, 0.000000, 0.000000), tolerance=1e-4)
 
+  expect_equal(unname(girf4$girf_res[[1]]$point_est[,1]), c(1.000000, 1.388742, 1.459335), tolerance=1e-4)
+  expect_equal(unname(girf4$girf_res[[1]]$point_est[,2]), c(0.7951274, 1.1723045, 1.4225543), tolerance=1e-4)
+  expect_equal(unname(girf4$girf_res[[1]]$conf_ints[1, 2, ]), c(1.0000000, 0.7951274, 0.0000000, 0.0000000), tolerance=1e-4)
 })
 
 

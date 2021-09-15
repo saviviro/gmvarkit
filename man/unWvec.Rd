@@ -40,3 +40,4 @@ a \eqn{(d x d)} matrix \eqn{W}.
  No argument checks!
 }
 
+\keyword{internal}

@@ -22,3 +22,4 @@ This function exists to avoid dublication inside the package.
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GAfit}}
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ Throws an error if is.null(gmvar$data).
 \description{
 \code{check_null_data} checks that the gmvar object has data.
 }
+\keyword{internal}

@@ -138,3 +138,4 @@ Returns an \eqn{(d x d x p+1 x M)} array containing the first p regimewise autoc
          paper, available as arXiv:2007.04713.
  }
 }
+\keyword{internal}

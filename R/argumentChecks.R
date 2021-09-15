@@ -45,6 +45,7 @@
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL, tolerance=1e-3) {
   if(is.null(all_boldA)) {
@@ -89,6 +90,7 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'  }
+#'  @keywords internal
 
 in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
@@ -281,6 +283,7 @@ check_parameters <- function(p, M, d, params, parametrization=c("intercept", "me
 #' @return Checks the constraint matrix \strong{C} and throws an error
 #'   if something is wrong.
 #' @details If \code{is.null(constraints)}, then this function doesn't do anything.
+#' @keywords internal
 
 check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {
   if(!is.null(constraints)) {
@@ -349,6 +352,7 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace references
+#' @keywords internal
 
 n_params <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {
   if(is.null(same_means)) {
@@ -375,6 +379,7 @@ n_params <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars
 #' @inheritParams loglikelihood_int
 #' @return Checks the data and tries to correct it. Throws an error if something is wrong and
 #'   returns the corrected data otherwise.
+#' @keywords internal
 
 check_data <- function(data, p) {
   if(is.data.frame(data)) {
@@ -399,6 +404,7 @@ check_data <- function(data, p) {
 #'
 #' @param x a vector containing the elements to be tested.
 #' @return Returns \code{TRUE} or \code{FALSE} accordingly.
+#' @keywords internal
 
 all_pos_ints <- function(x) {
   all(vapply(x, function(x1) x1 %% 1 == 0 && length(x1) == 1 && x1 >= 1, logical(1)))
@@ -411,6 +417,7 @@ all_pos_ints <- function(x) {
 #'
 #' @inheritParams is_stationary
 #' @return Throws an error if something is wrong.
+#' @keywords internal
 
 check_pMd <- function(p, M, d) {
   if(!all_pos_ints(c(p, M))) {
@@ -432,6 +439,7 @@ check_pMd <- function(p, M, d) {
 #' @param object S3 object to be tested
 #' @param object_name what is the name of the object that should of class 'gmvar'?
 #' @return Throws an error if the object doesn't have the class attribute 'gmvar'.
+#' @keywords internal
 
 check_gmvar <- function(object, object_name) {
   if(missing(object_name)) object_name <- "gmvar"
@@ -447,6 +455,7 @@ check_gmvar <- function(object, object_name) {
 #'
 #' @inheritParams simulateGMVAR
 #' @return Throws an error if is.null(gmvar$data).
+#' @keywords internal
 
 check_null_data <- function(gmvar) {
   if(is.null(gmvar$data)) {
@@ -461,6 +470,7 @@ check_null_data <- function(gmvar) {
 #'
 #' @inheritParams loglikelihood_int
 #' @return Throws an error if parametrization type is not "mean" and means are constrained
+#' @keywords internal
 
 check_same_means <- function(parametrization, same_means) {
   if(parametrization == "intercept" && !is.null(same_means)) {
@@ -478,6 +488,7 @@ check_same_means <- function(parametrization, same_means) {
 #' @details Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
 #'  some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
 #' @return Doesn't return anything.
+#' @keywords internal
 
 warn_eigens <- function(gmvar, tol=0.002) {
   boldA_eigens <- get_boldA_eigens(gmvar)

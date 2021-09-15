@@ -44,31 +44,37 @@ the conditional covariance matrix of the structural shock is identity matrix.}
      \code{init_values}.}
 }}
 
-\item{R1}{the number of repetitions used to estimate GIRF for each initial value.}
+\item{R1}{the number of repetitions used to estimate GIRF for each initial
+value.}
 
 \item{R2}{the number of initial values to be drawn if \code{initval_type="random"}.}
 
-\item{init_regimes}{a numeric vector of length at most \eqn{M} and elements in \eqn{1,...,M}
-specifying the regimes from which the initial values should be generated from. The initial
-values will be generated from a mixture distribution with the mixture components being the
-stationary distributions of the specific regimes and the (proportional) mixing weights given
-by the mixing weight parameters of those regimes. Note that if \code{init_regimes=1:M}, the
-initial values are generated from the stationary distribution of the process and if
-\code{init_regimes=m}, the initial value are generated from the stationary distribution
-of the \eqn{m}th regime. Ignored if \code{init_value} is specified.}
+\item{init_regimes}{a numeric vector of length at most \eqn{M} and elements
+in \eqn{1,...,M} specifying the regimes from which the initial values
+should be generated from. The initial values will be generated from a
+mixture distribution with the mixture components being the stationary
+distributions of the specific regimes and the (proportional) mixing weights
+given by the mixing weight parameters of those regimes. Note that if
+\code{init_regimes=1:M}, the initial values are generated from the
+stationary distribution of the process and if \code{init_regimes=m}, the
+initial value are generated from the stationary distribution of the
+\eqn{m}th regime. Ignored if \code{init_value} is specified.}
 
-\item{init_values}{a matrix or a multivariate class \code{'ts'} object with \eqn{d} columns
-and at least \eqn{p} rows specifying an initial value for the GIRF. The last \eqn{p} rows
-are taken to be the initial value assuming that the \strong{last} row is the most recent observation.}
+\item{init_values}{a matrix or a multivariate class \code{'ts'} object with
+\eqn{d} columns and at least \eqn{p} rows specifying an initial value for
+the GIRF. The last \eqn{p} rows are taken to be the initial value assuming
+that the \strong{last} row is the most recent observation.}
 
-\item{which_cumulative}{a numeric vector with values in \eqn{1,...,d} (\code{d=ncol(data)}) specifying
-which the variables for which the impulse responses should be cumulative. Default is none.}
+\item{which_cumulative}{a numeric vector with values in \eqn{1,...,d}
+(\code{d=ncol(data)}) specifying which the variables for which the impulse
+responses should be cumulative. Default is none.}
 
 \item{include_mixweights}{should the GFEVD be estimated for the mixing weights as well? Note that this is
 ignored if \code{M=1} and if \code{M=2} the GFEVD will be the same for both regime's mixing weights.}
 
-\item{ncores}{the number CPU cores to be used in parallel computing. Only single core computing is
-supported if an initial value is specified (and the GIRF won't thus be estimated multiple times).}
+\item{ncores}{the number CPU cores to be used in parallel computing. Only
+single core computing is supported if an initial value is specified (and
+the GIRF won't thus be estimated multiple times).}
 
 \item{seeds}{a numeric vector containing the random number generator seed for estimation
 of each GIRF. Should have the length...

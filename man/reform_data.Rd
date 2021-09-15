@@ -26,3 +26,4 @@ Returns the data reformed into a \eqn{((n_obs-p+1)x(dp))} matrix. The i:th row
  No argument checks!
 }
 
+\keyword{internal}

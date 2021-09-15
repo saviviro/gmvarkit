@@ -39,3 +39,4 @@ Intended to be called after calling the function \code{reform_constrained_pars} 
  No argument checks!
 }
 
+\keyword{internal}

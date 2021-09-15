@@ -21,3 +21,4 @@ a vector of size \eqn{(d(d+1)/2x1)}.
  No argument checks!
 }
 
+\keyword{internal}

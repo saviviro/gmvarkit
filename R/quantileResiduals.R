@@ -193,6 +193,7 @@ quantile_residuals <- function(gmvar) {
 #' @section Warning:
 #'   No argument checks!
 #' @inherit quantile_residuals return references
+#' @keywords internal
 
 quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL,
                                    same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
@@ -242,6 +243,7 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
 #'   random vector in corresponding row of \code{y}.
 #' @param Omega the \eqn{(k x k)} covariance matrix Omega.
 #' @return Returns a size \eqn{(T x 1)} vector containing the multinormal densities in logarithm.
+#' @keywords internal
 
 dlogmultinorm <- function(y, mu, Omega) {
   tmp <- -0.5*ncol(y)*log(2*pi) - 0.5*log(det(Omega))

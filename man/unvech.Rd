@@ -23,3 +23,4 @@ a symmetric matrix of size \eqn{(dxd)}.
  No argument checks!
 }
 
+\keyword{internal}

@@ -19,3 +19,4 @@ Checks the data and tries to correct it. Throws an error if something is wrong a
 \description{
 \code{check_data} checks the data.
 }
+\keyword{internal}

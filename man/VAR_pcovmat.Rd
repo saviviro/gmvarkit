@@ -34,3 +34,4 @@ Most of the code in this function is adapted from the one provided in the
          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
  }
 }
+\keyword{internal}

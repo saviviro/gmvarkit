@@ -360,6 +360,7 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
 #' @details This function exists to avoid dublication inside the package.
 #' @return Returns \code{-(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)}
 #' @seealso \code{\link{fitGMVAR}}, \code{\link{GAfit}}
+#' @keywords internal
 
 get_minval <- function(data) {
   -(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)

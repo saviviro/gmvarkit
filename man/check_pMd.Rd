@@ -19,3 +19,4 @@ Throws an error if something is wrong.
 \description{
 \code{check_pMd} checks the arguments p, M, and d.
 }
+\keyword{internal}

@@ -24,3 +24,4 @@ Throws an error if parametrization type is not "mean" and means are constrained
 \code{check_same_means} checks whether the parametrization is correct for
  usage of same means restrictions
 }
+\keyword{internal}

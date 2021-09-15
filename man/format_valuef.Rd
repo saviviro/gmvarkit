@@ -17,3 +17,4 @@ Returns a function that takes an atomic vector as argument
 \code{format_valuef} is a function factory for
   formatting values with certain number of digits.
 }
+\keyword{internal}

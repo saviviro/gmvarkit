@@ -53,6 +53,7 @@ swap_W_signs(mod222s, which_to_swap=1:2)
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},

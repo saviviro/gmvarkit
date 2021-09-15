@@ -20,3 +20,4 @@ a vector of size \eqn{(d^2x1)}.
  No argument checks!
 }
 
+\keyword{internal}

@@ -103,7 +103,7 @@
 
 * Fixed CRAN check issues and examples regarding LR and Wald tests.
 * Fixed a problem in the estimation procedure that was introduced in the previous version.
-* Updated some of the examples so that the running time fpr all of them is now shorter.
+* Updated some of the examples so that the running time for all of them is now shorter.
 * The genetic algorithm now sorts regimes of the structural models by mixing weight parameters to decreasing order by redecomposing the error term covariance matrices if the first regime changes (before, only regimes 2,..,M were sorted). As a result, the MLE is now found with higher probability in each estimation round.
 * In this version, the estimation results with a given seed are different to those in the previous versions due to the updates (see above).
 
@@ -125,5 +125,7 @@
 
 # gmvarkit 1.4.3
 
+* The function GIRF now allows to scale the GIRFs of some shocks to normalize the magnitude of the instantaneous movement of some variable.
 * Updated the plot method for class girf objects.
 * The function GMVAR now throws an error if there are more parameters in the model than d*nrow(data).
+* Internal functions are now removed from the user manual.

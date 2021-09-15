@@ -62,3 +62,4 @@ Returns the given alphas in a (M x 1) vector sorted in decreasing order and thei
  No argument checks!
 }
 
+\keyword{internal}

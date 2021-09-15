@@ -22,3 +22,4 @@ a vector of length \eqn{d^2 - n_zeros} where \eqn{n_zeros} is the
  No argument checks!
 }
 
+\keyword{internal}

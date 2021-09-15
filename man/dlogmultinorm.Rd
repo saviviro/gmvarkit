@@ -22,3 +22,4 @@ Returns a size \eqn{(T x 1)} vector containing the multinormal densities in loga
 \code{dlogmultinorm} calculates logarithms of multiple multivariate normal
   densities with varying mean and constant covariance matrix.
 }
+\keyword{internal}

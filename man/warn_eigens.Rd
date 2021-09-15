@@ -21,3 +21,4 @@ Doesn't return anything.
 Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
  some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
 }
+\keyword{internal}

@@ -64,4 +64,6 @@ Returns a length M vector containing the mixing weight parameters \eqn{alpha_{m}
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
+\keyword{internal}

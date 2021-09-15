@@ -7,6 +7,7 @@
 #' @return a vector of size \eqn{(d^2x1)}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 vec <- function(A) {
   as.vector(A)
@@ -23,6 +24,7 @@ vec <- function(A) {
 #'   number of zero entries in the matrix \code{W}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 Wvec <- function(W) {
   W[W != 0]
@@ -42,6 +44,7 @@ Wvec <- function(W) {
 #' @return a \eqn{(d x d)} matrix \eqn{W}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 unWvec <- function(Wvector, d, structural_pars=NULL) {
   if(is.null(structural_pars)) stop("Structural parameters needed")
@@ -62,6 +65,7 @@ unWvec <- function(Wvector, d, structural_pars=NULL) {
 #' @return a matrix of size \eqn{(dxd)}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 unvec <- function(d, a) {
   matrix(a, nrow=d, byrow=FALSE)
@@ -77,6 +81,7 @@ unvec <- function(d, a) {
 #' @return a vector of size \eqn{(d(d+1)/2x1)}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 vech <- function(A) {
   A[lower.tri(x=A, diag=TRUE), drop=TRUE]
@@ -93,6 +98,7 @@ vech <- function(A) {
 #' @return a symmetric matrix of size \eqn{(dxd)}.
 #' @section Warning:
 #'  No argument checks!
+#' @keywords internal
 
 unvech <- function(d, a) {
   A <- matrix(nrow=d, ncol=d)

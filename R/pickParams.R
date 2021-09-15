@@ -14,6 +14,7 @@
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_Ami <- function(p, M, d, params, m, i, structural_pars=NULL, unvec=TRUE) {
   if(is.null(structural_pars)) {
@@ -43,6 +44,7 @@ pick_Ami <- function(p, M, d, params, m, i, structural_pars=NULL, unvec=TRUE) {
 #' @inherit pick_Ami details
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_Am <- function(p, M, d, params, m, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -70,6 +72,7 @@ pick_Am <- function(p, M, d, params, m, structural_pars=NULL) {
 #' @inherit pick_Ami details
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_allA <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -95,6 +98,7 @@ pick_allA <- function(p, M, d, params, structural_pars=NULL) {
 #' @inherit pick_Ami details
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_phi0 <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -119,6 +123,7 @@ pick_phi0 <- function(p, M, d, params, structural_pars=NULL) {
 #' @inherit pick_Ami details
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_all_phi0_A <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -146,6 +151,7 @@ pick_all_phi0_A <- function(p, M, d, params, structural_pars=NULL) {
 #' @inherit pick_Ami details
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 pick_Omegas <- function(p, M, d, params, structural_pars=NULL) {
   Omegas <- array(dim=c(d, d, M))
@@ -177,7 +183,7 @@ pick_Omegas <- function(p, M, d, params, structural_pars=NULL) {
 #'   including non-parametrized \eqn{alpha_{M}}.
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
-
+#' @keywords internal
 
 pick_alphas <- function(p, M, d, params) {
   if(M == 1) {
@@ -199,6 +205,7 @@ pick_alphas <- function(p, M, d, params) {
 #'   Returns \code{NULL} for reduced form models.
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 pick_W <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars)) return(NULL)
@@ -217,7 +224,7 @@ pick_W <- function(p, M, d, params, structural_pars=NULL) {
 #' @inherit pick_W details
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
-
+#' @keywords internal
 
 pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
   if(is.null(structural_pars) || M == 1) return(numeric(0))
@@ -240,6 +247,7 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #'   }
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
+#' @keywords internal
 
 pick_regime <- function(p, M, d, params, m, structural_pars=NULL) {
   if(is.null(structural_pars)) {

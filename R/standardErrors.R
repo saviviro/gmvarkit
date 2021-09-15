@@ -7,6 +7,7 @@
 #' @inheritParams loglikelihood_int
 #' @return A vector containing the approximate standard errors of the estimates.
 #' @inherit in_paramspace_int references
+#' @keywords internal
 
 standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"),
                             constraints=NULL, same_means=NULL, structural_pars=NULL, minval,

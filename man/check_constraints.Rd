@@ -61,3 +61,4 @@ Checks the constraint matrix \strong{C} and throws an error
 \details{
 If \code{is.null(constraints)}, then this function doesn't do anything.
 }
+\keyword{internal}

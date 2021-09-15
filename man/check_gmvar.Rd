@@ -17,3 +17,4 @@ Throws an error if the object doesn't have the class attribute 'gmvar'.
 \description{
 \code{check_gmvar} checks that the object has class attribute 'gmvar'.
 }
+\keyword{internal}

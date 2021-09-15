@@ -146,4 +146,6 @@ Parametrization cannot be changed for models with same_means constraints!
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
+\keyword{internal}

@@ -71,3 +71,4 @@ a time-varying diagonal matrix with positive diagonal entries).}
 \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
   from (scaled) Wishart distribution that is fairly close to the given matrix.
 }
+\keyword{internal}

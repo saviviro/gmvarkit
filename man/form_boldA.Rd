@@ -35,4 +35,6 @@ Returns 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to e
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
+\keyword{internal}

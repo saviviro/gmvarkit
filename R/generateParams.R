@@ -8,6 +8,7 @@
 #' @return Returns random mean-parametrized parameter vector that has the same form as the argument \code{params}
 #'   in the other functions, for instance, in the function \code{loglikelihood}.
 #' @inherit in_paramspace references
+#' @keywords internal
 
 random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale,
                        W_scale, lambda_scale, ar_scale2=1) {
@@ -68,6 +69,7 @@ random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pa
 #' @section Warning:
 #'   No argument checks!
 #' @inherit random_ind return references
+#' @keywords internal
 
 smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, accuracy=1, which_random=numeric(0),
                       mu_scale, mu_scale2, omega_scale, ar_scale=1, ar_scale2=1, W_scale, lambda_scale) {
@@ -209,6 +211,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'  }
+#'  @keywords internal
 
 random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale, ar_scale=1,
                         W_scale, lambda_scale) {
@@ -251,6 +254,7 @@ random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale
 #' @return Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
 #'  matrices \eqn{(vec(A_{1}),...,vec(A_{how_many}))}. Note that if \code{how_many==p},
 #'  then the returned vector equals \strong{\eqn{\phi_{m}}}.
+#' @keywords internal
 
 random_coefmats <- function(d, how_many, scale) {
   as.vector(vapply(1:how_many, function(i1) {
@@ -279,6 +283,7 @@ random_coefmats <- function(d, how_many, scale) {
 #'       moving average model to enforce stationarity.
 #'       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
 #'  }
+#' @keywords internal
 
 random_coefmats2 <- function(p, d, ar_scale=1) {
   # First generate matrices P_1,..,P_p with singular values less than one
@@ -342,6 +347,7 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 #'       in \eqn{W}. If lambdas are constrained, replacce \eqn{d*(M - 1)} in the length with \eqn{r} and
 #'       \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}. The operator \eqn{Wvec()} vectorizes a matrix and removes zeros.}
 #'   }
+#' @keywords internal
 
 random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_pars=NULL) {
   if(is.null(structural_pars)) {
@@ -403,6 +409,7 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
 #'   For \strong{structural models}, the parameters are generated from normal distribution with mean given
 #'   by the argument \code{W_and_lambdas} and the standard deviation is \code{sqrt(abs(W_and_lambdas)/(d + accuracy))}.
 #' @inherit random_covmat return
+#' @keywords internal
 
 smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=NULL) {
   if(is.null(structural_pars)) {

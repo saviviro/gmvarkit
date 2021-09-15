@@ -52,6 +52,7 @@ mod222s_2
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
  }
+ @keywords internal
 }
 \seealso{
 \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{gmvar_to_sgmvar}},

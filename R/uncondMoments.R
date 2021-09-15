@@ -9,6 +9,7 @@
 #' @section Warning:
 #'  No argument checks!
 #' @inherit is_stationary references
+#' @keywords internal
 
 get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept", "mean"),
                                  constraints=NULL, same_means=NULL, structural_pars=NULL) {
@@ -85,6 +86,7 @@ get_regime_means <- function(gmvar) {
 #' @return Returns an \eqn{(d x d x p+1 x M)} array containing the first p regimewise autocovariance matrices.
 #'   The subset \code{[, , j, m]} contains the j-1:th lag autocovariance matrix of the m:th regime.
 #' @inherit loglikelihood_int references
+#' @keywords internal
 
 get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL) {
 
@@ -174,6 +176,7 @@ get_regime_autocovs <- function(gmvar) {
 #'     \item{\code{$autocors}}{the autocovariance matrices scaled to autocorrelation matrices.}
 #'   }
 #' @inherit loglikelihood_int references
+#' @keywords internal
 
 uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL,
                                same_means=NULL, structural_pars=NULL) {
@@ -269,6 +272,7 @@ uncond_moments <- function(gmvar) {
 #'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
 #'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
 #'  }
+#' @keywords internal
 
 VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
   # all_Am = all_A[, , , m]
@@ -380,6 +384,7 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
 #'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
 #'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
 #'  }
+#' @keywords internal
 
 get_Sigmas <- function(p, M, d, all_A, all_boldA, all_Omega) {
   Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
