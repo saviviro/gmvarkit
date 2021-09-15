@@ -371,9 +371,9 @@ swap_parametrization <- function(gmvar) {
 
 alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
   stopifnot(!is.null(gmvar$all_estimates))
-  stopifnot(which_round >= 1 || which_round <= length(gmvar$all_estimates))
+  stopifnot(which_round >= 1 && which_round <= length(gmvar$all_estimates))
   if(!missing(which_largest)) {
-    stopifnot(which_largest >= 1 || which_largest <= length(gmvar$all_estimates))
+    stopifnot(which_largest >= 1 && which_largest <= length(gmvar$all_estimates))
     which_round <- order(gmvar$all_logliks, decreasing=TRUE)[which_largest]
   }
   ret <- GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$all_estimates[[which_round]],
