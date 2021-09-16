@@ -13,7 +13,7 @@ fitGMVAR(
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  ncalls = floor(10 + 30 * log(M)),
+  ncalls = 100,
   ncores = 2,
   maxit = 500,
   seeds = NULL,
@@ -104,7 +104,10 @@ If you wish to estimate a structural model without overidentifying constraints t
  algorithms will end up in the global maximum point. It's expected that most of the estimation rounds will end up in
  some local maximum or saddle point instead. Therefore, a (sometimes large) number of estimation rounds is required
  for reliable results. Because of the nature of the model, the estimation may fail especially in the cases where the
- number of mixture components is chosen too large.
+ number of mixture components is chosen too large. \strong{With more than two regimes and more than couple hundred
+ observations, thousands of estimation rounds (or more) are often required to obtain reliable results. With two regimes,
+ small p, and couple hundred observations in a two-dimensional time series, 50 is usually enough. Several hundred estimation
+ rounds suffices for fitting two-regimes models to 3 or 4 dimensional time series.}
 
  The estimation process is computationally heavy and it might take considerably long time for large models with
  large number of observations. If the iteration limit \code{maxit} in the variable metric algorithm is reached,
@@ -151,15 +154,9 @@ If you wish to estimate a structural model without overidentifying constraints t
 ## These are long running examples that use parallel computing!
 # Running all the below examples will take approximately 3-4 minutes.
 
-# These examples use the data 'eurusd' which comes with the
-# package, but in a scaled form (similar to Kalliovirta et al. 2016).
-data(eurusd, package="gmvarkit")
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
 # GMVAR(1,2) model: 10 estimation rounds with seeds set
 # for reproducibility
-fit12 <- fitGMVAR(data, p=1, M=2, ncalls=10, seeds=1:10)
+fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 plot(fit12)
 summary(fit12)

@@ -25,37 +25,32 @@
 #'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
 #'   \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
 #' @examples
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # GMVAR(1,2), d=2 model:
-#' params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-#'  0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-#'  3.982, 12.135, 0.789)
-#' mod122 <- GMVAR(data, p=1, M=2, params=params122)
-#' diagnostic_plot(mod122, type="series")
-#' diagnostic_plot(mod122, type="ac")
+#' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319,
+#'  0.005, 0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185,
+#'  -0.012, 0.136, 0.674)
+#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' diagnostic_plot(mod12, type="series")
+#' diagnostic_plot(mod12, type="ac")
 #'
 #' # GMVAR(2,2), d=2 model:
-#' params222 <-  c(1.386, -0.765, 1.314, 0.145, 0.094, 1.292, -0.389,
-#'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 1.005, 5.928, 1.248,
-#'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-#'   9.838, 0.740)
-#' mod222 <- GMVAR(data, p=2, M=2, params=params222)
-#' diagnostic_plot(mod222, type="ch")
-#' diagnostic_plot(mod222, type="norm")
+#' params22 <-  c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406,
+#'  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218,
+#'  0.02, -0.119, 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004,
+#'   0.105, 0.58)
+#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+#' diagnostic_plot(mod22, type="ch")
+#' diagnostic_plot(mod22, type="norm")
 #'
 #' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
 #' # the same for both regimes:
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
-#'  1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
-#'  3.560, 9.799, 0.368)
-#' mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
-#' diagnostic_plot(mod222c, wait_time=0.1)
-#' diagnostic_plot(mod222c, type="ac", maxlag=12)
+#' params22c <- c(0.418, 0.153, 0.513, 0.057, 0.204, 0.028, -0.169,
+#'  0.591, 0.241, 0.014, 0.091, 0.248, 1.068, -0.01, 0.111, 0.219,
+#'  0.004, 0.027, 0.501)
+#' mod22c <- GMVAR(gdpdef, p=2, M=2, params=params22c, constraints=C_mat)
+#' diagnostic_plot(mod22c, wait_time=0.2)
+#' diagnostic_plot(mod22c, type="ac", maxlag=12)
 #' @export
 
 diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=12, wait_time=4) {
@@ -182,25 +177,19 @@ diagnostic_plot <- function(gmvar, type=c("all", "series", "ac", "ch", "norm"), 
 #' \donttest{
 #' # Running all the below examples takes approximately 2 minutes.
 #'
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form (similar to Kalliovirta et al. 2016).
-#' data(eurusd, package="gmvarkit")
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
+#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
 #' fit12
 #' profile_logliks(fit12)
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints: model build based on inaccurate hand-given estimates.
 #' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-#' params12s <- c(0.62, -0.13, 3.25, 7.92, 0.96, 0.09, -0.01, 1.01, 0.95, -0.04,
-#'                -0.02, 0.94, 1.31, 0.88, -0.16, 2.24, 4, 1.8, 0.79)
-#' fit12s <- GMVAR(data, p=1, M=2, params=params12s,
+#' params12s <- c(0.55, 0.11, 0.62, 0.17, 0.34, 0.05, -0.01, 0.72, 0.25,
+#'  0.02, -0.14, 0.86, 0.54, 0.06, -0.16, 0.16, 3.62, 4.73, 0.67)
+#' mod12s <- GMVAR(gdpdef, p=1, M=2, params=params12s,
 #'                 structural_pars=list(W=W_122))
-#' profile_logliks(fit12s)
+#' profile_logliks(mod12s)
 #' }
 #' @export
 

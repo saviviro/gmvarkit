@@ -37,59 +37,33 @@
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
+#' # GMVAR(1, 2), d=2 model:
+#' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
+#'   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
+#'   0.136, 0.674)
+#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' mod12
 #'
-#' # GMVAR(1,2), d=2 model:
-#' params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-#'  0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-#'  3.982, 12.135, 0.789)
-#' mod122 <- GMVAR(data, p=1, M=2, params=params122)
-#' mod122
+#' # GMVAR(1, 2), d=2 model without data
+#' mod12_2 <- GMVAR(p=1, M=2, d=2, params=params12)
+#' mod12_2
 #'
-#' # GMVAR(1,2), d=2 model without data
-#' mod122_2 <- GMVAR(p=1, M=2, d=2, params=params122)
-#' mod122_2
-#'
-#' # GMVAR(2,2), d=2 model with mean-parametrization:
-#' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
-#'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-#'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-#'   9.838, 0.740)
-#' mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-#' mod222
+#' # GMVAR(2, 2), d=2 model with mean-parametrization:
+#' params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406,
+#'  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218,
+#'  0.02, -0.119, 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004,
+#'  0.105, 0.58)
+#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
+#' mod22
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
-#'  structural_pars=list(W=W_222))
-#' mod222s
-#'
-#' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
-#' # the same for both regimes:
-#' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
-#'  1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
-#'  3.560, 9.799, 0.368)
-#' mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
-#' mod222c
-#'
-#' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
-#' # the same for both regimes and the non-diagonal elements of
-#' # the coefficient matrices constrained to zero.
-#' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
-#'  nrow=2*2^2, byrow=FALSE)
-#' C_mat2 <- rbind(tmp, tmp)
-#' params222c2 <- c(0.355, 3.193, -0.114, 2.829, 1.263, 1.338, -0.292,
-#'  -0.362, 5.597, 3.456, 9.622, 0.982, -0.327, 5.236, 0.650)
-#' mod222c2 <- GMVAR(data, p=2, M=2, params=params222c2,
-#'   constraints=C_mat2)
-#' mod222c2
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+#'  structural_pars=list(W=W_22))
+#' mod22s
 #' @export
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
@@ -229,44 +203,27 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # GMVAR(1,2), d=2 model:
-#' params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-#'  0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-#'  3.982, 12.135, 0.789)
-#' mod122 <- GMVAR(p=1, M=2, d=2, params=params122)
-#' mod122
+#' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
+#'   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
+#'   0.136, 0.674)
+#' mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
+#' mod12
 #'
-#' mod122_2 <- add_data(data, mod122)
-#' mod122_2
+#' mod12_2 <- add_data(gdpdef, mod12)
+#' mod12_2
 #'
-#'
-#' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
-#' # the same for both regimes:
-#' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
-#'  1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
-#'  3.560, 9.799, 0.368)
-#' mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
-#' mod222c
-#'
-#' mod222c_2 <- add_data(data, mod222c)
-#' mod222c_2
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
-#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
-#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, structural_pars=list(W=W_222))
-#' mod222s
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s
 #'
-#' mod222s_2 <- add_data(data, mod222s)
-#' mod222s_2
+#' mod22s_2 <- add_data(gdpdef, mod22s)
+#' mod22s_2
 #' @export
 
 add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE) {
@@ -292,33 +249,28 @@ add_data <- function(data, gmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE)
 #' @inherit add_data seealso
 #' @examples
 #' \donttest{
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
+#' # GMVAR(2, 2), d=2 model with mean-parametrization:
+#' params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406,
+#'  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218,
+#'  0.02, -0.119, 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004,
+#'  0.105, 0.58)
+#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
+#' mod22 # mean parametrization
 #'
-#' # GMVAR(2,2), d=2 model:
-#' params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
-#'  -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-#'   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-#'   9.838, 0.740)
-#' mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-#' mod222 # mean parametrization
+#' mod22_2 <- swap_parametrization(mod22)
+#' mod22_2 # intercept parametrization
 #'
-#' mod222_2 <- swap_parametrization(mod222)
-#' mod222_2 # intercept parametrization
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
-#'  -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
-#'   0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrizatio="intercept",
-#'  structural_pars=list(W=W_222))
-#' mod222s # intercept parametrization
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s # intercept parametrization
 #'
-#' mod222s_2 <- swap_parametrization(mod222s)
-#' mod222s_2 # mean parametrization
+#' mod22s_2 <- swap_parametrization(mod22s)
+#' mod22s_2 # mean parametrization
 #' }
 #' @export
 
@@ -331,7 +283,7 @@ swap_parametrization <- function(gmvar) {
   new_params <- change_parametrization(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
                                        constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
                                        change_to=change_to)
-  GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=new_params, conditional=gmvar$model$conditional,
+  GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=new_params, conditional=gmvar$model$conditional,
         parametrization=change_to, constraints=gmvar$model$constraints, structural_pars=gmvar$model$structural_pars,
         calc_std_errors=ifelse(is.null(gmvar$data), FALSE, TRUE), stat_tol=gmvar$num_tols$stat_tol,
         posdef_tol=gmvar$num_tols$posdef_tol)
@@ -354,15 +306,8 @@ swap_parametrization <- function(gmvar) {
 #' @inherit add_data seealso
 #' @examples
 #' \donttest{
-#' # These are long running examples and use parallel computing
-#' # Running the below examples takes approximately 20 seconds.
-#'
-#' data(eurusd, package="gmvarkit")
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=2, seeds=7:8)
+#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=2, seeds=4:5)
 #' fit12
 #' fit12_2 <- alt_gmvar(fit12, which_largest=2)
 #' fit12_2
@@ -426,16 +371,11 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
 #'  }
 #' @examples
 #' \donttest{
-#' # These are long running examples
-#' data(eurusd, package="gmvarkit")
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # Reduced form GMVAR(1,2) model
-#' params12 <- c(0.622, -0.128, 0.959, 0.089, -0.006, 1.006, 1.747, 0.805,
-#'  5.805, 3.257, 7.921, 0.952, -0.037, -0.019, 0.943, 6.925, 3.981, 12.135,
-#'   0.789)
-#' mod12 <- GMVAR(data, p=1, M=2, params=params12)
+#' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319,
+#'  0.005, 0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185,
+#'  -0.012, 0.136, 0.674)
+#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
 #'
 #' # Form a structural model based on the reduced form model:
 #' mod12s <- gmvar_to_sgmvar(mod12)
@@ -519,17 +459,16 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
 #' @inherit in_paramspace_int references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
-#'                  structural_pars=list(W=W_222))
-#' mod222s
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s
 #'
-#' # The same reduced form model, modified W and lambda:
-#' mod222s_2 <- reorder_W_columns(mod222s, perm=2:1)
-#' mod222s_2
+#' # The same reduced form model, reordered W and lambda in the structual model:
+#' mod22s_2 <- reorder_W_columns(mod22s, perm=2:1)
+#' mod22s_2
 #' @export
 
 reorder_W_columns <- function(gmvar, perm) {
@@ -591,19 +530,18 @@ reorder_W_columns <- function(gmvar, perm) {
 #' @inherit reorder_W_columns references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
-#'                  structural_pars=list(W=W_222))
-#' mod222s
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s
 #'
 #' # The same reduced form model, with signs in the second column of W swapped:
-#' swap_W_signs(mod222s, which_to_swap=2)
+#' swap_W_signs(mod22s, which_to_swap=2)
 #'
 #' # The same reduced form model, with signs in both column of W swapped:
-#' swap_W_signs(mod222s, which_to_swap=1:2)
+#' swap_W_signs(mod22s, which_to_swap=1:2)
 #' @export
 
 swap_W_signs <- function(gmvar, which_to_swap) {
@@ -663,17 +601,16 @@ swap_W_signs <- function(gmvar, which_to_swap) {
 #' @inherit reorder_W_columns references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
-#'                  structural_pars=list(W=W_222))
-#' mod222s
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s
 #'
 #' # Update numerical tolerances:
-#' mod222s <- update_numtols(mod222s, stat_tol=1e-4, posdef_tol=1e-9)
-#' mod222s
+#' mod22s <- update_numtols(mod22s, stat_tol=1e-4, posdef_tol=1e-9)
+#' mod22s # The same model
 #' @export
 
 update_numtols <- function(gmvar, stat_tol=1e-3, posdef_tol=1e-8) {
