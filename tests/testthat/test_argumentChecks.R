@@ -474,19 +474,19 @@ test_that("check_constraints works correctly", {
 
 
 
-data_na <- eurusd; data_na[252, 2] <- NA
-eurusd_mat <- t(t(eurusd))
+data_na <- gdpdef; data_na[202, 2] <- NA
+gdpdef_mat <- t(t(gdpdef))
 
 test_that("check_data works correctly", {
-  expect_equal(check_data(data=eurusd, p=10), eurusd)
-  expect_equal(check_data(data=ts(eurusd_mat, start=c(1989, 1), deltat=1/12), p=1), eurusd)
-  expect_equal(check_data(data=as.data.frame(eurusd_mat), p=2), eurusd_mat)
+  expect_equal(check_data(data=gdpdef, p=10), gdpdef)
+  expect_equal(check_data(data=ts(gdpdef_mat, start=c(1959, 1), frequency=4), p=1), gdpdef)
+  expect_equal(check_data(data=as.data.frame(gdpdef_mat), p=2), gdpdef_mat)
 
-  expect_error(check_data(data=eurusd[,1, drop=FALSE], p=4))
-  expect_error(check_data(data=as.data.frame(eurusd[,2]), p=4))
-  expect_error(check_data(data=ts(eurusd[,2], start=c(1989, 1), deltat=1/12), p=3))
+  expect_error(check_data(data=gdpdef[,1, drop=FALSE], p=4))
+  expect_error(check_data(data=as.data.frame(gdpdef[,2]), p=4))
+  expect_error(check_data(data=ts(gdpdef[,2], start=c(1959, 1), frequency=4), p=3))
   expect_error(check_data(data=data_na, p=4))
-  expect_error(check_data(data=eurusd, p=nrow(eurusd)))
+  expect_error(check_data(data=gdpdef, p=nrow(gdpdef)))
 })
 
 test_that("check_same_means works correctly", {

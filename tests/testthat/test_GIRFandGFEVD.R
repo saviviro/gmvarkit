@@ -1,62 +1,60 @@
 context("GIRF and GFEVD")
 library(gmvarkit)
 
-# NOTE that some elements of these tests use random elements obtained from simulation algorithms
-
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
+# NOTE that these tests contain random elements obtained from simulation algorithms
 
 ## A(M)(p)_(p)(M)(d)
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-params222s <- c(1.428, -0.808, 1.029, 5.84, 1.314, 0.145, 0.094, 1.292,
-                -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272,
-                -0.074, 0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7, 1.44, 0.742)
-W_222 <- matrix(c(1, NA, -1, 1), nrow=2, byrow=FALSE)
-mod222s <- GMVAR(data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395, 0.406,
+               -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+               0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+W22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W22))
 
-girf1 <- GIRF(mod222s, N=2, R2=2, R1=2, seeds=1:2, plot=FALSE)
-girf2 <- GIRF(mod222s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
-              include_mixweights=FALSE, init_values=mod222s$data, ci=0.1, plot=FALSE)
-girf3 <- GIRF(mod222s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot=FALSE)
-girf4 <- GIRF(mod222s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot=FALSE)
+girf1 <- GIRF(mod22s, N=2, R2=2, R1=2, seeds=1:2, plot=FALSE)
+girf2 <- GIRF(mod22s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
+              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot=FALSE)
+girf3 <- GIRF(mod22s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot=FALSE)
+girf4 <- GIRF(mod22s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot=FALSE)
 
 test_that("GIRF works correctly", {
-  expect_equal(unname(girf1$girf_res[[1]]$point_est[3,]), c(2.7647446, 2.6555342, -0.2440685, 0.2440685), tolerance=1e-4)
-  expect_equal(unname(girf1$girf_res[[2]]$point_est[1,]), c(-0.358230, 2.298642, 0.000000, 0.000000), tolerance=1e-4)
-  expect_equal(unname(girf1$girf_res[[2]]$conf_ints[3, , 2]), c(2.728152, 2.788786, 3.435544, 3.496178), tolerance=1e-4)
-  expect_equal(unname(girf1$girf_res[[1]]$conf_ints[1, 1, ]), c(1.409993, 1.121124, 0.000000, 0.000000), tolerance=1e-4)
+  expect_equal(unname(girf1$girf_res[[1]]$point_est[3,]), c(-0.1014679, 0.1171628, -0.1047082, 0.1047082), tolerance=1e-4)
+  expect_equal(unname(girf1$girf_res[[2]]$point_est[1,]), c(-0.57599848, 0.02003473, 0.00000000, 0.00000000), tolerance=1e-4)
+  expect_equal(unname(girf1$girf_res[[2]]$conf_ints[3, , 2]), c(-0.009430567, -0.008801493, -0.002091365, -0.001462290), tolerance=1e-4)
+  expect_equal(unname(girf1$girf_res[[1]]$conf_ints[1, 1, ]), c(0.06830714, 0.20611978, 0.00000000, 0.00000000), tolerance=1e-4)
 
-  expect_equal(unname(girf2$girf_res[[1]]$point_est[1,]), c(0.1317841, -0.8456145), tolerance=1e-4)
-  expect_equal(unname(girf2$girf_res[[1]]$point_est[2,]), c(-3.333572, -1.151782), tolerance=1e-4)
-  expect_equal(unname(girf2$girf_res[[1]]$conf_ints[2, 2, ]), c(-3.333572, -1.151782), tolerance=1e-4)
+  expect_equal(unname(girf2$girf_res[[1]]$point_est[1,]), c(0.124624506, -0.004334765), tolerance=1e-4)
+  expect_equal(unname(girf2$girf_res[[1]]$point_est[2,]), c(0.028445814, 0.005640614), tolerance=1e-4)
+  expect_equal(unname(girf2$girf_res[[1]]$conf_ints[2, 2, ]), c(0.028445814, 0.005640614), tolerance=1e-4)
 
-  expect_equal(unname(girf3$girf_res[[1]]$point_est[,1]), c(1.643883, 3.926812, 6.325788), tolerance=1e-4)
-  expect_equal(unname(girf3$girf_res[[1]]$point_est[,2]), c(1.307096, 3.234228, 5.572740), tolerance=1e-4)
-  expect_equal(unname(girf3$girf_res[[1]]$conf_ints[1, 2, ]), c(1.643883, 1.307096, 0.000000, 0.000000), tolerance=1e-4)
+  expect_equal(unname(girf3$girf_res[[1]]$point_est[,1]), c(0.11195283, 0.08590711, -0.41032582), tolerance=1e-4)
+  expect_equal(unname(girf3$girf_res[[1]]$point_est[,2]), c(0.3378226, 0.4778677, 0.6470493), tolerance=1e-4)
+  expect_equal(unname(girf3$girf_res[[1]]$conf_ints[1, 2, ]), c(0.1119528, 0.3378226, 0.0000000, 0.0000000), tolerance=1e-4)
 
-  expect_equal(unname(girf4$girf_res[[1]]$point_est[,1]), c(1.000000, 1.388742, 1.459335), tolerance=1e-4)
-  expect_equal(unname(girf4$girf_res[[1]]$point_est[,2]), c(0.7951274, 1.1723045, 1.4225543), tolerance=1e-4)
-  expect_equal(unname(girf4$girf_res[[1]]$conf_ints[1, 2, ]), c(1.0000000, 0.7951274, 0.0000000, 0.0000000), tolerance=1e-4)
+  expect_equal(unname(girf4$girf_res[[1]]$point_est[,1]), c(1.0000000, -0.2326491, -4.4325177), tolerance=1e-4)
+  expect_equal(unname(girf4$girf_res[[1]]$point_est[,2]), c(3.017544, 1.250930, 1.511186), tolerance=1e-4)
+  expect_equal(unname(girf4$girf_res[[1]]$conf_ints[1, 2, ]), c(1.000000, 3.017544, 0.000000, 0.000000), tolerance=1e-4)
 })
 
 
 # Estimating the GFEVD using all possible histories in the data as the
 # initial values:
-mod22s <- add_data(mod222s$data[1:50,], mod222s)
-gfevd1 <- GFEVD(mod22s, N=3, R1=1, initval_type="data", seeds=1:49)
-gfevd2 <- GFEVD(mod22s, N=2, R1=5, R2=10, initval_type="random", init_regimes=1:2, seeds=1:10)
-gfevd3 <- GFEVD(mod22s, N=4, R1=6, initval_type="fixed",
-                init_values=matrix(c(-6, -6, 120, 120), nrow=2),
+mod22s_2 <- add_data(mod22s$data[1:50,], mod22s)
+gfevd1 <- GFEVD(mod22s_2, N=3, R1=1, initval_type="data", seeds=1:49)
+gfevd2 <- GFEVD(mod22s_2, N=2, R1=5, R2=10, initval_type="random", init_regimes=1:2, seeds=1:10)
+gfevd3 <- GFEVD(mod22s_2, N=4, R1=6, initval_type="fixed",
+                init_values=matrix(c(1, 1, 2, 2), nrow=2),
                 include_mixweights=TRUE, seeds=1)
 
 test_that("GFEVD works correctly", {
-  expect_equal(unname(gfevd1$gfevd_res[3, , 1]), c(0.95766104, 0.04233896), tolerance=1e-3)
-  expect_equal(unname(gfevd1$gfevd_res[1, , 2]), c(0.3827664, 0.6172336), tolerance=1e-3)
-  expect_equal(unname(gfevd2$gfevd_res[3, , 1]), c(0.96554392, 0.03445608), tolerance=1e-3)
-  expect_equal(unname(gfevd2$gfevd_res[2, , 2]), c(0.1599383, 0.8400617), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[2, , 1]), c(0.97270462, 0.02729538), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[1, , 2]), c(0.2195167, 0.7804833), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[5, , 3]), c(0.688317, 0.311683), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[4, , 4]), c(0.96538007, 0.03461993), tolerance=1e-3)
+  expect_equal(unname(gfevd1$gfevd_res[3, , 1]), c(0.01382024, 0.98617976), tolerance=1e-3)
+  expect_equal(unname(gfevd1$gfevd_res[1, , 2]), c(0.98893981, 0.01106019), tolerance=1e-3)
+  expect_equal(unname(gfevd2$gfevd_res[3, , 1]), c(0.00793223, 0.99206777), tolerance=1e-3)
+  expect_equal(unname(gfevd2$gfevd_res[2, , 2]), c(0.98524421, 0.01475579), tolerance=1e-3)
+  expect_equal(unname(gfevd3$gfevd_res[2, , 1]), c(0.01929081, 0.98070919), tolerance=1e-3)
+  expect_equal(unname(gfevd3$gfevd_res[1, , 2]), c(0.993477615, 0.006522385), tolerance=1e-3)
+  expect_equal(unname(gfevd3$gfevd_res[5, , 3]), c(0.2543561, 0.7456439), tolerance=1e-3)
+  expect_equal(unname(gfevd3$gfevd_res[4, , 4]), c(0.7643379, 0.2356621), tolerance=1e-3)
 
 })

@@ -1,8 +1,6 @@
 context("generate parameters")
 library(gmvarkit)
 
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-
 params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746, 0.804, 5.804, 3.245, 7.913,
                0.952, -0.037, -0.019, 0.943, 6.926, 3.982, 12.135, 0.789) # p=1, M=2, d=2
 set.seed(1); W_313 <- chol(tcrossprod(matrix(rnorm(3*3), nrow=3)))

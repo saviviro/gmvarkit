@@ -1,9 +1,6 @@
 context("GMVAR construction")
 library(gmvarkit)
 
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-
-
 ## A(M)(p)_(p)(M)(d)
 rbind_diags <- function(p, M, d) {
   I <- diag(p*d^2)
@@ -17,7 +14,7 @@ params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746, 0.804, 5.804, 
 # p=2, M=2, d=2, constrained
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036, 1.335, -0.290, -0.083, -0.047,
-                -0.356, 0.934, -0.152, 5.201, 5.883, 3.560, 9.799, 0.368) # p=2, M=2, d=2, AR parameters restricted same for both regimes
+                -0.356, 0.934, -0.152, 5.201, 5.883, 3.560, 9.799, 0.368)  # p=2, M=2, d=2, AR parameters restricted same for both regimes
 
 # p=2, M=1, d=2, SGMVAR, W constrained
 phi10_212 <- c(1.03, 2.36)
@@ -63,21 +60,21 @@ C_lambda_222 <- matrix(c(1, 2), nrow=2)
 theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
 
 test_that("GMVAR works correctly", {
-  mod122 <- GMVAR(data, p=1, M=2, params=params122)
-  mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
+  mod122 <- GMVAR(gdpdef, p=1, M=2, params=params122)
+  mod222c <- GMVAR(gdpdef, p=2, M=2, params=params222c, constraints=C_mat)
   expect_equal(mod122$params, params122)
   expect_equal(mod222c$params, params222c)
 
   # SGMVAR
-  mod212csW <- GMVAR(data, p=2, M=1, params=theta_212csW, structural_pars=list(W=W_212))
-  mod122csLAR <- GMVAR(data, p=1, M=2, params=theta_122csLAR, constraints=C_122,
+  mod212csW <- GMVAR(gdpdef, p=2, M=1, params=theta_212csW, structural_pars=list(W=W_212))
+  mod122csLAR <- GMVAR(gdpdef, p=1, M=2, params=theta_122csLAR, constraints=C_122,
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
   expect_equal(mod212csW$params, theta_212csW)
   expect_equal(mod122csLAR$params, theta_122csLAR)
 
   # Same_means
-  mod222c_int <- GMVAR(data, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
-  mod222csLAR_int <- GMVAR(data, p=2, M=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+  mod222c_int <- GMVAR(gdpdef, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+  mod222csLAR_int <- GMVAR(gdpdef, p=2, M=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
                            structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
   expect_equal(mod222c_int$params, theta_222c_int)
   expect_equal(mod222csLAR_int$params, theta_222csLAR_int)
@@ -86,25 +83,25 @@ test_that("GMVAR works correctly", {
 
 test_that("add_data works correctly", {
   mod122 <- GMVAR(p=1, M=2, d=2, params=params122)
-  mod122_2 <- add_data(data=data, gmvar=mod122)
-  expect_equal(mod122_2$data, data)
+  mod122_2 <- add_data(data=gdpdef, gmvar=mod122)
+  expect_equal(mod122_2$data, gdpdef)
 
   # SGMVAR
   mod122csLAR <- GMVAR(p=1, M=2, d=2, params=theta_122csLAR, constraints=C_122,
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
-  mod122csLAR_2 <- add_data(data=data, gmvar=mod122csLAR)
-  expect_equal(mod122csLAR_2$data, data)
+  mod122csLAR_2 <- add_data(data=gdpdef, gmvar=mod122csLAR)
+  expect_equal(mod122csLAR_2$data, gdpdef)
 
   # Same means
   mod222c_int <- GMVAR(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
-  mod222c_int2 <- add_data(data=data, gmvar=mod222c_int)
-  expect_equal(mod222c_int2$data, data)
+  mod222c_int2 <- add_data(data=gdpdef, gmvar=mod222c_int)
+  expect_equal(mod222c_int2$data, gdpdef)
 })
 
 
 test_that("swap_parametrization works correctly", {
-  mod122 <- GMVAR(data, p=1, M=2, params=params122)
-  mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
+  mod122 <- GMVAR(gdpdef, p=1, M=2, params=params122)
+  mod222c <- GMVAR(gdpdef, p=2, M=2, params=params222c, constraints=C_mat)
   mod122_2 <- swap_parametrization(mod122)
   mod222c_2 <- swap_parametrization(mod222c)
   expect_equal(mod122_2$params, c(-10.291667, 174.159722, 0.959, 0.089, -0.006, 1.006, 1.746, 0.804,
@@ -115,8 +112,8 @@ test_that("swap_parametrization works correctly", {
                                    9.799, 0.368), tolerance=1e-4)
 
   # SGMVAR
-  mod212csW <- GMVAR(data, p=2, M=1, params=theta_212csW, structural_pars=list(W=W_212))
-  mod122csLAR <- GMVAR(data, p=1, M=2, params=theta_122csLAR, constraints=C_122,
+  mod212csW <- GMVAR(gdpdef, p=2, M=1, params=theta_212csW, structural_pars=list(W=W_212))
+  mod122csLAR <- GMVAR(gdpdef, p=1, M=2, params=theta_122csLAR, constraints=C_122,
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
   mod212csW_2 <- swap_parametrization(mod212csW)
   mod122csLAR_2 <- swap_parametrization(mod122csLAR)
@@ -128,16 +125,16 @@ test_that("swap_parametrization works correctly", {
 
 
 test_that("alt_gmvar does not throw errors", {
-  gmvar11 <- suppressMessages(fitGMVAR(data[1:20,], p=1, M=1, ncalls=2, ncores=1, maxit=1, seeds=1:2, print_res=FALSE, ngen=1))
+  gmvar11 <- suppressMessages(fitGMVAR(gdpdef[1:20,], p=1, M=1, ncalls=2, ncores=1, maxit=1, seeds=1:2, print_res=FALSE, ngen=1))
   tmp <- alt_gmvar(gmvar11, which_round=1, calc_cond_moments=FALSE, calc_std_errors=FALSE)
-  expect_true(TRUE)
+  expect_true(TRUE) # There needs to be a test inside each test_that
 })
 
 # GMVAR(1,2), d=2 model:
 params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
                0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019,
                0.943, 6.926, 3.982, 12.135, 0.789)
-mod122 <- GMVAR(data, p=1, M=2, params=params122)
+mod122 <- GMVAR(gdpdef, p=1, M=2, params=params122)
 mod122s <- gmvar_to_sgmvar(mod122)
 
 # GMVAR(2,2), d=2 model with AR-parameters restricted to be
@@ -150,7 +147,7 @@ mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
 mod222cs <- gmvar_to_sgmvar(mod222c)
 
 # p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
-mod222c_int <- GMVAR(data, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+mod222c_int <- GMVAR(gdpdef, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
 mod222cs_int <- gmvar_to_sgmvar(mod222c_int)
 
 test_that("gmvar_to_sgmvar works correctly", {
@@ -170,12 +167,12 @@ params112 <- c(0.899784972, 1.707574085, 0.989440729, 0.002636335, -0.006957649,
                1.961053552, 0.452934215, 0.452934215, 2.944004374)
 W112 <- matrix(NA, nrow=2, ncol=2)
 diag(W112) <- c(1, 1)
-mod112 <- GMVAR(data, p=1, M=1, params=params112, structural_pars=list(W=W112))
+mod112 <- GMVAR(gdpdef, p=1, M=1, params=params112, structural_pars=list(W=W112))
 mod112_2 <- reorder_W_columns(mod112, perm=2:1)
 
 # p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222), same_means=list(1:2)
 theta_222csAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, 0.4, alpha1_222)
-mod222csAR_int <- GMVAR(data, p=2, M=2, params=theta_222csAR_int, parametrization="mean",
+mod222csAR_int <- GMVAR(gdpdef, p=2, M=2, params=theta_222csAR_int, parametrization="mean",
                         constraints=C_222, structural_pars=list(W=W_222), same_means=list(1:2))
 mod222csAR_int2 <- reorder_W_columns(mod222csAR_int, perm=2:1)
 
