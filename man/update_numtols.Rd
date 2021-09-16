@@ -38,17 +38,16 @@ All signs in any column of \eqn{W} can be swapped without changing the implied r
 }
 \examples{
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
- -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-  0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, parametrization="mean",
-                 structural_pars=list(W=W_222))
-mod222s
+params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s
 
 # Update numerical tolerances:
-mod222s <- update_numtols(mod222s, stat_tol=1e-4, posdef_tol=1e-9)
-mod222s
+mod22s <- update_numtols(mod22s, stat_tol=1e-4, posdef_tol=1e-9)
+mod22s # The same model
 }
 \references{
 \itemize{

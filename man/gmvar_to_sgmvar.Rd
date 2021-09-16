@@ -34,16 +34,11 @@ The switch is made by simultaneously diagonalizing the two error term covariance
 }
 \examples{
 \donttest{
-# These are long running examples
-data(eurusd, package="gmvarkit")
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
 # Reduced form GMVAR(1,2) model
-params12 <- c(0.622, -0.128, 0.959, 0.089, -0.006, 1.006, 1.747, 0.805,
- 5.805, 3.257, 7.921, 0.952, -0.037, -0.019, 0.943, 6.925, 3.981, 12.135,
-  0.789)
-mod12 <- GMVAR(data, p=1, M=2, params=params12)
+params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319,
+ 0.005, 0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185,
+ -0.012, 0.136, 0.674)
+mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
 
 # Form a structural model based on the reduced form model:
 mod12s <- gmvar_to_sgmvar(mod12)

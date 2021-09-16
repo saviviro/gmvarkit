@@ -123,18 +123,18 @@ The model needs to be structural in order for this function to be applicable. A 
  # These are long-running examples that use parallel computing.
  # It takes approximately 30 seconds to run all the below examples.
 
- data(eurusd, package="gmvarkit")
- data <- cbind(10*eurusd[,1], 100*eurusd[,2])
- colnames(data) <- colnames(eurusd)
-
  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
- params22s <- c(1.386, -0.766, 1.005, 5.928, 1.314, 0.145, 0.094, 1.292,
-  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.001, 1.44, 0.741)
+ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
- mod22s <- GMVAR(data, p=2, M=2, params=params22s,
+ mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
   structural_pars=list(W=W_22))
  mod22s
+ # Alternatively, use:
+ #fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
+ #                   ncalls=20, seeds=1:20)
+ # To obtain an estimated version of the same model.
 
  ## NOTE: Use larger R1 is empirical applications! Small R1 is used
  ## Below only to fasten the execution time of the examples.

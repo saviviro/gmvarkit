@@ -19,12 +19,12 @@ Returns a matrix with \eqn{d*p} rows and \eqn{M} columns - one column for each r
   the "bold A" matrices containing the AR coefficients for each mixture component.
 }
 \examples{
-params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
- -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-  0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-  9.838, 0.740)
-mod222 <- GMVAR(d=2, p=2, M=2, params=params222, parametrization="mean")
-get_boldA_eigens(mod222)
+# GMVAR(2, 2), d=2 model
+params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+ 0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
+mod22 <- GMVAR(p=2, M=2, d=2, params=params22)
+get_boldA_eigens(mod22)
 }
 \references{
 \itemize{

@@ -40,20 +40,15 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
  ## These are long running examples that use parallel computing!
  ## The below examples take around 1 minute to run.
 
- # Load the data
- data(eurusd, package="gmvarkit")
- data <- cbind(10*eurusd[,1], 100*eurusd[,2])
- colnames(data) <- colnames(eurusd)
-
- # Structural GMVAR(2, 2), d=2 model identified similarly to Cholesky:
+ # Structural GMVAR(2, 2), d=2 model with recursive identification
  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
- fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W22),
-                    ncalls=1, seeds=4)
+ fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
+                    ncalls=1, seeds=2)
 
  # The same model but the AR coefficients restricted to be the same
  # in both regimes:
  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
- fit22sc <- fitGMVAR(data, p=2, M=2, constraints=C_mat,
+ fit22sc <- fitGMVAR(gdpdef, p=2, M=2, constraints=C_mat,
                      structural_pars=list(W=W22), ncalls=1, seeds=1)
 
  # Test the AR constraints with likelihood ratio test:

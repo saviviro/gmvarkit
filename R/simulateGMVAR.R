@@ -35,64 +35,44 @@
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}, \code{\link{GFEVD}}
 #' @inherit loglikelihood_int references
 #' @examples
-#'  # These examples use the data 'eurusd' which comes with the
-#'  # package, but in a scaled form.
-#'  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#'  colnames(data) <- colnames(eurusd)
-#'
 #'  # GMVAR(1,2), d=2 process, initial values from the stationary
 #'  # distribution
-#'  params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-#'   0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-#'   3.982, 12.135, 0.789)
-#'  mod122 <- GMVAR(p=1, M=2, d=2, params=params122)
+#'  params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
+#'   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136,
+#'   0.674)
+#'  mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
 #'  set.seed(1)
-#'  sim122 <- simulateGMVAR(mod122, nsimu=500)
-#'  plot.ts(sim122$sample)
-#'  ts.plot(sim122$mixing_weights, col=c("blue", "red"), lty=2)
-#'  plot(sim122$component, type="l")
+#'  sim12 <- simulateGMVAR(mod12, nsimu=500)
+#'  plot.ts(sim12$sample)
+#'  ts.plot(sim12$mixing_weights, col=c("blue", "red"), lty=2)
+#'  plot(sim12$component, type="l")
 #'
 #'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#'  params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'    -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'    0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#'  W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#'  mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
-#'    structural_pars=list(W=W_222))
-#'  sim222s <- simulateGMVAR(mod222s, nsimu=100)
-#'  plot.ts(sim222s$sample)
+#'  params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#'  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#'  mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+#'   structural_pars=list(W=W_22))
+#'  sim22s <- simulateGMVAR(mod22s, nsimu=100)
+#'  plot.ts(sim22s$sample)
 #'
 #'  ## FORECASTING EXAMPLE ##
 #'  # Forecast 5-steps-ahead, 500 sets of simulations with initial
 #'  # values from the data:
-#'  # GMVAR(2,2), d=2 model with mean-parametrization:
-#'  params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
-#'   -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-#'    0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-#'    9.838, 0.740)
-#'  mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-#'  sim222 <- simulateGMVAR(mod222, nsimu=5, ntimes=500)
+#'  # GMVAR(2,2), d=2 model
+#'  params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+#'   0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+#'    0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
+#'  mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+#'  sim22 <- simulateGMVAR(mod22, nsimu=5, ntimes=500)
 #'
 #'  # Point forecast + 95% prediction intervals:
-#'  apply(sim222$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))
+#'  apply(sim22$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))
 #'
 #'  # Similar forecast for the mixing weights:
-#'  apply(sim222$mixing_weights, MARGIN=1:2, FUN=quantile,
+#'  apply(sim22$mixing_weights, MARGIN=1:2, FUN=quantile,
 #'        probs=c(0.025, 0.5, 0.972))
-#'
-#'
-#'  # GMVAR(2,2), d=2 model with AR parameters restricted to be
-#'  # the same for both regimes, custom inital values:
-#'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#'  params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
-#'   1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
-#'   3.560, 9.799, 0.368)
-#'  mod222c <- GMVAR(data, p=2, M=2, params=params222c, constraints=C_mat)
-#'  sim222c <- simulateGMVAR(mod222c, nsimu=100,
-#'               init_values=matrix(c(30, 30, 80, 80), nrow=2))
-#'  plot.ts(sim222c$sample)
-#'  ts.plot(sim222c$mixing_weights, col=c("blue", "red"), lty=2)
-#'  plot(sim222c$component, type="l")
 #' @export
 
 simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {

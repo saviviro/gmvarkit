@@ -65,19 +65,14 @@ In particular, the functions \code{get_foc} and \code{get_soc} can be used to ch
   calc_gradient(x=c(1, 2), fn=foo, a=0.3, b=0.1)
 
   \donttest{
-  # These examples below use the data 'eurusd' which comes
-  # with the package, but in a scaled form.
-  data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-  colnames(data) <- colnames(eurusd)
-
   # GMVAR(1,2), d=2 model:
-  params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
-    0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
-    3.982, 12.135, 0.789)
-  mod122 <- GMVAR(data, p=1, M=2, params=params122)
-  get_gradient(mod122)
-  get_hessian(mod122)
-  get_soc(mod122)
+  params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
+   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
+   0.136, 0.674)
+  mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+  get_gradient(mod12)
+  get_hessian(mod12)
+  get_soc(mod12)
   }
 }
 \seealso{

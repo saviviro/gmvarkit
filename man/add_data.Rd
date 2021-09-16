@@ -26,44 +26,27 @@ Returns an object of class 'gmvar' defining the specified GMVAR model with the d
  Also calculates mixing weights and quantile residuals accordingly.
 }
 \examples{
-# These examples use the data 'eurusd' which comes with the
-# package, but in a scaled form.
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
 # GMVAR(1,2), d=2 model:
-params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746,
- 0.804, 5.804, 3.245, 7.913, 0.952, -0.037, -0.019, 0.943, 6.926,
- 3.982, 12.135, 0.789)
-mod122 <- GMVAR(p=1, M=2, d=2, params=params122)
-mod122
+params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
+  0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
+  0.136, 0.674)
+mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
+mod12
 
-mod122_2 <- add_data(data, mod122)
-mod122_2
+mod12_2 <- add_data(gdpdef, mod12)
+mod12_2
 
-
-# GMVAR(2,2), d=2 model with AR-parameters restricted to be
-# the same for both regimes:
-C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036,
- 1.335, -0.290, -0.083, -0.047, -0.356, 0.934, -0.152, 5.201, 5.883,
- 3.560, 9.799, 0.368)
-mod222c <- GMVAR(p=2, M=2, d=2, params=params222c, constraints=C_mat)
-mod222c
-
-mod222c_2 <- add_data(data, mod222c)
-mod222c_2
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
- -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
-  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod222s <- GMVAR(p=2, M=2, d=2, params=params222s, structural_pars=list(W=W_222))
-mod222s
+params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s
 
-mod222s_2 <- add_data(data, mod222s)
-mod222s_2
+mod22s_2 <- add_data(gdpdef, mod22s)
+mod22s_2
 }
 \references{
 \itemize{

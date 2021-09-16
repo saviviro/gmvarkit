@@ -47,14 +47,9 @@ The purpose of \code{iterate_more} is to provide a simple and convenient tool to
 ## These are long running examples that use parallel computing!
 ## Running the below examples takes approximately 2 minutes
 
-# These examples use the data 'eurusd' which comes with the
-# package, but in a scaled form.
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
 # GMVAR(1,2) model, only 5 iterations of the variable metric
 # algorithm
-fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, maxit=5, seeds=7)
+fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, maxit=5, seeds=1)
 fit12
 
 # Iterate more:

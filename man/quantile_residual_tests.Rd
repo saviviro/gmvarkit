@@ -78,30 +78,22 @@ heteroskedasticity tests.
 
 \examples{
 \donttest{
-## These are long running examples that use parallel computing!
-## The below examples take about 30 seconds to run.
-
-# These examples use the data 'eurusd' which comes with the
-# package, but in a scaled form.
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
-# GMVAR(1,2) model with default settings
-fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
-qrtests12 <- quantile_residual_tests(fit12)
-qrtests12
-plot(qrtests12)
+# GMVAR(3,2) model
+fit32 <- fitGMVAR(gdpdef, p=3, M=2, ncalls=1, seeds=2)
+qrtests32 <- quantile_residual_tests(fit32)
+qrtests32
+plot(qrtests32)
 
 # Structural GMVAR(1,2) model identified with sign
 # constraints and build with hand-specified parameter values.
 # Tests based on simulation procedure with nsimu=1000:
-W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-params12s <- c(0.624, -0.127, 3.248, 7.916, 0.959, 0.089, -0.006, 1.006,
- 0.952, -0.037, -0.019, 0.943, 1.312, 0.879, -0.155, 2.243, 3.997,
- 1.798, 0.788)
-fit12s <- GMVAR(data, p=1, M=2, params=params12s,
-                structural_pars=list(W=W_122))
-qrtests12s <- quantile_residual_tests(fit12s, nsimu=1000)
+params12s <- c(0.55, 0.112, 0.619, 0.173, 0.344, 0.055, -0.009, 0.718,
+ 0.255, 0.017, -0.136, 0.858, 0.541, 0.057, -0.162, 0.162, 3.623,
+ 4.726, 0.674)
+W_12 <- matrix(c(1, 1, -1, 1), nrow=2)
+mod12s <- GMVAR(gdpdef, p=1, M=2, params=params12s,
+                structural_pars=list(W=W_12))
+qrtests12s <- quantile_residual_tests(mod12s, nsimu=1000)
 qrtests12s
 }
 }

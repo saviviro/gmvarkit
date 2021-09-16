@@ -41,7 +41,9 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 #' @inheritParams simulateGMVAR
 #' @param digits how many digits should be printed?
 #' @details The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
-#'   errors to certain parameter estimates.
+#'   errors to certain parameter estimates. Note that if the model is intercept parametrized, there won't
+#'   be standard errors for the unconditional means, and vice versa. Also, there is no standard error for the
+#'   last mixing weight alpha_M because it is not parametrized.
 #'
 #'   Note that if linear constraints are imposed and they involve summations or multiplications, then the AR
 #'   parameter standard errors are printed separately as they don't correspond one-to-one to the model parameter
@@ -51,16 +53,8 @@ standard_errors <- function(data, p, M, params, conditional=TRUE, parametrizatio
 #' @inherit GMVAR references
 #' @examples
 #' \donttest{
-#' ## These are long running examples that use parallel computing!
-#' ## The below examples take around 20 seconds to run.
-#'
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
 #' # GMVAR(1,2) model
-#' fit12 <- fitGMVAR(data, p=1, M=2, ncalls=1, seeds=7)
+#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
 #' fit12
 #' print_std_errors(fit12)
 #' }

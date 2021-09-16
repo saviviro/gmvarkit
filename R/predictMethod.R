@@ -30,32 +30,27 @@
 #' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulateGMVAR}}
 #' @inherit in_paramspace_int references
 #' @examples
-#' # These examples use the data 'eurusd' which comes with the
-#' # package, but in a scaled form.
-#' data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-#' colnames(data) <- colnames(eurusd)
-#'
-#' # GMVAR(2,2) model
-#' params22 <- c(1.386, -0.767, 1.314, 0.145, 0.094, 1.292, -0.389, -0.07,
-#'  -0.109, -0.281, 0.92, -0.025, 4.839, 0.998, 5.916, 1.248, 0.077, -0.04,
-#'  1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.569, 9.837, 0.741)
-#' fit22 <- GMVAR(data, p=2, M=2, params=params22)
-#' p1 <- predict(fit22, n_ahead=10, pred_type="median", n_simu=500)
+#' # GMVAR(2, 2), d=2 model
+#' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+#'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+#'   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
+#' mod22 <- GMVAR(gdpdef, p=2, M=2, d=2, params=params22)
+#' p1 <- predict(mod22, n_ahead=10, pred_type="median", n_simu=500)
 #' p1
-#' p2 <- predict(fit22, n_ahead=10, nt=20, lty=1, n_simu=500)
+#' p2 <- predict(mod22, n_ahead=10, nt=20, lty=1, n_simu=500)
 #' p2
-#' p3 <- predict(fit22, n_ahead=10, pi=c(0.99, 0.90, 0.80, 0.70),
+#' p3 <- predict(mod22, n_ahead=10, pi=c(0.99, 0.90, 0.80, 0.70),
 #'               nt=30, lty=0, n_simu=500)
 #' p3
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params222s <- c(-11.964, 155.024, 11.636, 124.988, 1.314, 0.145, 0.094, 1.292,
-#'  -0.389, -0.07, -0.109, -0.281, 1.248, 0.077, -0.04, 1.266, -0.272, -0.074,
-#'   0.034, -0.313, 0.903, 0.718, -0.324, 2.079, 7.00, 1.44, 0.742)
-#' W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod222s <- GMVAR(data, p=2, M=2, params=params222s, parametrization="mean",
-#'  structural_pars=list(W=W_222))
-#' p1 <- predict(mod222s, n_ahead=10, n_simu=500)
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, parametrization="mean",
+#'  structural_pars=list(W=W_22))
+#' p1 <- predict(mod22s, n_ahead=10, n_simu=500)
 #' @export
 
 predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), pi_type=c("two-sided", "upper", "lower", "none"),

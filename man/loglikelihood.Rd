@@ -155,21 +155,18 @@ Returns log-likelihood if \code{params} is in the parameters space and \code{min
 \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 }
 \examples{
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-
 # GMVAR(2, 2), d=2 model;
-params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
- -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-  0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-  9.838, 0.740)
-loglikelihood(data=data, p=2, M=2, params=params222, parametrization="mean")
+params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+ 0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+ 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
+loglikelihood(data=gdpdef, p=2, M=2, params=params22)
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-params222s <- c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29,
- -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1, -0.05, -0.4,
-  0.89, 0.72, -0.37, 2.16, 7.16, 1.3, 0.37)
-W_222 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-loglikelihood(data=data, p=2, M=2, params=params222s, structural_pars=list(W=W_222))
+params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+ 0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+ 0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+loglikelihood(data=gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 }
 \references{
 \itemize{
