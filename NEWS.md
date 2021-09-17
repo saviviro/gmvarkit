@@ -123,7 +123,7 @@
 * Now fitGMVAR, GFEVD, and GIRF don't call closeAllConnections: instead, they only close the connections they opened.
 * Added new datasets: usamone_prec and usamone
 
-# gmvarkit 1.4.3
+# gmvarkit 1.5.0
 
 * The function GIRF now allows to scale the GIRFs of some shocks to normalize the magnitude of the instantaneous movement of some variable.
 * Changed the default ncalls in fitGMVAR to 100. 

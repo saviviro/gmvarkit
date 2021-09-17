@@ -1,7 +1,7 @@
 context("GIRF and GFEVD")
 library(gmvarkit)
 
-# NOTE that these tests contain random elements obtained from simulation algorithms
+# NOTE that these tests contain random elements and the results might change is simulateGMVAR is modified
 
 ## A(M)(p)_(p)(M)(d)
 

@@ -1,10 +1,10 @@
 context("Parameter reforms")
 library(gmvarkit)
 
-data0 <- t(t(eurusd))
+data0 <- t(t(gdpdef))
 data2 <- unname(data0)
-data3 <- cbind(1:252, data2)
-n_obs <- nrow(data3) # 252
+data3 <- cbind(1:244, data2)
+n_obs <- nrow(data3) # 244
 dat2_1 <- reform_data(data2, p=1)
 dat2_2 <- reform_data(data2, p=2)
 dat2_3 <- reform_data(data2, p=3)
@@ -17,19 +17,19 @@ test_that("reform_data works correctly", {
   expect_equal(nrow(dat2_2), n_obs - 2 + 1)
   expect_equal(dat2_2[1,], c(data2[2,], data2[1,]))
   expect_equal(dat2_2[23,], c(data2[24,], data2[23,]))
-  expect_equal(dat2_2[nrow(dat2_2),], c(data2[252,], data2[251,]))
+  expect_equal(dat2_2[nrow(dat2_2),], c(data2[244,], data2[243,]))
 
   expect_equal(nrow(dat2_3), n_obs - 3 + 1)
   expect_equal(dat2_3[1,], c(data2[3,], data2[2,], data2[1,]))
   expect_equal(dat2_3[100,], c(data2[102,], data2[101,], data2[100,]))
-  expect_equal(dat2_3[nrow(dat2_3),], c(data2[252,], data2[251,], data2[250,]))
+  expect_equal(dat2_3[nrow(dat2_3),], c(data2[244,], data2[243,], data2[242,]))
 
   expect_equal(dat3_1, data3)
 
   expect_equal(nrow(dat3_2), n_obs - 2 + 1)
   expect_equal(dat3_2[1,], c(data3[2,], data3[1,]))
   expect_equal(dat3_2[13,], c(data3[14,], data3[13,]))
-  expect_equal(dat3_2[nrow(dat3_2),], c(data3[252,], data3[251,]))
+  expect_equal(dat3_2[nrow(dat3_2),], c(data3[244,], data3[243,]))
 })
 
 
