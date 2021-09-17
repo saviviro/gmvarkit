@@ -3,8 +3,6 @@ library(gmvarkit)
 
 # NOTE that some elements of these tests use random elements obtained from simulation algorithms
 
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-
 ## A(M)(p)_(p)(M)(d)
 
 # p=1, M=1, d=2, parametrization="mean"

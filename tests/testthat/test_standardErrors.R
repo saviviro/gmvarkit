@@ -1,12 +1,10 @@
 context("standard errors")
 library(gmvarkit)
 
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-
 ## NOTE: For some reason these tests fail at win-builder with tolerance smaller than 1e-1 (while they pass locally).
 # Apparently, when testing diagonal of the observed information matrix, the tests pass, but when testing
 # diagonal of its inverse (or the standard errors), the tests fail (with average difference about 1e-3).
-# Possibly a numerical error caused by (the default) imprecission of float-point presentation?
+# Possibly a numerical error caused by the limited precision of float-point presentation?
 
 ## A(M)(p)_(p)(M)(d)
 
