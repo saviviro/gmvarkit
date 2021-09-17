@@ -18,18 +18,12 @@
  by \code{predict.gmvar}.
 }
 \examples{
-# This example uses the data 'eurusd' which comes with the
-# package, but in a scaled form.
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
-
-# GMVAR(2,2), d=2 model
-params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
- -0.070, -0.109, -0.281, 0.920, -0.025, 4.839, 11.633, 124.983, 1.248,
-  0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
-  9.838, 0.740)
-mod222 <- GMVAR(data, p=2, M=2, params=params222, parametrization="mean")
-pred222 <- predict(mod222, n_ahead=3, plot_res=FALSE)
-print(pred222)
-print(pred222, digits=3)
+# GMVAR(2, 2), d=2 model;
+params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+ 0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+ 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
+mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+pred22 <- predict(mod22, n_ahead=3, plot_res=FALSE)
+print(pred22)
+print(pred22, digits=3)
 }

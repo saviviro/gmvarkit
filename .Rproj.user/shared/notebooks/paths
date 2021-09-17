@@ -24,6 +24,7 @@
 /Users/savi/Documents/gmvarkit/R/simulateGMVAR.R="8BC2D47B"
 /Users/savi/Documents/gmvarkit/R/standardErrors.R="40FE99F5"
 /Users/savi/Documents/gmvarkit/R/uncondMoments.R="8C0F41C6"
+/Users/savi/Documents/gmvarkit/README.Rmd="C1D243EB"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_MAINest.R="326B5963"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_argumentChecks.R="3FA53AD7"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_generateParams.R="50F778CA"
@@ -32,3 +33,4 @@
 /Users/savi/Documents/gmvarkit/tests/testthat/test_parameterReforms.R="9879AD99"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_pickParams.R="66C699A7"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_waldAndLR.R="1E486705"
+/Users/savi/Documents/gmvarkit/vignettes/intro-to-gmvarkit.Rmd="5AB08021"

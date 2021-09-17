@@ -20,7 +20,7 @@
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params222)
+#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
 #'
 #' cond_moment_plot(mod22, which_moment="mean")
 #' cond_moment_plot(mod22, which_moment="variance")

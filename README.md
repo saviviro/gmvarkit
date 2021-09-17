@@ -42,60 +42,61 @@ computing. After estimating the model, it is shown by simple examples
 how to conduct some further analysis.
 
 ``` r
-# These examples use the data 'eurusd' which comes with the package, but in a scaled form.
-data(eurusd, package="gmvarkit")
-data <- cbind(10*eurusd[,1], 100*eurusd[,2])
-colnames(data) <- colnames(eurusd)
+# These examples use the data 'gdpdef' which comes with the package, and contains the quarterly percentage growth rate
+# of real U.S. GDP and quarterly percentage growth rate of U.S. GDP implicit price deflator, covering the period 
+# from 1959Q1 to 2019Q4.
+data(gdpdef, package="gmvarkit")
 
 ## Reduced form GMVAR model ##
 
-# Estimate a GMVAR(2, 2) model: 40 estimation rounds and seeds for reproducible results
-fit <- fitGMVAR(data, p=2, M=2, ncalls=40, seeds=1:40, ncores=4)
+# Estimate a GMVAR(2, 2) model: 20 estimation rounds and seeds for reproducible results
+# (note: many empirical applications require more estimation rounds, e.g., hundreds).
+fit <- fitGMVAR(gdpdef, p=2, M=2, ncalls=20, seeds=1:20, ncores=4)
 fit
 
 # Estimate a GMVAR(2, 2) model with autoregressive parameters restricted to be the same for all regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-fitc <- fitGMVAR(data, p=2, M=2, constraints=C_mat, ncalls=16, seeds=1:16, ncores=4)
+fitc <- fitGMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=20, seeds=1:20, ncores=4)
 fitc
 
 # Estimate a GMVAR(2, 2) model with autoregressive parameters and the unconditional means
 # restricted to be the same in both regimes (only the covariance matrix varies)
-fitcm <- fitGMVAR(data, p=2, M=2, parametrization="mean", constraints=C_mat, same_means=list(1:2),
-                  ncalls=16, seeds=1:16, ncores=4)
+fitcm <- fitGMVAR(gdpdef, p=2, M=2, parametrization="mean", constraints=C_mat, same_means=list(1:2),
+                  ncalls=20, seeds=1:20, ncores=4)
 fitcm 
 
 # Test the above constraints on the AR parameters with likelihood ratio test:
 LR_test(fit, fitc)
 
 # Further information on the estimated model:
-plot(fitc)
-summary(fitc)
-print_std_errors(fitc)
-get_foc(fitc) # The first order condition
-get_soc(fitc) # The second order condition (eigenvalues of approximated Hessian)
-profile_logliks(fitc) # Profile log-likelihood functions
+plot(fit)
+summary(fit)
+print_std_errors(fit)
+get_foc(fit) # The first order condition (gradient of the log-likelihood function)
+get_soc(fit) # The second order condition (eigenvalues of approximated Hessian)
+profile_logliks(fit) # Profile log-likelihood functions
 
 # Note: models can be built based the results from any estimation round 
 # conveniently with the function 'alt_gmvar'.
 
 # Quantile residual diagnostics
-diagnostic_plot(fitc) # type=c("all", "series", "ac", "ch", "norm")
-qrt <- quantile_residual_tests(fitc, nsimu=10000)
+diagnostic_plot(fit) # type=c("all", "series", "ac", "ch", "norm")
+qrt <- quantile_residual_tests(fit, nsimu=10000)
 
 # Simulate a sample path from the estimated process
-sim <- simulateGMVAR(fitc, nsimu=100)
+sim <- simulateGMVAR(fit, nsimu=100)
 plot.ts(sim$sample)
 
 # Forecast future values of the process
-predict(fitc, n_ahead=10)
+predict(fit, n_ahead=12)
 
 
 ## Structural GMVAR model ##
 
 # Estimate structural GMVAR(2,2) model identified with sign constraints:
-W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-fit22s <- fitGMVAR(data, p=2, M=2, structural_pars=list(W=W_22),
-                   ncalls=40, seeds=1:40, ncores=4)
+W22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
+                   ncalls=20, seeds=1:20, ncores=4)
 fit22s
 
 # Alternatively, if there are two regimes (M=2), a stuctural model can 
@@ -109,33 +110,34 @@ fit22s_2
 fit22s_3 <- reorder_W_columns(fit22s_2, perm=c(2, 1))
 fit22s_3
 
-fit22s_4 <- swap_W_signs(fit22s_3, which_to_swap=1)
-fit22s_4
+fit22s_4 <- swap_W_signs(fit22s_3, which_to_swap=2)
+fit22s_4 # The same model as fit22s
 
+all.equal(fit22s$loglik, fit$loglik)
 all.equal(fit22s$loglik, fit22s_2$loglik)
 all.equal(fit22s$loglik, fit22s_3$loglik)
 all.equal(fit22s$loglik, fit22s_4$loglik)
 
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
-girf1 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), R1=200, R2=200)
+girf1 <- GIRF(fit22s, N=20, ci=c(0.95, 0.8), R1=200, R2=200, ncores=4)
 
 # Estimate GIRF with starting values generated from the stationary distribution
 # of the first regime:
-girf2 <- GIRF(fit22s, N=60, ci=c(0.95, 0.8), init_regimes=1, R1=200, R2=200)
+girf2 <- GIRF(fit22s, N=20, ci=c(0.95, 0.8), init_regimes=1, R1=200, R2=200, ncores=4)
 
 # Estimate GIRF with starting values given by the last p observations of the
 # data:
-girf3 <- GIRF(fit22s, N=60, init_values=fit22s$data, R1=1000)
+girf3 <- GIRF(fit22s, N=20, init_values=fit22s$data, R1=1000, ncores=4)
 
 # Estimate generalized forecast error variance decmposition (GFEVD) with the
 # initial values being all possible lenght p the histories in the data:
-gfevd1 <- GFEVD(fit22s, N=48, R1=100, initval_type="data", ncores=4)
+gfevd1 <- GFEVD(fit22s, N=20, R1=100, initval_type="data", ncores=4)
 plot(gfevd1)
 
 # Estimate GFEVD with the initial values generated from the stationary
 # distribution of the second regime:
-gfevd2 <- GFEVD(fit22s, N=48, R1=100, R2=100, initval_type="random",
+gfevd2 <- GFEVD(fit22s, N=20, R1=100, R2=100, initval_type="random",
                 init_regimes=2, ncores=4)
 plot(gfevd2)
 
