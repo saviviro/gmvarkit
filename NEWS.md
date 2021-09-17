@@ -132,5 +132,5 @@
 * Removed confusing NAs from the standard error prints when the related statistics are not parametrized in the first place. 
 * The function GMVAR now throws an error if there are more parameters in the model than d*nrow(data).
 * Internal functions are now removed from the user manual. 
-* Added the data gdpdef, updated the examples for this data
+* Added the data gdpdef, updated the examples for this data, and removed the old data.
 
