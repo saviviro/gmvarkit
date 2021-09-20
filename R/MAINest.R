@@ -54,6 +54,10 @@
 #'  the different parametrization of the covariance matrices, so larger number of estimation rounds should be considered.
 #'  Also, be aware that if the lambda parameters are constrained in any other way than by restricting some of them to be
 #'  identical, the parameter "lambda_scale" of the genetic algorithm (see \code{?GAfit}) needs to be carefully adjusted accordingly.
+#'  \strong{When estimating a structural model that imposes overidentifiying constraints to a time series with \eqn{d>3},
+#'  it is highly recommended to create an initial population based on the estimates of a statistically identified model
+#'  (when \eqn{M=2}). This is because currently obtaining the ML estimate reliably to such a structural model seems
+#'  difficult in many application.}
 #'
 #'  Finally, the function fails to calculate approximate standard errors and the parameter estimates are near the border
 #'  of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
