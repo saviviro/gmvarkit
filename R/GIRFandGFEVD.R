@@ -217,8 +217,8 @@ GIRF <- function(gmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_r
         res_in_array[, i2, ] <- apply(res_in_array[, i2, , drop=FALSE], MARGIN=3, FUN=cumsum) # Replace GIRF with cumulative GIRF
       }
     }
-    if(i1 %in% scale[1,]) { # GIRF of this shock should be scaled
-      which_col <- which(i1 == scale[1,]) # which column of the scale-matrix contains the argument for this specific shock
+    if(which_shocks[i1] %in% scale[1,]) { # GIRF of this shock should be scaled
+      which_col <- which(which_shocks[i1] == scale[1,]) # which column of the scale-matrix contains the argument for this specific shock
       which_var <- scale[2, which_col] # According to initial response of which variable the GIRFs should be scaled
       init_magnitude <- scale[3, which_col] # What should be the magnitude of the initial response of this variable
 

@@ -134,3 +134,7 @@
 * Internal functions are now removed from the user manual. 
 * Added the data gdpdef, updated the examples for this data, and removed the old data.
 
+# gmvarkit 1.5.1 
+
+* Fixed a bug in the argument scale of the function GIRF.
+
