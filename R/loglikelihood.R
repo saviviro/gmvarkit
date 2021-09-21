@@ -1,40 +1,46 @@
 #' @import stats
 #'
-#' @title Compute log-likelihood of a Gaussian mixture vector autoregressive model
+#' @title Compute log-likelihood of a GMVAR, StMVAR, and G-StMVAR models
 #'
-#' @description \code{loglikelihood_int} computes log-likelihood of a GMVAR model.
+#' @description \code{loglikelihood_int} computes log-likelihoodof a GMVAR, StMVAR, and G-StMVAR models.
 #'
 #' @inheritParams in_paramspace_int
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-#'  a single time series. \code{NA} values are not supported.
+#'  a univariate time series. \code{NA} values are not supported.
 #' @param p a positive integer specifying the autoregressive order of the model.
-#' @param M a positive integer specifying the number of mixture components.
+#' @param M \describe{
+#'   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
+#'   \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
+#'    first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+#' }
 #' @param params a real valued vector specifying the parameter values.
 #'   \describe{
 #'     \item{\strong{For unconstrained models:}}{
-#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have the form
+#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)x1)} and have the form
 #'       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
-#'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where
+#'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
 #'       \itemize{
 #'         \item \strong{\eqn{\upsilon}}\eqn{_{m}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi}}\eqn{_{m}}\eqn{,\sigma_{m})}
 #'         \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
-#'         \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
+#'         \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M,
+#'         \item \strong{\eqn{\nu}}\eqn{=(\nu_{M1+1},...,\nu_{M})}
+#'         \item \eqn{M1} is the number of GMVAR type regimes.
 #'       }
 #'     }
 #'     \item{\strong{For constrained models:}}{
-#'       Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have the form
+#'       Should be size \eqn{((M(d+d(d+1)/2+2)+q-M1-1)x1)} and have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi},}
-#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}), where
 #'       \itemize{
 #'         \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
-#'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is \eqn{(Mpd^2xq)}
+#'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is a \eqn{(Mpd^2xq)}
 #'         constraint matrix.
 #'       }
 #'     }
 #'     \item{\strong{For same_means models:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\mu},}\strong{\eqn{\psi},}
-#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
 #'       \itemize{
 #'         \item \strong{\eqn{\mu}}\eqn{= (\mu_{1},...,\mu_{g})} where
 #'           \eqn{\mu_{i}} is the mean parameter for group \eqn{i} and
@@ -47,7 +53,7 @@
 #'     \item{\strong{For structural GMVAR model:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
 #'       \itemize{
 #'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
 #'       }
@@ -73,7 +79,14 @@
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-#'   The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.
+#'
+#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
+#'   In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
+#'   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+#'
+#'   The notation is similar to the cited literature.
+#' @param model is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+#'  are GMVAR type and the rest \code{M2} components are StMVAR type.
 #' @param conditional a logical argument specifying whether the conditional or exact log-likelihood function
 #'  should be used.
 #' @param parametrization \code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
@@ -145,8 +158,8 @@
 #'  }
 #' @keywords internal
 
-loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                              same_means=NULL, structural_pars=NULL,
+loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
+                              constraints=NULL, same_means=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans", "total_cmeans", "total_ccovs"),
                               check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
 
@@ -158,6 +171,7 @@ loglikelihood_int <- function(data, p, M, params, conditional=TRUE, parametrizat
   to_return <- match.arg(to_return)
 
   # Collect parameter values
+  model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means, structural_pars=structural_pars)

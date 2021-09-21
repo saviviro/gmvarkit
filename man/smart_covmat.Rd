@@ -11,7 +11,11 @@ smart_covmat(d, M, Omega, W_and_lambdas, accuracy, structural_pars = NULL)
 \arguments{
 \item{d}{the number of time series in the system.}
 
-\item{M}{a positive integer specifying the number of mixture components.}
+\item{M}{\describe{
+  \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
+   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+}}
 
 \item{Omega}{a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
 expected value of the matrix to be generated.}

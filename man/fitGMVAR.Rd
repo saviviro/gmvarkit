@@ -23,11 +23,15 @@ fitGMVAR(
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-a single time series. \code{NA} values are not supported.}
+a univariate time series. \code{NA} values are not supported.}
 
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 
-\item{M}{a positive integer specifying the number of mixture components.}
+\item{M}{\describe{
+  \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
+   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+}}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function}
 

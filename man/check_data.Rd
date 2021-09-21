@@ -8,7 +8,7 @@ check_data(data, p)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-a single time series. \code{NA} values are not supported.}
+a univariate time series. \code{NA} values are not supported.}
 
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 }

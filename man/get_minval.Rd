@@ -8,7 +8,7 @@ get_minval(data)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-a single time series. \code{NA} values are not supported.}
+a univariate time series. \code{NA} values are not supported.}
 }
 \value{
 Returns \code{-(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)}

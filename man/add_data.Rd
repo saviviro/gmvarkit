@@ -8,7 +8,7 @@ add_data(data, gmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
-a single time series. \code{NA} values are not supported.}
+a univariate time series. \code{NA} values are not supported.}
 
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 

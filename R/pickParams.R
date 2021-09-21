@@ -17,6 +17,7 @@
 #' @keywords internal
 
 pick_Ami <- function(p, M, d, params, m, i, structural_pars=NULL, unvec=TRUE) {
+  M <- sum(M)
   if(is.null(structural_pars)) {
     qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
     Ami <- params[(qm1 + d + (i - 1)*d^2 + 1):(qm1 + d + i*d^2)]
@@ -47,6 +48,7 @@ pick_Ami <- function(p, M, d, params, m, i, structural_pars=NULL, unvec=TRUE) {
 #' @keywords internal
 
 pick_Am <- function(p, M, d, params, m, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars)) {
     qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
     lowers <- qm1 + d + (1:p - 1)*d^2 + 1
@@ -75,6 +77,7 @@ pick_Am <- function(p, M, d, params, m, structural_pars=NULL) {
 #' @keywords internal
 
 pick_allA <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
     lowers <- qm1 + d + 1
@@ -101,6 +104,7 @@ pick_allA <- function(p, M, d, params, structural_pars=NULL) {
 #' @keywords internal
 
 pick_phi0 <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
     tmp <- matrix(1:d, nrow=d, ncol=length(qm1), byrow=FALSE)
@@ -126,6 +130,7 @@ pick_phi0 <- function(p, M, d, params, structural_pars=NULL) {
 #' @keywords internal
 
 pick_all_phi0_A <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars)) {
     q0 <- d + p*d^2
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
@@ -154,6 +159,7 @@ pick_all_phi0_A <- function(p, M, d, params, structural_pars=NULL) {
 #' @keywords internal
 
 pick_Omegas <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   Omegas <- array(dim=c(d, d, M))
   if(is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
@@ -180,19 +186,50 @@ pick_Omegas <- function(p, M, d, params, structural_pars=NULL) {
 #'
 #' @inheritParams is_stationary
 #' @return Returns a length M vector containing the mixing weight parameters \eqn{alpha_{m}, m=1,...,M},
-#'   including non-parametrized \eqn{alpha_{M}}.
+#'   including the non-parametrized \eqn{alpha_{M}}.
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-pick_alphas <- function(p, M, d, params) {
+pick_alphas <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    M2 <- 0
+  } else if(model == "StMVAR") {
+    M2 <- M
+  } else { # model == "G-StMVAR"
+    M2 <- M[2]
+  }
+  M <- sum(M)
   if(M == 1) {
     return(1)
   } else {
-    alphas <- params[(length(params) - M + 2):length(params)]
+    alphas <- params[(length(params) - M - M2 + 2):(length(params) - M2)]
     return(c(alphas, 1 - sum(alphas)))
   }
 }
+
+
+#' @title Pick the degrees of freedom parameters \strong{\eqn{\nu}}\eqn{=(\nu_{M1+1},...,\nu_{M})}
+#'
+#' @description \code{pick_df} picks  the degrees of freedom parameters from the given parameter vector.
+#'
+#' @inheritParams is_stationary
+#' @return Returns a length \eqn{M2} vector containing the degrees of freedom parameters
+#'  \strong{\eqn{\nu}}\eqn{=(\nu_{M1+1},...,\nu_{M})}. In the case of the GMVAR model (\eqn{M2=0}),
+#'  returns a numeric vector of length zero.
+#' @inheritSection pick_Ami Warning
+#' @inherit in_paramspace_int references
+#' @keywords internal
+
+pick_df <- function(M, params, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    return(numeric(0))
+  }
+  params[(length(params) - ifelse(model == "StMVAR", M, M[2]) + 1):length(params)]
+}
+
 
 
 #' @title Pick the structural parameter matrix W
@@ -208,6 +245,7 @@ pick_alphas <- function(p, M, d, params) {
 #' @keywords internal
 
 pick_W <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars)) return(NULL)
   unvec(d=d, a=params[(M*d + d^2*p*M + 1):(M*d + d^2*p*M + d^2)])
 }
@@ -227,37 +265,60 @@ pick_W <- function(p, M, d, params, structural_pars=NULL) {
 #' @keywords internal
 
 pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
+  M <- sum(M)
   if(is.null(structural_pars) || M == 1) return(numeric(0))
   params[(M*d + d^2*p*M + d^2 + 1):((M*d + d^2*p*M + d^2 + d*(M - 1)))]
 }
 
 
-#' @title Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
+#' @title Pick regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m},\nu_{m})}
 #'
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
 #' @inheritParams pick_Am
+#' @param with_df should the degrees of freedom parameter (if any) be included?
 #' @details Models with AR, mean, or lambda parameter constraints are currently not supported.
 #' @return
 #'   \describe{
-#'     \item{For reduced form models:}{returns length \eqn{pd^2+d+d(d+1)/2} vector containing
-#'       \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}, where
-#'       \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})} and \eqn{\sigma_{m} = vech(\Omega_{m})}.}
-#'     \item{For structural models:}{returns the length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+#'     \item{For reduced form models:}{
+#'       \describe{
+#'         \item{For \strong{GMVAR} model:}{a length \eqn{pd^2+d+d(d+1)/2} vector containing
+#'           \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}, where
+#'           \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})} and \eqn{\sigma_{m} = vech(\Omega_{m})}.}
+#'         \item{For \strong{StMVAR} model:}{a length \eqn{pd^2+d+d(d+1)/2 + 1} vector containing
+#'           (\strong{\eqn{\upsilon_{m}}}\eqn{,\nu_{m}}), where \eqn{\nu_{m}} is dropped if \code{with_df == FALSE}.}
+#'         \item{For \strong{G-StMVAR} model:}{Same as GMVAR for GMVAR type regimes and same as StMVAR for StMVAR type regimes.}
+#'        }
+#'     }
+#'     \item{For structural models:}{
+#'       \describe{
+#'         \item{For \strong{SGMVAR} model:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+#'         \item{For \strong{StMVAR} model:}{a length \eqn{pd^2 + d + 1} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\nu_{m})},
+#'            where \eqn{\nu_{m}} is dropped if \code{with_df == FALSE}.}
+#'         \item{For \strong{G-StMVAR} model:}{Same as GMVAR for GMVAR type regimes and same as StMVAR for StMVAR type regimes.}
+#'       }
+#'     }
 #'   }
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
 #' @keywords internal
 
-pick_regime <- function(p, M, d, params, m, structural_pars=NULL) {
+pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR"), structural_pars=NULL, with_df=TRUE) {
+  model <- match.arg(model)
+  if(model == "GMVAR" || with_df == FALSE) {
+    df <- numeric(0)
+  } else {
+    M1 <- ifelse(model == "StMVAR", 0, M[1])
+    df <- pick_df(M=M, params=params, model=model)[m - M1]
+  }
   if(is.null(structural_pars)) {
     qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
-    return(params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)])
+    return(c(params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)], df))
   } else {
     n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
     phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[,m]
     all_Am <- pick_Am(p=p, M=M, d=d, params=params, m=m, structural_pars=structural_pars)
-    return(c(phi0, as.vector(all_Am)))
+    return(c(phi0, as.vector(all_Am), df))
   }
 }
 
