@@ -139,6 +139,8 @@ theta_332sWC <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332), v
 
 theta_332t <- c(theta_332, 10, 20, 30) # StMVAR
 theta_332gs <- c(theta_332, 20, 30) # G-StMVAR, M1=1, M2=2
+theta_332gs2 <- c(theta_332, 30) # G-StMVAR, M1=2, M2=1
+
 
 theta_332ts <- c(theta_332s, 10, 20, 30) # SStMVAR
 theta_332gss <- c(theta_332s, 30) # SG-StMVAR, M1=2, M2=1
@@ -573,9 +575,21 @@ theta_332_2 <- c(upsilon1_332, upsilon2_332, upsilon3_332, alpha1_332_2, alpha2_
 alpha1_332_3 <- 0.5; alpha2_332_3 <- 0.2
 theta_332_3 <- c(upsilon1_332, upsilon2_332, upsilon3_332, alpha1_332_3, alpha2_332_3)
 
+theta_332t_2 <- c(theta_332_2, 10, 20, 30) # StMVAR
+
+theta_332gs_2 <- c(theta_332_2, 30) # SG-StMVAR, M1=2, M2=1
+theta_332gs_2_2 <- c(theta_332_2, 20, 30) # SG-StMVAR, M1=1, M2=2
+
+theta_332gs_3 <- c(theta_332_3, 30) # SG-StMVAR, M1=2, M2=1
+theta_332gs_3_2 <- c(theta_332_3, 20, 30) # SG-StMVAR, M1=1, M2=2
+
+
 theta_332s_2 <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332), vec(A13_332),
                   vec(A21_332), vec(A22_332), vec(A23_332), vec(A31_332), vec(A32_332), vec(A33_332),
                   Wvec(W_332), lambdas2_332, lambdas3_332, alpha1_332_2, alpha2_332_2) # SGMVAR
+
+theta_332ts_2 <- c(theta_332s_2, 10, 20, 30) # StMVAR
+
 
 # p=3, M=4, d=2
 upsilon1_342 <- upsilon1_332; upsilon2_342 <- upsilon2_332; upsilon3_342 <- upsilon3_332; upsilon4_342 <- upsilon3_342+0.07
@@ -585,6 +599,11 @@ alpha1_342_2 <- 0.2; alpha2_342_2 <- 0.3; alpha3_342_2 <- 0.4
 theta_342_2 <- c(upsilon1_342, upsilon2_342, upsilon3_342, upsilon4_342, alpha1_342_2, alpha2_342_2, alpha3_342_2)
 alpha1_342_3 <- 0.3; alpha2_342_3 <- 0.4; alpha3_342_3 <- 0.1
 theta_342_3 <- c(upsilon1_342, upsilon2_342, upsilon3_342, upsilon4_342, alpha1_342_3, alpha2_342_3, alpha3_342_3)
+
+theta_342gs <- c(theta_342, 30, 40) # G-StMVAR, M1=2, M2=2
+theta_342gs_2 <- c(theta_342_2, 40) # G-StMVAR, M1=3, M2=1
+theta_342gs_3 <- c(theta_342_3, 20, 30, 40) # G-StMVAR, M1=1, M2=3
+
 
 phi1_342 <- c(vec(A11_332), vec(A12_332), vec(A13_332))
 phi2_342 <- c(vec(A21_332), vec(A22_332), vec(A23_332))
@@ -602,9 +621,16 @@ theta_342s_2 <- c(phi10_342, phi20_342, phi30_342, phi40_342, phi1_342, phi2_342
 theta_342s_3 <- c(phi10_342, phi20_342, phi30_342, phi40_342, phi1_342, phi2_342, phi3_342, phi4_342,
                   Wvec(W_342), lambdas2_342, lambdas3_342, lambdas4_342, alpha1_342_3, alpha2_342_3, alpha3_342_3) # SGMVAR
 
+theta_342gss <- c(theta_342s, 20, 30, 40) # SG-StMVAR, M1=1, M2=3
+theta_342gss_2 <- c(theta_342s_2, 30, 40) # SG-StMVAR, M1=2, M2=2
+theta_342gss_3 <- c(theta_342s_3, 40) # SG-StMVAR, M1=3, M2=1
+
+
 # p=1, M=2, d=3
 alpha1_123_2 <- 0.3
 theta_123_2 <- c(upsilon1_123, upsilon2_123, alpha1_123_2)
+
+theta_123t_2 <- c(theta_123_2, 10, 20) # StMVAR
 
 # p=1, M=3, d=3, structural_pars=list(W=W_133)
 W_133 <- matrix(c(1, 2, 0, 4, 5, 6, 0, 8, 9), nrow=3)
@@ -639,26 +665,50 @@ theta_133s_4 <- c(phi10_133, phi20_133, phi30_133,
                   Wvec(W_133pars_with0), lambdas2_133, lambdas3_133,
                   alpha1_133_4, alpha2_133_4)
 
+theta_133ts_1 <- c(theta_133s_1, 10, 20, 30) # SStMVAR
+theta_133gss_1 <- c(theta_133s_1, 20, 30) # GS-StMVAR, M1=1, M2=2
+
+
 set.seed(1); DAT3 <- matrix(round(rnorm(150), 3), ncol=3)
 
 test_that("sort_components works correctly", {
   expect_equal(sort_components(p=1, M=1, d=2, params=theta_112), theta_112)
   expect_equal(sort_components(p=1, M=2, d=2, params=theta_122), c(upsilon2_122, upsilon1_122, 1-alpha1_122))
   expect_equal(sort_components(p=2, M=2, d=2, params=theta_222), c(upsilon2_222, upsilon1_222, 1-alpha1_222))
+  expect_equal(sort_components(p=2, M=2, d=2, params=theta_222t, model="StMVAR"), c(upsilon2_222, upsilon1_222, 1-alpha1_222, 20, 10))
+  expect_equal(sort_components(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR"), theta_222gs)
 
   expect_equal(sort_components(p=3, M=3, d=2, params=theta_332), theta_332)
   expect_equal(sort_components(p=3, M=3, d=2, params=theta_332_2), c(upsilon3_332, upsilon2_332, upsilon1_332, 1-alpha1_332_2-alpha2_332_2, alpha2_332_2))
   expect_equal(sort_components(p=3, M=3, d=2, params=theta_332_3), c(upsilon1_332, upsilon3_332, upsilon2_332, alpha1_332_3, 1-alpha1_332_3-alpha2_332_3))
 
+  expect_equal(sort_components(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR"),
+               c(upsilon3_332, upsilon2_332, upsilon1_332, 1-alpha1_332_2-alpha2_332_2, alpha2_332_2, 30, 20, 10))
+  expect_equal(sort_components(p=3, M=c(2, 1), d=2, params=theta_332gs_2, model="G-StMVAR"), c(upsilon2_332, upsilon1_332, upsilon3_332, alpha2_332_2, alpha1_332_2, 30))
+  expect_equal(sort_components(p=3, M=c(1, 2), d=2, params=theta_332gs_2_2, model="G-StMVAR"),
+               c(upsilon1_332, upsilon3_332, upsilon2_332, alpha1_332_2, 1-alpha1_332_2-alpha2_332_2, 30, 20))
+  expect_equal(sort_components(p=3, M=c(2, 1), d=2, params=theta_332gs_3, model="G-StMVAR"), theta_332gs_3)
+  expect_equal(sort_components(p=3, M=c(1, 2), d=2, params=theta_332gs_3_2, model="G-StMVAR"),
+               c(upsilon1_332, upsilon3_332, upsilon2_332, alpha1_332_3, 1-alpha1_332_3-alpha2_332_3, 30, 20))
+
   expect_equal(sort_components(p=3, M=4, d=2, params=theta_342), c(upsilon4_342, upsilon3_342, upsilon2_342, upsilon1_342, 1-alpha1_342-alpha2_342-alpha3_342, alpha3_342, alpha2_342))
   expect_equal(sort_components(p=3, M=4, d=2, params=theta_342_2), c(upsilon3_342, upsilon2_342, upsilon1_342, upsilon4_342, alpha3_342_2, alpha2_342_2, alpha1_342_2))
   expect_equal(sort_components(p=3, M=4, d=2, params=theta_342_3), c(upsilon2_342, upsilon1_342, upsilon4_342, upsilon3_342, alpha2_342_3, alpha1_342_3, 1-alpha1_342_3-alpha2_342_3-alpha3_342_3))
 
+  expect_equal(sort_components(p=3, M=c(2, 2), d=2, params=theta_342gs, model="G-StMVAR"), # perm = 2, 1, 4, 3
+               c(upsilon2_342, upsilon1_342, upsilon4_342, upsilon3_342, alpha2_342, alpha1_342, 1-alpha1_342-alpha2_342-alpha3_342, 40, 30))
+  expect_equal(sort_components(p=3, M=c(3, 1), d=2, params=theta_342gs_2, model="G-StMVAR"), # perm = 3, 2, 1, 4
+               c(upsilon3_342, upsilon2_342, upsilon1_342, upsilon4_342, alpha3_342_2, alpha2_342_2, alpha1_342_2, 40))
+  expect_equal(sort_components(p=3, M=c(1, 3), d=2, params=theta_342gs_3, model="G-StMVAR"), # perm = 1, 2, 4, 3
+               c(upsilon1_342, upsilon2_342, upsilon4_342, upsilon3_342, alpha1_342_3, alpha2_342_3, 1-alpha1_342_3-alpha2_342_3-alpha3_342_3, 20, 40, 30))
+
   expect_equal(sort_components(p=1, M=2, d=3, params=theta_123), theta_123)
   expect_equal(sort_components(p=1, M=2, d=3, params=theta_123_2),  c(upsilon2_123, upsilon1_123, 1-alpha1_123_2))
+  expect_equal(sort_components(p=1, M=2, d=3, params=theta_123t_2, model="StMVAR"),  c(upsilon2_123, upsilon1_123, 1-alpha1_123_2, 20, 10))
+
   expect_equal(sort_components(p=2, M=1, d=3, params=theta_213), theta_213)
 
-  # SGMVAR (redecompose_Omegas is tested in matcal and should work)
+  # Structural (redecompose_Omegas is tested in matcal and should work)
   expect_equal(sort_components(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W=W_122)),
                c(phi20_122, phi10_122, vec(A21_122),  vec(A11_122), redecompose_Omegas(M=2, d=2, W=W_122, lambdas=lambdas_122, perm=2:1),
                  1-alpha1_122), tolerance=1e-3)
@@ -668,6 +718,12 @@ test_that("sort_components works correctly", {
                  vec(A21_332), vec(A22_332), vec(A23_332), vec(A11_332), vec(A12_332), vec(A13_332),
                  Wvec(redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(lambdas2_332, lambdas3_332), perm=c(3, 2, 1))),
                  1 - alpha1_332_2 - alpha2_332_2, alpha2_332_2), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=3, d=2, params=theta_332ts_2, model="StMVAR", structural_pars=list(W=W_332)),
+               c(phi30_332, phi20_332, phi10_332, vec(A31_332), vec(A32_332), vec(A33_332),
+                 vec(A21_332), vec(A22_332), vec(A23_332), vec(A11_332), vec(A12_332), vec(A13_332),
+                 Wvec(redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(lambdas2_332, lambdas3_332), perm=c(3, 2, 1))),
+                 1 - alpha1_332_2 - alpha2_332_2, alpha2_332_2, 30, 20, 10), tolerance=1e-3)
+
   expect_equal(sort_components(p=3, M=4, d=2, params=theta_342s, structural_pars=list(W=W_342)), # perm=c(4, 3, 2, 1)
                c(phi40_342, phi30_342, phi20_342, phi10_342, phi4_342, phi3_342, phi2_342, phi1_342,
                  Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(4, 3, 2, 1))),
@@ -681,11 +737,34 @@ test_that("sort_components works correctly", {
                  Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(2, 1, 4, 3))),
                  alpha2_342_3, alpha1_342_3, 1 - alpha1_342_3 - alpha2_342_3 - alpha3_342_3), tolerance=1e-3)
 
+  expect_equal(sort_components(p=3, M=c(1, 3), d=2, params=theta_342gss, model="G-StMVAR", structural_pars=list(W=W_342)), # perm=c(1, 4, 3, 2)
+               c(phi10_342, phi40_342, phi30_342, phi20_342, phi1_342, phi4_342, phi3_342, phi2_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(1, 4, 3, 2))),
+                 alpha1_342, 1 - alpha1_342 - alpha2_342 - alpha3_342, alpha3_342, 40, 30, 20), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=c(2, 2), d=2, params=theta_342gss_2, model="G-StMVAR", structural_pars=list(W=W_342)), # perm=c(2, 1, 3, 4)
+               c(phi20_342, phi10_342, phi30_342, phi40_342, phi2_342, phi1_342, phi3_342, phi4_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(2, 1, 3, 4))),
+                 alpha2_342_2, alpha1_342_2, alpha3_342_2, 30, 40), tolerance=1e-3)
+  expect_equal(sort_components(p=3, M=c(3, 1), d=2, params=theta_342gss_3, model="G-StMVAR", structural_pars=list(W=W_342)), # perm=c(2, 1, 3, 4)
+               c(phi20_342, phi10_342, phi30_342, phi40_342, phi2_342, phi1_342, phi3_342, phi4_342,
+                 Wvec(redecompose_Omegas(M=4, d=2, W=W_342, lambdas=c(lambdas2_342, lambdas3_342, lambdas4_342), perm=c(2, 1, 3, 4))),
+                 alpha2_342_3, alpha1_342_3, alpha3_342_3, 40), tolerance=1e-3)
+
+
   # p=1, M=3, d=3
+
   expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_1, structural_pars=list(W=W_133)), # # perm=c(1, 3, 2)
                c(phi10_133, phi30_133, phi20_133, A11_133, A31_133, A21_133,
                  Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(1, 3, 2))),
                  alpha1_133_1, 1-alpha1_133_1-alpha2_133_1), tolerance=1e-3)
+  expect_equal(sort_components(p=1, M=3, d=3, params=theta_133ts_1, model="StMVAR", structural_pars=list(W=W_133)), # # perm=c(1, 3, 2)
+               c(phi10_133, phi30_133, phi20_133, A11_133, A31_133, A21_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(1, 3, 2))),
+                 alpha1_133_1, 1-alpha1_133_1-alpha2_133_1, 10, 30, 20), tolerance=1e-3)
+  expect_equal(sort_components(p=1, M=c(1, 2), d=3, params=theta_133gss_1, model="G-StMVAR", structural_pars=list(W=W_133)), # # perm=c(1, 3, 2)
+               c(phi10_133, phi30_133, phi20_133, A11_133, A31_133, A21_133,
+                 Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(1, 3, 2))),
+                 alpha1_133_1, 1-alpha1_133_1-alpha2_133_1, 30, 20), tolerance=1e-3)
   expect_equal(loglikelihood(data=DAT3, p=1, M=3, params=sort_components(p=1, M=3, d=3, params=theta_133s_1, structural_pars=list(W=W_133)),
                              structural_pars=list(W=W_133), conditional=FALSE),
                loglikelihood(data=DAT3, p=1, M=3, params=theta_133s_1, structural_pars=list(W=W_133), conditional=FALSE), tolerance=1e-3)

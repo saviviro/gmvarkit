@@ -226,75 +226,54 @@ form_boldA <- function(p, M, d, all_A) {
 #'   decomposition of the covariance matrices if the first regime changes. As a result, the sorted
 #'   parameter vector will differ from the given one not only by the ordering of the elements but
 #'   also by some of the parameter values.
-#' @return Returns sorted parameter vector...
-#'   \describe{
-#'     \item{\strong{For reduced form GMVAR model:}}{
-#'        ...with \eqn{\alpha_{1}>...>\alpha_{M}}, that has form
-#'        \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon_{1}}},...,\strong{\eqn{\upsilon_{M}}},
-#'        \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
-#'        \itemize{
-#'          \item \strong{\eqn{\upsilon_{m}}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
-#'          \item \strong{\eqn{\phi_{m}}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,1})}
-#'          \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
-#'        }
-#'     }
-#'     \item{\strong{For structural GMVAR model:}}{
-#'      ...with \eqn{\alpha_{1}>...>\alpha_{M}}, that has form
-#'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
-#'       \itemize{
-#'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
-#'       }
-#'       \strong{Note that if the first regime changes as a result of the sorting, the W and lambda parameters change (see details)!}
-#'     }
-#'   }
-#'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}:th coefficient matrix of the \eqn{m}:th
-#'   component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th component, and \eqn{\alpha_{m}} is the
-#'   mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the error term covariance
-#'   matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
-#'
-#'   \eqn{vec()} is vectorization operator that stack columns of the given matrix into a vector. \eqn{vech()} stacks columns
-#'   of the given matrix from the principal diagonal downwards (including elements on the diagonal) to form a vector.
-#'   The notation is in line with the cited article by KMS (2016) introducing the GMVAR model.
+#' @return Returns sorted parameter vector of the form described for the argument \code{params},
+#'   with the mixture components sorted so that \eqn{\alpha_{1}>...>\alpha_{M}} for GMVAR and StMVAR
+#'   models, and \eqn{\alpha_{1}>...>\alpha_{M1}} and \eqn{\alpha_{M1+1}>...>\alpha_{M}} for G-StMVAR models.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-sort_components <- function(p, M, d, params, structural_pars=NULL) {
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
-
+sort_components <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), structural_pars=NULL) {
+  model <- match.arg(model)
+  M_orig <- M
+  M <- sum(M)
+  if(M == 1) return(params)
+  alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params, model=model)
+  all_df <- pick_df(M=M_orig, params=params, model=model)
+  if(model != "G-StMVAR") {
+    M2 <- ifelse(model == "StMVAR", M, 0)
+    ord <- order(alphas, decreasing=TRUE, method="radix")
+    if(all(ord == 1:M)) return(params)
+    if(model == "StMVAR") all_df <- all_df[ord]
+  } else {  # G-StMVAR model: sort the M1 GMVAR type and M2 StMVAR type components separately
+    M1 <- M_orig[1]
+    M2 <- M_orig[2]
+    if(M1 == 1 && M2 == 1) return(params) # Only one component of each type - nothing to sort
+    ord_M1 <- order(alphas[1:M1], decreasing=TRUE, method="radix")
+    ord_M2 <- order(alphas[(M1 + 1):M], decreasing=TRUE, method="radix")
+    ord <- c(ord_M1, M1 + ord_M2) # Overall ordering
+    if(all(ord == 1:M)) return(params) # Already in the correct order
+    all_df <- all_df[ord_M2] # Df ordered
+  }
+  alphas <- alphas[ord][-M]
   if(is.null(structural_pars)) { # Reduced form model
-    ord <- order(alphas, decreasing=TRUE, method="radix")
-    if(all(ord == 1:M)) {
-      return(params)
-    } else {
-      q <- d + p*d^2 + d*(d + 1)/2
-      qm1 <- (1:M - 1)*q
-      qm <- qm1[ord]
-      pars <- vapply(1:M, function(m) params[(qm[m] + 1):(qm[m] + q)], numeric(q))
-      return(c(pars, alphas[ord][-M]))
-    }
+    pars <- matrix(params[1:(length(params) - M + 1 - M2)], ncol=M)[,ord]
+    return(c(pars, alphas, all_df))
   } else { # Structural model
-    if(M == 1) return(params)
-    ord <- order(alphas, decreasing=TRUE, method="radix")
-    if(all(ord == 1:M)) {
-      return(params)
-    } else {
-      n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
-      phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-      A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE) # [, m]
-      lambdas <- matrix(params[(d*M + d^2*p*M + d^2 - n_zeros + 1):(d*M + d^2*p*M + d^2 - n_zeros + d*(M - 1))],
-                        nrow=d, byrow=FALSE)
-      W_const <- as.vector(structural_pars$W)
-      W_const[is.na(W_const)] <- 1 # Insert arbitrary non-NA and non-zero constraint where was NA
-      old_W <- rep(0, times=d^2) # Include non-parametrized zeros here
-      old_W[W_const != 0] <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)] # Zeros where there are zero constaints
-      return(c(phi0[, ord], # sorted phi0/mu parameters
-               A[, ord], # sorted AR parameters
-               Wvec(redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
-               alphas[ord][-M])) # sorted alphas, excluding the M:th one.
-    }
+    n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
+    phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    A <- matrix(params[(d*M + 1):(d*M + d^2*p*M)], nrow=d^2*p, byrow=FALSE) # [, m]
+    lambdas <- matrix(params[(d*M + d^2*p*M + d^2 - n_zeros + 1):(d*M + d^2*p*M + d^2 - n_zeros + d*(M - 1))],
+                      nrow=d, byrow=FALSE)
+    W_const <- as.vector(structural_pars$W)
+    W_const[is.na(W_const)] <- 1 # Insert arbitrary non-NA and non-zero constraint where was NA
+    old_W <- rep(0, times=d^2) # Include non-parametrized zeros here
+    old_W[W_const != 0] <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)] # Zeros where there are zero constaints
+    return(c(phi0[, ord], # sorted phi0/mu parameters
+             A[, ord], # sorted AR parameters
+             Wvec(redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
+             alphas, all_df)) # sorted alphas, excluding the M:th one.
   }
 }
 
