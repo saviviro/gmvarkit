@@ -44,6 +44,8 @@ theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 W_112 <- t(chol(Omega1_112))
 theta_112s <- c(phi10_112, vec(A11_112), vec(W_112)) # SGMVAR
 Omega1_112s <- tcrossprod(W_112)
+theta_112ts <- c(theta_112s, 10)
+
 
 theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W constrained
 
@@ -88,6 +90,11 @@ theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
 Omega1_222s <- tcrossprod(W_222)
 Omega2_222s <- W_222%*%tcrossprod(diag(lambdas_222), W_222)
 
+theta_222t <- c(theta_222, 10, 20) # StMVAR
+theta_222gs <- c(theta_222, 20) # G-StMVAR
+
+theta_222ts <- c(theta_222s, 10, 20) # SStMVAR
+theta_222gss <- c(theta_222s, 20) # SG-StMVAR
 
 # p=3, M=3, d=2
 phi10_332 <- c(1.03, 2.36)
@@ -130,6 +137,14 @@ theta_332sWC <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332), v
                   vec(A21_332), vec(A22_332), vec(A23_332), vec(A31_332), vec(A32_332), vec(A33_332),
                   Wvec(W_332), lambdas2_332, lambdas3_332, alpha1_332, alpha2_332) # SGMVAR W constrained
 
+theta_332t <- c(theta_332, 10, 20, 30) # StMVAR
+theta_332gs <- c(theta_332, 20, 30) # G-StMVAR, M1=1, M2=2
+
+theta_332ts <- c(theta_332s, 10, 20, 30) # SStMVAR
+theta_332gss <- c(theta_332s, 30) # SG-StMVAR, M1=2, M2=1
+
+theta_332gssWC <- c(theta_332sWC, 20, 30) # SG-StMVAR, M1=1, M2=2
+
 # p=1, M=2, d=3
 phi10_123 <- c(1.1, 2.2, 3.3)
 A11_123 <- matrix(c(1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3), nrow=3, byrow=FALSE)
@@ -147,6 +162,12 @@ W_123 <- matrix(WL_123[1:(3^2)], nrow=3, byrow=FALSE)
 lambdas_123 <- WL_123[(3^2 + 1):length(WL_123)]
 theta_123s <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), lambdas_123, alpha1_123) # SGMVAR
 
+theta_123t <- c(theta_123, 20, 25) # StMVAR
+theta_123gs <- c(theta_123, 25) # G-StMVAR
+
+theta_123ts <- c(theta_123s, 20, 25) # StMVAR
+theta_123gss <- c(theta_123s, 25) # G-StMVAR
+
 
 # p=2, M=1, d=3
 phi10_213 <- c(1.1, 2.2, 3.3)
@@ -160,7 +181,6 @@ W_213 <- t(chol(Omega1_213))
 theta_213s <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_213)) # SGMVAR
 
 theta_213sWC <- c(phi10_213, vec(A11_213), vec(A12_213), Wvec(W_213)) # SGMVAR W constrained
-
 
 ## A(M)(p)_(p)(M)(d)
 rbind_diags <- function(p, M, d) {
@@ -176,6 +196,8 @@ theta_112c <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 
 theta_112csWAR <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W and AR
 
+theta_112tcsWAR <- c(theta_112csWAR, 10) # SStMVAR W and AR
+
 # p=1, M=2, d=2
 C_122 <- rbind_diags(p=1, M=2, d=2)
 theta_122c <- c(phi10_122, phi20_122, vec(A11_122), vech(Omega1_122), vech(Omega2_122), alpha1_122)
@@ -187,11 +209,20 @@ theta_122csL_expanded <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec
 theta_122csLAR <- c(phi10_122, phi20_122, vec(A11_122), vec(W_122), 0.5, alpha1_122) # SGMVAR lambdas and AR
 theta_122csLAR_expanded <- c(phi10_122, phi20_122, vec(A11_122), vec(A11_122), vec(W_122), 0.5, 0.5, alpha1_122)
 
+theta_122gsc <- c(theta_122c, 20) # G-StMVAR AR
+theta_122gsc_expanded <- c(theta_122c_expanded, 20) # G-StMVAR AR
+
+theta_122gscsLAR <- c(theta_122csLAR, 20) # SG-StMVAR lambdas and AR, M1=1, M2=1
+theta_122gscsLAR_expanded <- c(theta_122csLAR_expanded, 20)
+
 # p=2, M=2, d=2
 C_222 <- rbind_diags(p=2, M=2, d=2)
 theta_222c <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
 theta_222c_expanded <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), phi20_222, vec(A11_222), vec(A12_222),
                          vech(Omega2_222), alpha1_222)
+
+theta_222tc <- c(theta_222c, 10, 20) # StMVAR
+theta_222tc_expanded <- c(theta_222c_expanded, 10, 20)
 
 C_lambda_222 <- matrix(c(1, 2), nrow=2)
 theta_222csL <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
@@ -227,6 +258,13 @@ theta_332csWLAR <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332)
 theta_332csWLAR_expanded <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A11_332), vec(A12_332), vec(A13_332),
                               vec(A11_332), vec(A12_332), vec(A13_332), vec(W_332), 1, 1, 2, 2, alpha1_332, alpha2_332)
 
+
+theta_332gsc <- c(theta_332c, 30) # SG-StMVAR AR, M1=2, M2=1
+theta_332gsc_expanded <-  c(theta_332c_expanded, 30)
+
+theta_332gscsWLAR <- c(theta_332csWLAR, 20, 30) # SG-StMVAR, W, L, AR, M1=1, M2=2
+theta_332gscsWLAR_expanded <-  c(theta_332csWLAR_expanded, 20, 30)
+
 # p=1, M=2, d=3
 C_123 <- rbind_diags(p=1, M=2, d=3)
 theta_123c <- c(phi10_123, phi20_123, vec(A11_123), vech(Omega1_123), vech(Omega2_123), alpha1_123)
@@ -237,6 +275,13 @@ theta_123csL <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), 
 theta_123csL_expanded <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), 1, 1, 2, alpha1_123)
 theta_123csLAR <- c(phi10_123, phi20_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
 theta_123csLAR_expanded <- c(phi10_123, phi20_123, vec(A11_123), vec(A11_123), vec(W_123), 1, 1, 2, alpha1_123)
+
+theta_123tc <- c(theta_123c, 10, 20) # StMVAR, AR
+theta_123tc_expanded <- c(theta_123c_expanded, 10, 20)
+
+theta_123tcsLAR <- c(theta_123csLAR, 10, 20) # SStMVAR, L, AR
+theta_123tcsLAR_expanded <- c(theta_123csLAR_expanded, 10, 20) # SStMVAR, L, AR
+
 
 # p=2, M=1, d=3
 C_213 <- rbind_diags(p=2, M=1, d=3)
@@ -273,6 +318,10 @@ theta_222_c2s_expanded <- c(phi10_222_c2, phi20_222_c2, vec(A11_222_c2), vec(A12
 theta_112_int <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 theta_112_int_expanded <- theta_112_int
 
+theta_112t_int <- c(theta_112_int, 10)
+theta_112t_int_expanded <- theta_112t_int
+
+
 # p=1, M=2, d=2, same_means=list(1:2)
 theta_122_int <- c(phi10_122, vec(A11_122), vec(A21_122), vech(Omega1_122), vech(Omega2_122), alpha1_122)
 theta_122_int_expanded <- c(phi10_122, vec(A11_122), vech(Omega1_122), phi10_122, vec(A21_122), vech(Omega2_122), alpha1_122)
@@ -290,6 +339,9 @@ theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vec
 theta_222c_int_expanded <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), phi10_222, vec(A11_222), vec(A12_222),
                              vech(Omega2_222), alpha1_222)
 
+theta_222tc_int <- c(theta_222c_int, 10, 20) # StMVAR
+theta_222tc_int_expanded <- c(theta_222c_int_expanded, 10, 20)
+
 # p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
 theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
 theta_222csLAR_int_expanded <-  c(phi10_222, phi10_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222),
@@ -301,6 +353,9 @@ theta_332c_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_33
 theta_332c_int_expanded <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), phi20_332, vec(A11_332),
                              vec(A12_332), vec(A13_332), vech(Omega2_332), phi20_332, vec(A11_332), vec(A12_332), vec(A13_332),
                              vech(Omega3_332), alpha1_332, alpha2_332)
+
+theta_332gsc_int <- c(theta_332c_int, 20, 30) # G-StMVAR, M1=1, M2=2
+theta_332gsc_int_expanded <- c(theta_332c_int_expanded, 20, 30)
 
 # p=3, M=3, d=2, constraints=C_332, same_means=list(2, c(1, 3))
 theta_332c_int2 <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
@@ -351,6 +406,10 @@ theta_123csL_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A21_123),
 theta_123csLAR_int <- c(phi10_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
 theta_123csLAR_int_expanded <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), vec(W_123), 1, 1, 2, alpha1_123)
 
+theta_123tcsLAR_int <- c(theta_123csLAR_int, 10, 20) # SStMVAR
+theta_123tcsLAR_int_expanded <- c(theta_123csLAR_int_expanded, 10, 20)
+
+
 # p=2, M=1, d=3, constraints=C_213, same_means=list(1)
 theta_213c_int <- c(phi10_213, vec(A11_213), vec(A12_213), vech(Omega1_213))
 theta_213c_int_expanded <- theta_213c_int
@@ -362,47 +421,60 @@ theta_213csWAR_int_expanded <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_21
 test_that("reform_constrained_pars works correctly", {
   expect_equal(reform_constrained_pars(p=1, M=1, d=2, params=theta_112c, constraints=C_112), theta_112)
   expect_equal(reform_constrained_pars(p=1, M=2, d=2, params=theta_122c, constraints=C_122), theta_122c_expanded)
+  expect_equal(reform_constrained_pars(p=1, M=c(1, 1), d=2, params=theta_122gsc, model="G-StMVAR", constraints=C_122), theta_122gsc_expanded)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222, constraints=NULL), theta_222)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222c, constraints=C_222), theta_222c_expanded)
+  expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222tc, model="StMVAR", constraints=C_222), theta_222tc_expanded)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332c, constraints=C_332), theta_332c_expanded)
+  expect_equal(reform_constrained_pars(p=3, M=c(2, 1), d=2, params=theta_332gsc, model="G-StMVAR", constraints=C_332), theta_332gsc_expanded)
   expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123c, constraints=C_123), theta_123c_expanded)
+  expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", constraints=C_123), theta_123tc_expanded)
   expect_equal(reform_constrained_pars(p=2, M=1, d=3, params=theta_213c, constraints=C_213), theta_213)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222_c2, constraints=C_222_2), theta_222_c2_expanded)
 
-  # SGMVAR only W constrained
+  # Structural only W constrained
   expect_equal(reform_constrained_pars(p=1, M=1, d=2, params=theta_112sWC, structural_pars=list(W=W_112)), theta_112s)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332sWC, structural_pars=list(W=W_332)), theta_332s)
   expect_equal(reform_constrained_pars(p=2, M=1, d=3, params=theta_213sWC, structural_pars=list(W=W_213)), theta_213s)
 
-  # SGMVAR only lambdas constrained
+  # Structural only lambdas constrained
   expect_equal(reform_constrained_pars(p=1, M=2, d=2, params=theta_122csL, structural_pars=list(W=W_122, C_lambda=C_lambda_122)), theta_122csL_expanded)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222csL, structural_pars=list(W=W_222, C_lambda=C_lambda_222)), theta_222csL_expanded)
   expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123csL, structural_pars=list(W=W_123, C_lambda=C_lambda_123)), theta_123csL_expanded)
 
-  # SGMVAR AR parameters only constrained
+  # Structural AR parameters only constrained
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222_c2s, constraints=C_222_2, structural_pars=list(W=W_222c2)),
                theta_222_c2s_expanded)
 
-  # SGMVAR W and AR parameters constrained
+  # Structural W and AR parameters constrained
   expect_equal(reform_constrained_pars(p=1, M=1, d=2, params=theta_112csWAR, constraints=C_112, structural_pars=list(W=W_112)), theta_112s)
+  expect_equal(reform_constrained_pars(p=1, M=1, d=2, params=theta_112tcsWAR, model="StMVAR", constraints=C_112, structural_pars=list(W=W_112)), theta_112ts)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332csWAR, constraints=C_332, structural_pars=list(W=W_332)), theta_332csWAR_expanded)
   expect_equal(reform_constrained_pars(p=2, M=1, d=3, params=theta_213csWAR, constraints=C_213, structural_pars=list(W=W_213)), theta_213s)
 
-  # SGMVAR lambdas and AR parameters
+  # Structural lambdas and AR parameters
   expect_equal(reform_constrained_pars(p=1, M=2, d=2, params=theta_122csLAR, constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122)),
                theta_122csLAR_expanded)
+  expect_equal(reform_constrained_pars(p=1, M=c(1, 1), d=2, params=theta_122gscsLAR, constraints=C_122, model="G-StMVAR", structural_pars=list(W=W_122, C_lambda=C_lambda_122)),
+               theta_122gscsLAR_expanded)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222)),
                theta_222csLAR_expanded)
   expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123csLAR, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123)),
                theta_123csLAR_expanded)
+  expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123tcsLAR, model="StMVAR", constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123)),
+               theta_123tcsLAR_expanded)
 
-  # SGMVAR W and Lambda parameters constrained
+  # Structural W and Lambda parameters constrained
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332csWL, structural_pars=list(W=W_332, C_lambda=C_lambda_332)),
                theta_332csWL_expanded)
 
-  # SGMVAR W, Lambda, and AR parameters constrained
+  # Structural W, Lambda, and AR parameters constrained
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332csWLAR, constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332)),
                theta_332csWLAR_expanded)
+  expect_equal(reform_constrained_pars(p=3, M=c(1, 2), d=2, params=theta_332gscsWLAR, model="G-StMVAR", constraints=C_332,
+                                       structural_pars=list(W=W_332, C_lambda=C_lambda_332)),
+               theta_332gscsWLAR_expanded)
+
 
   # Models with same_means
   expect_equal(reform_constrained_pars(p=1, M=1, d=2, params=theta_112_int, same_means=list(1)), theta_112_int_expanded)
@@ -412,10 +484,14 @@ test_that("reform_constrained_pars works correctly", {
                                        same_means=list(1:2)), theta_122csL_int_expanded)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2)),
                theta_222c_int_expanded)
+  expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222tc_int, model="StMVAR", constraints=C_222, same_means=list(1:2)),
+               theta_222tc_int_expanded)
   expect_equal(reform_constrained_pars(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222),
                                        same_means=list(1:2)), theta_222csLAR_int_expanded)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332c_int, constraints=C_332, same_means=list(1, 2:3)),
                theta_332c_int_expanded)
+  expect_equal(reform_constrained_pars(p=3, M=c(1, 2), d=2, params=theta_332gsc_int, model="G-StMVAR", constraints=C_332, same_means=list(1, 2:3)),
+               theta_332gsc_int_expanded)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332c_int2, constraints=C_332, same_means=list(2, c(1, 3))),
                theta_332c_int2_expanded)
   expect_equal(reform_constrained_pars(p=3, M=3, d=2, params=theta_332c_int3, constraints=C_332, same_means=list(1:3)),
@@ -434,6 +510,8 @@ test_that("reform_constrained_pars works correctly", {
                theta_123csL_int_expanded)
   expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123csLAR_int, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)),
                theta_123csLAR_int_expanded)
+  expect_equal(reform_constrained_pars(p=1, M=2, d=3, params=theta_123tcsLAR_int, model="StMVAR", constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)),
+               theta_123tcsLAR_int_expanded)
   expect_equal(reform_constrained_pars(p=2, M=1, d=3, params=theta_213c_int, constraints=C_213, same_means=list(1)),
                theta_213c_int_expanded)
   expect_equal(reform_constrained_pars(p=2, M=1, d=3, params=theta_213csWAR_int, constraints=C_213, structural_pars=list(W=W_213), same_means=list(1)),
@@ -444,8 +522,14 @@ test_that("reform_structural_pars works correctly", {
   expect_equal(reform_structural_pars(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W=W_112)), theta_112, tolerance=1e-4)
   expect_equal(reform_structural_pars(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W=W_122)), theta_122, tolerance=1e-4)
   expect_equal(reform_structural_pars(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222)), theta_222, tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=2, M=2, d=2, params=theta_222ts, model="StMVAR", structural_pars=list(W=W_222)), theta_222t, tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=2, M=c(1, 1), d=2, params=theta_222gss, model="G-StMVAR", structural_pars=list(W=W_222)), theta_222gs, tolerance=1e-4)
   expect_equal(reform_structural_pars(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W=W_332)), theta_332_froms, tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=3, M=3, d=2, params=theta_332ts, model="StMVAR", structural_pars=list(W=W_332)), c(theta_332_froms, 10, 20, 30), tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=3, M=c(2, 1), d=2, params=theta_332gss, model="G-StMVAR", structural_pars=list(W=W_332)), c(theta_332_froms, 30), tolerance=1e-4)
   expect_equal(reform_structural_pars(p=1, M=2, d=3, params=theta_123s, structural_pars=list(W=W_123)), theta_123, tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=1, M=2, d=3, params=theta_123ts, model="StMVAR", structural_pars=list(W=W_123)), theta_123t, tolerance=1e-4)
+  expect_equal(reform_structural_pars(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", structural_pars=list(W=W_123)), theta_123gs, tolerance=1e-4)
   expect_equal(reform_structural_pars(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W=W_213)), theta_213, tolerance=1e-4)
 })
 

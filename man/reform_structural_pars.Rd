@@ -4,7 +4,14 @@
 \alias{reform_structural_pars}
 \title{Reform structural parameter vector into the "standard" form}
 \usage{
-reform_structural_pars(p, M, d, params, structural_pars = NULL)
+reform_structural_pars(
+  p,
+  M,
+  d,
+  params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
+  structural_pars = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -89,6 +96,9 @@ reform_structural_pars(p, M, d, params, structural_pars = NULL)
   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
 
   The notation is similar to the cited literature.}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 the following elements:

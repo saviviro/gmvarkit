@@ -53,6 +53,10 @@ Returns a length \eqn{M2} vector containing the degrees of freedom parameters
 \description{
 \code{pick_df} picks  the degrees of freedom parameters from the given parameter vector.
 }
+\details{
+Constrained models are supported, but obtaining the degrees of freedom does not require
+  specifying the constraints.
+}
 \section{Warning}{
 
  No argument checks!

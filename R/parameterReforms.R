@@ -15,7 +15,7 @@ reform_data <- function(data, p) {
   d <- ncol(data)
   n_obs <- nrow(data)
   T_obs <- n_obs - p
-  matrix(vapply(1:p, function(i1) as.vector(data[(p-i1+1):(T_obs + p - i1 + 1),]), numeric((n_obs-p+1)*d)), nrow=n_obs-p+1, byrow=FALSE)
+  matrix(vapply(1:p, function(i1) as.vector(data[(p - i1 + 1):(T_obs + p - i1 + 1),]), numeric((n_obs - p + 1)*d)), nrow=n_obs - p + 1, byrow=FALSE)
 }
 
 
@@ -33,12 +33,17 @@ reform_data <- function(data, p) {
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, change_na=FALSE) {
+reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"),
+                                    constraints=NULL, same_means=NULL, structural_pars=NULL, change_na=FALSE) {
+  model <- match.arg(model)
   if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
     return(params)
   } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
     return(params)
   }
+  all_df <- pick_df(M=M, params=params, model=model)
+  M2 <- length(all_df)
+  M <- sum(M)
 
   if(is.null(same_means)) {
     less_pars <- 0 # Number of parameters less compared to models without same mean constraints
@@ -48,7 +53,7 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_mean
   }
 
   # Obtain the AR coefficients from the constraints
-  if(is.null(constraints)) { # For SGMVAR model with constrained structural parameters but no AR constraints
+  if(is.null(constraints)) { # For structural model with constrained structural parameters but no AR constraints
     q <- M*p*d^2
     psi_expanded <- params[(d*M + 1 - less_pars):(d*M + d^2*p*M - less_pars)] # AR coefficients (without constraints)
     psiNA <- FALSE
@@ -112,11 +117,10 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_mean
       pars <- c(as.vector(all_phi0), psi_expanded, vec(new_W), lambdas)
     }
   }
-
   if(M == 1) {
-    return(pars)
+    return(c(pars, all_df))
   } else {
-    return(c(pars, params[(length(params) - M + 2):length(params)]))
+    return(c(pars, params[(length(params) - M - M2 + 2):length(params)]))
   }
 }
 
@@ -136,13 +140,17 @@ reform_constrained_pars <- function(p, M, d, params, constraints=NULL, same_mean
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
+reform_structural_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), structural_pars=NULL) {
   if(is.null(structural_pars)) {
     return(params)
   }
+  model <- match.arg(model)
   Omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   allA <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_df <- pick_df(M=M, params=params, model=model)
+  M_orig <- M
+  M <- sum(M)
   make_upsilon <- function(phi0, Am, Omega) c(phi0, vec(Am), vech(Omega))
   n_upsilon_pars <- d^2*p + d + d*(d + 1)/2
   pars <- numeric(M*n_upsilon_pars) # no alphas
@@ -152,10 +160,10 @@ reform_structural_pars <- function(p, M, d, params, structural_pars=NULL) {
   if(M == 1) {
     ret <- pars
   } else {
-    alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+    alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params, model=model)
     ret <- c(pars, alphas[-M]) # + alphas
   }
-  ret
+  c(ret, all_df)
 }
 
 

@@ -215,6 +215,8 @@ pick_alphas <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"))
 #' @description \code{pick_df} picks  the degrees of freedom parameters from the given parameter vector.
 #'
 #' @inheritParams is_stationary
+#' @details Constrained models are supported, but obtaining the degrees of freedom does not require
+#'   specifying the constraints.
 #' @return Returns a length \eqn{M2} vector containing the degrees of freedom parameters
 #'  \strong{\eqn{\nu}}\eqn{=(\nu_{M1+1},...,\nu_{M})}. In the case of the GMVAR model (\eqn{M2=0}),
 #'  returns a numeric vector of length zero.
