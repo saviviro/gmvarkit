@@ -1121,6 +1121,18 @@ test_that("sort_and_standardize_alphas works correctly", {
   expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.7), structural_pars=list(1)), c(0.7, 0.3))
   expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), structural_pars=list(1)), c(0.6, 0.3, 0.1))
   expect_equal(sort_and_standardize_alphas(alphas=c(3, 2, 5), structural_pars=list(1)), c(0.5, 0.3, 0.2))
+
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), model="StMVAR"), c(0.6, 0.3, 0.1))
+  expect_equal(sort_and_standardize_alphas(alphas=c(4, 6), model="StMVAR"), c(0.6, 0.4))
+
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), constraints=1, model="G-StMVAR"), c(0.3, 0.1, 0.6))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.4, 0.6), M=c(1, 1), model="G-StMVAR"), c(0.4, 0.6))
+  expect_equal(sort_and_standardize_alphas(alphas=c(4, 6), M=c(1, 1), model="G-StMVAR"), c(0.4, 0.6))
+  expect_equal(sort_and_standardize_alphas(alphas=c(0.3, 0.1, 0.6), M=c(1, 2), model="G-StMVAR"), c(0.3, 0.6, 0.1))
+  expect_equal(sort_and_standardize_alphas(alphas=c(3, 1, 6), M=c(2, 1), model="G-StMVAR"), c(0.3, 0.1, 0.6))
+  expect_equal(sort_and_standardize_alphas(alphas=c(1, 2, 3, 4), M=c(2, 2), model="G-StMVAR"), c(0.2, 0.1, 0.4, 0.3))
+  expect_equal(sort_and_standardize_alphas(alphas=c(1, 2, 3, 4), M=c(1, 3), model="G-StMVAR"), c(0.1, 0.4, 0.3, 0.2))
+  expect_equal(sort_and_standardize_alphas(alphas=c(1, 3, 2, 4), M=c(3, 1), model="G-StMVAR"), c(0.3, 0.2, 0.1, 0.4))
 })
 
 

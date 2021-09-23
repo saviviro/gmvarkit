@@ -457,11 +457,13 @@ regime_distance <- function(regime_pars1, regime_pars2) {
 
 
 #' @title Sort mixing weight parameters in a decreasing order and standardize them
-#'  to sum to one. For G-StMVAR models..
+#'  to sum to one. For G-StMVAR models, the mixing weight parameters are sorted
+#'  to a decreasing order for GMVAR and StMVAR type regimes separately.
 #'
 #' @description \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
-#'  order and standardizes them to sum to one. Does not sort if AR constraints, lambda constraints,
-#'  or same means are employed.
+#'  order and standardizes them to sum to one. For G-StMVAR models, the mixing weight parameters are sorted
+#'  to a decreasing order for GMVAR and StMVAR type regimes separately. Does not sort if AR constraints,
+#'  lambda constraints, or same means are employed.
 #'
 #' @inheritParams loglikelihood_int
 #' @param alphas mixing weights parameters alphas, \strong{INCLUDING} the one for the M:th regime (that is
@@ -473,9 +475,16 @@ regime_distance <- function(regime_pars1, regime_pars2) {
 #'  No argument checks!
 #' @keywords internal
 
-sort_and_standardize_alphas <- function(alphas, constraints=NULL, same_means=NULL, structural_pars=NULL) {
+sort_and_standardize_alphas <- function(alphas, M, model=c("GMVAR", "StMVAR", "G-StMVAR"),
+                                        constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
   if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
-    alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
+    if(model != "G-StMVAR") {
+      alphas <- alphas[order(alphas, decreasing=TRUE, method="radix")]
+    } else { # model == "G-StMVAR"
+      alphas <- c(alphas[order(alphas[1:M[1]], decreasing=TRUE, method="radix")], # Sort GMVAR type alphas
+                  alphas[M[1] + order(alphas[(M[1] + 1):sum(M)], decreasing=TRUE, method="radix")]) # Sort StMVAR type alphas
+    }
   }
   alphas/sum(alphas)
 }
