@@ -437,16 +437,14 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
 
 #' @title Create random degrees of freedom parameter values
 #'
-#' @description \code{random_df} generates random \code{M2} degrees of freedom parameter values where
-#' \code{M2} is number of StMVAR type regimes in the model
+#' @description \code{random_df} generates random \code{M2} degrees of freedom parameter values, where
+#' \code{M2} is number of StMVAR type regimes in the model-
 #'
 #' @inheritParams loglikelihood_int
 #' @return
-#'   \describe{
-#'     \item{\strong{GMVAR models}:}{a numeric vector of length zero.}
-#'     \item{For \strong{StMVAR models}:}{a numeric vector of length \code{M} with random entries strictly larger than two.}
-#'     \item{For \strong{G-StMVAR models}:}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
-#'   }
+#'   \item{\strong{GMVAR models}}{a numeric vector of length zero.}
+#'   \item{\strong{StMVAR models}}{a numeric vector of length \code{M} with random entries strictly larger than two.}
+#'   \item{\strong{G-StMVAR models}}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
 #' @keywords internal
 
 random_df <- function(M, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
@@ -459,4 +457,36 @@ random_df <- function(M, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
     M2 <- M[2]
   }
   2 + rgamma(M2, shape=0.3, rate=0.007)
+}
+
+
+#' @title Create random degrees of freedom parameter values close to given values
+#'
+#' @description \code{random_df} generates random \code{M2} degrees of freedom parameter values
+#'   close to given values, where \code{M2} is number of StMVAR type regimes in the model.
+#'
+#' @inheritParams loglikelihood_int
+#' @param df the old degrees of freedom parameters (of all regimes)
+#' @param which_random a vector with length between 1 and M specifying the mixture components that should be random instead of
+#'   close to the given degrees of freedom.
+#' @param accuracy a positive real number adjusting how close to the given degrees of freedom parameters
+#'   the returned df should be.
+#' @param which_random a vector with length between 1 and M specifying the mixture components that should be random instead of
+#'   close to the given degrees of freedom.
+#' @inherit random_df return
+#' @keywords internal
+
+smart_df <- function(M, df, accuracy, which_random=numeric(0), model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    return(numeric(0))
+  }
+  M1 <- ifelse(model == "StMVAR", 0, M[1])
+  new_df <- rnorm(length(df), mean=df, sd=pmax(0.2, abs(df))/accuracy) # smart df
+  if(model == "G-StMVAR") which_random <- which_random[which_random > M1]
+  if(length(which_random) > 0) { # Some df should be random instead of smart?
+    rand_df <- 2 + rgamma(length(which_random), shape=0.3, rate=0.007)
+    new_df[which_random - M1] <- rand_df
+  }
+  pmax(2.01, new_df) # Make sure all df are above the strict lower bound 2
 }
