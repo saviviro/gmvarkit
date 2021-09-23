@@ -1,6 +1,8 @@
 context("generate parameters")
 library(gmvarkit)
 
+test_length0 <- function(x, length_x) expect_equal(length(x), length_x)
+
 params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746, 0.804, 5.804, 3.245, 7.913,
                0.952, -0.037, -0.019, 0.943, 6.926, 3.982, 12.135, 0.789) # p=1, M=2, d=2
 set.seed(1); W_313 <- chol(tcrossprod(matrix(rnorm(3*3), nrow=3)))
@@ -16,7 +18,6 @@ params222s_sm <- random_ind2(p=2, M=2, d=2, mu_scale=1:2, mu_scale2=1:2, W_scale
 
 
 test_that("generate parameters don't throw errors", {
-  test_length0 <- function(x, length_x) expect_equal(length(x), length_x)
   test_length0(random_ind(p=2, M=3, d=2, mu_scale=1:2, mu_scale2=1:2, omega_scale=1:2), 41)
   test_length0(random_ind(p=3, M=1, d=3, mu_scale=1:3, mu_scale2=1:3, W_scale=1:3, lambda_scale=1:3,
                           structural_pars=list(W=chol(tcrossprod(matrix(rnorm(3*3), nrow=3))))), 36)
@@ -53,4 +54,18 @@ test_that("generate parameters don't throw errors", {
   test_length0(smart_covmat(d=2, Omega=diag(2), accuracy=1), 3)
   test_length0(smart_covmat(d=3, M=2, W_and_lambdas=c(rnorm(3*3), abs(rnorm(3*2))), accuracy=10,
                              structural_pars=list(1)), 15)
+})
+
+set.seed(1)
+df_1 <- random_df(M=1, model="StMVAR")
+df_1_2 <- random_df(M=c(1, 1), model="G-StMVAR")
+df_2 <- random_df(M=2, model="StMVAR")
+df_3 <- random_df(M=c(2, 3), model="G-StMVAR")
+
+
+test_that("random_df works", {
+  test_length0(df_1, 1)
+  test_length0(df_1_2, 1)
+  test_length0(df_2, 2)
+  test_length0(df_3, 3)
 })
