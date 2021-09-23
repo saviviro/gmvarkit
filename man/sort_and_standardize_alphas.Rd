@@ -3,7 +3,7 @@
 \name{sort_and_standardize_alphas}
 \alias{sort_and_standardize_alphas}
 \title{Sort mixing weight parameters in a decreasing order and standardize them
- to sum to one.}
+ to sum to one. For G-StMVAR models..}
 \usage{
 sort_and_standardize_alphas(
   alphas,

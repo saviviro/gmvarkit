@@ -305,11 +305,20 @@ sort_components <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVA
 #'  }
 #' @keywords internal
 
-sort_W_and_lambdas <- function(p, M, d, params) {
+sort_W_and_lambdas <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    M2 <- 0
+  } else if(model == "StMVAR") {
+    M2 <- M
+  } else { # model == "G-StMVAR"
+    M2 <- M[2]
+    M <- sum(M)
+  }
   if(M == 1) return(params)
-  # The last M - 1 parameters are alphas, after that, the last d^2 + d*(M - 1) params
-  # are the W and lambda parameters.
-  W_and_lambda_inds <- (length(params) - (d^2 + d*(M - 1)) - (M - 1) + 1):(length(params) - (M - 1))
+  # The last M2 parameters the degrees of freedom, the next M - 1 parameters are alphas, after that,
+  # the last d^2 + d*(M - 1) params are the W and lambda parameters.
+  W_and_lambda_inds <- (length(params) - (d^2 + d*(M - 1)) - M2 - M + 2):(length(params) - M2 - M + 1)
   W_and_lambdas <- params[W_and_lambda_inds]
   W <- matrix(W_and_lambdas[1:(d^2)], nrow=d, ncol=d, byrow=FALSE)
   lambdas <- matrix(W_and_lambdas[(d^2 + 1):length(W_and_lambdas)], nrow=d, ncol=M - 1, byrow=FALSE)
@@ -339,16 +348,18 @@ sort_W_and_lambdas <- function(p, M, d, params) {
 #' @inherit is_stationary references
 #' @keywords internal
 
-change_parametrization <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL,
-                                   change_to=c("intercept", "mean")) {
+change_parametrization <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
+                                   structural_pars=NULL, change_to=c("intercept", "mean")) {
   stopifnot(is.null(same_means))
-  re_params <- params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means,
-                                    structural_pars=structural_pars) # Parameters in regular form
+  model <- match.arg(model)
   change_to <- match.arg(change_to)
+  re_params <- params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
+                                    structural_pars=structural_pars) # Parameters in "regular" form
   Id <- diag(nrow=d)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  M <- sum(M)
 
   if(is.null(constraints) && is.null(structural_pars)) {
     qm1 <- (1:M - 1)*(d + p*d^2 + d*(d + 1)/2)
@@ -379,8 +390,9 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, same_means
 #' @param regime_pars
 #'   \describe{
 #'     \item{For reduced form models:}{a size \eqn{((pd^2+d+d(d+1)/2)x1)} vector
-#'       \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.}
-#'     \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+#'       (\strong{\eqn{\upsilon_{m}}}\eqn{,\nu_m})\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m},\nu_m)}.}
+#'     \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\nu_m)}.}
+#'     In the case of a GMVAR type regime, \eqn{\nu_m} is omitted.
 #'   }
 #' @return Returns parameter vector with \code{m}:th regime changed to \code{regime_pars}.
 #' @details Does not currently support models with AR, mean, or lambda parameter constraints.
@@ -389,17 +401,26 @@ change_parametrization <- function(p, M, d, params, constraints=NULL, same_means
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-change_regime <- function(p, M, d, params, m, regime_pars, structural_pars=NULL) {
+change_regime <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), m, regime_pars, structural_pars=NULL) {
+  model <- match.arg(model)
+  all_df <- pick_df(M=M, params=params, model=model)
+  if(model == "StMVAR" || (model == "G-StMVAR" && m > M[1])) {
+    M <- sum(M)
+    df <- regime_pars[length(regime_pars)] # Extract df
+    regime_pars <- regime_pars[-length(regime_pars)] # Remove df
+    params[length(params) - M + m] <- df # Change df in the parameter vector (the index is the same for G-StMVAR model)
+  } else if(model == "G-StMVAR") { # GMVAR type regime is changes
+    M <- sum(M)
+  }
   if(is.null(structural_pars)) {
     qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
     params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)] <- regime_pars
-    return(params)
   } else {
     n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
     params[(d*(m - 1) + 1):(d*m)] <- regime_pars[1:d] # phi0
     params[(d*M + d^2*p*(m - 1) + 1):(d*M + d^2*p*(m - 1) + d^2*p)] <- regime_pars[(d + 1):(d + d^2*p)] # AR coefs
-    return(params)
   }
+  params
 }
 
 
@@ -431,12 +452,12 @@ regime_distance <- function(regime_pars1, regime_pars2) {
   }
   scales1 <- vapply(regime_pars1, dist_fun, numeric(1))
   scales2 <- vapply(regime_pars2, dist_fun, numeric(1))
-  sqrt(crossprod(regime_pars1/scales1 - regime_pars2/scales2))
+  c(sqrt(crossprod(regime_pars1/scales1 - regime_pars2/scales2)))
 }
 
 
 #' @title Sort mixing weight parameters in a decreasing order and standardize them
-#'  to sum to one.
+#'  to sum to one. For G-StMVAR models..
 #'
 #' @description \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
 #'  order and standardizes them to sum to one. Does not sort if AR constraints, lambda constraints,

@@ -5,7 +5,16 @@
 \title{Change regime parameters \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}
   of the given parameter vector}
 \usage{
-change_regime(p, M, d, params, m, regime_pars, structural_pars = NULL)
+change_regime(
+  p,
+  M,
+  d,
+  params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
+  m,
+  regime_pars,
+  structural_pars = NULL
+)
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}
@@ -95,8 +104,9 @@ change_regime(p, M, d, params, m, regime_pars, structural_pars = NULL)
 
 \item{regime_pars}{\describe{
   \item{For reduced form models:}{a size \eqn{((pd^2+d+d(d+1)/2)x1)} vector
-    \strong{\eqn{\upsilon_{m}}}\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m})}.}
-  \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{)}.}
+    (\strong{\eqn{\upsilon_{m}}}\eqn{,\nu_m})\eqn{ = (\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\sigma_{m},\nu_m)}.}
+  \item{For structural models:}{a length \eqn{pd^2 + d} vector \eqn{(\phi_{m,0},}\strong{\eqn{\phi_{m}}}\eqn{,\nu_m)}.}
+  In the case of a GMVAR type regime, \eqn{\nu_m} is omitted.
 }}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing

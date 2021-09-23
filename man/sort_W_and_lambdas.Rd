@@ -4,7 +4,7 @@
 \alias{sort_W_and_lambdas}
 \title{Sort the columns of W matrix by sorting the lambda parameters of the second regime to increasing order}
 \usage{
-sort_W_and_lambdas(p, M, d, params)
+sort_W_and_lambdas(p, M, d, params, model = c("GMVAR", "StMVAR", "G-StMVAR"))
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

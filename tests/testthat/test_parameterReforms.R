@@ -67,6 +67,7 @@ W_122 <- matrix(WL_122[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_122 <- WL_122[(2^2 + 1):length(WL_122)]
 theta_122s <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec(W_122), lambdas_122, alpha1_122) # SGMVAR
 
+theta_122t <- c(theta_122, 10, 20)
 
 # p=2, M=2, d=2
 phi10_222 <- c(1.03, 2.36)
@@ -792,11 +793,13 @@ test_that("sort_components works correctly", {
 })
 
 
-calc_mu <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
-  params <- reform_constrained_pars(p, M, d, params, constraints=constraints, same_means=NULL,
+calc_mu <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
+  params <- reform_constrained_pars(p, M, d, params, model=model, constraints=constraints, same_means=NULL,
                                     structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  M <- sum(M)
   vapply(1:M, function(m) solve(diag(d) - rowSums(all_A[, , , m, drop=FALSE], dims=2), all_phi0[,m]), numeric(d))
 }
 
@@ -808,10 +811,19 @@ theta_342_mu <- change_parametrization(p=3, M=4, d=2, params=theta_342, change_t
 theta_123_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123, change_to="mean")
 theta_213_mu <- change_parametrization(p=2, M=1, d=3, params=theta_213, change_to="mean")
 
+theta_222t_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222t, model="StMVAR", change_to="mean")
+theta_222gs_mu <- change_parametrization(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", change_to="mean")
+theta_332gs_mu <- change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", change_to="mean")
+theta_332gs_mu2 <- change_parametrization(p=3, M=c(2, 1), d=2, params=theta_332gs2, model="G-StMVAR", change_to="mean")
+
 theta_112c_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112c, constraints=C_112, change_to="mean")
 theta_222c_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222c, constraints=C_222, change_to="mean")
 theta_222c_mu2 <- change_parametrization(p=2, M=2, d=2, params=theta_222_c2, constraints=C_222_2, change_to="mean")
 theta_123c_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123c, constraints=C_123, change_to="mean")
+
+theta_123tc_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", constraints=C_123, change_to="mean")
+theta_332gsc_mu <- change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gsc, model="G-StMVAR", constraints=C_332, change_to="mean")
+
 
 # SGMVAR
 theta_112s_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W=W_112), change_to="mean")
@@ -822,6 +834,13 @@ theta_112csWAR_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112csWAR
 theta_222csLAR_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222csLAR, structural_pars=list(W=W_222), constraints=C_222, change_to="mean")
 theta_123csL_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123csL, structural_pars=list(W=W_123), constraints=NULL, change_to="mean")
 
+theta_123gss_mu <- change_parametrization(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR",
+                                          structural_pars=list(W=W_123), change_to="mean")
+theta_112tcsWAR_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112tcsWAR, model="StMVAR",
+                                             structural_pars=list(W=W_112), constraints=C_112, change_to="mean")
+theta_123tcsLAR_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123tcsLAR, model="StMVAR", structural_pars=list(W=W_123), constraints=C_123, change_to="mean")
+
+
 test_that("change_parametrization works correctly", {
   expect_equal(pick_phi0(p=1, M=1, d=2, params=theta_112_mu), calc_mu(p=1, M=1, d=2, params=theta_112))
   expect_equal(change_parametrization(p=1, M=1, d=2, params=theta_112_mu, change_to="intercept"), theta_112)
@@ -831,9 +850,17 @@ test_that("change_parametrization works correctly", {
 
   expect_equal(pick_phi0(p=2, M=2, d=2, params=theta_222_mu), calc_mu(p=2, M=2, d=2, params=theta_222))
   expect_equal(change_parametrization(p=2, M=2, d=2, params=theta_222_mu, change_to="intercept"), theta_222)
+  expect_equal(pick_phi0(p=2, M=2, d=2, params=theta_222t_mu), calc_mu(p=2, M=2, d=2, params=theta_222t, model="StMVAR"))
+  expect_equal(change_parametrization(p=2, M=2, d=2, params=theta_222t_mu, model="StMVAR", change_to="intercept"), theta_222t)
+  expect_equal(pick_phi0(p=2, M=c(1, 1), d=2, params=theta_222gs_mu), calc_mu(p=2, M=2, d=2, params=theta_222gs, model="G-StMVAR"))
+  expect_equal(change_parametrization(p=2, M=c(1, 1), d=2, params=theta_222gs_mu, model="G-StMVAR", change_to="intercept"), theta_222gs)
 
   expect_equal(pick_phi0(p=3, M=3, d=2, params=theta_332_mu), calc_mu(p=3, M=3, d=2, params=theta_332))
   expect_equal(change_parametrization(p=3, M=3, d=2, params=theta_332_mu, change_to="intercept"), theta_332)
+  expect_equal(pick_phi0(p=3, M=c(1, 2), d=2, params=theta_332gs_mu), calc_mu(p=3, M=3, d=2, params=theta_332gs, model="G-StMVAR"))
+  expect_equal(change_parametrization(p=3, M=c(2, 1), d=2, params=theta_332gs_mu, model="G-StMVAR", change_to="intercept"), theta_332gs)
+  expect_equal(pick_phi0(p=3, M=c(1, 2), d=2, params=theta_332gs_mu2), calc_mu(p=3, M=3, d=2, params=theta_332gs2, model="G-StMVAR"))
+  expect_equal(change_parametrization(p=3, M=c(2, 1), d=2, params=theta_332gs_mu2, model="G-StMVAR", change_to="intercept"), theta_332gs2)
 
   expect_equal(pick_phi0(p=3, M=4, d=2, params=theta_342_mu), calc_mu(p=3, M=4, d=2, params=theta_342))
   expect_equal(change_parametrization(p=3, M=4, d=2, params=theta_342_mu, change_to="intercept"), theta_342)
@@ -855,8 +882,13 @@ test_that("change_parametrization works correctly", {
 
   expect_equal(matrix(theta_123c_mu[1:(2*3)], nrow=3, byrow=FALSE), calc_mu(p=1, M=2, d=3, constraints=C_123, params=theta_123c))
   expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123c_mu, constraints=C_123, change_to="intercept"), theta_123c)
+  expect_equal(matrix(theta_123tc_mu[1:(2*3)], nrow=3, byrow=FALSE), calc_mu(p=1, M=2, d=3, constraints=C_123, params=theta_123tc, model="StMVAR"))
+  expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123tc_mu, constraints=C_123, model="StMVAR", change_to="intercept"), theta_123tc)
 
-  # SGMVAR
+  expect_equal(matrix(theta_332gsc_mu[1:(3*2)], nrow=2, byrow=FALSE), calc_mu(p=3, M=c(1, 2), d=2, constraints=C_332, params=theta_332gsc, model="G-StMVAR"))
+  expect_equal(change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gsc_mu, constraints=C_332, model="G-StMVAR", change_to="intercept"), theta_332gsc)
+
+  # Structural
   expect_equal(pick_phi0(p=1, M=1, d=2, params=theta_112s_mu, structural_pars=list(W=W_112)),
                calc_mu(p=1, M=1, d=2, params=theta_112s, structural_pars=list(W=W_112)))
   expect_equal(change_parametrization(p=1, M=1, d=2, params=theta_112s_mu, structural_pars=list(W=W_112), change_to="intercept"), theta_112s)
@@ -868,11 +900,19 @@ test_that("change_parametrization works correctly", {
   expect_equal(pick_phi0(p=1, M=2, d=3, params=theta_123s_mu, structural_pars=list(W=W_123)),
                calc_mu(p=1, M=2, d=3, params=theta_123s, structural_pars=list(W=W_123)))
   expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123s_mu, change_to="intercept", structural_pars=list(W=W_123)), theta_123s)
+  expect_equal(pick_phi0(p=1, M=c(1, 1), d=3, params=theta_123gss_mu, structural_pars=list(W=W_123)),
+               calc_mu(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", structural_pars=list(W=W_123)))
+  expect_equal(change_parametrization(p=1, M=c(1, 1), d=3, params=theta_123gss_mu, model="G-StMVAR",
+                                      change_to="intercept", structural_pars=list(W=W_123)), theta_123gss)
 
   expect_equal(matrix(theta_112csWAR_mu[1:(1*2)], nrow=2, byrow=FALSE),
                calc_mu(p=1, M=1, d=2, constraints=C_112, structural_pars=list(W=W_112), params=theta_112csWAR))
   expect_equal(change_parametrization(p=1, M=1, d=2, params=theta_112csWAR_mu, constraints=C_112, structural_pars=list(W=W_112), change_to="intercept"),
                theta_112csWAR)
+  expect_equal(matrix(theta_112tcsWAR_mu[1:(1*2)], nrow=2, byrow=FALSE),
+               calc_mu(p=1, M=1, d=2, params=theta_112csWAR, model="StMVAR", constraints=C_112, structural_pars=list(W=W_112)))
+  expect_equal(change_parametrization(p=1, M=1, d=2, params=theta_112tcsWAR_mu, model="StMVAR", constraints=C_112, structural_pars=list(W=W_112), change_to="intercept"),
+               theta_112tcsWAR)
 
   expect_equal(matrix(theta_222csLAR_mu[1:(2*2)], nrow=2, byrow=FALSE),
                calc_mu(p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222), params=theta_222csLAR))
@@ -883,6 +923,12 @@ test_that("change_parametrization works correctly", {
                calc_mu(p=1, M=2, d=3, constraints=NULL, structural_pars=list(W=W_123), params=theta_123csL))
   expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123csL_mu, constraints=NULL, structural_pars=list(W=W_123), change_to="intercept"),
                theta_123csL)
+
+  expect_equal(matrix(theta_123tcsLAR_mu[1:(2*3)], nrow=3, byrow=FALSE),
+               calc_mu(p=1, M=2, d=3, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123), params=theta_123tcsLAR))
+  expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123tcsLAR_mu, constraints=C_123, model="StMVAR",
+                                      structural_pars=list(W=W_123, C_lambda=C_lambda_123), change_to="intercept"),
+               theta_123tcsLAR)
 })
 
 
@@ -895,6 +941,12 @@ theta_123_cr2 <- c(upsilon2_123, upsilon2_123, alpha1_123)
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222)
 
+theta_122t_cr <- c(theta_122_cr, 15, 20) # StMVAR
+theta_222gs_cr <- c(theta_222_cr, 25) # G-StMVAR, M1=1, M2=1
+theta_332gs_cr <- c(theta_332_cr, 20, 35) # G-StMVAR, M1=1, M2=2
+theta_332gs_cr2 <- c(upsilon2_332, upsilon2_332, upsilon3_332, alpha1_332, alpha2_332, 20, 30) # G-StMVAR, M1=1, M2=2
+theta_123t_cr <- c(theta_123_cr1, 20, 30) # StMVAR
+
 ## A(M)(p)_(p)(M)(d)
 theta_122_crs <- c(phi10_122, phi10_122, vec(A11_122), vec(A11_122), Wvec(W_122), lambdas_122, alpha1_122)
 theta_122_crs2 <- c(phi20_122, phi20_122, vec(A21_122), vec(A21_122), Wvec(W_122), lambdas_122, alpha1_122)
@@ -905,13 +957,22 @@ theta_332_crs <- c(phi10_332, phi20_332, phi20_332, vec(A11_332), vec(A12_332), 
 theta_123_crs <- c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), Wvec(W_123), lambdas_123, alpha1_123)
 theta_123_crs2 <- c(phi20_123, phi20_123, vec(A21_123), vec(A21_123), Wvec(W_123), lambdas_123, alpha1_123)
 
+theta_222t_crs <- c(theta_222_crs, 10, 25) # SStMVAR
+theta_332gs_crs <- c(theta_332_crs, 20, 35) # SG-StMVAR, M1=1, M2=2
+theta_123gs_crs <- c(theta_123_crs, 30) # SG-StMVAR, M1=1, M2=1
+theta_123gs_crs2 <- c(theta_123_crs2, 25) # SG-StMVAR, M1=1, M2=1
 
 
 test_that("change_regime works correctly", {
   expect_equal(change_regime(p=1, M=2, d=2, params=theta_122, m=1, regime_pars=upsilon2_122), theta_122_cr)
+  expect_equal(change_regime(p=1, M=2, d=2, params=theta_122t, model="StMVAR", m=1, regime_pars=c(upsilon2_122, 15)), theta_122t_cr)
   expect_equal(change_regime(p=2, M=2, d=2, params=theta_222, m=2, regime_pars=upsilon1_222), theta_222_cr)
+  expect_equal(change_regime(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", m=2, regime_pars=c(upsilon1_222, 25)), theta_222gs_cr)
   expect_equal(change_regime(p=3, M=3, d=2, params=theta_332, m=3, regime_pars=upsilon2_332), theta_332_cr)
+  expect_equal(change_regime(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", m=3, regime_pars=c(upsilon2_332, 35)), theta_332gs_cr)
+  expect_equal(change_regime(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", m=1, regime_pars=c(upsilon2_332)), theta_332gs_cr2)
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123, m=2, regime_pars=upsilon1_123), theta_123_cr1)
+  expect_equal(change_regime(p=1, M=2, d=3, params=theta_123t, m=2, model="StMVAR", regime_pars=c(upsilon1_123, 30)), theta_123t_cr)
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123, m=1, regime_pars=upsilon2_123), theta_123_cr2)
 
   # SGMVAR
@@ -925,17 +986,27 @@ test_that("change_regime works correctly", {
   rpars222_m2 <- c(phi10_222, vec(A11_222), vec(A12_222))
   expect_equal(change_regime(p=2, M=2, d=2, params=theta_222s, m=2, regime_pars=rpars222_m2,
                              structural_pars=list(W=W_222)), theta_222_crs, tol=1-6)
+  expect_equal(change_regime(p=2, M=2, d=2, params=theta_222ts, model="StMVAR", m=2, regime_pars=c(rpars222_m2, 25),
+                             structural_pars=list(W=W_222)), theta_222t_crs, tol=1-6)
 
   rpars332_m3 <- c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332))
   expect_equal(change_regime(p=3, M=3, d=2, params=theta_332sWC, m=3, regime_pars=rpars332_m3,
                              structural_pars=list(W=W_332)), theta_332_crs, tol=1-6)
+  expect_equal(change_regime(p=3, M=c(1, 2), d=2, params=theta_332gssWC, model="G-StMVAR", m=3, regime_pars=c(rpars332_m3, 35),
+                             structural_pars=list(W=W_332)), theta_332gs_crs, tol=1-6)
 
   rpars123_m2 <- c(phi10_123, vec(A11_123))
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123s, m=2, regime_pars=rpars123_m2,
                              structural_pars=list(W=W_123)), theta_123_crs, tol=1-6)
+  expect_equal(change_regime(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", m=2, regime_pars=c(rpars123_m2, 30),
+                             structural_pars=list(W=W_123)), theta_123gs_crs, tol=1-6)
+
   rpars123_m1 <- c(phi20_123, vec(A21_123))
   expect_equal(change_regime(p=1, M=2, d=3, params=theta_123s, m=1, regime_pars=rpars123_m1,
                              structural_pars=list(W=W_123)), theta_123_crs2, tol=1-6)
+  expect_equal(change_regime(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", m=1, regime_pars=rpars123_m1,
+                             structural_pars=list(W=W_123)), theta_123gs_crs2, tol=1-6)
+
 })
 
 
@@ -958,34 +1029,80 @@ params222csm <- c(1.03, 2.36, 1.25, 0.06, 0.04, 1.34, -0.29, -0.08, -0.05, -0.36
 params123csm <- c(1.1, 2.2, 3.3, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2, -0.32, -0.13,
                   -0.23, -3, 0.47, 0.39, -1.23, 0.58, -1, 0.18, -0.67, -0.92, -1.2, 3, 2, 1, 0.6)
 
+# structural_pars=list(W=matrix(c(1, 1, NA, NA), nrow=2, byrow=FALSE))
+params132s <- c(1.15, 0.28, 0.32, 0.16, 1.83, 0.64, 0.13, -0.03, -1.05, 0.42, 0.46, 0.11, 0.14, 0.66, 0.08,
+                -0.03, -0.73, 0.66, 0.58, 0.02, -0.07, 0.11, 4, 1, 3.81, 10.75, 0.43, 0.4)
+
+
+# SStMVAR
+params122ts <- c(params122s, 10, 20)
+params222ts <- c(params222s, 10, 20)
+params123ts_2 <- c(params123s_2, 10, 20)
+params222tcs <- c(params222cs, 10, 20)
+params123tcsm <- c(params123csm, 10, 20)
+
+# SG-StMVAR
+params222gss_2 <- c(params222s_2, 20) # M1=1, M2=1
+params123gss_3 <- c(params123s_3, 20) # M1=1, M2=1
+params132gss <- c(params132s, 30) # M1=2, M1=1
+params132gss_2 <- c(params132s, 20, 30) # M1=1, M2=2
+params123gscs <- c(params123cs, 20) # M1=1, M2=1
+params222gscsm <- c(params222csm, 20) # M1=1, M2=1
+
+
 test_that("sort_W_and_lambdas works correctly", {
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=2, params=params122s),
                 c(1.03, 2.36, 1.79, 3, 1, -0.06, -0.04, 1, 1.02, -0.04, -0.02, 1.02, 0.37, -2.16, -0.89, -0.72, 1.3, 7.16, 0.37))
+  expect_equal(sort_W_and_lambdas(p=1, M=2, d=2, params=params122ts, model="StMVAR"),
+               c(1.03, 2.36, 1.79, 3, 1, -0.06, -0.04, 1, 1.02, -0.04, -0.02, 1.02, 0.37, -2.16, -0.89, -0.72, 1.3, 7.16, 0.37, 10, 20))
   expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222s),
                c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29, -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1,
                  -0.05, -0.4, 0.37, -2.16, -0.89, -0.72, 1.3, 7.16, 0.37))
+  expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222ts, model="StMVAR"),
+               c(1.03, 2.36, 1.79, 3, 1.25, 0.06, 0.04, 1.34, -0.29, -0.08, -0.05, -0.36, 1.2, 0.05, 0.05, 1.3, -0.3, -0.1,
+                 -0.05, -0.4, 0.37, -2.16, -0.89, -0.72, 1.3, 7.16, 0.37, 10, 20))
   expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222s_2), params222s_2)
+  expect_equal(sort_W_and_lambdas(p=2, M=c(1, 1), d=2, params=params222gss_2, model="G-StMVAR"), params222gss_2)
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123s),
                c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
                  -0.32, -0.13, -0.23, -3, -0.67, -0.92, -1.2, 0.58, -1, 0.18, 0.47, 0.39, -1.23, 1.08, 1.12, 1.13, 0.6))
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123s_2),
                c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
                  -0.32, -0.13, -0.23, -3, 0.47, 0.39, -1.23, -0.67, -0.92, -1.2, 0.58, -1, 0.18, 1.08, 1.12, 1.13, 0.6))
+  expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123ts_2, model="StMVAR"),
+               c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
+                 -0.32, -0.13, -0.23, -3, 0.47, 0.39, -1.23, -0.67, -0.92, -1.2, 0.58, -1, 0.18, 1.08, 1.12, 1.13, 0.6, 10, 20))
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123s_3),
                c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
                  -0.32, -0.13, -0.23, -3, 0.58, -1, 0.18, 0.47, 0.39, -1.23, -0.67, -0.92, -1.2, 1.08, 1.12, 1.13, 0.6))
+  expect_equal(sort_W_and_lambdas(p=1, M=c(1, 1), d=3, params=params123gss_3, model="G-StMVAR"),
+               c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
+                 -0.32, -0.13, -0.23, -3, 0.58, -1, 0.18, 0.47, 0.39, -1.23, -0.67, -0.92, -1.2, 1.08, 1.12, 1.13, 0.6, 20))
+  expect_equal(sort_W_and_lambdas(p=1, M=c(2, 1), d=2, params=params132gss, model="G-StMVAR"),
+               c(1.15, 0.28, 0.32, 0.16, 1.83, 0.64, 0.13, -0.03, -1.05, 0.42, 0.46, 0.11, 0.14, 0.66, 0.08,
+                 -0.03, -0.73, 0.66, -0.07, 0.11, 0.58, 0.02, 1, 4, 10.75, 3.81, 0.43, 0.4, 30))
+  expect_equal(sort_W_and_lambdas(p=1, M=c(1, 2), d=2, params=params132gss_2, model="G-StMVAR"),
+               c(1.15, 0.28, 0.32, 0.16, 1.83, 0.64, 0.13, -0.03, -1.05, 0.42, 0.46, 0.11, 0.14, 0.66, 0.08,
+                 -0.03, -0.73, 0.66, -0.07, 0.11, 0.58, 0.02, 1, 4, 10.75, 3.81, 0.43, 0.4, 20, 30))
   expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222cs),
                c(-0.11, 2.83, 0.36, 3.19, 1.26, 1.34, -0.29, -0.36, 0.46, -2.16, -0.88, -0.76, 1.2, 6.97, 0.35))
+  expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222tcs, model="StMVAR"),
+               c(-0.11, 2.83, 0.36, 3.19, 1.26, 1.34, -0.29, -0.36, 0.46, -2.16, -0.88, -0.76, 1.2, 6.97, 0.35, 10, 20))
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123cs),
                c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
                  -0.32, -0.13, -0.23, -3, 0.58, -1, 0.18, -0.67, -0.92, -1.2, 0.47, 0.39, -1.23, 1, 2, 3, 0.6))
+  expect_equal(sort_W_and_lambdas(p=1, M=c(1, 1), d=3, params=params123gscs, model="G-StMVAR"),
+               c(1.1, 2.2, 3.3, 1.11, 2.22, 3.33, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2,
+                 -0.32, -0.13, -0.23, -3, 0.58, -1, 0.18, -0.67, -0.92, -1.2, 0.47, 0.39, -1.23, 1, 2, 3, 0.6, 20))
   expect_equal(sort_W_and_lambdas(p=1, M=2, d=2, params=params122csm),
                c(1.03, 2.36, 1, -0.06, -0.04, 1, 0.37, -2.16, -0.89, -0.72, 1, 2, 0.37))
   expect_equal(sort_W_and_lambdas(p=2, M=2, d=2, params=params222csm),
                c(1.03, 2.36, 1.25, 0.06, 0.04, 1.34, -0.29, -0.08, -0.05, -0.36, 0.37, -2.16, -0.89, -0.72, 1, 2, 0.37))
-  expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123csm),
+  expect_equal(sort_W_and_lambdas(p=2, M=c(1, 1), d=2, params=params222gscsm, model="G-StMVAR"),
+               c(1.03, 2.36, 1.25, 0.06, 0.04, 1.34, -0.29, -0.08, -0.05, -0.36, 0.37, -2.16, -0.89, -0.72, 1, 2, 0.37, 20))
+  expect_equal(sort_W_and_lambdas(p=1, M=2, d=3, params=params123tcsm, model="StMVAR"),
                c(1.1, 2.2, 3.3, 1, 0.21, 0.31, 0.12, 2, 0.32, 0.13, 0.23, 3, -1, -0.21, -0.31, -0.12, -2, -0.32, -0.13,
-                 -0.23, -3, -0.67, -0.92, -1.2, 0.58, -1, 0.18, 0.47, 0.39, -1.23, 1, 2, 3, 0.6))
+                 -0.23, -3, -0.67, -0.92, -1.2, 0.58, -1, 0.18, 0.47, 0.39, -1.23, 1, 2, 3, 0.6, 10, 20))
 })
 
 
@@ -1007,3 +1124,21 @@ test_that("sort_and_standardize_alphas works correctly", {
 })
 
 
+rpars122_1 <-c(phi20_122, vec(A21_122))
+rpars122_2 <-c(phi10_122, vec(A11_122))
+
+rpars122t_1 <- c(rpars122_1, 1001)
+rpars122t_2 <- c(rpars122_2, 1010)
+
+rpars332_1 <- c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332))
+rpars332_2 <- c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332))
+
+rpars332t_1 <- c(rpars332_1, 3)
+rpars332t_2 <- c(rpars332_2, 13)
+
+test_that("regime_distance", {
+  expect_equal(regime_distance(regime_pars1=rpars122_1, regime_pars2=rpars122_2), 1.274159, tol=1e-4)
+  expect_equal(regime_distance(regime_pars1=rpars122t_1, regime_pars2=rpars122t_2), 1.274159, tol=1e-4)
+  expect_equal(regime_distance(regime_pars1=rpars332_1, regime_pars2=rpars332_2), 0.7478055, tol=1e-4)
+  expect_equal(regime_distance(regime_pars1=rpars332t_1, regime_pars2=rpars332t_2), 0.7668853, tol=1e-4)
+})
