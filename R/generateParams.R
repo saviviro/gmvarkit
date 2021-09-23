@@ -1,5 +1,5 @@
 
-#' @title Create random mean-parametrized parameter vector of a GMVAR model that may not be stationary
+#' @title Create random mean-parametrized parameter vector of a GMVAR, StMVAR, or G-StMVAR model that may not be stationary
 #'
 #' @description \code{random_ind} generates random mean-parametrized parameter vector that may not be stationary.
 #'
@@ -431,4 +431,32 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
     }
     return(pars)
   }
+}
+
+
+
+#' @title Create random degrees of freedom parameter values
+#'
+#' @description \code{random_df} generates random \code{M2} degrees of freedom parameter values where
+#' \code{M2} is number of StMVAR type regimes in the model
+#'
+#' @inheritParams loglikelihood_int
+#' @return
+#'   \describe{
+#'     \item{\strong{GMVAR models}:}{a numeric vector of length zero.}
+#'     \item{For \strong{StMVAR models}:}{a numeric vector of length \code{M} with random entries strictly larger than two.}
+#'     \item{For \strong{G-StMVAR models}:}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
+#'   }
+#' @keywords internal
+
+random_df <- function(M, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    return(numeric(0))
+  } else if(model == "StMVAR") {
+    M2 <- M
+  } else { # model == "G-StMVAR"
+    M2 <- M[2]
+  }
+  2 + rgamma(M2, shape=0.3, rate=0.007)
 }

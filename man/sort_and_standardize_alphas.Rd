@@ -3,10 +3,13 @@
 \name{sort_and_standardize_alphas}
 \alias{sort_and_standardize_alphas}
 \title{Sort mixing weight parameters in a decreasing order and standardize them
- to sum to one. For G-StMVAR models..}
+ to sum to one. For G-StMVAR models, the mixing weight parameters are sorted
+ to a decreasing order for GMVAR and StMVAR type regimes separately.}
 \usage{
 sort_and_standardize_alphas(
   alphas,
+  M,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL
@@ -15,6 +18,15 @@ sort_and_standardize_alphas(
 \arguments{
 \item{alphas}{mixing weights parameters alphas, \strong{INCLUDING} the one for the M:th regime (that is
 not parametrized in the model). Don't need to be standardized to sum to one.}
+
+\item{M}{\describe{
+  \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
+   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+}}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form
@@ -54,8 +66,9 @@ Returns the given alphas in a (M x 1) vector sorted in decreasing order and thei
 }
 \description{
 \code{sort_and_standardize_alphas} sorts mixing weight parameters in a decreasing
- order and standardizes them to sum to one. Does not sort if AR constraints, lambda constraints,
- or same means are employed.
+ order and standardizes them to sum to one. For G-StMVAR models, the mixing weight parameters are sorted
+ to a decreasing order for GMVAR and StMVAR type regimes separately. Does not sort if AR constraints,
+ lambda constraints, or same means are employed.
 }
 \section{Warning}{
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{random_ind}
 \alias{random_ind}
-\title{Create random mean-parametrized parameter vector of a GMVAR model that may not be stationary}
+\title{Create random mean-parametrized parameter vector of a GMVAR, StMVAR, or G-StMVAR model that may not be stationary}
 \usage{
 random_ind(
   p,
