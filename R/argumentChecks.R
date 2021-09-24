@@ -85,6 +85,8 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'   the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 #'   as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 #'   evaluation of the log-likelihood might fail and cause error.
+#' @param df_tol the parameter vector is considered to be outside the parameter space if all degrees of
+#'   freedom parameters are not larger than \code{2 + df_tol}.
 #' @details The parameter vector in the argument \code{params} should be unconstrained and it is used for
 #'   structural models only.
 #' @return Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.
@@ -98,8 +100,16 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'  }
 #'  @keywords internal
 
-in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
+in_paramspace_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), all_boldA, alphas, all_Omega,
+                              W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
+  model <- match.arg(model)
+  if(model != "GMVAR") { # Check degrees of freedom parameters for StMVAR and G-StMVAR models
+    if(any(pick_df(M=M, params=params, model=model) <= 2 + df_tol)) {
+      return(FALSE)
+    }
+  }
+  M <- sum(M) # pick_W, pick_lambdas, and is_stationary all just use the number of mixture components, not M1 and M2 separately
   if(!is.null(W_constraints)) {
     W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=list(W=W_constraints))
     # No need to check zero constraints because the zeros are not parametrized
@@ -172,21 +182,23 @@ in_paramspace_int <- function(p, M, d, params, all_boldA, alphas, all_Omega, W_c
 #'   structural_pars=list(W=W_22))
 #' @export
 
-in_paramspace <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
-  check_pMd(p=p, M=M, d=d)
+in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
+                          structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  model <- match.arg(model)
+  check_pMd(p=p, M=M, d=d, model=model)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("The parameter vector has wrong length!")
   }
   W_constraints <- structural_pars$W
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means,
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
                                     structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-  in_paramspace_int(p=p, M=M, d=d, params=params, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
-                    alphas=pick_alphas(p=p, M=M, d=d, params=params),
+  in_paramspace_int(p=p, M=M, d=d, params=params, model=model, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
+                    alphas=pick_alphas(p=p, M=M, d=d, params=params, model=model),
                     all_Omega=pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars),
-                    W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                    W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
@@ -235,29 +247,39 @@ in_paramspace <- function(p, M, d, params, constraints=NULL, same_means=NULL, st
 #' }
 #' @export
 
-check_parameters <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                             structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
+check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
+                             constraints=NULL, same_means=NULL, structural_pars=NULL,
+                             stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  model <- match.arg(model)
+  check_pMd(p=p, M=M, d=d, model=model)
+  if(model != "GMVAR") { # Check degrees of freedom parameters for StMVAR and G-StMVAR models
+    if(any(pick_df(M=M, params=params, model=model) <= 2 + df_tol)) {
+      stop("The degrees of freedom parameters are not strictly larger than two (with large enough numerical tolerance)")
+    }
+  }
+  M_orig <- M
+  M <- sum(M)
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
-  check_pMd(p=p, M=M, d=d)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  check_constraints(p=p, M=M_orig, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M_orig, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("The parameter vector has wrong dimension!")
   }
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model, constraints=constraints,
+                                    same_means=same_means, structural_pars=structural_pars)
   W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+  alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params, model=model)
 
   if(!is.null(structural_pars)) {
-    W_pars <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+    W_pars <- pick_W(p=p, M=M_orig, d=d, params=params, structural_pars=structural_pars)
     if(any(W_pars[W_constraints < 0] > -1e-8, na.rm=TRUE)) {
       stop("The W parameter does not satisfy the (strict) negative sign constraints (with large enough numerical tolerance)")
     } else if(any(W_pars[W_constraints > 0] < 1e-8, na.rm=TRUE)) {
       stop("The W parameter does not satisfy the (strict) positive sign constraints (with large enough numerical tolerance)")
     }
     if(M > 1) {
-      lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+      lambdas <- pick_lambdas(p=p, M=M_orig, d=d, params=params, structural_pars=structural_pars)
       if(any(lambdas < 1e-8)) {
         stop("The lambda parameters are not strictly positive (with large enough numerical tolerance)")
       }
@@ -292,6 +314,7 @@ check_parameters <- function(p, M, d, params, parametrization=c("intercept", "me
 #' @keywords internal
 
 check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  M <- sum(M)
   if(!is.null(constraints)) {
     if(!is.matrix(constraints) | !is.numeric(constraints)) {
       stop("The argument constraints should be a numeric matrix (or NULL if no constraints should be employed)")
@@ -360,21 +383,31 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
 #' @inherit in_paramspace references
 #' @keywords internal
 
-n_params <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {
+n_params <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
+  if(model == "GMVAR") {
+    n_df <- 0
+  } else if(model == "StMVAR") {
+    n_df <- M
+  } else { # model == "G-StMVAR"
+    n_df <- M[2]
+    M <- sum(M)
+  }
   if(is.null(same_means)) {
-    less_pars <- 0 # Number of parameters less compared to models without same interecept constraints
+    less_pars <- 0 # Number of parameters less compared to models without same intercept constraints
   } else {
     g <- length(same_means) # Number groups with the same mean parameters
-    less_pars <- d*(M - g) # Number of parameters less compared to models without same interecept constraints
+    less_pars <- d*(M - g) # Number of parameters less compared to models without same intercept constraints
   }
   if(is.null(structural_pars)) {
-    return(ifelse(is.null(constraints), M*(d^2*p + d + d*(d+1)/2 + 1) - 1, M*(d + d*(d + 1)/2 + 1) + ncol(constraints) - 1) - less_pars)
+    ret <- ifelse(is.null(constraints), M*(d^2*p + d + d*(d+1)/2 + 1) - 1, M*(d + d*(d + 1)/2 + 1) + ncol(constraints) - 1) - less_pars
   } else {
     q <- ifelse(is.null(constraints), M*p*d^2, ncol(constraints))
     n_Wpars <- length(Wvec(structural_pars$W))
     r <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
-    return(M*d + q + n_Wpars + r + M - 1 - less_pars)
+    ret <- M*d + q + n_Wpars + r + M - 1 - less_pars
   }
+  ret + n_df
 }
 
 
@@ -392,7 +425,7 @@ check_data <- function(data, p) {
     data <- as.matrix(data)
   }
   if(!is.matrix(data)) {
-    stop("The data must be numeric matrix!")
+    stop("The data must be numeric matrix (possibly a class 'ts' object)!")
   } else {
     if(anyNA(data)) stop("The data contains NA values!")
     if(!is.numeric(data)) stop("The data must be numeric!")
@@ -425,13 +458,23 @@ all_pos_ints <- function(x) {
 #' @return Throws an error if something is wrong.
 #' @keywords internal
 
-check_pMd <- function(p, M, d) {
-  if(!all_pos_ints(c(p, M))) {
-    stop("Arguments p and M have to be positive integers!")
+check_pMd <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(model == "G-StMVAR") {
+    if(length(M) != 2 || !all_pos_ints(M)) {
+      stop("For G-StMVAR model, the argument M must a length two vector with positive integer entries")
+    }
+  } else {
+    if(!all_pos_ints(M) || length(M) != 1) {
+      stop("For GMVAR and StMVAR models, the argument M must be a positive integer")
+    }
+  }
+  if(!all_pos_ints(p) || length(p) != 1) {
+    stop("The argument p must be a positive integer!")
   }
   if(!missing(d)) {
     if(d < 2 | d%%1 != 0) {
-      stop("Argument d, number of columns in the data matrix, has to be positive integer larger than one!
+      stop("Argument d, the number of columns in the data matrix, has to be a positive integer larger than one!
            For univariate analysis, use the package 'uGMAR'")
     }
   }

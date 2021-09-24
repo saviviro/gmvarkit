@@ -9,12 +9,14 @@ check_parameters(
   M,
   d,
   params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
   stat_tol = 0.001,
-  posdef_tol = 1e-08
+  posdef_tol = 1e-08,
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -101,6 +103,9 @@ check_parameters(
 
   The notation is similar to the cited literature.}
 
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
+
 \item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
 parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
@@ -143,6 +148,9 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
 Throws an informative error if there is something wrong with the parameter vector.

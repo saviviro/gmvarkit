@@ -4,7 +4,7 @@
 \alias{check_pMd}
 \title{Check that p, M, and d are correctly set}
 \usage{
-check_pMd(p, M, d)
+check_pMd(p, M, d, model = c("GMVAR", "StMVAR", "G-StMVAR"))
 }
 \arguments{
 \item{p}{a positive integer specifying the autoregressive order of the model.}

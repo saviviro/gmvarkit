@@ -553,6 +553,7 @@ test_that("form_boldA works correctly", {
 
   expect_equal(form_boldA(p=1, M=2, d=2, all_A=allA_122)[, , 1], A11_122)
   expect_equal(form_boldA(p=1, M=2, d=2, all_A=allA_122)[, , 2], A21_122)
+  expect_equal(form_boldA(p=1, M=c(1, 1), d=2, all_A=allA_122)[, , 2], A21_122)
 
   expect_equal(form_boldA(p=2, M=2, d=2, all_A=allA_222)[, , 1], rbind(cbind(A11_222, A12_222), lower_part(p=2, d=2)))
   expect_equal(form_boldA(p=2, M=2, d=2, all_A=allA_222)[, , 2], rbind(cbind(A21_222, A22_222), lower_part(p=2, d=2)))
