@@ -9,6 +9,7 @@ get_regime_means_int(
   M,
   d,
   params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
@@ -98,6 +99,9 @@ get_regime_means_int(
   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
 
   The notation is similar to the cited literature.}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
 parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}

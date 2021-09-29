@@ -190,7 +190,7 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
       # Calculated in logarithm because same values may be too close to zero for machine accuracy.
       matprods <- get_matprods(Y)
       log_mvnvalues <- get_logmvnvalues(matprods)
-      alpha_mt <- get_alpha_mt(M=M, log_mvnvalues=log_mvnvalues, alphas=alphas,
+      alpha_mt <- get_alpha_mt(M=M, log_mvvalues=log_mvnvalues, alphas=alphas,
                                epsilon=epsilon, also_l_0=FALSE)
 
       # Draw a mixture component and store the values

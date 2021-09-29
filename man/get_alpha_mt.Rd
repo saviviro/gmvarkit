@@ -4,7 +4,7 @@
 \alias{get_alpha_mt}
 \title{Get mixing weights alpha_mt (this function is for internal use)}
 \usage{
-get_alpha_mt(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0 = FALSE)
+get_alpha_mt(M, log_mvvalues, alphas, epsilon, conditional, also_l_0 = FALSE)
 }
 \arguments{
 \item{M}{\describe{
@@ -13,7 +13,7 @@ get_alpha_mt(M, log_mvnvalues, alphas, epsilon, conditional, also_l_0 = FALSE)
    first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
 }}
 
-\item{log_mvnvalues}{\eqn{T x M} matrix containing the log multivariate normal densities.}
+\item{log_mvvalues}{\eqn{T x M} matrix containing the log multivariate normal densities.}
 
 \item{alphas}{\eqn{M x 1} vector containing the mixing weight pa}
 
@@ -26,7 +26,7 @@ should be used.}
 \item{also_l_0}{return also l_0 (the first term in the exact log-likelihood function)?}
 }
 \value{
-Returns the mixing weights a matrix of the same dimension as \code{log_mvnvalues} so
+Returns the mixing weights a matrix of the same dimension as \code{log_mvvalues} so
   that the t:th row is for the time point t and m:th column is for the regime m.
 }
 \description{

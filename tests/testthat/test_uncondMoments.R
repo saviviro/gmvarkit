@@ -14,6 +14,9 @@ theta_112 <- upsilon1_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 W_112 <- t(chol(Omega1_112))
 theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR, W constrained by Cholesky
 
+theta_112t <- c(theta_112, 10)
+theta_112tsWC <- c(theta_112sWC, 10)
+
 # p=1, M=2, d=2
 phi10_122 <- c(1.03, 2.36)
 A11_122 <- matrix(c(0.1, -0.06, -0.04, 0.1), nrow=2, byrow=FALSE)
@@ -54,6 +57,10 @@ W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
+
+theta_222gs <- c(theta_222, 20) # G-StMVAR, M1=1, M2=1
+theta_222ts <- c(theta_222s, 10, 20) # SStMVAR
+
 
 # p=3, M=3, d=2
 phi10_332 <- c(1.03, 2.36)
@@ -99,6 +106,9 @@ theta_332sWC <- c(phi10_332, phi20_332, phi30_332, vec(A11_332), vec(A12_332), v
                   vec(A21_332), vec(A22_332), vec(A23_332), vec(A31_332), vec(A32_332), vec(A33_332),
                   Wvec(W_332), lambdas2_332, lambdas3_332, alpha1_332, alpha2_332) # SGMVAR W constrained
 
+theta_332gs <- c(theta_332, 20, 30) # G-StMVAR, M1=1, M2=2
+theta_332gssWC <- c(theta_332sWC, 30) # SG-StMVAR, M1=2, M2=1
+
 # p=1, M=2, d=3
 phi10_123 <- c(1.1, 2.2, 3.3)
 A11_123 <- matrix(c(0.1, 0.21, 0.31, 0.12, 0.2, 0.32, 0.13, 0.23, 0.3), nrow=3, byrow=FALSE)
@@ -118,6 +128,8 @@ W_123 <- matrix(WL_123[1:(3^2)], nrow=3, byrow=FALSE)
 lambdas_123 <- WL_123[(3^2 + 1):length(WL_123)]
 theta_123s <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), lambdas_123, alpha1_123) # SGMVAR
 
+theta_123t <- c(theta_123, 10, 20) # StMVAR
+theta_123gss <- c(theta_123s, 20) # SG-StMVAR
 
 # p=2, M=1, d=3
 phi10_213 <- c(1.1, 2.2, 3.3)
@@ -133,22 +145,35 @@ theta_213s <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_213)) # SGMVAR
 
 theta_213sWC <- c(phi10_213, vec(A11_213), vec(A12_213), Wvec(W_213)) # SGMVAR W constrained
 
-calc_mu <- function(p, M, d, params, constraints=NULL, structural_pars=NULL) {
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, structural_pars=structural_pars)
+theta_213t <- c(theta_213, 10) # StMVAR
+theta_213tsWC <- c(theta_213, 10) # SStMVAR
+
+calc_mu <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-  vapply(1:M, function(m) solve(diag(d) - rowSums(all_A[, , , m, drop=FALSE], dims=2), all_phi0[,m]), numeric(d))
+  vapply(1:sum(M), function(m) solve(diag(d) - rowSums(all_A[, , , m, drop=FALSE], dims=2), all_phi0[,m]), numeric(d))
 }
 
 theta_112_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112, change_to="mean")
+theta_112t_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112t, model="StMVAR", change_to="mean")
 theta_122_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122, change_to="mean")
 theta_222_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222, change_to="mean")
+theta_222t_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222t, model="StMVAR", change_to="mean")
+theta_222gs_mu <- change_parametrization(p=2, M=c(1, 1), d=2, params=theta_222t, model="G-StMVAR", change_to="mean")
 theta_332_mu <- change_parametrization(p=3, M=3, d=2, params=theta_332, change_to="mean")
+theta_332gs_mu <- change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", change_to="mean")
 theta_123_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123, change_to="mean")
+theta_123t_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123t, model="StMVAR", change_to="mean")
 theta_213_mu <- change_parametrization(p=2, M=1, d=3, params=theta_213, change_to="mean")
+theta_213t_mu <- change_parametrization(p=2, M=1, d=3, params=theta_213t, model="StMVAR", change_to="mean")
 
 theta_112sWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112sWC, structural_pars=list(W=W_112), change_to="mean")
-theta_222s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222), change_to="mean")
+theta_112tsWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", structural_pars=list(W=W_112), change_to="mean")
+theta_222ts_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222ts, model="StMVAR", structural_pars=list(W=W_222), change_to="mean")
+
+
 
 ## A(M)(p)_(p)(M)(d)
 rbind_diags <- function(p, M, d) {
@@ -164,6 +189,10 @@ theta_112c <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 
 theta_112csWAR <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W and AR
 
+theta_112tc <- c(theta_112c, 10) # StMVAR
+
+theta_112tcsWAR <- c(theta_112csWAR, 10) # StMVAR
+
 # p=2, M=2, d=2
 C_222 <- rbind_diags(p=2, M=2, d=2)
 theta_222c <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
@@ -173,6 +202,12 @@ theta_222csL <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222)
                   vec(A22_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas
 theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
 
+theta_222gscsL <- c(theta_222csL, 20) # SG-StMVAR, M1=1, M2=1
+theta_222gscsL_expanded <- c(theta_222csL_expanded, 20) # SG-StMVAR, M1=1, M2=1
+
+theta_222tcsLAR <- c(theta_222csLAR, 10, 20) # SStMVAR
+theta_222tcsLAR_expanded <- c(theta_222csLAR_expanded, 10, 20) # SStMVAR
+
 # p=1, M=2, d=3
 C_123 <- rbind_diags(p=1, M=2, d=3)
 theta_123c <- c(phi10_123, phi20_123, vec(A11_123), vech(Omega1_123), vech(Omega2_123), alpha1_123)
@@ -180,6 +215,13 @@ theta_123c <- c(phi10_123, phi20_123, vec(A11_123), vech(Omega1_123), vech(Omega
 C_lambda_123 <- matrix(c(1, 1, 0, 0, 0, 1), nrow=3, byrow=FALSE)
 theta_123csL <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas
 theta_123csLAR <- c(phi10_123, phi20_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
+
+theta_123tc <- c(theta_123c, 10, 20) # StMVAR
+theta_123tc_expanded <- c(theta_123c_expanded, 10, 20) # StMVAR
+
+theta_123tcsL <- c(theta_123csL, 10, 20) # StMVAR
+theta_123tcL_expanded <- c(theta_123csL_expanded, 10, 20) # StMVAR
+
 
 # p=2, M=2, d=2, constraint AR-parameters to be the same for all regimes
 # and constraint the of-diagonal elements of AR-matrices to be zero.
@@ -201,14 +243,20 @@ lambdas_222c2 <- WL_222c2[(2^2 + 1):length(WL_222c2)]
 theta_222_c2s <- c(phi10_222_c2, phi20_222_c2, 1.26, 1.34, -0.29, -0.36, vec(W_222c2), lambdas_222c2, alpha1_222_c2) # SGMVAR AR
 
 theta_112c_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112c, constraints=C_112, change_to="mean")
+theta_112tc_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112tc, model="StMVAR", constraints=C_112, change_to="mean")
+
 theta_222c_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222c, constraints=C_222, change_to="mean")
 theta_222c_mu2 <- change_parametrization(p=2, M=2, d=2, params=theta_222_c2, constraints=C_222_2, change_to="mean")
 theta_123c_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123c, constraints=C_123, change_to="mean")
+theta_123tc_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", constraints=C_123, change_to="mean")
 
 theta_112c_mu_exp <- reform_constrained_pars(p=1, M=1, d=2, params=theta_112c_mu, constraints=C_112)
+theta_112tc_mu_exp <- reform_constrained_pars(p=1, M=1, d=2, params=theta_112tc_mu, model="StMVAR", constraints=C_112)
+
 theta_222c_mu_exp <- reform_constrained_pars(p=2, M=2, d=2, params=theta_222c_mu, constraints=C_222)
 theta_222c_mu2_exp <- reform_constrained_pars(p=2, M=2, d=2, params=theta_222c_mu2, constraints=C_222_2)
 theta_123c_mu_exp <- reform_constrained_pars(p=1, M=2, d=3, params=theta_123c_mu, constraints=C_123)
+theta_123tc_mu_exp <- reform_constrained_pars(p=1, M=2, d=3, params=theta_123tc_mu, model="StMVAR", constraints=C_123)
 
 theta_112cs_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112csWAR, constraints=C_112,
                                          structural_pars=list(W=W_112), change_to="mean")
@@ -223,10 +271,19 @@ theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vec
 theta_222c_int_expanded <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), phi10_222, vec(A11_222), vec(A12_222),
                              vech(Omega2_222), alpha1_222)
 
+theta_222gsc_int <- c(theta_222c_int, 20) # G-StMVAR, M1=1, M2=1
+theta_222gsc_int_expanded <- c(theta_222c_int_expanded, 20) # G-StMVAR, M1=1, M2=1
+
 # p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
 theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
 theta_222csLAR_int_expanded <-  c(phi10_222, phi10_222, vec(A11_222), vec(A12_222), vec(A11_222), vec(A12_222),
                                   vec(W_222), 0.2, 2*0.2, alpha1_222)
+
+theta_222tcsLAR_int <- c(theta_222csLAR_int, 10, 20) # SStMVAR
+theta_222tcsLAR_int_expanded <- c(theta_222csLAR_int_expanded, 10, 20) # SStMVAR
+
+theta_222gscsLAR_int <- c(theta_222csLAR_int, 20) # SG-StMVAR, M1=1, M2=1
+theta_222gscsLAR_int_expanded <- c(theta_222csLAR_int_expanded, 20) # SG-StMVAR, M1=1, M2=1
 
 
 test_that("get_regime_means_int works correctly", {
@@ -234,6 +291,10 @@ test_that("get_regime_means_int works correctly", {
                pick_phi0(p=1, M=1, d=2, params=theta_112_mu))
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112_mu, parametrization="mean", constraints=NULL),
                calc_mu(p=1, M=1, d=2, params=theta_112))
+  expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112t, model="StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=1, M=1, d=2, params=theta_112t_mu))
+  expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112t_mu, model="StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=1, M=1, d=2, params=theta_112t, model="StMVAR"))
   expect_equal(get_regime_means_int(p=1, M=2, d=2, params=theta_122, parametrization="intercept", constraints=NULL),
                pick_phi0(p=1, M=2, d=2, params=theta_122_mu))
   expect_equal(get_regime_means_int(p=1, M=2, d=2, params=theta_122_mu, parametrization="mean", constraints=NULL),
@@ -242,23 +303,48 @@ test_that("get_regime_means_int works correctly", {
                pick_phi0(p=2, M=2, d=2, params=theta_222_mu))
   expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222_mu, parametrization="mean", constraints=NULL),
                calc_mu(p=2, M=2, d=2, params=theta_222))
+  expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222t, model="StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=2, M=2, d=2, params=theta_222t_mu))
+  expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222t_mu, model="StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=2, M=2, d=2, params=theta_222t, model="StMVAR"))
+  expect_equal(get_regime_means_int(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=2, M=c(1, 1), d=2, params=theta_222gs_mu))
+  expect_equal(get_regime_means_int(p=2, M=c(1, 1), d=2, params=theta_222gs_mu, model="StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=2, M=c(1, 1), d=2, params=theta_222t, model="G-StMVAR"))
   expect_equal(get_regime_means_int(p=3, M=3, d=2, params=theta_332, parametrization="intercept", constraints=NULL),
                pick_phi0(p=3, M=3, d=2, params=theta_332_mu))
   expect_equal(get_regime_means_int(p=3, M=3, d=2, params=theta_332_mu, parametrization="mean", constraints=NULL),
                calc_mu(p=3, M=3, d=2, params=theta_332))
+  expect_equal(get_regime_means_int(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=3, M=c(1, 2), d=2, params=theta_332gs_mu))
+  expect_equal(get_regime_means_int(p=3, M=c(1, 2), d=2, params=theta_332gs_mu, model="G-StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=3, M=c(1, 2), d=2, params=theta_332, model="G-StMVAR"))
+
   expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123, parametrization="intercept", constraints=NULL),
                pick_phi0(p=1, M=2, d=3, params=theta_123_mu))
   expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123_mu, parametrization="mean", constraints=NULL),
                calc_mu(p=1, M=2, d=3, params=theta_123))
+  expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123t, model="StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=1, M=2, d=3, params=theta_123t_mu))
+  expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123t_mu, model="StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=1, M=2, d=3, params=theta_123, model="StMVAR"))
   expect_equal(get_regime_means_int(p=2, M=1, d=3, params=theta_213, parametrization="intercept", constraints=NULL),
                pick_phi0(p=2, M=1, d=3, params=theta_213_mu))
   expect_equal(get_regime_means_int(p=2, M=1, d=3, params=theta_213_mu, parametrization="mean", constraints=NULL),
                calc_mu(p=2, M=1, d=3, params=theta_213))
+  expect_equal(get_regime_means_int(p=2, M=1, d=3, params=theta_213t, model="StMVAR", parametrization="intercept", constraints=NULL),
+               pick_phi0(p=2, M=1, d=3, params=theta_213t_mu))
+  expect_equal(get_regime_means_int(p=2, M=1, d=3, params=theta_213t_mu, model="StMVAR", parametrization="mean", constraints=NULL),
+               calc_mu(p=2, M=1, d=3, params=theta_213t, model="StMVAR"))
 
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112c, parametrization="intercept", constraints=C_112),
                pick_phi0(p=1, M=1, d=2, params=theta_112c_mu_exp))
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112c_mu, parametrization="mean", constraints=C_112),
                calc_mu(p=1, M=1, d=2, params=theta_112c, constraints=C_112))
+  expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112tc, model="StMVAR", parametrization="intercept", constraints=C_112),
+               pick_phi0(p=1, M=1, d=2, params=theta_112tc_mu_exp))
+  expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112tc_mu, model="StMVAR", parametrization="mean", constraints=C_112),
+               calc_mu(p=1, M=1, d=2, params=theta_112tc, model="StMVAR", constraints=C_112))
   expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222c, parametrization="intercept", constraints=C_222),
                pick_phi0(p=2, M=2, d=2, params=theta_222c_mu_exp))
   expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222c_mu, parametrization="mean", constraints=C_222),
@@ -271,6 +357,10 @@ test_that("get_regime_means_int works correctly", {
                pick_phi0(p=1, M=2, d=3, params=theta_123c_mu_exp))
   expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123c_mu, parametrization="mean", constraints=C_123),
                calc_mu(p=1, M=2, d=3, params=theta_123c, constraints=C_123))
+  expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", parametrization="intercept", constraints=C_123),
+               pick_phi0(p=1, M=2, d=3, params=theta_123tc_mu_exp))
+  expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123tc_mu, model="StMVAR", parametrization="mean", constraints=C_123),
+               calc_mu(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", constraints=C_123))
 
   # SGMVAR
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL,
@@ -305,35 +395,64 @@ test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
                                     structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)),
                unname(cbind(phi10_222, phi10_222)))
+  expect_equal(get_regime_means_int(p=2, M=2, d=2, params=theta_222tcsLAR_int, model="StMVAR", parametrization="mean", constraints=C_222,
+                                    structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)),
+               unname(cbind(phi10_222, phi10_222)))
+  expect_equal(get_regime_means_int(p=2, M=c(1, 1), d=2, params=theta_222tcsLAR_int, model="G-StMVAR", parametrization="mean", constraints=C_222,
+                                    structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)),
+               unname(cbind(phi10_222, phi10_222)))
+
 })
 
 
 test_that("get_regime_autocovs_int works correctly", {
   expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112, constraints=NULL)[, 2, 2, 1],
                c(0.2201706, 1.9959185), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112t, model="StMVAR", constraints=NULL)[, 2, 2, 1],
+               c(0.2201706, 1.9959185), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=1, M=2, d=2, params=theta_122, constraints=NULL)[, 1, 1, 2],
                c(5.926843, 3.528684), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222, constraints=NULL)[, 1, 3, 2],
                c(36.50580, 13.77247), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222t, model="StMVAR", constraints=NULL)[, 1, 3, 2],
+               c(36.50580, 13.77247), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", constraints=NULL)[, 1, 3, 2],
+               c(36.50580, 13.77247), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=3, M=3, d=2, params=theta_332, constraints=NULL)[2, , 4, 3],
+               c(2.89655, 4.28663), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", constraints=NULL)[2, , 4, 3],
                c(2.89655, 4.28663), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=1, M=2, d=3, params=theta_123, constraints=NULL)[1, , 2, 2],
                c(-0.3194244, -0.5931677, -0.8712061), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=1, M=2, d=3, params=theta_123t, model="StMVAR", constraints=NULL)[1, , 2, 2],
+               c(-0.3194244, -0.5931677, -0.8712061), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=2, M=1, d=3, params=theta_213, constraints=NULL)[, 3, 3, 1],
+               c(-0.582898, -1.038395, -1.413783), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=2, M=1, d=3, params=theta_213t, model="StMVAR", constraints=NULL)[, 3, 3, 1],
                c(-0.582898, -1.038395, -1.413783), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222c, constraints=C_222)[, 1, 3, 2],
                c(102.509805, 3.535469), tolerance=1e-6)
 
+
   # SGMVAR
   expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112sWC, constraints=NULL, structural_pars=list(W=W_112))[, 2, 2, 1],
+               c(0.2201706, 1.9959185), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", constraints=NULL, structural_pars=list(W=W_112))[, 2, 2, 1],
                c(0.2201706, 1.9959185), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=1, M=2, d=2, params=theta_122s, constraints=NULL, structural_pars=list(W=W_122))[, 1, 1, 2],
                c(5.926843, 3.528684), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222s, constraints=NULL, structural_pars=list(W=W_222))[, 1, 3, 2],
                c(36.50580, 13.77247), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222ts, model="StMVAR", constraints=NULL, structural_pars=list(W=W_222))[, 1, 3, 2],
+               c(36.50580, 13.77247), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=3, M=3, d=2, params=theta_332sWC, constraints=NULL, structural_pars=list(W=W_332))[2, , 4, 3],
                c(1.396341, 2.174643), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=3, M=c(2, 1), d=2, params=theta_332gssWC, model="G-StMVAR", constraints=NULL, structural_pars=list(W=W_332))[2, , 4, 3],
+               c(1.396341, 2.174643), tolerance=1e-5)
+
   expect_equal(get_regime_autocovs_int(p=1, M=2, d=3, params=theta_123s, constraints=NULL, structural_pars=list(W=W_123))[1, , 2, 2],
+               c(-0.3194244, -0.5931677, -0.8712061), tolerance=1e-6)
+  expect_equal(get_regime_autocovs_int(p=1, M=2, d=3, params=theta_123gss, model="G-StMVAR", constraints=NULL, structural_pars=list(W=W_123))[1, , 2, 2],
                c(-0.3194244, -0.5931677, -0.8712061), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=2, M=1, d=3, params=theta_213sWC, constraints=NULL, structural_pars=list(W=W_213))[, 3, 3, 1],
                c(-0.582898, -1.038395, -1.413783), tolerance=1e-6)
@@ -345,13 +464,18 @@ test_that("get_regime_autocovs_int works correctly", {
                c(-48.59455, 246.67447), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222c_int, constraints=C_222, same_means=list(1:2))[, 1, 1, 2],
                c(111.265016, 7.133962), tolerance=1e-5)
-
+  expect_equal(get_regime_autocovs_int(p=2, M=c(1, 1), d=2, params=theta_222c_int, model="G-StMVAR", constraints=C_222, same_means=list(1:2))[, 1, 1, 2],
+               c(111.265016, 7.133962), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222,
                                        structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 2, 1, 2],
                c(-21.57249, 97.57641), tolerance=1e-5)
   expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222csLAR_int, constraints=C_222,
                                        structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 1, 2, 1],
                c(29.21410, -47.35956), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=c(1, 1), d=2, params=theta_222csLAR_int, model="G-StMVAR", constraints=C_222,
+                                       structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 1, 2, 1],
+               c(29.21410, -47.35956), tolerance=1e-5)
+
 })
 
 

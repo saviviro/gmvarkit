@@ -11,14 +11,16 @@
 #' @inherit is_stationary references
 #' @keywords internal
 
-get_regime_means_int <- function(p, M, d, params, parametrization=c("intercept", "mean"),
+get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
                                  constraints=NULL, same_means=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+  model <- match.arg(model)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
                                     same_means=same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL, structural_pars=structural_pars, change_to="mean")
+    params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
+                                     structural_pars=structural_pars, change_to="mean")
   }
   pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 }
@@ -74,14 +76,15 @@ get_regime_means <- function(gmvar) {
 #' @inherit loglikelihood_int references
 #' @keywords internal
 
-get_regime_autocovs_int <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL) {
-
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints,
+get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
                                     same_means=same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
+  M <- sum(M)
   I_dp2 <- diag(nrow=(d*p)^2)
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
   ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
@@ -156,10 +159,11 @@ get_regime_autocovs <- function(gmvar) {
 #' @inherit loglikelihood_int references
 #' @keywords internal
 
-uncond_moments_int <- function(p, M, d, params, parametrization=c("intercept", "mean"), constraints=NULL,
-                               same_means=NULL, structural_pars=NULL) {
+uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
+                               constraints=NULL, same_means=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means,
+  model <- match.arg(model)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
                                     structural_pars=structural_pars) # Remove any constraints
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params)
@@ -357,6 +361,7 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
 #' @keywords internal
 
 get_Sigmas <- function(p, M, d, all_A, all_boldA, all_Omega) {
+  M <- sum(M)
   Sigmas <- array(NA, dim=c(d*p, d*p, M)) # Store the (dpxdp) covariance matrices
   if(d*p < 12) { # d*p < 12
     # Calculate the covariance matrices Sigma_{m,p} using the equation (2.1.39) in Lütkepohl (2005).
