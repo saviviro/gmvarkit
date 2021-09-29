@@ -130,11 +130,10 @@
 #'   be returned? Default is the log-likelihood value (\code{"loglik"}).
 #' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 #' @return
-#'  \describe{
 #'   \item{By default:}{log-likelihood value of the specified GMVAR model,}
 #'   \item{If \code{to_return=="mw"}:}{a size ((n_obs-p)xM) matrix containing the mixing weights: for m:th component in m:th column.}
 #'   \item{If \code{to_return=="mw_tplus1"}:}{a size ((n_obs-p+1)xM) matrix containing the mixing weights: for m:th component in m:th column.
-#'     The last row is for \eqn{\alpha_{m,T+1}}}.
+#'     The last row is for \eqn{\alpha_{m,T+1}}.}
 #'   \item{If \code{to_return=="terms"}:}{a size ((n_obs-p)x1) numeric vector containing the terms \eqn{l_{t}}.}
 #'   \item{if \code{to_return=="loglik_and_mw"}:}{a list of two elements. The first element contains the log-likelihood value and the
 #'     second element contains the mixing weights.}
@@ -144,7 +143,6 @@
 #'    (the first p values are used as the initial values).}
 #'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
 #'    (the first p values are used as the initial values).}
-#'  }
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -209,7 +207,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   }
   M <- sum(M) # The total number of mixture components
 
-  # An i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1}',...,y_{i-p}') (dpx1),
+  # i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1},...,y_{i-p}) (dpx1),
   # assuming the observed data is y_{-p+1},...,y_0,y_1,...,y_{T}
   Y <- reform_data(data, p)
 
@@ -236,11 +234,12 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   # i:th row for index i-1 etc, m:th column for m:th component.
   # We calculate in logarithm because the non-log values may be too close to zero for machine accuracy (if they are too close to zero
   # for all regimes and computer handles them as zero, we would divide by zero when calculating the mixing weights)
-  log_mvvalues <- matprods <- matrix(nrow=n_obs - p + 1, ncol=M)
+  log_mvvalues <- matprods <- matrix(nrow=n_obs - p + 1, ncol=M) # The quadratic forms in Student's t density
   if(M1 > 0) { # Multinormals
     log_mvvalues[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m],
                                                                    log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
-  } else if(M2 > 0) { # Multistudents
+  }
+  if(M2 > 0) { # Multistudents
     # We use the package mvnfast for faster evaluation. It employs scale-matrix parametrization so we need to transform
     # our Cholesky decompositions of covariance matrices to the Cholesky decompositions of scale matrices.
     #log_mvvalues[,(M1 + 1):M] <- vapply(1:M1, function(m) mvnfast::tmvn(X=Y, mu=rep(mu[,m], p),
@@ -250,12 +249,16 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     #### ENSIN LASKETAAN ITSE HITAALLLA MENETELMÄLLÄ SUORAAN KAAVASTA, JA SITTEN KUN TULOS VARMA, JA TARKISTETAAN ETTÄ TULEE SAMA TULOS MVNFASTILLA
     #### HUOM: ehdolliselle varianssille tarvii matprodin myös myöhemmin ehdolliseen tiheyteen!
     #### Siitä syystä, varmaan nopeampaa laskea koko roska ilman mvnfastia!
-    for(i1 in (M1 + 1):M) {
-      matprods[,i1] <- NULL
+    for(m in (M1 + 1):M) {
+      #tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
+      #matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  - matprods[,m] # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
       logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
-      for(i2 in 1:nrow(log_mvvalues)) {
-        log_mvvalues[i1, i2] <- NULL
+      log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m])) # TESTAA JÄLKIMMÄISELLÄ ETTÄ VARMASTI MENEE OIKEIN
+      #log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(all_df[m - M1] - 2)*(1 + matprods[,m]/(all_df[m - M1] - 2))
 
+      for(i1 in 1:nrow(log_mvvalues)) { # DELETOI TÄMÄ LOOPPI KOKONAAN JA POISTA KOMMENTIT YLTÄ
+        matprods[i1, m] <- crossprod(Y[i1,] - rep(mu[,m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(mu[,m], p))
+        log_mvvalues[i1, m] <- logC - 0.5*log_det_Sigma - 0.5*(all_df[m - M1] - 2)*(1 + matprods[i1, m]/(all_df[m - M1] - 2))
       }
     }
     # HUOM: NOPEUTA YLLÄ OLEVA KUN YKSIKKÖTESTIT TEHTY NS. VARMASTI OIKEILLA KAAVOILLA
@@ -279,6 +282,22 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   all_A2 <- array(all_A, dim=c(d, d*p, M)) # cbind coefficient matrices of each component: m:th component is obtained at [, , m]
   Y2 <- Y[1:T_obs,] # Last row is not needed because mu_mt uses lagged values
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
+
+  # For the StMVAR type regimes, calculate the time-varying ARC-type scalar that multiplies the conditional covariance matrix:
+  # i:th row calculated from y_{i-1} observation when the indexing is y_{-p+1},..,y_0,y_1,...,y_T - note that the last row of arch_scalars is for time T+1
+  if(M2 > 0) {
+    #arch_scalars <- matrix(nrow=n_obs - p + 1, ncol=M)
+    matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M]) # The last row is not needed because for the time t, we use the previous value y_{t-1}
+    arch_scalars <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
+
+    # THE CODE BELOW IS FASTER! CHANGE WHEN CORRECTNESS TESTED!
+    #tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
+    #arch_scalars <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
+
+    # NOTE: the column i1 of arch_scalars contains the scalars for the regime M1 + i1
+  }
+
+  ################ CONTINUE HERE!!!!!!!!!!!! #######################
 
   if(to_return == "regime_cmeans") {
     return(mu_mt)

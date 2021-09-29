@@ -146,7 +146,7 @@ theta_213s <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_213)) # SGMVAR
 theta_213sWC <- c(phi10_213, vec(A11_213), vec(A12_213), Wvec(W_213)) # SGMVAR W constrained
 
 theta_213t <- c(theta_213, 10) # StMVAR
-theta_213tsWC <- c(theta_213, 10) # SStMVAR
+theta_213tsWC <- c(theta_213sWC, 10) # SStMVAR
 
 calc_mu <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, structural_pars=NULL) {
   model <- match.arg(model)
@@ -484,6 +484,10 @@ test_that("uncond_moments_int works correctly", {
                c(1.571661, 3.718636), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112, parametrization="intercept", constraints=NULL)$autocors[, 1, 1],
                c(1.00000000, -0.02484575), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112t, model="StMVAR", parametrization="intercept", constraints=NULL)$uncond_mean,
+               c(1.571661, 3.718636), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112t, model="StMVAR", parametrization="intercept", constraints=NULL)$autocors[, 1, 1],
+               c(1.00000000, -0.02484575), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=2, params=theta_122, parametrization="intercept", constraints=NULL)$uncond_mean,
                c(1.544567, 2.967251), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=2, params=theta_122, parametrization="intercept", constraints=NULL)$autocors[, 2, 2],
@@ -492,13 +496,27 @@ test_that("uncond_moments_int works correctly", {
                c(9.4270, 58.7715), tolerance=1e-4)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222, parametrization="intercept", constraints=NULL)$autocors[1, , 3],
                c(0.9623361, -0.8532178), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222, parametrization="intercept", constraints=NULL)$autocors[1, , 3],
+               c(0.9623361, -0.8532178), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", parametrization="intercept", constraints=NULL)$uncond_mean,
+               c(9.4270, 58.7715), tolerance=1e-4)
+  expect_equal(uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gs, model="G-StMVAR", parametrization="intercept", constraints=NULL)$autocors[1, , 3],
+               c(0.9623361, -0.8532178), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=3, M=3, d=2, params=theta_332, parametrization="intercept", constraints=NULL)$uncond_mean,
                c(2.108140, 3.872402), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=3, M=3, d=2, params=theta_332, parametrization="intercept", constraints=NULL)$autocors[2, , 2],
                c(0.08213133, 0.17093255), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", parametrization="intercept", constraints=NULL)$uncond_mean,
+               c(2.108140, 3.872402), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=3, M=c(1, 2), d=2, params=theta_332gs, model="G-StMVAR", parametrization="intercept", constraints=NULL)$autocors[2, , 2],
+               c(0.08213133, 0.17093255), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=3, params=theta_123, parametrization="intercept", constraints=NULL)$uncond_mean,
                c(2.263278, 4.278151, 6.265532), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=3, params=theta_123, parametrization="intercept", constraints=NULL)$autocors[, 3, 1],
+               c(0.7763858, 0.8178659, 1.0000000), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=2, d=3, params=theta_123t, model="StMVAR", parametrization="intercept", constraints=NULL)$uncond_mean,
+               c(2.263278, 4.278151, 6.265532), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=2, d=3, params=theta_123t, model="StMVAR", parametrization="intercept", constraints=NULL)$autocors[, 3, 1],
                c(0.7763858, 0.8178659, 1.0000000), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=1, d=3, params=theta_213, parametrization="intercept", constraints=NULL)$uncond_mean,
                c(1.1, 2.2, 3.3), tolerance=1e-1)
@@ -513,6 +531,10 @@ test_that("uncond_moments_int works correctly", {
   expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$uncond_mean,
                c(1.571661, 3.718636), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$autocors[, 1, 1],
+               c(1.00000000, -0.02484575), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$uncond_mean,
+               c(1.571661, 3.718636), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$autocors[, 1, 1],
                c(1.00000000, -0.02484575), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=2, params=theta_122s, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_122))$uncond_mean,
                c(1.544567, 2.967251), tolerance=1e-6)
@@ -530,9 +552,17 @@ test_that("uncond_moments_int works correctly", {
                c(2.263278, 4.278151, 6.265532), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=2, d=3, params=theta_123s, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_123))$autocors[, 3, 1],
                c(0.7763858, 0.8178659, 1.0000000), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_123))$uncond_mean,
+               c(2.263278, 4.278151, 6.265532), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=1, M=c(1, 1), d=3, params=theta_123gss, model="G-StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_123))$autocors[, 3, 1],
+               c(0.7763858, 0.8178659, 1.0000000), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=1, d=3, params=theta_213sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_213))$uncond_mean,
                c(1.1, 2.2, 3.3), tolerance=1e-1)
   expect_equal(uncond_moments_int(p=2, M=1, d=3, params=theta_213sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_213))$autocors[3, , 3],
+               c(-0.2324331, -0.2750250, -0.2901025), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=1, d=3, params=theta_213tsWC, model="StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_213))$uncond_mean,
+               c(1.1, 2.2, 3.3), tolerance=1e-1)
+  expect_equal(uncond_moments_int(p=2, M=1, d=3, params=theta_213tsWC, model="StMVAR", parametrization="intercept", constraints=NULL, structural_pars=list(W=W_213))$autocors[3, , 3],
                c(-0.2324331, -0.2750250, -0.2901025), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR, parametrization="intercept", constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222))$uncond_mean,
                c(4.24, 133.92), tolerance=1e-2)
@@ -544,10 +574,20 @@ test_that("uncond_moments_int works correctly", {
                c(1.03, 2.36), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))$autocors[, 1, 2],
                c(0.97148078, -0.08139881), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gsc_int, model="G-StMVAR", parametrization="mean", constraints=C_222, same_means=list(1:2))$uncond_mean,
+               c(1.03, 2.36), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gsc_int, model="G-StMVAR", parametrization="mean", constraints=C_222, same_means=list(1:2))$autocors[, 1, 2],
+               c(0.97148078, -0.08139881), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
                                   structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$uncond_mean,
                c(1.03, 2.36), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
+                                  structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$autocors[, 2, 1],
+               c(-0.6139921, 1.0000000), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222tcsLAR_int, model="StMVAR", parametrization="mean", constraints=C_222,
+                                  structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$uncond_mean,
+               c(1.03, 2.36), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222tcsLAR_int, model="StMVAR", parametrization="mean", constraints=C_222,
                                   structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$autocors[, 2, 1],
                c(-0.6139921, 1.0000000), tolerance=1e-6)
 })

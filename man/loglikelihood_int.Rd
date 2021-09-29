@@ -174,11 +174,10 @@ evaluation of the log-likelihood might fail and cause error.}
 freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
-\describe{
-  \item{By default:}{log-likelihood value of the specified GMVAR model,}
+\item{By default:}{log-likelihood value of the specified GMVAR model,}
   \item{If \code{to_return=="mw"}:}{a size ((n_obs-p)xM) matrix containing the mixing weights: for m:th component in m:th column.}
   \item{If \code{to_return=="mw_tplus1"}:}{a size ((n_obs-p+1)xM) matrix containing the mixing weights: for m:th component in m:th column.
-    The last row is for \eqn{\alpha_{m,T+1}}}.
+    The last row is for \eqn{\alpha_{m,T+1}}.}
   \item{If \code{to_return=="terms"}:}{a size ((n_obs-p)x1) numeric vector containing the terms \eqn{l_{t}}.}
   \item{if \code{to_return=="loglik_and_mw"}:}{a list of two elements. The first element contains the log-likelihood value and the
     second element contains the mixing weights.}
@@ -188,7 +187,6 @@ freedom parameters are not larger than \code{2 + df_tol}.}
    (the first p values are used as the initial values).}
   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
    (the first p values are used as the initial values).}
- }
 }
 \description{
 \code{loglikelihood_int} computes log-likelihoodof a GMVAR, StMVAR, and G-StMVAR models.

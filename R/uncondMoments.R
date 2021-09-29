@@ -166,13 +166,13 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
                                     structural_pars=structural_pars) # Remove any constraints
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
-  reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=NULL,
-                                    same_means=NULL, structural_pars=structural_pars)
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
+  reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, model=model, parametrization=parametrization,
+                                    constraints=NULL, same_means=NULL, structural_pars=structural_pars)
   uncond_mean <- colSums(alphas*t(reg_means))
-  tmp <- rowSums(vapply(1:M, function(m) alphas[m]*tcrossprod(reg_means[,m] - uncond_mean), numeric(d*d))) # Vectorized matrix
-  reg_autocovs <- get_regime_autocovs_int(p=p, M=M, d=d, params=params, constraints=NULL, structural_pars=structural_pars)
-  autocovs <- array(rowSums(vapply(1:M, function(m) alphas[m]*reg_autocovs[, , , m], numeric(d*d*(p + 1)))) + tmp, dim=c(d, d, p + 1))
+  tmp <- rowSums(vapply(1:sum(M), function(m) alphas[m]*tcrossprod(reg_means[,m] - uncond_mean), numeric(d*d))) # Vectorized matrix
+  reg_autocovs <- get_regime_autocovs_int(p=p, M=M, d=d, params=params, model=model, constraints=NULL, structural_pars=structural_pars)
+  autocovs <- array(rowSums(vapply(1:sum(M), function(m) alphas[m]*reg_autocovs[, , , m], numeric(d*d*(p + 1)))) + tmp, dim=c(d, d, p + 1))
   ind_vars <- diag(autocovs[, , 1])
   autocors <- array(vapply(1:(p + 1), function(i1) {
     acor_mat <- matrix(NA, nrow=d, ncol=d)
