@@ -251,8 +251,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     #### Siitä syystä, varmaan nopeampaa laskea koko roska ilman mvnfastia!
     for(m in (M1 + 1):M) {
       #tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
-      #matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  - matprods[,m] # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
-      logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
+      #matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
+      logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
       log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m])) # TESTAA JÄLKIMMÄISELLÄ ETTÄ VARMASTI MENEE OIKEIN
       #log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(all_df[m - M1] - 2)*(1 + matprods[,m]/(all_df[m - M1] - 2))
 
@@ -277,7 +277,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     return(alpha_mt)
   }
 
-  # Calculate the conditional means mu_{m,t} (KMS 2016, Condition 1 (a)).
+  # Calculate the conditional means mu_{m,t} (KMS 2016, Condition 1 (a))
   # The dimensions of mu_mt will be: [t, p, m]
   all_A2 <- array(all_A, dim=c(d, d*p, M)) # cbind coefficient matrices of each component: m:th component is obtained at [, , m]
   Y2 <- Y[1:T_obs,] # Last row is not needed because mu_mt uses lagged values
@@ -285,38 +285,54 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
 
   # For the StMVAR type regimes, calculate the time-varying ARC-type scalar that multiplies the conditional covariance matrix:
   # i:th row calculated from y_{i-1} observation when the indexing is y_{-p+1},..,y_0,y_1,...,y_T - note that the last row of arch_scalars is for time T+1
+  arch_scalars <- matrix(1, nrow=nrow(matprods) - 1, ncol=M) # The arch-scalars are all 1 for the GMVAR type regimes
   if(M2 > 0) {
     #arch_scalars <- matrix(nrow=n_obs - p + 1, ncol=M)
     matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M]) # The last row is not needed because for the time t, we use the previous value y_{t-1}
-    arch_scalars <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
+    arch_scalars[,(M1 + 1):M] <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
 
     # THE CODE BELOW IS FASTER! CHANGE WHEN CORRECTNESS TESTED!
     #tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
-    #arch_scalars <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
-
-    # NOTE: the column i1 of arch_scalars contains the scalars for the regime M1 + i1
+    #arch_scalars[,(M1 + 1):M] <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
   }
 
-  ################ CONTINUE HERE!!!!!!!!!!!! #######################
 
   if(to_return == "regime_cmeans") {
     return(mu_mt)
   } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
   } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
-    first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(all_Omega[, , m]), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
-    sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
-    second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(vapply(1:nrow(alpha_mt), function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
+    first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m]*arch_scalars[, m], each=d*d)*as.vector(all_Omega[, , m]),
+                                       numeric(d*d*T_obs))), dim=c(d, d, T_obs))
+    sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m],
+                                          numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
+    second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(vapply(1:nrow(alpha_mt),
+                                                                                                       function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
                                                                                                        numeric(d*d))), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     return(first_term + second_term)
   }
 
-  # Calculate the second term of the log-likelihood (KMS 2016 eq.(10))
-  dat <- data[(p + 1):n_obs,] # Initial values are not used here
-  mvn_vals <- vapply(1:M, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
-  weighted_mvn <- rowSums(alpha_mt*mvn_vals)
-  weighted_mvn[weighted_mvn == 0] <- exp(epsilon)
-  l_t <- log(weighted_mvn)
+  # Calculate the second term of the log-likelihood (KMS 2016 eq.(10)), also see Virolainen (2021) for the StMVAR type regimes
+  dat <- data[(p + 1):n_obs,] # Initial values are not used here (conditional means and variances are already calculated)
+  mvd_vals <- matrix(nrow=T_obs, ncol=M)
+  if(M1 > 0) { # GMVAR type regimes
+    mvd_vals[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
+  } # StMVAR type regimes
+  if(M2 > 0) {
+    for(m in (M1 + 1):M) {
+      df_m <- all_df[m - M1] + d*p # Degrees of freedom in regime m
+      chol_Omega_m <- chol(all_Omega[, , m]) # Faster determinant and matrix inversion useing Cholesky decomposition
+      det_Omega_m <- prod(diag(chol_Omega_m))^2
+      inv_Omega_m <- chol2inv(chol_Omega_m)
+      # Below, we calculate the d-dimensional conditional t-densities for the regime m, for t=1,...,T.
+      tmp_mat <- dat - mu_mt[, , m]
+      mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
+    }
+  }
+
+  weighted_mvd <- rowSums(alpha_mt*mvd_vals)
+  weighted_mvd[weighted_mvd == 0] <- exp(epsilon)
+  l_t <- log(weighted_mvd)
 
   if(to_return == "terms") {
      return(l_t)
