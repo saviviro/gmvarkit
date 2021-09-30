@@ -58,6 +58,7 @@ lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
 
+theta_222t <- c(theta_222, 10, 20) # StMVAR
 theta_222gs <- c(theta_222, 20) # G-StMVAR, M1=1, M2=1
 theta_222ts <- c(theta_222s, 10, 20) # SStMVAR
 
@@ -203,10 +204,10 @@ theta_222csL <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222)
 theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
 
 theta_222gscsL <- c(theta_222csL, 20) # SG-StMVAR, M1=1, M2=1
-theta_222gscsL_expanded <- c(theta_222csL_expanded, 20) # SG-StMVAR, M1=1, M2=1
+#theta_222gscsL_expanded <- c(theta_222csL_expanded, 20) # SG-StMVAR, M1=1, M2=1
 
 theta_222tcsLAR <- c(theta_222csLAR, 10, 20) # SStMVAR
-theta_222tcsLAR_expanded <- c(theta_222csLAR_expanded, 10, 20) # SStMVAR
+#theta_222tcsLAR_expanded <- c(theta_222csLAR_expanded, 10, 20) # SStMVAR
 
 # p=1, M=2, d=3
 C_123 <- rbind_diags(p=1, M=2, d=3)
@@ -217,10 +218,10 @@ theta_123csL <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), 
 theta_123csLAR <- c(phi10_123, phi20_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
 
 theta_123tc <- c(theta_123c, 10, 20) # StMVAR
-theta_123tc_expanded <- c(theta_123c_expanded, 10, 20) # StMVAR
+#theta_123tc_expanded <- c(theta_123c_expanded, 10, 20) # StMVAR
 
 theta_123tcsL <- c(theta_123csL, 10, 20) # StMVAR
-theta_123tcL_expanded <- c(theta_123csL_expanded, 10, 20) # StMVAR
+#theta_123tcL_expanded <- c(theta_123csL_expanded, 10, 20) # StMVAR
 
 
 # p=2, M=2, d=2, constraint AR-parameters to be the same for all regimes
@@ -257,6 +258,8 @@ theta_222c_mu_exp <- reform_constrained_pars(p=2, M=2, d=2, params=theta_222c_mu
 theta_222c_mu2_exp <- reform_constrained_pars(p=2, M=2, d=2, params=theta_222c_mu2, constraints=C_222_2)
 theta_123c_mu_exp <- reform_constrained_pars(p=1, M=2, d=3, params=theta_123c_mu, constraints=C_123)
 theta_123tc_mu_exp <- reform_constrained_pars(p=1, M=2, d=3, params=theta_123tc_mu, model="StMVAR", constraints=C_123)
+
+theta_222s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222), change_to="mean")
 
 theta_112cs_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112csWAR, constraints=C_112,
                                          structural_pars=list(W=W_112), change_to="mean")
