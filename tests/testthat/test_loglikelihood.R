@@ -13,6 +13,9 @@ theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
 W_112 <- t(chol(Omega1_112))
 theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR, W constrained by Cholesky
 
+theta_112t <- c(theta_112, 10) # StMVAR
+theta_112tsWC <- c(theta_112sWC, 10) # SStMVAR
+
 # p=2, M=1, d=2
 phi10_212 <- c(0.53, 0.03)
 A11_212 <- matrix(c(0.23, 0.02, -0.17, 0.66), nrow=2, byrow=FALSE)
@@ -23,6 +26,9 @@ theta_212 <- c(phi10_212, vec(A11_212), vec(A12_212), vech(Omega1_212))
 
 W_212 <- t(chol(Omega1_212))
 theta_212sWC <- c(phi10_212, vec(A11_212), vec(A12_212), Wvec(W_212)) # SGMVAR, W constrained by Cholesky
+
+theta_212t <- c(theta_212, 2.1) # StMVAR
+theta_212tsWC <- c(theta_212sWC, 3) # SStMVAR
 
 # p=1, M=2, d=2
 phi10_122 <- c(0.55, 0.11)
@@ -43,6 +49,8 @@ W_122 <- matrix(WL_122[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_122 <- WL_122[(2^2 + 1):length(WL_122)]
 theta_122s <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec(W_122), lambdas_122, alpha1_122) # SGMVAR
 
+theta_122gs <- c(theta_122, 20) # G-StMVAR
+theta_122gss <- c(theta_122s, 10) # SG-StMVAR
 
 # p=2, M=2, d=2
 phi10_222 <- c(0.36, 0.12)
@@ -66,6 +74,13 @@ lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
 
+theta_222t <- c(theta_222, 100, 200) # StMVAR
+theta_222gs <- c(theta_222, 50) # G-StMVAR
+
+theta_222ts <- c(theta_222s, 10, 20) # SStMVAR
+theta_222gss <- c(theta_222s, 2.1) # SG-StMVAR
+
+
 # p=1, M=4, d=2
 theta_142 <- c(0.680381, 0.099736, 0.502918, 0.080781, -0.627348, 0.674579,
                0.37666, 0.020433, 0.016747, 0.285857, 0.205766, 0.392568,
@@ -75,18 +90,36 @@ theta_142 <- c(0.680381, 0.099736, 0.502918, 0.080781, -0.627348, 0.674579,
                -0.155109, -1.746672, -0.348001, 0.43192, -0.028927, 0.002053,
                0.428343, 0.347302, 0.152716)
 
+theta_142gs_1 <- c(theta_142, 20, 30, 40) # G-StMVAR, M1=1, M2=3
+theta_142gs_2 <- c(theta_142, 40) # G-StMVAR, M1=3, M2=1
+theta_142gs_3 <- c(theta_142, 30, 40) # G-StMVAR, M1=2, M2=2
+
+
+# Mean parametrization
 theta_112_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112, change_to="mean")
 theta_212_mu <- change_parametrization(p=2, M=1, d=2, params=theta_212, change_to="mean")
 theta_122_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122, change_to="mean")
 theta_222_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222, change_to="mean")
 theta_112sWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112sWC, structural_pars=list(W=W_112), change_to="mean")
-theta_122s_mu <- change_parametrization(p=1, M=1, d=2, params=theta_122s, structural_pars=list(W=W_122), change_to="mean")
+theta_122s_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122s, structural_pars=list(W=W_122), change_to="mean")
 theta_222s_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222s, structural_pars=list(W=W_222), change_to="mean")
+
+theta_112t_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112t, model="StMVAR", change_to="mean") # StMVAR
+theta_212t_mu <- change_parametrization(p=2, M=1, d=2, params=theta_212t, model="StMVAR", change_to="mean") # StMVAR
+theta_122gs_mu <- change_parametrization(p=1, M=c(1, 1), d=2, params=theta_122gs, model="G-StMVAR", change_to="mean") # G-StMVAR
+theta_222t_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222t, model="StMVAR", change_to="mean") # StMVAR
+theta_112tsWC_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", structural_pars=list(W=W_112), change_to="mean") # SStMVAR
+theta_122gss_mu <- change_parametrization(p=1, M=c(1, 1), d=2, params=theta_122gss, model="G-StMVAR", structural_pars=list(W=W_122), change_to="mean") # SG-StMVAR
+theta_222gss_mu <- change_parametrization(p=2, M=c(1, 1), d=2, params=theta_222gss, model="G-StMVAR", structural_pars=list(W=W_222), change_to="mean") # SG-StMVAR
+theta_222ts_mu <- change_parametrization(p=2, M=c(1, 1), d=2, params=theta_222ts, model="StMVAR", structural_pars=list(W=W_222), change_to="mean") # SStMVAR
+
 
 # p=4, M=1, d=3, data2 (note: very bad fit)
 theta_413 <- c(0.955, 1.968, 5.832, 0.384, 0.895, 1.519, 1.175, 0.067, -0.68, 1.517, -0.654, -0.237, -1.343, -1.188, -0.403,
               0.98, -0.285, -1.787, 0.546, -0.545, -1.633, 0.277, -0.33, 2.037, 0.563, 1.126, -1.264, 0.179, 2.345, -1.126,
               -0.152, -0.82, 0.428, -0.332, 1.776, -0.976, -0.256, 0.374, -0.82, 1.964, -0.42, 0.798, 3.931, -0.436, 0.404)
+
+theta_413t <- c(theta_413, 10) # StMVAR
 
 # p=3, M=2, d=3, data2
 theta_323 <- c(0.352, 0.085, 0.19, 0.166, 0.059, -0.35, -0.003, 0.351, 0.019, -0.003, 0.003, -0.015, 0.465, -0.021, -0.051,
@@ -95,12 +128,16 @@ theta_323 <- c(0.352, 0.085, 0.19, 0.166, 0.059, -0.35, -0.003, 0.351, 0.019, -0
                -0.031, -0.055, 0.093, 0.044, 0.041, 0.058, 0.079, -0.658, 0.032, 0.054, -0.036, -0.057, 0.038, -0.107,
                -0.078, 0.138, 0.445, -0.166, 0.049, -0.237, 1.143, 0.02, -0.271, 0.095, 0.018, 0.688, 0.719)
 
+theta_323gs <- c(theta_323, 20) # G-StMVAR
+
 # p=7, M=2, d=2
 theta_722 <- c(0.556, -0.027, 0.267, 0.021, -0.15, 0.622, 0.078, 0.026, 0.158, 0.04, -0.027, 0.015, -0.242, 0.099, 0.05,
                0.057, -0.235, 0.27, -0.069, -0.002, 0.249, -0.135, -0.014, 0.032, 0.054, 0.058, -0.09, 0.081, 0.132,
                -0.053, 0.843, 0.021, 0.082, 0.537, 0.061, 0.167, 0.051, -0.112, 0.308, 0.372, 0.039, 0.211, 0.227,
                -0.139, 0.066, -0.371, 0.208, 0.142, -0.046, -0.071, 0.076, -0.164, 0.012, -0.163, 0.03, 0.165, 0.006,
                -0.496, 0.234, 0.271, -0.089, 0.225, -0.259, 0.218, 0.002, 0.021, 0.721)
+
+theta_722t <- c(theta_722, 3, 4) # StMVAR
 
 # p=6, M=3, d=2
 theta_632 <- c(0.946496, 0.080268, 0.030026, 0.454984, 0.153281, -0.597408, -0.343207, 0.27003, -0.009369, 0.398815,
@@ -113,10 +150,17 @@ theta_632 <- c(0.946496, 0.080268, 0.030026, 0.454984, 0.153281, -0.597408, -0.3
                0.253254, -0.125366, 0.010989, 0.221103, -0.201323, -0.086355, 0.064991, -0.174453, -0.091006, 1.080211, -0.009982,
                0.101493, 0.990494, 0.008251)
 
+theta_632t <- c(theta_632, 10, 20, 30) # StMVAR
+theta_632gs_1 <- c(theta_632, 20, 30) # G-StMVAR, M1=1, M2=2
+theta_632gs_2 <- c(theta_632, 30) # G-StMVAR, M1=2, M2=1
+
+
 # p=8, M=1, d=2 (note: very bad fit)
 theta_812 <- c(2.54, 1.341, -0.316, -0.405, -0.181, 0.744, 0.505, -0.795, -0.221, 0.109, 1.382, 1.453, -0.659, -1.004, 0.44, 0.314,
                0.437, 1.082, -2.219, -0.177, 1.155, -0.081, -0.663, 0.478, -0.869, -0.114, 0.881, -0.098, -0.868, 0.448, 0.308, -0.535,
                0.122, 0.165, 0.051, 0.086, 3.732)
+
+theta_812t <- c(theta_812, 10) # StMVAR
 
 # Same means
 mu_112 <- pick_phi0(p=1, M=1, d=2, params=theta_112_mu)
@@ -126,6 +170,14 @@ mu_222 <- pick_phi0(p=2, M=2, d=2, params=theta_222_mu)
 mu_112sWC <- pick_phi0(p=1, M=1, d=2, params=theta_112sWC_mu, structural_pars=list(W=W_112))
 mu_122s <- pick_phi0(p=1, M=2, d=2, params=theta_122s_mu, structural_pars=list(W=W_122))
 mu_222s <- pick_phi0(p=2, M=2, d=2, params=theta_222s_mu, structural_pars=list(W=W_222))
+
+mu_112t <- pick_phi0(p=1, M=1, d=2, params=theta_112t_mu) # StMVAR
+mu_212t <- pick_phi0(p=2, M=1, d=2, params=theta_212t_mu) # StMVAR
+mu_122gs <- pick_phi0(p=1, M=c(1, 1), d=2, params=theta_122gs_mu) # G-StMVAR
+mu_222t <- pick_phi0(p=2, M=c(1, 1), d=2, params=theta_222t_mu) # StMVAR
+mu_112tsWC <- pick_phi0(p=1, M=1, d=2, params=theta_112tsWC_mu, structural_pars=list(W=W_112)) # StMVAR
+mu_122gss <- pick_phi0(p=1, M=c(1, 1), d=2, params=theta_122gss_mu, structural_pars=list(W=W_122)) # G-StMVAR
+mu_222ts <- pick_phi0(p=2, M=2, d=2, params=theta_222ts_mu, structural_pars=list(W=W_222)) # StMVAR
 
 theta_112_int <- c(mu_112, vec(A11_112), vech(Omega1_112)) # same_means=list(1)
 theta_212_int <- c(mu_212, vec(A11_212), vec(A12_212), vech(Omega1_212)) # same_means=list(1)
@@ -137,48 +189,102 @@ theta_122s_int <- c(mu_122s[,1], vec(A11_122), vec(A21_122), vec(W_122), lambdas
 theta_222s_int <- c(mu_222s[,1], vec(A11_222), vec(A12_222), vec(A21_222),
                     vec(A22_222), vec(W_222), lambdas_222, alpha1_222)  # structural_pars=list(W=W_222), same_means=list(1:2)
 
+theta_112t_int <- c(theta_112_int, 10) # same_means=list(1), # StMVAR
+theta_212t_int <- c(theta_212_int, 2.1) # same_means=list(1), # StMVAR
+theta_122gs_int <- c(theta_122_int, 20) # same_means=list(1:2), # G-StMVAR
+theta_222t_int <- c(theta_222_int, 100, 200) # same_means=list(1:2), # StMVAR
+theta_112tsWC_int <- c(theta_112sWC_int, 10) # structural_pars=list(W=W_112), same_means=list(1), # StMVAR
+theta_122gss_int <- c(theta_122s_int, 10) # structural_pars=list(W=W_122), same_means=list(1:2), # G-StMVAR
+theta_222ts_int <- c(theta_222s_int, 10, 20)  # structural_pars=list(W=W_222), same_means=list(1:2) # StMVAR
+
+# AR constraints
+# p=2, M=2, d=2, model with autoregressive parameters restricted
+# to be the same for both regimes
+C_222 <- rbind(diag(2*2^2), diag(2*2^2))
+theta_222c <- c(0.418, 0.153, 0.513, 0.057, 0.204, 0.028, -0.169, 0.591, 0.241, 0.014, 0.091, 0.248, 1.068,
+                -0.01, 0.111, 0.219, 0.004, 0.027, 0.501)
+
+theta_222tc <- c(theta_222c, 10, 20) # StMVAR
+theta_222gsc <- c(theta_222c, 20) # G-StMVAR
+
+
 test_that("loglikelihood_int works correctly", {
   # Regular
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112, conditional=FALSE), -1065.289, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", conditional=FALSE), -737.8115, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212, conditional=FALSE), -290.4883, tolerance=1e-3)
-  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=2, params=theta_122, conditional=FALSE), -309.2328, tolerance=1e-2)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212t, model="StMVAR", conditional=FALSE), -290.8789, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=2, params=theta_122, conditional=FALSE), -309.2328, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(1, 1), params=theta_122gs, model="G-StMVAR", conditional=FALSE), -303.2403, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222, conditional=FALSE), -241.6249, tolerance=1e-3)
-  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222, conditional=TRUE), -236.5213, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222t, model="StMVAR", conditional=FALSE), -241.2498, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", conditional=TRUE), -236.1063, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=500*gdpdef, p=2, M=2, params=theta_222, conditional=FALSE), -960378.7, tolerance=1)
+  expect_equal(loglikelihood_int(data=500*gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", conditional=FALSE), -5044.579, tolerance=1e-1)
 
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112_mu, conditional=FALSE, parametrization="mean"), -1065.289, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112t_mu, model="StMVAR", conditional=FALSE, parametrization="mean"), -737.8115, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212_mu, conditional=FALSE, parametrization="mean"), -290.4883, tolerance=1e-3)
-  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=2, params=theta_122_mu, conditional=FALSE, parametrization="mean"), -309.2328, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212t_mu, model="StMVAR", conditional=FALSE, parametrization="mean"), -290.8789, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(1, 1), params=theta_122gs_mu, model="G-StMVAR", conditional=FALSE, parametrization="mean"), -303.2403, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222_mu, conditional=FALSE, parametrization="mean"), -241.6249, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222t_mu, model="StMVAR", conditional=FALSE, parametrization="mean"), -241.2498, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222_mu, conditional=TRUE, parametrization="mean"), -236.5213, tolerance=1e-3)
-
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=4, params=theta_142, conditional=FALSE, parametrization="intercept"), -226.3188, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(1, 3), params=theta_142gs_1, model="G-StMVAR", conditional=FALSE, parametrization="intercept"), -228.2573, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="intercept"), -223.825, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(3, 1), params=theta_142gs_2, model="G-StMVAR", conditional=TRUE, parametrization="intercept"), -223.825, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=4, params=theta_142, conditional=TRUE, parametrization="mean"), -355.9515, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(2, 2), params=theta_142gs_3, model="G-StMVAR", conditional=TRUE, parametrization="mean"), -351.7676, tolerance=1e-3)
 
   # p*d >= 12
   expect_equal(loglikelihood_int(data=data2, p=4, M=1, params=theta_413, conditional=FALSE), -73586.24, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=data2, p=4, M=1, params=theta_413t, model="StMVAR", conditional=FALSE), -8634.684, tolerance=1e-1)
   expect_equal(loglikelihood_int(data=data2, p=3, M=2, params=theta_323, conditional=FALSE), -536.6736, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=data2, p=3, M=c(1, 1), params=theta_323gs, model="G-StMVAR", conditional=FALSE), -537.0112, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=7, M=2, params=theta_722, conditional=FALSE), -202.0608, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=7, M=2, params=theta_722t, model="StMVAR", conditional=FALSE), -215.7163, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=6, M=3, params=theta_632, conditional=FALSE), -179.4021, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=6, M=3, params=theta_632t, model="StMVAR", conditional=FALSE), -174.8772, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=6, M=c(1, 2), params=theta_632gs_1, model="G-StMVAR", conditional=FALSE), -172.1303, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=6, M=c(2, 1), params=theta_632gs_2, model="G-StMVAR", conditional=FALSE), -180.914, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=8, M=1, params=theta_812, conditional=FALSE), -15542.64, tolerance=1e-1)
+  expect_equal(loglikelihood_int(data=gdpdef, p=8, M=1, params=theta_812t, model="StMVAR", conditional=FALSE), -1787.325, tolerance=1e-1)
 
-  # SGMVAR
+
+  # Structural
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112sWC, structural_pars=list(W=W_112), conditional=FALSE),
                -1065.289, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112tsWC, model="StMVAR", structural_pars=list(W=W_112), conditional=FALSE),
+               -737.8115, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212sWC, structural_pars=list(W=W_212), conditional=FALSE),
                -290.4883, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=1, params=theta_212tsWC, model="StMVAR", structural_pars=list(W=W_212), conditional=FALSE),
+               -256.3104, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=2, params=theta_122s, structural_pars=list(W=W_122), conditional=FALSE),
                -309.232, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(1, 1), params=theta_122gss, model="G-StMVAR", structural_pars=list(W=W_122), conditional=FALSE),
+               -300.998, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222s, structural_pars=list(W=W_222), conditional=FALSE),
                -241.6249, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=c(1, 1), params=theta_222gss, model="G-StMVAR", structural_pars=list(W=W_222), conditional=FALSE),
+               -270.4163, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222s, structural_pars=list(W=W_222), conditional=TRUE),
                -236.5213, tolerance=1e-3)
-
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222ts, model="StMVAR", structural_pars=list(W=W_222), conditional=TRUE),
+               -236.4644, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112sWC_mu, structural_pars=list(W=W_112), conditional=FALSE, parametrization="mean"),
                -1065.289, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112tsWC_mu, model="StMVAR", structural_pars=list(W=W_112), conditional=FALSE, parametrization="mean"),
+               -737.8115, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=2, params=theta_122s_mu, structural_pars=list(W=W_122), conditional=FALSE, parametrization="mean"),
+               -309.2328, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=1, M=c(1, 1), params=theta_122gss_mu, model="G-StMVAR", structural_pars=list(W=W_122), conditional=FALSE, parametrization="mean"),
+               -300.998, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222s_mu, structural_pars=list(W=W_222), conditional=FALSE, parametrization="mean"),
                -241.6249, tolerance=1e-3)
+  expect_equal(loglikelihood_int(data=gdpdef, p=2, M=c(1, 1), params=theta_222gss_mu, model="G-StMVAR", structural_pars=list(W=W_222), conditional=FALSE, parametrization="mean"),
+               -270.4163, tolerance=1e-3)
 
   # same_means
   expect_equal(loglikelihood_int(data=gdpdef, p=1, M=1, params=theta_112_int, parametrization="mean", same_means=list(1), conditional=FALSE),
@@ -197,6 +303,10 @@ test_that("loglikelihood_int works correctly", {
                -328.9261, tolerance=1e-3)
   expect_equal(loglikelihood_int(data=gdpdef, p=2, M=2, params=theta_222s_int, parametrization="mean", structural_pars=list(W=W_222), same_means=list(1:2), conditional=FALSE),
                -245.8273, tolerance=1e-3)
+
+  # AR constraints
+
+  # FILL IN
 })
 
 

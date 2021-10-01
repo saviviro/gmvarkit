@@ -207,6 +207,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   }
   M <- sum(M) # The total number of mixture components
 
+
   # i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1},...,y_{i-p}) (dpx1),
   # assuming the observed data is y_{-p+1},...,y_0,y_1,...,y_{T}
   Y <- reform_data(data, p)
@@ -242,23 +243,23 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   if(M2 > 0) { # Multistudents
     # We use the package mvnfast for faster evaluation. It employs scale-matrix parametrization so we need to transform
     # our Cholesky decompositions of covariance matrices to the Cholesky decompositions of scale matrices.
-    #log_mvvalues[,(M1 + 1):M] <- vapply(1:M1, function(m) mvnfast::tmvn(X=Y, mu=rep(mu[,m], p),
-    #                                                                     sigma=sqrt((all_df[m - M1] - 2)/all_df[m - M1])*chol_Sigmas[, , m],
-    #                                                                     df=all_df[m - M1], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
+#    log_mvvalues[,(M1 + 1):M] <- vapply(1:M2, function(m) mvnfast::dmvt(X=Y, mu=rep(mu[,m], p),
+#                                                                         sigma=sqrt((all_df[m - M1] - 2)/all_df[m - M1])*chol_Sigmas[, , m],
+#                                                                         df=all_df[m - M1], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
     ####
     #### ENSIN LASKETAAN ITSE HITAALLLA MENETELMÄLLÄ SUORAAN KAAVASTA, JA SITTEN KUN TULOS VARMA, JA TARKISTETAAN ETTÄ TULEE SAMA TULOS MVNFASTILLA
     #### HUOM: ehdolliselle varianssille tarvii matprodin myös myöhemmin ehdolliseen tiheyteen!
     #### Siitä syystä, varmaan nopeampaa laskea koko roska ilman mvnfastia!
     for(m in (M1 + 1):M) {
-      #tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
-      #matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
+#      tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
+#      matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
       logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
       log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m])) # TESTAA JÄLKIMMÄISELLÄ ETTÄ VARMASTI MENEE OIKEIN
-      #log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(all_df[m - M1] - 2)*(1 + matprods[,m]/(all_df[m - M1] - 2))
+#      log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[,m]/(all_df[m - M1] - 2))
 
       for(i1 in 1:nrow(log_mvvalues)) { # DELETOI TÄMÄ LOOPPI KOKONAAN JA POISTA KOMMENTIT YLTÄ
         matprods[i1, m] <- crossprod(Y[i1,] - rep(mu[,m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(mu[,m], p))
-        log_mvvalues[i1, m] <- logC - 0.5*log_det_Sigma - 0.5*(all_df[m - M1] - 2)*(1 + matprods[i1, m]/(all_df[m - M1] - 2))
+        log_mvvalues[i1, m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[i1, m]/(all_df[m - M1] - 2))
       }
     }
     # HUOM: NOPEUTA YLLÄ OLEVA KUN YKSIKKÖTESTIT TEHTY NS. VARMASTI OIKEILLA KAAVOILLA
@@ -326,7 +327,12 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
       inv_Omega_m <- chol2inv(chol_Omega_m)
       # Below, we calculate the d-dimensional conditional t-densities for the regime m, for t=1,...,T.
       tmp_mat <- dat - mu_mt[, , m]
-      mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
+      #mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
+      for(i1 in 1:nrow(mvd_vals)) {
+        tmp_numb <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[i1, m]^(-d/2)*1/sqrt(det_Omega_m)
+        mvd_vals[i1, m] <- tmp_numb*(1 + crossprod(tmp_mat[i1,], inv_Omega_m)%*%tmp_mat[i1,]/(arch_scalars[i1, m]*(df_m - 2)))^(-0.5*(d + df_m))
+      }
+      # TÄSSÄ VAIHDA NOPEAMPAAN MENETELMÄÄN KUN ON TESTATTU
     }
   }
 
