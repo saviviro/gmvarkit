@@ -241,28 +241,13 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
                                                                    log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
   }
   if(M2 > 0) { # Multistudents
-    # We use the package mvnfast for faster evaluation. It employs scale-matrix parametrization so we need to transform
-    # our Cholesky decompositions of covariance matrices to the Cholesky decompositions of scale matrices.
-#    log_mvvalues[,(M1 + 1):M] <- vapply(1:M2, function(m) mvnfast::dmvt(X=Y, mu=rep(mu[,m], p),
-#                                                                         sigma=sqrt((all_df[m - M1] - 2)/all_df[m - M1])*chol_Sigmas[, , m],
-#                                                                         df=all_df[m - M1], log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
-    ####
-    #### ENSIN LASKETAAN ITSE HITAALLLA MENETELMÄLLÄ SUORAAN KAAVASTA, JA SITTEN KUN TULOS VARMA, JA TARKISTETAAN ETTÄ TULEE SAMA TULOS MVNFASTILLA
-    #### HUOM: ehdolliselle varianssille tarvii matprodin myös myöhemmin ehdolliseen tiheyteen!
-    #### Siitä syystä, varmaan nopeampaa laskea koko roska ilman mvnfastia!
-    for(m in (M1 + 1):M) {
-#      tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
-#      matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)  # rowSums((Y - rep(mu[,m], p))%*%inv_Sigmas[, , m]*(Y - rep(mu[,m], p))) # Test this
+    for(m in (M1 + 1):M) { # Go through the StMVAR type regimes
+      tmp_mat <- Y - matrix(rep(mu[,m], p), nrow=nrow(Y), ncol=ncol(Y), byrow=TRUE)
+      matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)
       logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
-      log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m])) # TESTAA JÄLKIMMÄISELLÄ ETTÄ VARMASTI MENEE OIKEIN
-#      log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[,m]/(all_df[m - M1] - 2))
-
-      for(i1 in 1:nrow(log_mvvalues)) { # DELETOI TÄMÄ LOOPPI KOKONAAN JA POISTA KOMMENTIT YLTÄ
-        matprods[i1, m] <- crossprod(Y[i1,] - rep(mu[,m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(mu[,m], p))
-        log_mvvalues[i1, m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[i1, m]/(all_df[m - M1] - 2))
-      }
+      log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m]))
+      log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[,m]/(all_df[m - M1] - 2))
     }
-    # HUOM: NOPEUTA YLLÄ OLEVA KUN YKSIKKÖTESTIT TEHTY NS. VARMASTI OIKEILLA KAAVOILLA
   }
 
   ## Calculate the mixing weights alpha_{m,t} (KMS 2016, eq.(7))
@@ -288,13 +273,12 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   # i:th row calculated from y_{i-1} observation when the indexing is y_{-p+1},..,y_0,y_1,...,y_T - note that the last row of arch_scalars is for time T+1
   arch_scalars <- matrix(1, nrow=nrow(matprods) - 1, ncol=M) # The arch-scalars are all 1 for the GMVAR type regimes
   if(M2 > 0) {
-    #arch_scalars <- matrix(nrow=n_obs - p + 1, ncol=M)
     matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M]) # The last row is not needed because for the time t, we use the previous value y_{t-1}
-    arch_scalars[,(M1 + 1):M] <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
+    #arch_scalars[,(M1 + 1):M] <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
 
     # THE CODE BELOW IS FASTER! CHANGE WHEN CORRECTNESS TESTED!
-    #tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
-    #arch_scalars[,(M1 + 1):M] <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
+    tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
+    arch_scalars[,(M1 + 1):M] <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
   }
 
 
@@ -327,12 +311,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
       inv_Omega_m <- chol2inv(chol_Omega_m)
       # Below, we calculate the d-dimensional conditional t-densities for the regime m, for t=1,...,T.
       tmp_mat <- dat - mu_mt[, , m]
-      #mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
-      for(i1 in 1:nrow(mvd_vals)) {
-        tmp_numb <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[i1, m]^(-d/2)*1/sqrt(det_Omega_m)
-        mvd_vals[i1, m] <- tmp_numb*(1 + crossprod(tmp_mat[i1,], inv_Omega_m)%*%tmp_mat[i1,]/(arch_scalars[i1, m]*(df_m - 2)))^(-0.5*(d + df_m))
-      }
-      # TÄSSÄ VAIHDA NOPEAMPAAN MENETELMÄÄN KUN ON TESTATTU
+      mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
     }
   }
 
@@ -419,9 +398,9 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
 }
 
 
-#' @title Compute log-likelihood of a GMVAR model using parameter vector
+#' @title Compute log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector
 #'
-#' @description \code{loglikelihood} computes log-likelihood of a GMVAR model using parameter vector
+#' @description \code{loglikelihood} computes log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector
 #'   instead of an object of class 'gmvar'. Exists for convenience if one wants to for example
 #'   employ other estimation algorithms than the ones used in \code{fitGMVAR}. Use \code{minval} to
 #'   control what happens when the parameter vector is outside the parameter space.
@@ -445,27 +424,28 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
 #' loglikelihood(data=gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' @export
 
-loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                          same_means=NULL, structural_pars=NULL, minval=NA, stat_tol=1e-3, posdef_tol=1e-8) {
-  if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
+loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
+                          constraints=NULL, same_means=NULL, structural_pars=NULL, minval=NA, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
+  model <- match.arg(model)
   check_same_means(parametrization=parametrization, same_means=same_means)
   data <- check_data(data, p)
   d <- ncol(data)
+  check_pMd(p=p, M=M, d=d, model=model)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
-  loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
+  loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional, parametrization=parametrization,
                     constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return="loglik",
-                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
-#' @title Compute conditional moments of a GMVAR model
+#' @title Compute conditional moments of a GMVAR, StMVAR, or G-StMVAR model
 #'
 #' @description \code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices
-#'  of a GMVAR model.
+#'  of a GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams loglikelihood_int
 #' @param to_return should the regimewise conditional means, total conditional means, or total conditional covariance matrices
@@ -493,22 +473,23 @@ loglikelihood <- function(data, p, M, params, conditional=TRUE, parametrization=
 #' cond_moments(data=gdpdef, p=2, M=2, params=params22, to_return="total_ccovs")
 #' @export
 
-cond_moments <- function(data, p, M, params, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
+cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
                          structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs"),
-                         stat_tol=1e-3, posdef_tol=1e-8) {
-  if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
+                         stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
-  check_same_means(parametrization=parametrization, same_means=same_means)
+  model <- match.arg(model)
   to_return <- match.arg(to_return)
+  check_same_means(parametrization=parametrization, same_means=same_means)
   data <- check_data(data, p)
   d <- ncol(data)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  check_pMd(p=p, M=M, d=d, model=model)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
-  loglikelihood_int(data=data, p=p, M=M, params=params, conditional=TRUE, parametrization=parametrization,
-                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return=to_return, check_params=TRUE,
-                    minval=NA, stat_tol=stat_tol, posdef_tol=posdef_tol)
+  loglikelihood_int(data=data, p=p, M=M, params=params, model=model, parametrization=parametrization,
+                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return=to_return,
+                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
