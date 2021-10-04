@@ -276,7 +276,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
   }
   G <- colMeans(dg)
 
-  # Calculate gradients of the terms l_t
+  # Calculate gradients of the terms l_t # TÄNNE PBAPPLY MULTICORE JA SITÄ ENNEN SOPIVA PRINTOUTTI KUTSUVASSA FUNKTIOSSA
   dl <- vapply(1:npars, function(i1) central_diff(params, loglik_fn, i1), numeric(T_obs)) # (T x npars)
 
   # Approximate Fisher information matrix, calculate Psi matrix and H matrix

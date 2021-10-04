@@ -143,6 +143,12 @@
 #'    (the first p values are used as the initial values).}
 #'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
 #'    (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
+#'    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
+#'    are all ones (the first p values are used as the initial values).}
+#'   \item{if \code{to_return=="loglik_mw_rccovs_archscalars"}:}{a list of four elements. The first element contains the log-likelihood value, the
+#'     second element contains the mixing weights, the third element contains the regime ccovs, and the last element contains the arch scalars
+#'     (this is used in \code{quantile_residuals_int}).}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -159,8 +165,9 @@
 loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                               constraints=NULL, same_means=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
-                                          "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
-                              check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e-5) {
+                                          "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
+                                          "arch_scalars", "loglik_mw_rccovs_archscalars"),
+                              check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
 
   # Compute required values
   epsilon <- round(log(.Machine$double.xmin) + 10) # Logarithm of the smallest value that can be handled normally
@@ -282,12 +289,16 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
 
   if(to_return == "regime_cmeans") {
     return(mu_mt)
+  } else if(to_return == "arch_scalars") {
+    return(arch_scalars)
   } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
-  } else if(to_return == "regime_ccovs") {
+  } else if(to_return == "regime_ccovs" || to_return == "loglik_mw_rccovs_archscalars") {
     regime_ccovs <- array(vapply(1:M, function(m) t(matrix(all_Omega[, , m], nrow=nrow(arch_scalars), ncol=d^2, byrow=TRUE)*arch_scalars[, m]),
                                  numeric(d*d*nrow(arch_scalars))), dim=c(d, d, nrow(arch_scalars), M))
-    return(regime_ccovs)
+    if(to_return == "regime_ccovs") {
+      return(regime_ccovs)
+    }
   } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
     first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m]*arch_scalars[, m], each=d*d)*as.vector(all_Omega[, , m]),
                                        numeric(d*d*T_obs))), dim=c(d, d, T_obs))
@@ -320,13 +331,20 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   weighted_mvd <- rowSums(alpha_mt*mvd_vals)
   weighted_mvd[weighted_mvd == 0] <- exp(epsilon)
   l_t <- log(weighted_mvd)
+  loglik <- l_0 + sum(l_t)
 
   if(to_return == "terms") {
      return(l_t)
   } else if(to_return == "loglik_and_mw") {
-    return(list(loglik=l_0 + sum(l_t), mw=alpha_mt))
-  } else {
-    return(l_0 + sum(l_t))
+    return(list(loglik=loglik,
+                mw=alpha_mt))
+  } else if(to_return == "loglik_mw_rccovs_archscalars") {
+    return(list(loglik=loglik,
+                mw=alpha_mt,
+                regime_ccovs=regime_ccovs,
+                arch_scalars=arch_scalars))
+  } else { # to_return == "loglik"
+    return(loglik)
   }
 }
 
@@ -465,6 +483,9 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #'     (the first p values are used as the initial values).}
 #'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
 #'     (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
+#'    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
+#'    are all ones (the first p values are used as the initial values).}
 #' @inherit loglikelihood_int references
 #' @family moment functions
 #' @examples
@@ -478,7 +499,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @export
 
 cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                         structural_pars=NULL, to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
+                         structural_pars=NULL, to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars"),
                          stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)

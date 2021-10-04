@@ -22,7 +22,7 @@ loglikelihood_int(
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08,
-  df_max = 1e-05
+  df_max = 1e+05
 )
 }
 \arguments{

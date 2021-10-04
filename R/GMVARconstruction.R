@@ -70,7 +70,7 @@
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
-                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, max_df=1e+5) {
+                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
@@ -136,8 +136,10 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
   if(calc_cond_moments == FALSE || is.null(data)) {
     if(calc_cond_moments) warning("Conditional moments can't be calculated without data")
     regime_cmeans <- NA
+    regime_cmeans <- NA
     total_cmeans <- NA
     total_ccovs <- NA
+    arch_scalars <- NA
   } else {
     get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                                     conditional=conditional, parametrization=parametrization,
@@ -145,11 +147,13 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                                     structural_pars=structural_pars,
                                                     check_params=TRUE,
                                                     to_return=to_return, minval=NA,
-                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
+                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
     regime_cmeans <- get_cm("regime_cmeans")
     regime_ccovs <- get_cm("regime_ccovs")
     total_cmeans <- get_cm("total_cmeans")
     total_ccovs <- get_cm("total_ccovs")
+    arch_scalars <- get_cm("arch_scalars")
+
   }
 
   structure(list(data=data,
@@ -168,6 +172,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                  regime_ccovs=regime_ccovs,
                  total_cmeans=total_cmeans,
                  total_ccovs=total_ccovs,
+                 arch_scalars=arch_scalars,
                  quantile_residuals=qresiduals,
                  loglik=structure(lok_and_mw$loglik,
                                   class="logLik",
@@ -183,7 +188,9 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                  which_converged=NULL,
                  which_round=NULL,
                  num_tols=list(stat_tol=stat_tol,
-                               posdef_tol=posdef_tol)),
+                               posdef_tol=posdef_tol,
+                               df_tol=df_tol,
+                               df_max=df_max)),
             class="gmvar")
 }
 
