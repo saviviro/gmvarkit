@@ -65,6 +65,7 @@ quantile_residuals <- function(gmvar) {
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
+  all_df <- pick_df(M=M, params=params, model=model)
 
   if(model == "GMVAR") {
     M1 <- M
@@ -109,42 +110,68 @@ quantile_residuals <- function(gmvar) {
   # applying them to the mixture components at each time point t.
 
   # Compute partitions and matrix products of partitioned covariance matrices Omega_m that will be used multiple times.
-  upleft_jjmat <- function(arr, j) arr[1:j, 1:j, , drop=FALSE] # Returns upper-left (j x j) block matrix from each slice of the 3d array "arr"
+  upleft_jjmat <-  function(mat, j) mat[1:j, 1:j , drop=FALSE] # function(arr, j) arr[1:j, 1:j, , drop=FALSE] # Returns upper-left (j x j) block matrix from each slice of the 3d array "arr"
 
   # Storage for variances and conditional means
   # (obtained from properties of multinormal/multistudent for 1-dimensional conditional distribution)
-#  variances <- matrix(nrow=d, ncol=M) # Column per mixture component and row per component
+  variances <- matrix(nrow=d, ncol=M) # Column per mixture component and row per component
   Omega_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]; time-varying for StMVAR type regimes
   mu_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]
+
+  # POISTA REGIME_CCOVS KOKONAAN POIS KOKO PASKASTA, KOSKA SAMAT LASKUT TEHDÄÄN TÄÄLLÄ AR-COEFFEISTA?
 
   # Calculate 1-dimensional conditional variances and means, conditional on F_{t-1} and A_{j-1}, for t=1,...,T, m=1,...,M, and j=1,...,d
   dat <- data[(p + 1):nrow(data),] # Remove the initial values
   for(m in 1:M) {
     # j = 1; conditional on previous observations only
-    Omega_mtj[, 1, m] <- Omega_mt[1, 1, , m] # Marginal conditional variances
-    mu_dif <- dat - mu_mt[, , m] # mu_mt - y_t, t = 1,...,T
+    variances[1, m] <- all_Omega[1, 1, m] # "Marginal" variance
+
+    Omega_mtj[, 1, m] <- arch_scalars[,m]*all_Omega[1, 1, m]
     mu_mtj[, 1, m] <- mu_mt[, 1, m] # Marginal conditional means
+    mu_dif <- dat - mu_mt[, , m] # mu_mt - y_t, t = 1,...,T
 
     # j=2,...,d; conditional on previous observations and y_{1,t},...,y_{j-1,t}
     for(j in 2:d) {
-      Omega_mtjj <- upleft_jjmat(Omega_mt[, , , m], j) # [d, d, t] --- ONKO TÄMÄ TURHA, IE., VOIDAANKO OTTAA KAIKKI SUORAAN OMEGA_MT:STÄ?
-      up_left <- upleft_jjmat(Omega_mtjj, j - 1)
-      up_right <- Omega_mtjj[1:(j - 1), j, , drop=FALSE] # (j-1 x 1) in each slice; [j - 1, 1, t]
-      low_left <- aperm(up_right, perm=c(2, 1, 3)) # Transpose each slice in up_right
-      low_right <- Omega_mtjj[j, j, , drop=FALSE] # j,j:th element of each Omega_mt in each slice
+#      Omega_mtjj <- upleft_jjmat(Omega_mt[, , , m], j) # [d, d, t]
+#      up_left <- upleft_jjmat(Omega_mtjj, j - 1) # Omega_{m,t}^(j-1) matrix (j-1 x j-1)
+#      up_right <- Omega_mtjj[1:(j - 1), j, , drop=FALSE] # (j-1 x 1) in each slice; [j-1, 1, t]
+#      low_left <- aperm(up_right, perm=c(2, 1, 3)) # Transpose each slice in up_right
+#      low_right <- Omega_mtjj[j, j, , drop=FALSE] # j,j:th element of each Omega_mt in each slice
 
-      matprod <- low_left[, , 1]%*%solve(up_left[, , 1]) # (1 x j-1) for each slice?
+      Omega_mj <- upleft_jjmat(all_Omega[, , m], j)
+      up_left <- upleft_jjmat(Omega_mj, j - 1) # (j-1 x j-1)
+      up_right <- Omega_mj[1:(j - 1), j, drop=FALSE] # (j-1 x 1)
+#      low_left <- t(up_right) # (1 x j-1 )
+      low_right <- Omega_mj[j, j] # (1 x 1)
+
+#      array(t(matrix(all_Omega[, , m], nrow=nrow(arch_scalars), ncol=d^2, byrow=TRUE)*arch_scalars[, m]), dim=c(d, d, nrow(arch_scalars)))
+      inv_Omega_j_minus_1 <- chol2inv(chol(up_left)) # Inverse of upper left (j-1 x j-1) Omega_m block matrix
+#      matprod <- matprod <- low_left%*%solve(up_left) # (1 x j-1)
+      matprod <- crossprod(up_right, inv_Omega_j_minus_1)
+
+      # Common formula for GMVAR and StMVAR type regimes
+      mu_dif_j_minus_1 <- mu_dif[, 1:(j - 1), drop=FALSE]
+      mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif_j_minus_1)) #t(matprod%*%t(mu_dif[,1:(j-1)]))
+
       variances[j, m] <- low_right - matprod%*%up_right # Conditional variance conditioned to components 1,..,j-1
-      mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif[, 1:(j - 1), drop=FALSE])) #t(matprod%*%t(mu_dif[,1:(j-1)]))
 
-      # NOTE TAKE THE arch scalars SEPARATELY OUTSIDE THE OMEGA_MT AND NEED TO INVERT OMEGAS ONLY ONCE FOR EACH J!
-      # We can use common formulas then for both types of regimes?
+      if(m <= M1) { # Constant conditional variance for GMVAR type regimes Omega_mtj [t, j, m];
+        Omega_mtj[, j, m] <- low_right - matprod%*%up_right
+      } else { # Time-varying conditional variance for StMVAR type regimes
+        # Slow formula for testing:
+        ### TÄNNE JÄI !!!!! JATKA STMVAR-REGIIMIEN  SYSTEEMIT LOPPUUN, JA JATKA SITTEN ETEENPÄIN.
+        ### HUOM: KÄYTTÄÄ YHÄ VANHAN KOODIN VARIANCES-MUUTTUJAA
 
-      if(m <= M1) { # GMVAR type regimes: Omega_mtj = Omega_mj -> much faster computation
+        # Fast formula:
+        arch_scalar2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
 
-      } else { # StMVAR type regimes: need to invert Omega_mtj for all m,t,j separately -> slow computation
-
+        # Omega_tilde^2_mt
       }
+
+
+      # Vectorized operations with arch_scalars (also, remove regime_ccovs from quantile_residuals_int and loglik to_return when it is not needed)
+
+      # HUOM: VANHA KOODI KÄYTTÄÄ MUUTUJAA VARIANCES. UUDESSA KOODISSA TÄMÄ PITÄÄ KORVATA AIKA-VARIANTILLA MUUTTUJALLA.
     }
   }
 
@@ -206,8 +233,9 @@ quantile_residuals <- function(gmvar) {
 #' @inherit quantile_residuals return references
 #' @keywords internal
 
-quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL,
+quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional, parametrization, constraints=NULL,
                                    same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+  model <- match.arg(model)
   loglik_mw_rccovs_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                                     parametrization=parametrization, constraints=constraints,
                                                     same_means=same_means, structural_pars=structural_pars,
