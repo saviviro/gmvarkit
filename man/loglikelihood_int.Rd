@@ -16,7 +16,7 @@ loglikelihood_int(
   same_means = NULL,
   structural_pars = NULL,
   to_return = c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans",
-    "total_cmeans", "total_ccovs"),
+    "regime_ccovs", "total_cmeans", "total_ccovs"),
   check_params = TRUE,
   minval = NULL,
   stat_tol = 0.001,
@@ -149,11 +149,8 @@ the following elements:
 See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
-\item{to_return}{should the returned object be the log-likelihood value, mixing weights, mixing weights including
-value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights, or
-the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Or should
-the regimewise conditional means, total conditional means, or total conditional covariance matrices
-be returned? Default is the log-likelihood value (\code{"loglik"}).}
+\item{to_return}{should the returned object be the log-likelihood value, which is default, or something else?
+See the section "Return" for all the options.}
 
 \item{check_params}{should it be checked that the parameter vector satisfies the model assumptions? Can be skipped to save
 computation time if it does for sure.}
@@ -183,6 +180,9 @@ freedom parameters are not larger than \code{2 + df_tol}.}
     second element contains the mixing weights.}
   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
    (the first p values are used as the initial values).}
+   \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+   covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
+   \code{t} conditional covariance matrix for the regime \code{m}.}
   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
    (the first p values are used as the initial values).}
   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process

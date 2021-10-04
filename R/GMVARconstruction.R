@@ -1,7 +1,7 @@
-#' @title Create a class 'gmvar' object defining a reduced form or structural GMVAR model
+#' @title Create a class 'gsmvar' object defining a reduced form or structural GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{GMVAR} creates a class \code{'gmvar'} object that defines
-#'  a reduced form or structural GMVAR model
+#' @description \code{GSMVAR} creates a class \code{'gsmvar'} object that defines
+#'  a reduced form or structural GMVAR, StMVAR, or G-StMVAR model
 #'
 #' @inheritParams loglikelihood_int
 #' @param data a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
@@ -17,10 +17,10 @@
 #'   If the function fails to calculate approximative standard errors and the parameter values are near the border
 #'   of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
 #'   definiteness conditions.
-#' @return Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
-#'   Can be used to work with other functions provided in \code{gmvarkit}.
+#' @return Returns an object of class \code{'gsmvar'} defining the specified reduced form or structural GMVAR,
+#'   StMVAR, or G-StMVAR model. Can be used to work with other functions provided in \code{gmvarkit}.
 #'
-#'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+#'   Note that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
 #' @section About S3 methods:
 #'   Only the \code{print} method is available if data is not provided.
@@ -35,6 +35,8 @@
 #'          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2109.13648.
 #'  }
 #' @examples
 #' # GMVAR(1, 2), d=2 model:
@@ -66,10 +68,10 @@
 #' mod22s
 #' @export
 
-GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL,
-                  same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
-                  stat_tol=1e-3, posdef_tol=1e-8) {
-
+GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
+                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
+                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
   if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
@@ -86,10 +88,10 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     }
   }
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  check_parameters(p=p, M=M, d=d, params=params, parametrization=parametrization, constraints=constraints,
+  check_parameters(p=p, M=M, d=d, params=params, model=model, parametrization=parametrization, constraints=constraints,
                    same_means=same_means, structural_pars=structural_pars,
-                   stat_tol=stat_tol, posdef_tol=posdef_tol)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+                   stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
 
   if(is.null(data)) {
     lok_and_mw <- list(loglik=NA, mw=NA)
@@ -97,7 +99,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
     qresiduals <- NA
   } else {
     if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model than there are observations in the data")
-    lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params,
+    lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                     conditional=conditional, parametrization=parametrization,
                                     constraints=constraints, same_means=same_means,
                                     structural_pars=structural_pars,

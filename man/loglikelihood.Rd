@@ -2,7 +2,7 @@
 % Please edit documentation in R/loglikelihood.R
 \name{loglikelihood}
 \alias{loglikelihood}
-\title{Compute log-likelihood of a GMVAR model using parameter vector}
+\title{Compute log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector}
 \usage{
 loglikelihood(
   data,
@@ -165,7 +165,7 @@ freedom parameters are not larger than \code{2 + df_tol}.}
 Returns log-likelihood if \code{params} is in the parameters space and \code{minval} if not.
 }
 \description{
-\code{loglikelihood} computes log-likelihood of a GMVAR model using parameter vector
+\code{loglikelihood} computes log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector
   instead of an object of class 'gmvar'. Exists for convenience if one wants to for example
   employ other estimation algorithms than the ones used in \code{fitGMVAR}. Use \code{minval} to
   control what happens when the parameter vector is outside the parameter space.

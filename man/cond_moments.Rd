@@ -2,20 +2,22 @@
 % Please edit documentation in R/loglikelihood.R
 \name{cond_moments}
 \alias{cond_moments}
-\title{Compute conditional moments of a GMVAR model}
+\title{Compute conditional moments of a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 cond_moments(
   data,
   p,
   M,
   params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  to_return = c("regime_cmeans", "total_cmeans", "total_ccovs"),
+  to_return = c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
   stat_tol = 0.001,
-  posdef_tol = 1e-08
+  posdef_tol = 1e-08,
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -103,6 +105,9 @@ a univariate time series. \code{NA} values are not supported.}
 
   The notation is similar to the cited literature.}
 
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
+
 \item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
 parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
@@ -148,20 +153,24 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
-\describe{
-  \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
-   (the first p values are used as the initial values).}
+\item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
+    (the first p values are used as the initial values).}
+  \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+    covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
+    \code{t} conditional covariance matrix for the regime \code{m}.}
   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
-   (the first p values are used as the initial values).}
+    (the first p values are used as the initial values).}
   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
-   (the first p values are used as the initial values).}
- }
+    (the first p values are used as the initial values).}
 }
 \description{
 \code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices
- of a GMVAR model.
+ of a GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
 The first p values are used as the initial values, and by conditional we mean conditioning on the past. Formulas

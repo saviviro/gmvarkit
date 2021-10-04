@@ -48,22 +48,35 @@ quantile_residuals <- function(gmvar) {
   structural_pars <- gmvar$model$structural_pars
   n_obs <- nrow(data)
   T_obs <- n_obs - p
+  model <- "GMVAR" ##################
 
   # Collect parameter values
   params <- gmvar$params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=gmvar$model$constraints,
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=gmvar$model$constraints,
                                     same_means=gmvar$model$same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(gmvar$model$parametrization == "mean") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
+    params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
-  all_mu <- get_regime_means(gmvar)
+  all_mu <- get_regime_means(gmvar) # TÄMÄ HIDASTAA NYT TURHAAN KOODIA QR-testeissä? noin 200 mikrosekunttia
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
+
+  if(model == "GMVAR") {
+    M1 <- M
+    M2 <- 0
+  } else if(model == "StMVAR") {
+    M1 <- 0
+    M2 <- M
+  } else { # model == "G-StMVAR"
+    M1 <- M[1]
+    M2 <- M[2]
+  }
+  M <- sum(M) # The total number of mixture components
 
   # An i:th row denotes the vector \bold{y_{i-1}} = (y_{i-1}',...,y_{i-p}') (dpx1),
   # assuming the observed data is y_{-p+1},...,y_0,y_1,...,y_{T}
@@ -82,20 +95,33 @@ quantile_residuals <- function(gmvar) {
   # using properties of marginal and conditional distributions of multinormal random variables and
   # applying them to the mixture components at each time point t.
 
-  # Compute partitions and matrix products of partioned covariance matrices Omega that will be used multiple times.
-  upleft_jjmat <- function(mat, j) mat[1:j, 1:j, drop=FALSE]
+  # Compute partitions and matrix products of partitioned covariance matrices Omega_m that will be used multiple times.
+  upleft_jjmat <- function(mat, j) mat[1:j, 1:j, drop=FALSE] # Returns upper-left (j x j) block matrix
 
-  # Storage for variances and conditional means (obtained from multinormal)
+  # Storage for variances and conditional means
+  # (obtained from properties of multinormal/multistudent for 1-dimensional conditional distribution)
   variances <- matrix(nrow=d, ncol=M) # Column per mixture component and row per component
+#  Omega_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]; time-varying for StMVAR type regimes
   mu_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]
 
-  # Calculate variances and means (both conditional for j=2,...,d) for t=1,...,T, m=1,...,M, j=1,...,d
+  # Calculate variances and means, conditional on F_{t-1} and A_{j-1}, for t=1,...,T, m=1,...,M, j=1,...,d
   dat <- data[(p + 1):nrow(data),] # Remove the initial values
   for(m in 1:M) {
-    variances[1, m] <- all_Omega[1, 1, m] # "Marginal" variance
+    # j = 1; conditional on previous observations only
+  #  if(m <= M1) { # Constant marginal conditional variance for GMVAR type regimes
+  #    Omega_mtj[, 1, m] <- all_Omega[1, 1, m]
+  #  } else { # Time varying marginal conditional variance for StMVAR type regimes
+  #
+  #  }
+    variances[1, m] <- all_Omega[1, 1, m]
     mu_dif <- dat - mu_mt[, , m] # mu_mt - y_t, t = 1,...,T
-    mu_mtj[, 1, m] <- mu_mt[, 1, m] # "Marginal" means
+    mu_mtj[, 1, m] <- mu_mt[, 1, m] # Marginal conditional means
 
+    # POINTTI TÄSSÄ JÄRJESTELYSSÄ ON SE, ETTÄ CONDITIONAL VARIANSSIT SAA GMVAR-OBJEKTISTA,EIKÄ
+    # NIITÄ TARVITSE TÄÄLLÄ ERIKSEEN LASKEA. SIKSI GMVAR-PITÄÄ PÄIVITTÄÄ ENSIN.
+    # TOISAALTA REGIME-VARIANSSEJA EI PALAUTETA VIELÄ MISSÄÄN -- PITÄÄ PÄIVITTÄÄ NE LOGLIKKIIN EKA?
+
+    # j=2,...,d; conditional on previous observations and y_{1,t},...,y_{j-1,t}
     for(j in 2:d) {
       Omega_mj <- upleft_jjmat(all_Omega[, , m], j)
       up_left <- upleft_jjmat(Omega_mj, j - 1)
@@ -176,6 +202,9 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                                   stat_tol=stat_tol, posdef_tol=posdef_tol)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
+  # VOIKO TÄÄLLÄ KUTSUA GMVARRIA JOS TEKEE ARGUMENTIN CALC_QUANTILE_RESIDUALS?
+  # VAI ONKO LOOPPI SITTEN HUONOA KOODIA?
+
   mod <- structure(list(data=data,
                         model=list(p=p,
                                    M=M,

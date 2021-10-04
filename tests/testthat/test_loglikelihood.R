@@ -549,21 +549,47 @@ test_that("user loglikelihood works correctly", {
 
 
 test_that("cond_moments works correctly", {
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="total_ccovs")[, 2, 20], c(0.01, 0.07), tolerance=1e-2)
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="regime_cmeans")[1, , 1], c(1.174027, 0.948235), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="total_cmeans")[100, ], c(1.148798, 1.424473), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="total_ccovs")[, 2, 20], c(0.1111498, 0.7780486), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="regime_cmeans")[1, , 1], c(1.174027, 0.948235), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="total_cmeans")[100, ], c(1.148798, 1.424473), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222, parametrization="intercept", to_return="total_ccovs")[1, , 200], c(1.099995625, 0.009998022), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="total_ccovs")[, 2, 20],
+               c(0.01, 0.07), tolerance=1e-2)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="regime_cmeans")[1, , 1],
+               c(1.174027, 0.948235), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="regime_ccovs")[, , 13, 1]),
+               c(0.60, 0.01, 0.01, 0.07), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="regime_ccovs")[, , 14, 1]),
+               c(0.60, 0.01, 0.01, 0.07), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112, parametrization="intercept", to_return="total_cmeans")[100, ],
+               c(1.148798, 1.424473), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="total_ccovs")[, 2, 20],
+               c(0.1111498, 0.7780486), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="regime_cmeans")[1, , 1],
+               c(1.174027, 0.948235), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="regime_ccovs")[, , 10, 1]),
+               c(8.0428623, 0.1340477, 0.1340477, 0.9383339), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112t, model="StMVAR", parametrization="intercept", to_return="total_cmeans")[100, ],
+               c(1.148798, 1.424473), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222, parametrization="intercept", to_return="total_ccovs")[1, , 200],
+               c(1.099995625, 0.009998022), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222, parametrization="intercept", to_return="total_cmeans")[1, ], c(1.2107632, 0.3326596), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="total_ccovs")[1, , 200], c(1.22552239, 0.01113919), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="total_cmeans")[1, ], c(1.2139722, 0.3329077), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="total_ccovs")[1, , 200],
+               c(1.22552239, 0.01113919), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="total_cmeans")[1, ],
+               c(1.2139722, 0.3329077), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="regime_ccovs")[ , , 13, 1]),
+               c(0.21, 0.01, 0.01, 0.03), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs, model="G-StMVAR", parametrization="intercept", to_return="regime_ccovs")[ , , 13, 2]),
+               c(1.08963687, 0.00990579, 0.00990579, 0.10896369), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=1, M=2, params=theta_122_mu, parametrization="mean", to_return="total_ccovs")[, 2, 100], c(0.005306351, 0.070671908), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222c, parametrization="intercept", constraints=C_222, to_return="total_cmeans")[13, ], c(1.3920590, 0.3398279), tolerance=1e-5)
-  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222_c2, parametrization="intercept", constraints=C_222_2, to_return="total_ccovs")[ , 2, 13], c(-0.008241019, 0.073319271), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222c, parametrization="intercept", constraints=C_222, to_return="total_cmeans")[13, ],
+               c(1.3920590, 0.3398279), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=2, params=theta_222c, parametrization="intercept", constraints=C_222, to_return="regime_ccovs")[, 2, 42, ]),
+               c(0.01, 0.03, 0.01, 0.11), tolerance=1e-5)
+  expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222_c2, parametrization="intercept", constraints=C_222_2, to_return="total_ccovs")[ , 2, 13],
+               c(-0.008241019, 0.073319271), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222t_c2, model="StMVAR", parametrization="intercept", constraints=C_222_2, to_return="total_ccovs")[ , 2, 13],
                c(-0.007235455, 0.072874057), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=2, params=theta_222t_c2, model="StMVAR", parametrization="intercept", constraints=C_222_2,
+                            to_return="regime_ccovs")[ , , 100, 1]),
+               c(1.28204272, -0.02374153, -0.02374153, 0.13057842), tolerance=1e-5)
 
 
   # Structural
@@ -577,17 +603,18 @@ test_that("cond_moments works correctly", {
                             structural_pars=list(W=W_112), to_return="total_ccovs")[, 2, 20], c(0.1111498, 0.7780486), tolerance=1e-2)
   expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112tsWC, model="StMVAR", parametrization="intercept",
                             structural_pars=list(W=W_112), to_return="regime_cmeans")[1, , 1], c(1.174027, 0.948235), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=1, M=1, params=theta_112tsWC, model="StMVAR", parametrization="intercept",
+                            structural_pars=list(W=W_112), to_return="regime_ccovs")[, , 2, 1]), c(8.3830968, 0.1397183, 0.1397183, 0.9780280), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=1, M=1, params=theta_112tsWC, model="StMVAR", parametrization="intercept",
                             structural_pars=list(W=W_112), to_return="total_cmeans")[100, ], c( 1.148798, 1.424473), tolerance=1e-5)
-
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222s, parametrization="intercept",
                             structural_pars=list(W=W_222), to_return="total_ccovs")[1, , 200], c(1.099995625, 0.009998022), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222s, parametrization="intercept",
                             structural_pars=list(W=W_222), to_return="total_cmeans")[1, ], c(1.2107632, 0.3326596), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222s_mu, parametrization="mean",
                             structural_pars=list(W=W_222), to_return="total_ccovs")[, 2, 100], c(-0.01783773, 0.08487145), tolerance=1e-5)
-
-
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=2, params=theta_222s_mu, parametrization="mean",
+                            structural_pars=list(W=W_222), to_return="regime_ccovs")[, 2, 13, ]), c(0.01, 0.03, 0.01, 0.11), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gss, model="G-StMVAR", parametrization="intercept",
                             structural_pars=list(W=W_222), to_return="total_ccovs")[1, , 200], c(2.69172894, 0.02445033), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gss, model="G-StMVAR", parametrization="intercept",
@@ -600,6 +627,9 @@ test_that("cond_moments works correctly", {
   expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gscsLAR, model="G-StMVAR", parametrization="intercept",
                             constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), to_return="total_cmeans")[13, ],
                c(1.3638536, 0.3515802), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gscsLAR, model="G-StMVAR", parametrization="intercept",
+                            constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), to_return="regime_ccovs")[ 2, , 98,]),
+               c(0.01000000, 0.03000000, 0.01573479, 0.02699613), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222_c2s, parametrization="intercept",
                             constraints=C_222_2, structural_pars=list(W=W_222c2), to_return="total_ccovs")[ , 2, 13],
                c(-0.01999998, 0.10999991), tolerance=1e-5)
@@ -629,6 +659,9 @@ test_that("cond_moments works correctly", {
   expect_equal(cond_moments(data=gdpdef, p=1, M=2, params=theta_122tcsLAR_int, model="StMVAR", same_means=list(1:2), constraints=C_122,
                             structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean", to_return="total_ccovs")[1, , 100],
                c(0.6131236874, -0.0001219459), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=1, M=2, params=theta_122tcsLAR_int, model="StMVAR", same_means=list(1:2), constraints=C_122,
+                            structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean", to_return="regime_ccovs")[2 , , 22, ]),
+               c(0.008892241, 0.053353447, -0.031536334, 0.379448757), tolerance=1e-5)
   expect_equal(cond_moments(data=200*gdpdef, p=1, M=2, params=theta_122tcsLAR_int, model="StMVAR", same_means=list(1:2), constraints=C_122,
                             structural_pars=list(W=W_122, C_lambda=C_lambda_122), parametrization="mean", to_return="regime_cmeans")[1, , 2],
                c(130.61308, 52.88054), tolerance=1e-4)
@@ -638,6 +671,9 @@ test_that("cond_moments works correctly", {
   expect_equal(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs_c2s_int, model="G-StMVAR", same_means=list(1:2), constraints=C_222_2,
                             structural_pars=list(W=W_222c2), parametrization="mean", to_return="total_ccovs")[, 2, 13],
                c(-0.01940003, 0.11024089), tolerance=1e-5)
+  expect_equal(c(cond_moments(data=gdpdef, p=2, M=c(1, 1), params=theta_222gs_c2s_int, model="G-StMVAR", same_means=list(1:2), constraints=C_222_2,
+                            structural_pars=list(W=W_222c2), parametrization="mean", to_return="regime_ccovs")[, 1, 3, ]),
+               c(1.08000000, -0.02000000, 0.97192655, 0.04417848), tolerance=1e-5)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222_int, parametrization="mean", same_means=list(1:2), to_return="total_cmeans")[13,],
                c(1.1300052, 0.3267675), tolerance=1e-4)
   expect_equal(cond_moments(data=gdpdef, p=2, M=2, params=theta_222s_int, parametrization="mean", structural_pars=list(W=W_222), same_means=list(1:2),

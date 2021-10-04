@@ -123,11 +123,8 @@
 #'   computation time if it does for sure.
 #' @param minval the value that will be returned if the parameter vector does not lie in the parameter space
 #'   (excluding the identification condition).
-#' @param to_return should the returned object be the log-likelihood value, mixing weights, mixing weights including
-#'   value for \eqn{alpha_{m,T+1}}, a list containing log-likelihood value and mixing weights, or
-#'   the terms \eqn{l_{t}: t=1,..,T} in the log-likelihood function (see \emph{KMS 2016, eq.(9)})? Or should
-#'   the regimewise conditional means, total conditional means, or total conditional covariance matrices
-#'   be returned? Default is the log-likelihood value (\code{"loglik"}).
+#' @param to_return should the returned object be the log-likelihood value, which is default, or something else?
+#'  See the section "Return" for all the options.
 #' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 #' @return
 #'   \item{By default:}{log-likelihood value of the specified GMVAR model,}
@@ -139,6 +136,9 @@
 #'     second element contains the mixing weights.}
 #'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
 #'    (the first p values are used as the initial values).}
+#'    \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+#'    covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
+#'    \code{t} conditional covariance matrix for the regime \code{m}.}
 #'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
 #'    (the first p values are used as the initial values).}
 #'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
@@ -158,7 +158,8 @@
 
 loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                               constraints=NULL, same_means=NULL, structural_pars=NULL,
-                              to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans", "total_cmeans", "total_ccovs"),
+                              to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
+                                          "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
                               check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   # Compute required values
@@ -274,9 +275,6 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   arch_scalars <- matrix(1, nrow=nrow(matprods) - 1, ncol=M) # The arch-scalars are all 1 for the GMVAR type regimes
   if(M2 > 0) {
     matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M]) # The last row is not needed because for the time t, we use the previous value y_{t-1}
-    #arch_scalars[,(M1 + 1):M] <- vapply(1:M2, function(i1) (all_df[i1] - 2 + matprods0[,i1])/(all_df[i1] - 2 + d*p), numeric(nrow(matprods0)))
-
-    # THE CODE BELOW IS FASTER! CHANGE WHEN CORRECTNESS TESTED!
     tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
     arch_scalars[,(M1 + 1):M] <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
   }
@@ -286,6 +284,10 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     return(mu_mt)
   } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
+  } else if(to_return == "regime_ccovs") {
+    regime_ccovs <- array(vapply(1:M, function(m) t(matrix(all_Omega[, , m], nrow=nrow(arch_scalars), ncol=d^2, byrow=TRUE)*arch_scalars[, m]),
+                                 numeric(d*d*nrow(arch_scalars))), dim=c(d, d, nrow(arch_scalars), M))
+    return(regime_ccovs)
   } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
     first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m]*arch_scalars[, m], each=d*d)*as.vector(all_Omega[, , m]),
                                        numeric(d*d*T_obs))), dim=c(d, d, T_obs))
@@ -453,14 +455,15 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @details The first p values are used as the initial values, and by conditional we mean conditioning on the past. Formulas
 #'   for the conditional means and covariance matrices are given in equations (3) and (4) of KMS (2016).
 #' @return
-#'  \describe{
 #'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
-#'    (the first p values are used as the initial values).}
+#'     (the first p values are used as the initial values).}
+#'   \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+#'     covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
+#'     \code{t} conditional covariance matrix for the regime \code{m}.}
 #'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
-#'    (the first p values are used as the initial values).}
+#'     (the first p values are used as the initial values).}
 #'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
-#'    (the first p values are used as the initial values).}
-#'  }
+#'     (the first p values are used as the initial values).}
 #' @inherit loglikelihood_int references
 #' @family moment functions
 #' @examples
@@ -474,7 +477,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @export
 
 cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                         structural_pars=NULL, to_return=c("regime_cmeans", "total_cmeans", "total_ccovs"),
+                         structural_pars=NULL, to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
                          stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)

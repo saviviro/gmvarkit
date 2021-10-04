@@ -10,10 +10,10 @@ swap_parametrization(gmvar)
 \item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the specified reduced form or structural GMVAR model.
-  Can be used to work with other functions provided in \code{gmvarkit}.
+Returns an object of class \code{'gsmvar'} defining the specified reduced form or structural GMVAR,
+  StMVAR, or G-StMVAR model. Can be used to work with other functions provided in \code{gmvarkit}.
 
-  Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+  Note that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
   the second one for the lag one, etc.
 }
 \description{
@@ -59,6 +59,8 @@ mod22s_2 # mean parametrization
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
 }
 \seealso{
