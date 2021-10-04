@@ -133,12 +133,17 @@ quantile_residuals <- function(gmvar) {
       low_left <- aperm(up_right, perm=c(2, 1, 3)) # Transpose each slice in up_right
       low_right <- Omega_mtjj[j, j, , drop=FALSE] # j,j:th element of each Omega_mt in each slice
 
+      matprod <- low_left[, , 1]%*%solve(up_left[, , 1]) # (1 x j-1) for each slice?
+      variances[j, m] <- low_right - matprod%*%up_right # Conditional variance conditioned to components 1,..,j-1
+      mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif[, 1:(j - 1), drop=FALSE])) #t(matprod%*%t(mu_dif[,1:(j-1)]))
+
+      # NOTE TAKE THE arch scalars SEPARATELY OUTSIDE THE OMEGA_MT AND NEED TO INVERT OMEGAS ONLY ONCE FOR EACH J!
+      # We can use common formulas then for both types of regimes?
+
       if(m <= M1) { # GMVAR type regimes: Omega_mtj = Omega_mj -> much faster computation
-        matprod <- low_left[, , 1]%*%solve(up_left[, , 1]) # (1 x j-1) for each slice?
-        variances[j, m] <- low_right - matprod%*%up_right # Conditional variance conditioned to components 1,..,j-1
-        mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif[, 1:(j - 1), drop=FALSE])) #t(matprod%*%t(mu_dif[,1:(j-1)]))
+
       } else { # StMVAR type regimes: need to invert Omega_mtj for all m,t,j separately -> slow computation
-        # NOTE TAKE THE arch scalars SEPARATELY OUTSIDE THE OMEGA_MT AND NEED TO INVERT OMEGAS ONLY ONCE FOR EACH J!
+
       }
     }
   }
