@@ -87,6 +87,8 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'   evaluation of the log-likelihood might fail and cause error.
 #' @param df_tol the parameter vector is considered to be outside the parameter space if all degrees of
 #'   freedom parameters are not larger than \code{2 + df_tol}.
+#' @param df_max the largest allowed value for a degrees of freedom parameter (extremely large values
+#'   will cause numerical problems and are not useful)
 #' @details The parameter vector in the argument \code{params} should be unconstrained and it is used for
 #'   structural models only.
 #' @return Returns \code{TRUE} if the given parameter values are in the parameter space and \code{FALSE} otherwise.
@@ -101,11 +103,12 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'  @keywords internal
 
 in_paramspace_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), all_boldA, alphas, all_Omega,
-                              W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                              W_constraints=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
 
   model <- match.arg(model)
   if(model != "GMVAR") { # Check degrees of freedom parameters for StMVAR and G-StMVAR models
-    if(any(pick_df(M=M, params=params, model=model) <= 2 + df_tol)) {
+    all_df <- pick_df(M=M, params=params, model=model)
+    if(any(all_df <= 2 + df_tol) || any(all_df > df_max)) {
       return(FALSE)
     }
   }
@@ -183,7 +186,7 @@ in_paramspace_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StM
 #' @export
 
 in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
-                          structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                          structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
   model <- match.arg(model)
   check_pMd(p=p, M=M, d=d, model=model)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
@@ -198,7 +201,7 @@ in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"
   in_paramspace_int(p=p, M=M, d=d, params=params, model=model, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
                     alphas=pick_alphas(p=p, M=M, d=d, params=params, model=model),
                     all_Omega=pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars),
-                    W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
+                    W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
 }
 
 
@@ -249,12 +252,14 @@ in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"
 
 check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
                              constraints=NULL, same_means=NULL, structural_pars=NULL,
-                             stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                             stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
   model <- match.arg(model)
   check_pMd(p=p, M=M, d=d, model=model)
   if(model != "GMVAR") { # Check degrees of freedom parameters for StMVAR and G-StMVAR models
     if(any(pick_df(M=M, params=params, model=model) <= 2 + df_tol)) {
       stop("The degrees of freedom parameters are not strictly larger than two (with large enough numerical tolerance)")
+    } else if(any(pick_df(M=M, params=params, model=model) > df_max)) {
+      stop("The degrees of freedom parameters should not be extremely large (they cause numerical problems)")
     }
   }
   M_orig <- M

@@ -70,7 +70,7 @@
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
-                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, max_df=1e+5) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
@@ -139,14 +139,15 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
     total_cmeans <- NA
     total_ccovs <- NA
   } else {
-    get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params,
+    get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                                     conditional=conditional, parametrization=parametrization,
                                                     constraints=constraints, same_means=same_means,
                                                     structural_pars=structural_pars,
                                                     check_params=TRUE,
                                                     to_return=to_return, minval=NA,
-                                                    stat_tol=stat_tol, posdef_tol=posdef_tol)
+                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
     regime_cmeans <- get_cm("regime_cmeans")
+    regime_ccovs <- get_cm("regime_ccovs")
     total_cmeans <- get_cm("total_cmeans")
     total_ccovs <- get_cm("total_ccovs")
   }
@@ -164,6 +165,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                  std_errors=std_errors,
                  mixing_weights=lok_and_mw$mw,
                  regime_cmeans=regime_cmeans,
+                 regime_ccovs=regime_ccovs,
                  total_cmeans=total_cmeans,
                  total_ccovs=total_ccovs,
                  quantile_residuals=qresiduals,

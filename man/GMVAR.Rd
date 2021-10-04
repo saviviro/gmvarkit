@@ -26,7 +26,8 @@ GMVAR(
   calc_std_errors = FALSE,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
-  df_tol = 1e-08
+  df_tol = 1e-08,
+  max_df = 1e+05
 )
 
 \method{logLik}{gmvar}(object, ...)

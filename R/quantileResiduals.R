@@ -194,16 +194,14 @@ quantile_residuals <- function(gmvar) {
 #' @keywords internal
 
 quantile_residuals_int <- function(data, p, M, params, conditional, parametrization, constraints=NULL,
-                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8) {
+                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, max_df=1e+5) {
   lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional,
                                   parametrization=parametrization, constraints=constraints,
                                   same_means=same_means, structural_pars=structural_pars,
                                   to_return="loglik_and_mw", check_params=TRUE, minval=NA,
-                                  stat_tol=stat_tol, posdef_tol=posdef_tol)
+                                  stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, max_df=max_df)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, constraints=constraints)
-  # VOIKO TÄÄLLÄ KUTSUA GMVARRIA JOS TEKEE ARGUMENTIN CALC_QUANTILE_RESIDUALS?
-  # VAI ONKO LOOPPI SITTEN HUONOA KOODIA?
 
   mod <- structure(list(data=data,
                         model=list(p=p,
@@ -217,6 +215,13 @@ quantile_residuals_int <- function(data, p, M, params, conditional, parametrizat
                         params=params,
                         std_errors=rep(NA, npars),
                         mixing_weights=lok_and_mw$mw,
+                        regime_ccovs=loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
+                                                       conditional=conditional, parametrization=parametrization,
+                                                       constraints=constraints, same_means=same_means,
+                                                       structural_pars=structural_pars,
+                                                       check_params=TRUE,
+                                                       to_return=to_return, minval=NA,
+                                                       stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, max_df=max_df),
                         quantile_residuals=NA,
                         loglik=structure(lok_and_mw$loglik,
                                          class="logLik",

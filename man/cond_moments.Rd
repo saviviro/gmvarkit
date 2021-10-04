@@ -17,7 +17,8 @@ cond_moments(
   to_return = c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
   stat_tol = 0.001,
   posdef_tol = 1e-08,
-  df_tol = 1e-08
+  df_tol = 1e-08,
+  df_max = 1e+05
 )
 }
 \arguments{
@@ -156,6 +157,9 @@ evaluation of the log-likelihood might fail and cause error.}
 
 \item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
 freedom parameters are not larger than \code{2 + df_tol}.}
+
+\item{df_max}{the largest allowed value for a degrees of freedom parameter (extremely large values
+will cause numerical problems and are not useful)}
 }
 \value{
 \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means

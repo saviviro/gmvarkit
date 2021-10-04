@@ -16,7 +16,8 @@ check_parameters(
   structural_pars = NULL,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
-  df_tol = 1e-08
+  df_tol = 1e-08,
+  df_max = 1e+05
 )
 }
 \arguments{
@@ -151,6 +152,9 @@ evaluation of the log-likelihood might fail and cause error.}
 
 \item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
 freedom parameters are not larger than \code{2 + df_tol}.}
+
+\item{df_max}{the largest allowed value for a degrees of freedom parameter (extremely large values
+will cause numerical problems and are not useful)}
 }
 \value{
 Throws an informative error if there is something wrong with the parameter vector.
