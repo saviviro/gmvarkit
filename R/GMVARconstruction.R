@@ -74,7 +74,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
-  if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers")
+  if(!all_pos_ints(c(p, M))) stop("Arguments p and M must be positive integers") ###### !!!!!
   if(missing(data) & missing(d)) stop("data or d must be provided")
   if(missing(data) || is.null(data)) {
     data <- NULL
@@ -106,11 +106,11 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                     to_return="loglik_and_mw",
                                     check_params=FALSE, minval=NA,
                                     stat_tol=stat_tol, posdef_tol=posdef_tol)
-    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params,
+    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, model=model,
                                          conditional=conditional, parametrization=parametrization,
                                          constraints=constraints, same_means=same_means,
                                          structural_pars=structural_pars, stat_tol=stat_tol,
-                                         posdef_tol=posdef_tol)
+                                         posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
@@ -119,7 +119,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
       warning("Approximate standard errors can't be calculated")
       std_errors <- rep(NA, npars)
     } else {
-      std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params,
+      std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, model=model,
                                              conditional=conditional, parametrization=parametrization,
                                              constraints=constraints, same_means=same_means,
                                              structural_pars=structural_pars,
@@ -135,11 +135,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
   }
   if(calc_cond_moments == FALSE || is.null(data)) {
     if(calc_cond_moments) warning("Conditional moments can't be calculated without data")
-    regime_cmeans <- NA
-    regime_cmeans <- NA
-    total_cmeans <- NA
-    total_ccovs <- NA
-    arch_scalars <- NA
+    regime_cmeans <- regime_ccovs <- total_cmeans <- total_ccovs <- arch_scalars <- NA
   } else {
     get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                                     conditional=conditional, parametrization=parametrization,
@@ -160,6 +156,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                  model=list(p=p,
                             M=M,
                             d=d,
+                            model=model,
                             conditional=conditional,
                             parametrization=parametrization,
                             constraints=constraints,
@@ -178,7 +175,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                   class="logLik",
                                   df=npars),
                  IC=IC,
-                 uncond_moments=uncond_moments_int(p=p, M=M, d=d, params=params,
+                 uncond_moments=uncond_moments_int(p=p, M=M, d=d, params=params, model=model,
                                                    parametrization=parametrization,
                                                    constraints=constraints,
                                                    same_means=same_means,

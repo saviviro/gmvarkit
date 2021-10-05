@@ -9,9 +9,10 @@
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
-standard_errors <- function(data, p, M, params, conditional=TRUE, parametrization=c("intercept", "mean"),
+standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                             constraints=NULL, same_means=NULL, structural_pars=NULL, minval,
                             stat_tol=1e-3, posdef_tol=1e-8) {
+  model <- match.arg(model)
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {

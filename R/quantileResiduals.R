@@ -44,11 +44,11 @@ quantile_residuals <- function(gmvar) {
   p <- gmvar$model$p
   M <- gmvar$model$M
   d <- gmvar$model$d
+  model <- gmvar$model$model
   data <- gmvar$data
   structural_pars <- gmvar$model$structural_pars
   n_obs <- nrow(data)
   T_obs <- n_obs - p
-  model <- "GMVAR" ##################
 
   # Collect parameter values
   params <- gmvar$params
@@ -59,7 +59,7 @@ quantile_residuals <- function(gmvar) {
     params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
-  all_mu <- get_regime_means(gmvar) # TÄMÄ HIDASTAA NYT TURHAAN KOODIA QR-testeissä? noin 200 mikrosekunttia
+  all_mu <- get_regime_means(gmvar)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -92,9 +92,6 @@ quantile_residuals <- function(gmvar) {
   Y2 <- Y[1:T_obs,] # Last row is not needed because mu_mt uses lagged values
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
 
-  # Regimewise conditional (d x d) covariance matrices Omega_{m,t}
-  Omega_mt <- gmvar$regime_ccovs # [, , t, m]
-
   # The arch scalars multiplying the error covariance matrices (ones for GMVAR type regimes)
   arch_scalars <- gmvar$arch_scalars
 
@@ -107,11 +104,8 @@ quantile_residuals <- function(gmvar) {
 
   # Storage for variances and conditional means
   # (obtained from properties of multinormal/multistudent for 1-dimensional conditional distribution)
-  variances <- matrix(nrow=d, ncol=M) # Column per mixture component and row per component
   Omega_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]; time-varying for StMVAR type regimes, conditional on F_{t-1} and A_{j-1}
   mu_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m], conditional on F_{t-1} and A_{j-1}
-
-  # POISTA REGIME_CCOVS KOKONAAN POIS KOKO PASKASTA, KOSKA SAMAT LASKUT TEHDÄÄN TÄÄLLÄ AR-COEFFEISTA?
 
   # Inverses of the upper-left (j-1 x j-1) blocks of Omega; and logarithms of the determinants of the non-inverted block matrices
   all_inv_Omega_j_minus_1 <- array(dim=c(d-1, d-1, d-1, M)) # [d, d, j-1, m], inverses to be filled in the upper-left (j-1 x j-1) block
@@ -121,8 +115,6 @@ quantile_residuals <- function(gmvar) {
   dat <- data[(p + 1):nrow(data),] # Remove the initial values
   for(m in 1:M) {
     # j = 1; conditional on previous observations only
-    variances[1, m] <- all_Omega[1, 1, m] # "Marginal" variance
-
     Omega_mtj[, 1, m] <- arch_scalars[,m]*all_Omega[1, 1, m]
     mu_mtj[, 1, m] <- mu_mt[, 1, m] # Marginal conditional means
     mu_dif <- dat - mu_mt[, , m] # mu_mt - y_t, t = 1,...,T
@@ -130,7 +122,7 @@ quantile_residuals <- function(gmvar) {
 
     # j=2,...,d; conditional on previous observations and y_{1,t},...,y_{j-1,t}
     for(j in 2:d) {
-      Omega_mj <- upleft_jjmat(all_Omega[, , m], j)
+      Omega_mj <- upleft_jjmat(all_Omega[, , m], j) # (j x j)
       up_left <- upleft_jjmat(Omega_mj, j - 1) # (j-1 x j-1)
       up_right <- Omega_mj[1:(j - 1), j, drop=FALSE] # (j-1 x 1)
       low_right <- Omega_mj[j, j] # (1 x 1)
@@ -144,30 +136,14 @@ quantile_residuals <- function(gmvar) {
       mu_dif_j_minus_1 <- mu_dif[, 1:(j - 1), drop=FALSE]
       mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif_j_minus_1))
 
-      variances[j, m] <- low_right - matprod%*%up_right # Conditional variance conditioned to components 1,..,j-1
-
-
       if(m <= M1) { # Constant conditional variance for GMVAR type regimes Omega_mtj [t, j, m];
         Omega_mtj[, j, m] <- low_right - matprod%*%up_right
       } else { # Time-varying conditional variance for StMVAR type regimes
-        # Slow formula for testing:
-        arch_scalars2 <- numeric(nrow(arch_scalars))
-        for(i1 in 1:length(arch_scalars2)) {
-          arch_scalars2[i1] <- (all_df[m - M1] + d*p + arch_scalars[i1, m]^(-1)*crossprod(mu_dif_j_minus_1[i1,], inv_Omega_j_minus_1)%*%mu_dif_j_minus_1[i1,])/(all_df[m - M1] + d*p + j - 3)
-        }
-        # Fast formula:
-        #arch_scalars2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
-
+        arch_scalars2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
         Omega_mtj[, j, m] <- arch_scalars2*arch_scalars[,m]*c(low_right - matprod%*%up_right)
       }
-      # KUN TESTATTU! POISTA HIDAS LOOPPI JA VAIHDA NOPEAMPAAN KAAVAAN!
-
-      # Vectorized operations with arch_scalars (also, remove regime_ccovs from quantile_residuals_int and loglik to_return when it is not needed)
-
-      # HUOM: VANHA KOODI KÄYTTÄÄ MUUTUJAA VARIANCES. UUDESSA KOODISSA TÄMÄ PITÄÄ KORVATA AIKA-VARIANTILLA MUUTTUJALLA.
     }
   }
-  # HUOM HUOM! ALLA KÄÄNNETÄÄN OMEGA J-1:SET UUDESTAAN! NE KANNATTAISI SÄILÖÄ JONNEKIN JA KÄYTTÄÄ SUORAAN UUSIKSI
 
   # Calculate beta_{m,t,j} for j=2,...,d (Virolainen 2021, eq. (2.6),(2.7) unpublished work paper)
   beta_mtj <- array(dim=c(T_obs, M, d)) # [t, m, j] j=1,...,d
@@ -223,33 +199,35 @@ quantile_residuals <- function(gmvar) {
     } else { # StMVAR type regimes
       # Function for numerical integration of the Student's t pdf (when closed form expression if not available)
       my_integral <- function(t) { # Takes the observation index t (1,...,T) as formal argument and the rest from parent frame
-        f_mt <- function(y_t) { # The conditional density function to be integrated numerically;
-          C0/sqrt(Omega_mtj[t, j, m])*
-            (1 + ((y_t - mu_mt[t, j, m])^2)/(Omega_mtj[t, j, m]*(df - 2)))^(-0.5*(1 + df))
-        }
-        tryCatch(integrate(f_mt, lower=-Inf, upper=dat[t, j])$value, # Integrate PDF numerically
-                 error=function(e) {
-                   warning("Couldn't analytically nor numerically integrate all quantile residuals:")
-                   warning(e)
-                   return(NA)
-                 })
+        tryCatch(integrate(function(y_t) { # The conditional density function to be integrated numerically;
+          C0/sqrt(Omega_mtj[t, j, m])*(1 + ((y_t - mu_mtj[t, j, m])^2)/(Omega_mtj[t, j, m]*(df - 2)))^(-0.5*(1 + df))
+        }, lower=-Inf, upper=dat[t, j])$value,
+        error=function(e) {
+          warning("Couldn't analytically nor numerically integrate all quantile residuals:")
+          warning(e)
+          return(NA)
+        })
       }
-      # HUOM TESTAILE INTEGROINTI LAITTAMALLA WHICH_DEF = KIINTEÄ tai NUMERIC(0)
 
       # Go through dimensions
       for(j in 1:d) {
         df <- all_df[m - M1] + d*p + j - 1
         which_def <- which(abs(ydiff[,j]) < sqrt(Omega_mtj[, j, m]*(df - 2)))
-        which_not_def <- (1:nrow(ydiff))[-which_def]
+        if(length(which_def) > 0) {
+          which_not_def <- (1:nrow(ydiff))[-which_def]
+        } else {
+          which_not_def <- 1:nrow(ydiff)
+        }
         C0 <- exp(lgamma(0.5*(1 + df)) - 0.5*log(base::pi) - 0.5*log(df - 2) - lgamma(0.5*df))
 
         # Calculate CDF values using hypergeometric function whenever it is defined
         if(length(which_def) > 0) {
           ydiff0 <- ydiff[which_def, j]
           F_values_regime[which_def, j, m] <- 0.5 + C0/sqrt(Omega_mtj[which_def, j, m])*ydiff0*gsl::hyperg_2F1(a=0.5, b=0.5*(1 + df), c=1.5,
-                                                                                                               x=-(ydiff0^2)/(Omega_mtj[which_def, j, m]*(df - 2)),
+                                                                                                              x=-(ydiff0^2)/(Omega_mtj[which_def, j, m]*(df - 2)),
                                                                                                                give=FALSE, strict=TRUE)
         }
+
         # Calculate CDF values by numerically integrating the t-densities whenever hypergeometric function is not defined
         if(length(which_not_def) > 0) {
           for(t in which_not_def) {
@@ -260,10 +238,7 @@ quantile_residuals <- function(gmvar) {
     }
   }
 
-  # Then calculate (y_{i_j,t} - mu_mtj)/sqrt(Omega_mtj) for m=1,...,M, t=1,...,T, j=1,...,d
-#  points_mtj <- array(vapply(1:M, function(m) t(t(dat - mu_mtj[, , m])/sqrt(variances[, m])),
- #                     numeric(d*T_obs)), dim=c(T_obs, d, M))
-
+  # Then calculate the conditional (marginal) CDFs of the process
   F_values <- vapply(1:d, function(j) rowSums(as.matrix(beta_mtj[, , j]*F_values_regime[, j, ])), numeric(T_obs))
 
   # Values too close to 0 or 1 will be scaled so that qnorm doesn't return inf-values
@@ -288,18 +263,19 @@ quantile_residuals <- function(gmvar) {
 quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional, parametrization, constraints=NULL,
                                    same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
   model <- match.arg(model)
-  loglik_mw_rccovs_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
-                                                    parametrization=parametrization, constraints=constraints,
-                                                    same_means=same_means, structural_pars=structural_pars,
-                                                    to_return="loglik_mw_rccovs_archscalars", check_params=TRUE, minval=NA,
-                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+  loglik_mw_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
+                                             parametrization=parametrization, constraints=constraints,
+                                             same_means=same_means, structural_pars=structural_pars,
+                                             to_return="loglik_mw_archscalars", check_params=TRUE, minval=NA,
+                                             stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
   d <- ncol(data)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints)
 
   mod <- structure(list(data=data,
                         model=list(p=p,
                                    M=M,
                                    d=ncol(data),
+                                   model=model,
                                    conditional=conditional,
                                    parametrization=parametrization,
                                    constraints=constraints,
@@ -307,11 +283,10 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
                                    structural_pars=structural_pars),
                         params=params,
                         std_errors=rep(NA, npars),
-                        mixing_weights=loglik_mw_rccovs_archscalars$mw,
-                        regime_ccovs=loglik_mw_rccovs_archscalars$regime_ccovs,
-                        arch_scalars=loglik_mw_rccovs_archscalars$arch_scalars,
+                        mixing_weights=loglik_mw_archscalars$mw,
+                        arch_scalars=loglik_mw_archscalars$arch_scalars,
                         quantile_residuals=NA,
-                        loglik=structure(loglik_mw_rccovs_archscalars$loglik,
+                        loglik=structure(loglik_mw_archscalars$loglik,
                                          class="logLik",
                                          df=npars),
                         IC=NA,
@@ -343,7 +318,7 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
 #' @keywords internal
 
 dlogmultinorm <- function(y, mu, inv_Omega, log_det_Omega) {
-  tmp <- -0.5*ncol(y)*log(2*pi) - 0.5*log_det_Omega
+  tmp <- -0.5*ncol(y)*log(2*base::pi) - 0.5*log_det_Omega
   ymu <- y - mu
   tmp - 0.5*rowSums(ymu%*%inv_Omega*ymu)
 }
@@ -367,5 +342,5 @@ dlogmultistudent <- function(y, mu, inv_Omega, log_det_Omega, arch_scalars, df) 
   logC <- lgamma(0.5*(ncol(y) + df)) - 0.5*ncol(y)*log(base::pi) - 0.5*ncol(y)*log(df - 2) - lgamma(0.5*df)
   tmp <- -0.5*ncol(y)*log(arch_scalars) - 0.5*log_det_Omega
   ymu <- y - mu
-  logC + tmp - 0.5*(ncol(y) + df)*(1 + rowSums(ymu%*%inv_Omega*ymu)/(arch_scalars*(df - 2)))
+  logC + tmp - 0.5*(ncol(y) + df)*log(1 + rowSums(ymu%*%inv_Omega*ymu)/(arch_scalars*(df - 2)))
 }

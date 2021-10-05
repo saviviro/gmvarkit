@@ -146,8 +146,8 @@
 #'   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
 #'    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
 #'    are all ones (the first p values are used as the initial values).}
-#'   \item{if \code{to_return=="loglik_mw_rccovs_archscalars"}:}{a list of four elements. The first element contains the log-likelihood value, the
-#'     second element contains the mixing weights, the third element contains the regime ccovs, and the last element contains the arch scalars
+#'   \item{if \code{to_return=="loglik_mw_archscalars"}:}{a list of three elements. The first element contains the log-likelihood value, the
+#'     second element contains the mixing weights, the third element contains the arch scalars
 #'     (this is used in \code{quantile_residuals_int}).}
 #' @references
 #'  \itemize{
@@ -166,7 +166,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
                               constraints=NULL, same_means=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
                                           "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
-                                          "arch_scalars", "loglik_mw_rccovs_archscalars"),
+                                          "arch_scalars", "loglik_mw_archscalars"),
                               check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
 
   # Compute required values
@@ -293,12 +293,10 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     return(arch_scalars)
   } else if(to_return == "total_cmeans") { # KMS 2016, eq.(3)
     return(matrix(rowSums(vapply(1:M, function(m) alpha_mt[,m]*mu_mt[, , m], numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE))
-  } else if(to_return == "regime_ccovs" || to_return == "loglik_mw_rccovs_archscalars") {
+  } else if(to_return == "regime_ccovs") {
     regime_ccovs <- array(vapply(1:M, function(m) t(matrix(all_Omega[, , m], nrow=nrow(arch_scalars), ncol=d^2, byrow=TRUE)*arch_scalars[, m]),
                                  numeric(d*d*nrow(arch_scalars))), dim=c(d, d, nrow(arch_scalars), M))
-    if(to_return == "regime_ccovs") {
-      return(regime_ccovs)
-    }
+    return(regime_ccovs)
   } else if(to_return == "total_ccovs") { # KMS 2016, eq.(4)
     first_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m]*arch_scalars[, m], each=d*d)*as.vector(all_Omega[, , m]),
                                        numeric(d*d*T_obs))), dim=c(d, d, T_obs))
@@ -338,10 +336,9 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   } else if(to_return == "loglik_and_mw") {
     return(list(loglik=loglik,
                 mw=alpha_mt))
-  } else if(to_return == "loglik_mw_rccovs_archscalars") {
+  } else if(to_return == "loglik_mw_archscalars") {
     return(list(loglik=loglik,
                 mw=alpha_mt,
-                regime_ccovs=regime_ccovs,
                 arch_scalars=arch_scalars))
   } else { # to_return == "loglik"
     return(loglik)

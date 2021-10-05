@@ -17,7 +17,7 @@ loglikelihood_int(
   structural_pars = NULL,
   to_return = c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans",
     "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars",
-    "loglik_mw_rccovs_archscalars"),
+    "loglik_mw_archscalars"),
   check_params = TRUE,
   minval = NULL,
   stat_tol = 0.001,
@@ -195,8 +195,8 @@ will cause numerical problems and are not useful)}
   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
    are all ones (the first p values are used as the initial values).}
-  \item{if \code{to_return=="loglik_mw_rccovs_archscalars"}:}{a list of four elements. The first element contains the log-likelihood value, the
-    second element contains the mixing weights, the third element contains the regime ccovs, and the last element contains the arch scalars
+  \item{if \code{to_return=="loglik_mw_archscalars"}:}{a list of three elements. The first element contains the log-likelihood value, the
+    second element contains the mixing weights, the third element contains the arch scalars
     (this is used in \code{quantile_residuals_int}).}
 }
 \description{
