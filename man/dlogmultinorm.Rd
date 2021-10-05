@@ -5,15 +5,17 @@
 \title{Calculate logarithms of multiple multivariate normal densities with varying
  mean and constant covariance matrix}
 \usage{
-dlogmultinorm(y, mu, Omega)
+dlogmultinorm(y, mu, inv_Omega, log_det_Omega)
 }
 \arguments{
-\item{y}{dimension \eqn{(T x k)} matrix where each row is a k-dimensional random vector}
+\item{y}{dimension \eqn{(T x k)} matrix where each row is a k-dimensional vector}
 
 \item{mu}{dimension \eqn{(T x k)} matrix where each row is the mean of the k-dimensional
-random vector in corresponding row of \code{y}.}
+vector in corresponding row of \code{y}.}
 
-\item{Omega}{the \eqn{(k x k)} covariance matrix Omega.}
+\item{inv_Omega}{inverse of the \eqn{(k x k)} covariance matrix Omega.}
+
+\item{log_det_Omega}{logarithm of the determinant of the covariance matrix Omega.}
 }
 \value{
 Returns a size \eqn{(T x 1)} vector containing the multinormal densities in logarithm.

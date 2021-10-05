@@ -75,7 +75,14 @@ mod_222c <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, pa
 
 # p=3, M=2, d=3, no constraints, rand_ind and simulated data
 set.seed(42)
-theta_323 <- random_ind2(p=3, M=2, d=3, mu_scale=c(-10, 0, 5), mu_scale2=1:3, omega_scale=1:3, ar_scale=1)
+# theta_323 <- random_ind2(p=3, M=2, d=3, mu_scale=c(-10, 0, 5), mu_scale2=1:3, omega_scale=1:3, ar_scale=1)
+theta_323 <- c(-8.62904, -1.1294, 6.08939, 0.30181, -0.01918, 0.20814, 2.09997, -0.76256, 0.34977, 1.08522, 0.1862, 0.56666,
+               -0.20946, -0.19745, 0.41976, 0.37882, 0.36577, -0.64832, -1.56472, 0.62412, 0.67048, -0.21841, -0.34758,
+               0.38573, 0.28527, 0.09343, -0.55505, -0.76295, 0.16713, -0.30743, 1.00487, 0.84722, 0.50618, 2.21109, -1.67388,
+               3.40942, -10.78446, -1.70182, -2.24262, 0.72048, -0.12182, 0.60088, 0.32822, -0.04847, -0.83748, -0.89225,
+               -1.14077, -0.29568, -0.61784, -0.36704, -0.79401, -0.92552, 0.51123, -0.52166, -0.45825, -0.24572, 0.3612,
+               -0.10096, -0.58217, 0.17453, -0.19763, -0.2274, 0.77741, 1.09703, 1.24502, 0.74678, 0.90936, 0.71689, -0.086,
+               2.57044, 0.81515, 0.45869, 0.84737)
 mod_323 <- GMVAR(p=3, M=2, d=3, params=theta_323, conditional=FALSE, parametrization="mean", constraints=NULL)
 sim_323 <- simulateGMVAR(mod_323, nsimu=500)$sample
 mod_323 <- add_data(data=sim_323, gmvar=mod_323)
@@ -117,10 +124,16 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res_222c[1,], c(-1.3793624, 0.1456127), tolerance=1e-6)
   expect_equal(res_222c[100,], c(0.5482568, -0.2830299), tolerance=1e-6)
 
-  expect_equal(res_323[1,], c(-0.04254252, 0.37966523, -1.43671034), tolerance=1e-6)
-  expect_equal(res_323[13,], c(-1.1160317, -0.1883617, -0.4064072), tolerance=1e-6)
-  expect_equal(res_323[150,], c(0.09401363, 0.44800577, 1.11962898), tolerance=1e-6)
-  expect_equal(res_323[497,], c(0.3658767, 0.4336302, -0.6696751), tolerance=1e-6)
+#  expect_equal(res_323[1,], c(-0.04254252, 0.37966523, -1.43671034), tolerance=1e-6)
+#  expect_equal(res_323[13,], c(-1.1160317, -0.1883617, -0.4064072), tolerance=1e-6)
+#  expect_equal(res_323[150,], c(0.09401363, 0.44800577, 1.11962898), tolerance=1e-6)
+#  expect_equal(res_323[497,], c(0.3658767, 0.4336302, -0.6696751), tolerance=1e-6)
+
+  expect_equal(res_323[1,], c(1.2789657, -0.4454311, 2.1568430), tolerance=1e-6)
+  expect_equal(res_323[13,], c(0.9090539, 0.7672014, 1.4780458), tolerance=1e-6)
+  expect_equal(res_323[150,], c(1.4215695, 0.6164883, 0.8540793), tolerance=1e-6)
+  expect_equal(res_323[497,], c(0.4797046, -0.7006484, 0.7415371), tolerance=1e-6)
+
 
   expect_equal(res_142_int[122:125, 1], c(-0.2421819, -0.7722385, 1.0008730, -0.9905129), tolerance=1e-6)
   expect_equal(res_142_int[12:15, 2], c(0.4100877, -2.2630865, -0.6945604, -0.9637667), tolerance=1e-6)

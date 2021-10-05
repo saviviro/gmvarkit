@@ -14,7 +14,8 @@ cond_moments(
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  to_return = c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs"),
+  to_return = c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
+    "arch_scalars"),
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08,
@@ -171,6 +172,9 @@ will cause numerical problems and are not useful)}
     (the first p values are used as the initial values).}
   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
     (the first p values are used as the initial values).}
+  \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
+   multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
+   are all ones (the first p values are used as the initial values).}
 }
 \description{
 \code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices

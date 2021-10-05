@@ -98,13 +98,6 @@ quantile_residuals <- function(gmvar) {
   # The arch scalars multiplying the error covariance matrices (ones for GMVAR type regimes)
   arch_scalars <- gmvar$arch_scalars
 
-  #Omega_mt <- loglikelihood_int(data=data, p=p, M=c(1, 1), params=params, model=model,
-  #                  conditional=conditional, parametrization=parametrization,
-  #                  constraints=constraints, same_means=same_means,
-  #                  structural_pars=structural_pars,
-  #                  check_params=TRUE,
-  #                  to_return="regime_ccovs")
-
   ## Start computing the multivariate quantile residuals (Kalliovirta and Saikkonen 2010, eq.(4))
   # using properties of marginal and conditional distributions of multinormal random variables and
   # applying them to the mixture components at each time point t.
@@ -115,10 +108,14 @@ quantile_residuals <- function(gmvar) {
   # Storage for variances and conditional means
   # (obtained from properties of multinormal/multistudent for 1-dimensional conditional distribution)
   variances <- matrix(nrow=d, ncol=M) # Column per mixture component and row per component
-  Omega_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]; time-varying for StMVAR type regimes
-  mu_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]
+  Omega_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m]; time-varying for StMVAR type regimes, conditional on F_{t-1} and A_{j-1}
+  mu_mtj <- array(dim=c(T_obs, d, M)) # [t, j, m], conditional on F_{t-1} and A_{j-1}
 
   # POISTA REGIME_CCOVS KOKONAAN POIS KOKO PASKASTA, KOSKA SAMAT LASKUT TEHDÄÄN TÄÄLLÄ AR-COEFFEISTA?
+
+  # Inverses of the upper-left (j-1 x j-1) blocks of Omega; and logarithms of the determinants of the non-inverted block matrices
+  all_inv_Omega_j_minus_1 <- array(dim=c(d-1, d-1, d-1, M)) # [d, d, j-1, m], inverses to be filled in the upper-left (j-1 x j-1) block
+  log_det_Omega_j_minus_1 <- matrix(nrow=d-1, ncol=M) # [j-1, M]
 
   # Calculate 1-dimensional conditional variances and means, conditional on F_{t-1} and A_{j-1}, for t=1,...,T, m=1,...,M, and j=1,...,d
   dat <- data[(p + 1):nrow(data),] # Remove the initial values
@@ -130,89 +127,144 @@ quantile_residuals <- function(gmvar) {
     mu_mtj[, 1, m] <- mu_mt[, 1, m] # Marginal conditional means
     mu_dif <- dat - mu_mt[, , m] # mu_mt - y_t, t = 1,...,T
 
+
     # j=2,...,d; conditional on previous observations and y_{1,t},...,y_{j-1,t}
     for(j in 2:d) {
-#      Omega_mtjj <- upleft_jjmat(Omega_mt[, , , m], j) # [d, d, t]
-#      up_left <- upleft_jjmat(Omega_mtjj, j - 1) # Omega_{m,t}^(j-1) matrix (j-1 x j-1)
-#      up_right <- Omega_mtjj[1:(j - 1), j, , drop=FALSE] # (j-1 x 1) in each slice; [j-1, 1, t]
-#      low_left <- aperm(up_right, perm=c(2, 1, 3)) # Transpose each slice in up_right
-#      low_right <- Omega_mtjj[j, j, , drop=FALSE] # j,j:th element of each Omega_mt in each slice
-
       Omega_mj <- upleft_jjmat(all_Omega[, , m], j)
       up_left <- upleft_jjmat(Omega_mj, j - 1) # (j-1 x j-1)
       up_right <- Omega_mj[1:(j - 1), j, drop=FALSE] # (j-1 x 1)
-#      low_left <- t(up_right) # (1 x j-1 )
       low_right <- Omega_mj[j, j] # (1 x 1)
 
-#      array(t(matrix(all_Omega[, , m], nrow=nrow(arch_scalars), ncol=d^2, byrow=TRUE)*arch_scalars[, m]), dim=c(d, d, nrow(arch_scalars)))
-      inv_Omega_j_minus_1 <- chol2inv(chol(up_left)) # Inverse of upper left (j-1 x j-1) Omega_m block matrix
-#      matprod <- matprod <- low_left%*%solve(up_left) # (1 x j-1)
-      matprod <- crossprod(up_right, inv_Omega_j_minus_1)
+      chol_up_left <- chol(up_left)
+      all_inv_Omega_j_minus_1[1:(j-1), 1:(j-1), j-1, m] <- inv_Omega_j_minus_1 <- chol2inv(chol_up_left) # Inverse of upper left (j-1 x j-1) Omega_m block matrix
+      log_det_Omega_j_minus_1[j-1, m] <- 2*log(prod(diag(chol_up_left))) # Log of the determinant of inverse of upper left (j-1 x j-1) Omega_m block matrix
+      matprod <- crossprod(up_right, inv_Omega_j_minus_1) # (1 x j-1)
 
       # Common formula for GMVAR and StMVAR type regimes
       mu_dif_j_minus_1 <- mu_dif[, 1:(j - 1), drop=FALSE]
-      mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif_j_minus_1)) #t(matprod%*%t(mu_dif[,1:(j-1)]))
+      mu_mtj[, j, m] <- mu_mt[, j, m] + t(tcrossprod(matprod, mu_dif_j_minus_1))
 
       variances[j, m] <- low_right - matprod%*%up_right # Conditional variance conditioned to components 1,..,j-1
+
 
       if(m <= M1) { # Constant conditional variance for GMVAR type regimes Omega_mtj [t, j, m];
         Omega_mtj[, j, m] <- low_right - matprod%*%up_right
       } else { # Time-varying conditional variance for StMVAR type regimes
         # Slow formula for testing:
-        ### TÄNNE JÄI !!!!! JATKA STMVAR-REGIIMIEN  SYSTEEMIT LOPPUUN, JA JATKA SITTEN ETEENPÄIN.
-        ### HUOM: KÄYTTÄÄ YHÄ VANHAN KOODIN VARIANCES-MUUTTUJAA
-
+        arch_scalars2 <- numeric(nrow(arch_scalars))
+        for(i1 in 1:length(arch_scalars2)) {
+          arch_scalars2[i1] <- (all_df[m - M1] + d*p + arch_scalars[i1, m]^(-1)*crossprod(mu_dif_j_minus_1[i1,], inv_Omega_j_minus_1)%*%mu_dif_j_minus_1[i1,])/(all_df[m - M1] + d*p + j - 3)
+        }
         # Fast formula:
-        arch_scalar2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
+        #arch_scalars2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
 
-        # Omega_tilde^2_mt
+        Omega_mtj[, j, m] <- arch_scalars2*arch_scalars[,m]*c(low_right - matprod%*%up_right)
       }
-
+      # KUN TESTATTU! POISTA HIDAS LOOPPI JA VAIHDA NOPEAMPAAN KAAVAAN!
 
       # Vectorized operations with arch_scalars (also, remove regime_ccovs from quantile_residuals_int and loglik to_return when it is not needed)
 
       # HUOM: VANHA KOODI KÄYTTÄÄ MUUTUJAA VARIANCES. UUDESSA KOODISSA TÄMÄ PITÄÄ KORVATA AIKA-VARIANTILLA MUUTTUJALLA.
     }
   }
+  # HUOM HUOM! ALLA KÄÄNNETÄÄN OMEGA J-1:SET UUDESTAAN! NE KANNATTAISI SÄILÖÄ JONNEKIN JA KÄYTTÄÄ SUORAAN UUSIKSI
 
-  # Calculate beta_{m,t,j} for j=2,...,d (Virolainen 2018, eq. (1.12) unpublished work paper)
+  # Calculate beta_{m,t,j} for j=2,...,d (Virolainen 2021, eq. (2.6),(2.7) unpublished work paper)
   beta_mtj <- array(dim=c(T_obs, M, d)) # [t, m, j] j=1,...,d
   beta_mtj[, , 1] <- alpha_mt
   for(j in 2:d) {
-    log_mvnvalues <- vapply(1:M, function(m) dlogmultinorm(y=dat[,1:(j - 1), drop=FALSE],
-                                                           mu=as.matrix(mu_mt[, 1:(j - 1), m]),
-                                                           Omega=upleft_jjmat(all_Omega[, , m], j - 1)),
-                                             numeric(T_obs))
+    log_mvdvalues <- matrix(nrow=T_obs, ncol=M)
+    for(m in 1:M) {
+      if(m <= M1) { # GMVAR type regime
+        log_mvdvalues[,m] <- dlogmultinorm(y=dat[,1:(j - 1), drop=FALSE],
+                                           mu=as.matrix(mu_mt[, 1:(j - 1), m]),
+                                           inv_Omega=as.matrix(all_inv_Omega_j_minus_1[1:(j-1), 1:(j-1), j-1, m]),
+                                           log_det_Omega=log_det_Omega_j_minus_1[j-1, m])
+      } else { # StMVAR type regime
+      log_mvdvalues[,m] <- dlogmultistudent(y=dat[,1:(j - 1), drop=FALSE],
+                                            mu=as.matrix(mu_mt[, 1:(j - 1), m]),
+                                            inv_Omega=as.matrix(all_inv_Omega_j_minus_1[1:(j-1), 1:(j-1), j-1, m]),
+                                            log_det_Omega=log_det_Omega_j_minus_1[j-1, m],
+                                            arch_scalars=arch_scalars[,m],
+                                            df=all_df[m - M1] + d*p)
+      }
+    }
 
-    small_logmvns <- log_mvnvalues < epsilon
-    if(any(small_logmvns)) {
+    small_logmvds <- log_mvdvalues < epsilon
+    if(any(small_logmvds)) {
       # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
       # we replace them with ones that are not too small or large but imply the same mixing weights
       # up to negligible numerical tolerance.
-      which_change <- rowSums(small_logmvns) > 0 # Which rows contain too small  values
-      to_change <- log_mvnvalues[which_change, , drop=FALSE]
+      which_change <- rowSums(small_logmvds) > 0 # Which rows contain too small  values
+      to_change <- log_mvdvalues[which_change, , drop=FALSE]
       largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
       diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
 
       # For each element in each row, check the (negative) distance from the largest value of the row. If the difference
-      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
+      # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvd values.
       diff_to_largest[diff_to_largest < epsilon] <- epsilon
 
-      # Replace the old log_mvnvalues with the new ones
-      log_mvnvalues[which_change,] <- diff_to_largest
+      # Replace the old log_mvdvalues with the new ones
+      log_mvdvalues[which_change,] <- diff_to_largest
     }
 
-    numerators <- as.matrix(alpha_mt*exp(log_mvnvalues))
+    numerators <- as.matrix(alpha_mt*exp(log_mvdvalues))
     denominator <- rowSums(numerators)
     beta_mtj[, , j] <- numerators/denominator
 
   }
 
-  # Then calculate (y_{i_j,t} - mu_mtj)/sqrt(variance_mtj) for m=1,...,M, t=1,...,T, j=1,...,d
-  points_mtj <- array(vapply(1:M, function(m) t(t(dat - mu_mtj[, , m])/sqrt(variances[, m])),
-                      numeric(d*T_obs)), dim=c(T_obs, d, M))
+  # Then, we calculate the conditional cumulative distribution function values, for all m=1,...,M, t=1,...,T, and j=1,...,d.
+  F_values_regime <- array(dim=c(T_obs, d, M)) # [t, d, m]
+  for(m in 1:M) {
+    ydiff <- dat - mu_mtj[, , m] # [t, j]
+    if(m <= M1) { # GMVAR type regimes
+      F_values_regime[, , m] <- pnorm(ydiff/sqrt(Omega_mtj[, , m])) # Omega_mtj, mu_mtj = [t, j, m]
+    } else { # StMVAR type regimes
+      # Function for numerical integration of the Student's t pdf (when closed form expression if not available)
+      my_integral <- function(t) { # Takes the observation index t (1,...,T) as formal argument and the rest from parent frame
+        f_mt <- function(y_t) { # The conditional density function to be integrated numerically;
+          C0/sqrt(Omega_mtj[t, j, m])*
+            (1 + ((y_t - mu_mt[t, j, m])^2)/(Omega_mtj[t, j, m]*(df - 2)))^(-0.5*(1 + df))
+        }
+        tryCatch(integrate(f_mt, lower=-Inf, upper=dat[t, j])$value, # Integrate PDF numerically
+                 error=function(e) {
+                   warning("Couldn't analytically nor numerically integrate all quantile residuals:")
+                   warning(e)
+                   return(NA)
+                 })
+      }
+      # HUOM TESTAILE INTEGROINTI LAITTAMALLA WHICH_DEF = KIINTEÄ tai NUMERIC(0)
 
-  F_values <- vapply(1:d, function(j) rowSums(as.matrix(beta_mtj[, , j]*pnorm(points_mtj[, j, ]))), numeric(T_obs))
+      # Go through dimensions
+      for(j in 1:d) {
+        df <- all_df[m - M1] + d*p + j - 1
+        which_def <- which(abs(ydiff[,j]) < sqrt(Omega_mtj[, j, m]*(df - 2)))
+        which_not_def <- (1:nrow(ydiff))[-which_def]
+        C0 <- exp(lgamma(0.5*(1 + df)) - 0.5*log(base::pi) - 0.5*log(df - 2) - lgamma(0.5*df))
+
+        # Calculate CDF values using hypergeometric function whenever it is defined
+        if(length(which_def) > 0) {
+          ydiff0 <- ydiff[which_def, j]
+          F_values_regime[which_def, j, m] <- 0.5 + C0/sqrt(Omega_mtj[which_def, j, m])*ydiff0*gsl::hyperg_2F1(a=0.5, b=0.5*(1 + df), c=1.5,
+                                                                                                               x=-(ydiff0^2)/(Omega_mtj[which_def, j, m]*(df - 2)),
+                                                                                                               give=FALSE, strict=TRUE)
+        }
+        # Calculate CDF values by numerically integrating the t-densities whenever hypergeometric function is not defined
+        if(length(which_not_def) > 0) {
+          for(t in which_not_def) {
+            F_values_regime[t, j, m] <- my_integral(t=t)
+          }
+        }
+      }
+    }
+  }
+
+  # Then calculate (y_{i_j,t} - mu_mtj)/sqrt(Omega_mtj) for m=1,...,M, t=1,...,T, j=1,...,d
+#  points_mtj <- array(vapply(1:M, function(m) t(t(dat - mu_mtj[, , m])/sqrt(variances[, m])),
+ #                     numeric(d*T_obs)), dim=c(T_obs, d, M))
+
+  F_values <- vapply(1:d, function(j) rowSums(as.matrix(beta_mtj[, , j]*F_values_regime[, j, ])), numeric(T_obs))
 
   # Values too close to 0 or 1 will be scaled so that qnorm doesn't return inf-values
   F_values[F_values >= 1 - .Machine$double.eps/2] <- 1 - .Machine$double.eps/2
@@ -282,15 +334,38 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
 #' @description \code{dlogmultinorm} calculates logarithms of multiple multivariate normal
 #'   densities with varying mean and constant covariance matrix.
 #'
-#' @param y dimension \eqn{(T x k)} matrix where each row is a k-dimensional random vector
+#' @param y dimension \eqn{(T x k)} matrix where each row is a k-dimensional vector
 #' @param mu dimension \eqn{(T x k)} matrix where each row is the mean of the k-dimensional
-#'   random vector in corresponding row of \code{y}.
-#' @param Omega the \eqn{(k x k)} covariance matrix Omega.
+#'   vector in corresponding row of \code{y}.
+#' @param inv_Omega inverse of the \eqn{(k x k)} covariance matrix Omega.
+#' @param log_det_Omega logarithm of the determinant of the covariance matrix Omega.
 #' @return Returns a size \eqn{(T x 1)} vector containing the multinormal densities in logarithm.
 #' @keywords internal
 
-dlogmultinorm <- function(y, mu, Omega) {
-  tmp <- -0.5*ncol(y)*log(2*pi) - 0.5*log(det(Omega))
+dlogmultinorm <- function(y, mu, inv_Omega, log_det_Omega) {
+  tmp <- -0.5*ncol(y)*log(2*pi) - 0.5*log_det_Omega
   ymu <- y - mu
-  tmp - 0.5*rowSums(ymu%*%solve(Omega)*ymu)
+  tmp - 0.5*rowSums(ymu%*%inv_Omega*ymu)
+}
+
+
+#' @title Calculate logarithms of multiple multivariate Student's t densities with varying
+#'  mean and covariance matrix of specific structure, but constant degrees of freedom.
+#'
+#' @description \code{dlogmultistudent} calculates logarithms of multiple multivariate
+#'  Student's t densities with varying mean and covaraince matrix of specific structure.
+#'
+#' @inheritParams dlogmultinorm
+#' @param arch_scalars length \eqn{T} numeric vector containing the coefficients that multiply
+#'   the covariance matrix \code{Omega}.
+#' @param df the degrees of freedom parameter that is common for all \eqn{t=1,...,T}.
+#' @return Returns a size \eqn{(T x 1)} vector containing the  multivariate Student's t
+#'   densities in logarithm.
+#' @keywords internal
+
+dlogmultistudent <- function(y, mu, inv_Omega, log_det_Omega, arch_scalars, df) {
+  logC <- lgamma(0.5*(ncol(y) + df)) - 0.5*ncol(y)*log(base::pi) - 0.5*ncol(y)*log(df - 2) - lgamma(0.5*df)
+  tmp <- -0.5*ncol(y)*log(arch_scalars) - 0.5*log_det_Omega
+  ymu <- y - mu
+  logC + tmp - 0.5*(ncol(y) + df)*(1 + rowSums(ymu%*%inv_Omega*ymu)/(arch_scalars*(df - 2)))
 }
