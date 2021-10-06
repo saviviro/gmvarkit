@@ -394,7 +394,7 @@ test_that("pick_all_phi0_A works correctly", {
   expect_equal(pick_all_phi0_A(p=2, M=2, d=2, params=theta_222ts, structural_pars=list(W=W_222)),
                cbind(c(phi10_222, vec(A11_222), vec(A12_222)), c(phi20_222, vec(A21_222), vec(A22_222)))) # SStMVAR
   expect_equal(pick_all_phi0_A(p=2, M=c(1, 1), d=2, params=theta_222gss, structural_pars=list(W=W_222)),
-               cbind(c(phi10_222, vec(A11_222), vec(A12_222)), c(phi20_222, vec(A21_222), vec(A22_222)))) # SG-GMVAR
+               cbind(c(phi10_222, vec(A11_222), vec(A12_222)), c(phi20_222, vec(A21_222), vec(A22_222)))) # SG-StMVAR
   expect_equal(pick_all_phi0_A(p=3, M=3, d=2, params=theta_332s, structural_pars=list(W=W_332)),
                cbind(c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332)),
                      c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332)),
