@@ -11,10 +11,15 @@ rbind_diags <- function(p, M, d) {
 params122 <- c(0.623, -0.129, 0.959, 0.089, -0.006, 1.006, 1.746, 0.804, 5.804, 3.245, 7.913,
                0.952, -0.037, -0.019, 0.943, 6.926, 3.982, 12.135, 0.789) # p=1, M=2, d=2
 
+params122t <- c(params122, 10, 20) # StMVAR
+params122gs <- c(params122, 20) # G-StMVAR
+
 # p=2, M=2, d=2, constrained
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 params222c <- c(1.031, 2.356, 1.786, 3.000, 1.250, 0.060, 0.036, 1.335, -0.290, -0.083, -0.047,
                 -0.356, 0.934, -0.152, 5.201, 5.883, 3.560, 9.799, 0.368)  # p=2, M=2, d=2, AR parameters restricted same for both regimes
+
+params222gsc <- c(params222c, 20) # G-StMVAR
 
 # p=2, M=1, d=2, SGMVAR, W constrained
 phi10_212 <- c(1.03, 2.36)
@@ -24,6 +29,8 @@ Omega1_212 <- matrix(c(0.93, -0.15, -0.15, 5.20), nrow=2, byrow=FALSE)
 
 W_212 <- t(chol(Omega1_212))
 theta_212csW <- c(phi10_212, vec(A11_212), vec(A12_212), Wvec(W_212))
+
+theta_212tcsW <- c(theta_212csW, 10) # SStMVAR
 
 # p=1, M=2, d=2, SGMVAR, AR parameters and lambdas constrained
 phi10_122 <- c(1.03, 2.36)
@@ -42,6 +49,8 @@ W_122 <- matrix(WL_122[1:(2^2)], nrow=2, byrow=FALSE)
 C_lambda_122 <- matrix(c(7, 1), nrow=2)
 theta_122csLAR <- c(phi10_122, phi20_122, vec(A11_122), vec(W_122), 1, alpha1_122)
 
+theta_122gscsLAR <- c(theta_122csLAR, 10) # SG-StMVAR
+
 # p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
 C_222 <- rbind_diags(p=2, M=2, d=2)
 phi10_222 <- c(1.03, 2.36)
@@ -53,31 +62,50 @@ alpha1_222 <- 0.37
 
 theta_222c_int <- c(-5, 123, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
 
+theta_222gsc_int <- c(theta_222c_int, 20) # G-StMVAR
+
 # p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
 WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
 W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 C_lambda_222 <- matrix(c(1, 2), nrow=2)
 theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
 
+theta_222tcsLAR_int <- c(theta_222csLAR_int, 10, 20) # SStMVAR
+
 test_that("GSMVAR works correctly", {
   mod122 <- GSMVAR(gdpdef, p=1, M=2, params=params122)
+  mod122t <- GSMVAR(gdpdef, p=1, M=2, params=params122t, model="StMVAR")
+  mod122gs <- GSMVAR(gdpdef, p=1, M=c(1, 1), params=params122gs, model="G-StMVAR")
   mod222c <- GSMVAR(gdpdef, p=2, M=2, params=params222c, constraints=C_mat)
+  mod222gsc <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=params222gsc, model="G-StMVAR", constraints=C_mat)
   expect_equal(mod122$params, params122)
+  expect_equal(mod122t$params, params122t)
+  expect_equal(mod122gs$params, params122gs)
   expect_equal(mod222c$params, params222c)
+  expect_equal(mod222gsc$params, params222gsc)
 
   # SGSMVAR
   mod212csW <- GSMVAR(gdpdef, p=2, M=1, params=theta_212csW, structural_pars=list(W=W_212))
+  mod212tcsW <- GSMVAR(gdpdef, p=2, M=1, params=theta_212tcsW, model="StMVAR", structural_pars=list(W=W_212))
   mod122csLAR <- GSMVAR(gdpdef, p=1, M=2, params=theta_122csLAR, constraints=C_122,
                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
+  mod122gscsLAR <- GSMVAR(gdpdef, p=1, M=c(1, 1), params=theta_122gscsLAR, model="G-StMVAR", constraints=C_122,
+                        structural_pars=list(W=W_122, C_lambda=C_lambda_122))
   expect_equal(mod212csW$params, theta_212csW)
+  expect_equal(mod212tcsW$params, theta_212tcsW)
   expect_equal(mod122csLAR$params, theta_122csLAR)
+  expect_equal(mod122gscsLAR$params, theta_122gscsLAR)
 
   # Same_means
   mod222c_int <- GSMVAR(gdpdef, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+  mod222gsc_int <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=theta_222gsc_int, model="G-StMVAR", parametrization="mean", constraints=C_222, same_means=list(1:2))
   mod222csLAR_int <- GSMVAR(gdpdef, p=2, M=2, params=theta_222csLAR_int, parametrization="mean", constraints=C_222,
                            structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
+  mod222tcsLAR_int <- GSMVAR(gdpdef, p=2, M=2, params=theta_222tcsLAR_int, model="StMVAR", parametrization="mean", constraints=C_222,
+                            structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))
   expect_equal(mod222c_int$params, theta_222c_int)
-  expect_equal(mod222csLAR_int$params, theta_222csLAR_int)
+  expect_equal(mod222gsc_int$params, theta_222gsc_int)
+  expect_equal(mod222tcsLAR_int$params, theta_222tcsLAR_int)
 })
 
 

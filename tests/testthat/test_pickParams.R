@@ -649,7 +649,10 @@ params222 <- c(-11.904, 154.684, 1.314, 0.145, 0.094, 1.292, -0.389,
   0.077, -0.040, 1.266, -0.272, -0.074, 0.034, -0.313, 5.855, 3.570,
   9.838, 0.740)
 mod222 <- GSMVAR(d=2, p=2, M=2, params=params222, parametrization="mean")
-get_boldA_eigens(mod222)
+
+mod222t <- GSMVAR(d=2, p=2, M=2, params=c(params222, 10, 20), model="StMVAR", parametrization="mean") # StMVAR
+mod222gs <- GSMVAR(d=2, p=2, M=c(1, 1), params=c(params222, 20), model="G-StMVAR", parametrization="mean") # G-StMVAR
+
 
 ## A(M)(p)_(p)(M)(d)
 rbind_diags <- function(p, M, d) {
@@ -678,28 +681,43 @@ A11_112 <- matrix(c(0.25, 0.06, 0.04, 0.34), nrow=2, byrow=FALSE) # Re-define as
 theta_112csWAR <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W and AR
 mod112csWAR <- GSMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
 
+mod112tcsWAR <- GSMVAR(p=1, M=1, d=2, params=c(theta_112csWAR, 10), model="StMVAR", structural_pars=list(W=W_112)) # SStMVAR
+
+
 C_222 <- rbind_diags(p=2, M=2, d=2)
 C_lambda_222 <- matrix(c(1, 2), nrow=2)
 theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
 mod222csLAR <- GSMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
                      structural_pars=list(W=W_222, C_lambda=C_lambda_222))
 
+mod222gscsLAR <- GSMVAR(p=2, M=c(1, 1), d=2, params=c(theta_222csLAR, 20), model="G-StMVAR", constraints=C_222,
+                        structural_pars=list(W=W_222, C_lambda=C_lambda_222)) # SG-StMVAR
+
+
 test_that("get_boldA_eigens works correctly", {
   expect_equal(get_boldA_eigens(mod222)[,1], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222t)[2,], c(0.9112338, 0.9285837), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222gs)[3,], c(0.4566127, 0.3125171), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222c)[,2], c(0.9681610, 0.9569557, 0.3718390, 0.3030443), tolerance=1e-5)
 
   # SGSMVAR
   expect_equal(get_boldA_eigens(mod112csWAR)[,1], c(0.3615207, 0.2284793), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod112tcsWAR)[,1], c(0.3615207, 0.2284793), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222csLAR)[,2], c(0.9819784, 0.9215689, 0.4260533, 0.2603994), tolerance=1e-5)
+  expect_equal(get_boldA_eigens(mod222gscsLAR)[4,], c(.2603994, 0.2603994), tolerance=1e-5)
 })
 
 test_that("get_omega_eigens works correctly", {
   expect_equal(get_omega_eigens(mod222)[,1], c(4.8391595, 0.9198405), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222t)[2,], c(0.9198405, 3.7585944), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222gs)[1,], c(4.839159, 11.934406), tolerance=1e-5)
   expect_equal(get_omega_eigens(mod222c)[,2], c(11.611462, 3.608538), tolerance=1e-5)
 
   # SGSMVAR
   expect_equal(get_omega_eigens(mod112csWAR)[,1], c(5.2052628, 0.9247372), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod112tcsWAR)[,1], c(5.2052628, 0.9247372), tolerance=1e-5)
   expect_equal(get_omega_eigens(mod222csLAR)[,2], c(2.0610439, 0.1882761), tolerance=1e-5)
+  expect_equal(get_omega_eigens(mod222gscsLAR)[,1], c(5.3657061, 0.9039939), tolerance=1e-5)
 })
 
 

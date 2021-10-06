@@ -349,13 +349,15 @@ get_boldA_eigens <- function(gsmvar) {
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params,
+  model <- gsmvar$model$model
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
                                     constraints=gsmvar$model$constraints,
                                     same_means=gsmvar$model$same_means,
                                     structural_pars=gsmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
+  M <- sum(M)
   matrix(vapply(1:M, function(m) abs(eigen(all_boldA[, , m], symmetric=FALSE, only.values=TRUE)$'values'), numeric(d*p)),
          nrow=d*p, ncol=M, byrow=FALSE)
 }
@@ -385,12 +387,14 @@ get_omega_eigens <- function(gsmvar) {
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params,
+  model <- gsmvar$model$model
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
                                     constraints=gsmvar$model$constraints,
                                     same_means=gsmvar$model$same_means,
                                     structural_pars=gsmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  M <- sum(M)
   matrix(vapply(1:M, function(m) eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$'values', numeric(d)),
          nrow=d, ncol=M, byrow=FALSE)
 }

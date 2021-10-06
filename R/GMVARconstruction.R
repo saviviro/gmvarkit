@@ -50,6 +50,16 @@
 #' mod12_2 <- GSMVAR(p=1, M=2, d=2, params=params12)
 #' mod12_2
 #'
+#' # StMVAR(1, 2), d=2 model:
+#' mod12t <- GSMVAR(gdpdef, p=1, M=2, params=c(params12, 10, 20),
+#'                  model="StMVAR")
+#' mod12t
+#'
+#' # G-StMVAR(1, 1, 1), d=2 model:
+#' mod12gs <- GSMVAR(gdpdef, p=1, M=c(1, 1), params=c(params12, 20),
+#'                   model="G-StMVAR")
+#' mod12gs
+#'
 #' # GMVAR(2, 2), d=2 model with mean-parametrization:
 #' params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406,
 #'  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218,
