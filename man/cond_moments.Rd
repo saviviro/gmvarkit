@@ -16,6 +16,7 @@ cond_moments(
   structural_pars = NULL,
   to_return = c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
     "arch_scalars"),
+  minval = NA,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08
@@ -145,6 +146,9 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{to_return}{should the regimewise conditional means, total conditional means, or total conditional covariance matrices
 be returned?}
+
+\item{minval}{the value that will be returned if the parameter vector does not lie in the parameter space
+(excluding the identification condition).}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the

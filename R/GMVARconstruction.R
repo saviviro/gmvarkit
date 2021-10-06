@@ -250,7 +250,7 @@ add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE
 #' @details \code{swap_parametrization} is a convenient tool if you have estimated the model in
 #'  "intercept"-parametrization, but wish to work with "mean"-parametrization in the future, or vice versa.
 #'  In \code{gmvarkit}, the approximate standard errors are only available for parametrized parameters.
-#' @inherit GMVAR references return
+#' @inherit GSMVAR references return
 #' @inherit add_data seealso
 #' @examples
 #' \donttest{
@@ -346,7 +346,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 
 #' @title Switch from two-regime reduced form GMVAR, StMVAR, or G-StMVAR model to a structural model.
 #'
-#' @description \code{gmvar_to_sgmvar} constructs SGMVAR, SStMVAR, or SG-StMVAR model based on a reduced
+#' @description \code{gsmvar_to_sgsmvar} constructs SGMVAR, SStMVAR, or SG-StMVAR model based on a reduced
 #'   form GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams simulateGMVAR

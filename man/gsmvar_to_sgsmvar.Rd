@@ -17,7 +17,7 @@ Returns an object of class \code{'gsmvar'} defining a structural GMVAR, StMVAR, 
   positive.
 }
 \description{
-\code{gmvar_to_sgmvar} constructs SGMVAR, SStMVAR, or SG-StMVAR model based on a reduced
+\code{gsmvar_to_sgsmvar} constructs SGMVAR, SStMVAR, or SG-StMVAR model based on a reduced
   form GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{

@@ -9,6 +9,13 @@ swap_parametrization(gsmvar)
 \arguments{
 \item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
+\value{
+Returns an object of class \code{'gsmvar'} defining the specified reduced form or structural GMVAR,
+  StMVAR, or G-StMVAR model. Can be used to work with other functions provided in \code{gmvarkit}.
+
+  Note that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
+  the second one for the lag one, etc.
+}
 \description{
 \code{swap_parametrization} swaps the parametrization of a GMVAR model
  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
@@ -43,6 +50,18 @@ mod22s # intercept parametrization
 mod22s_2 <- swap_parametrization(mod22s)
 mod22s_2 # mean parametrization
 }
+}
+\references{
+\itemize{
+   \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
+         \emph{Journal of Econometrics}, \strong{192}, 485-498.
+   \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
+         Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
+   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
+ }
 }
 \seealso{
 \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
