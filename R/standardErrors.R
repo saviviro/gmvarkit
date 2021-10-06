@@ -11,14 +11,15 @@
 
 standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                             constraints=NULL, same_means=NULL, structural_pars=NULL, minval,
-                            stat_tol=1e-3, posdef_tol=1e-8) {
+                            stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
 
   loglik_fn <- function(params) {
-    tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, conditional=conditional, parametrization=parametrization,
+    tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional, parametrization=parametrization,
                                constraints=constraints, same_means=same_means, structural_pars=structural_pars,
-                               check_params=TRUE, to_return="loglik", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol),
+                               check_params=TRUE, to_return="loglik", minval=minval,
+                               stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
              error=function(e) NA)
   }
 

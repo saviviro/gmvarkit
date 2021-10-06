@@ -167,7 +167,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
                                           "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
                                           "arch_scalars", "loglik_mw_archscalars"),
-                              check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+                              check_params=TRUE, minval=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   # Compute required values
   epsilon <- round(log(.Machine$double.xmin) + 10) # Logarithm of the smallest value that can be handled normally
@@ -198,7 +198,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   # Check that the parameter vector lies in the parameter space (excluding indentifiability)
   if(check_params) {
     if(!in_paramspace_int(p=p, M=M, d=d, params=params, model=model, all_boldA=all_boldA, alphas=alphas, all_Omega=all_Omega,
-                          W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)) {
+                          W_constraints=W_constraints, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)) {
       return(minval)
     }
   }
@@ -443,7 +443,7 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
 
 loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                           constraints=NULL, same_means=NULL, structural_pars=NULL, minval=NA,
-                          stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+                          stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
   check_same_means(parametrization=parametrization, same_means=same_means)
@@ -456,7 +456,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
   }
   loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional, parametrization=parametrization,
                     constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return="loglik",
-                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
@@ -497,7 +497,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 
 cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
                          structural_pars=NULL, to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars"),
-                         stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+                         stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
   to_return <- match.arg(to_return)
@@ -511,7 +511,7 @@ cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVA
   }
   loglikelihood_int(data=data, p=p, M=M, params=params, model=model, parametrization=parametrization,
                     constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return=to_return,
-                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 

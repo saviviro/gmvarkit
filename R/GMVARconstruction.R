@@ -70,7 +70,7 @@
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
-                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+                  stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
   if(missing(calc_cond_moments)) calc_cond_moments <- ifelse(missing(data) || is.null(data), FALSE, TRUE)
@@ -110,7 +110,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                          conditional=conditional, parametrization=parametrization,
                                          constraints=constraints, same_means=same_means,
                                          structural_pars=structural_pars, stat_tol=stat_tol,
-                                         posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+                                         posdef_tol=posdef_tol, df_tol=df_tol)
     obs <- ifelse(conditional, nrow(data) - p, nrow(data))
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=obs)
   }
@@ -124,7 +124,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                              constraints=constraints, same_means=same_means,
                                              structural_pars=structural_pars,
                                              minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1),
-                                             stat_tol=stat_tol, posdef_tol=posdef_tol),
+                                             stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
                              error=function(e) {
                                warning("Approximate standard errors can't be calculated")
                                std_errors=rep(NA, npars)
@@ -143,7 +143,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                                                     structural_pars=structural_pars,
                                                     check_params=TRUE,
                                                     to_return=to_return, minval=NA,
-                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+                                                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
     regime_cmeans <- get_cm("regime_cmeans")
     regime_ccovs <- get_cm("regime_ccovs")
     total_cmeans <- get_cm("total_cmeans")
@@ -186,8 +186,7 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StM
                  which_round=NULL,
                  num_tols=list(stat_tol=stat_tol,
                                posdef_tol=posdef_tol,
-                               df_tol=df_tol,
-                               df_max=df_max)),
+                               df_tol=df_tol)),
             class="gmvar")
 }
 

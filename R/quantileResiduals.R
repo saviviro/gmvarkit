@@ -261,13 +261,13 @@ quantile_residuals <- function(gmvar) {
 #' @keywords internal
 
 quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional, parametrization, constraints=NULL,
-                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8, df_max=1e+5) {
+                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   loglik_mw_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                              parametrization=parametrization, constraints=constraints,
                                              same_means=same_means, structural_pars=structural_pars,
                                              to_return="loglik_mw_archscalars", check_params=TRUE, minval=NA,
-                                             stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol, df_max=df_max)
+                                             stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
   d <- ncol(data)
   npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints)
 
@@ -295,8 +295,7 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
                         which_converged=NULL,
                         num_tols=list(stat_tol=stat_tol,
                                       posdef_tol=posdef_tol,
-                                      df_tol=df_tol,
-                                      df_max=df_max)),
+                                      df_tol=df_tol)),
                    class="gmvar")
 
   quantile_residuals(mod)
