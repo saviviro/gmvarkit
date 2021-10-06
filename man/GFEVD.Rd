@@ -5,10 +5,11 @@
 \alias{GFEVD}
 \alias{plot.gfevd}
 \alias{print.gfevd}
-\title{Estimate generalized forecast error variance decomposition for a structural GMVAR model.}
+\title{Estimate generalized forecast error variance decomposition for a structural
+  GMVAR, StMVAR, or G-StMVAR model.}
 \usage{
 GFEVD(
-  gmvar,
+  gsmvar,
   shock_size = 1,
   N = 30,
   initval_type = c("data", "random", "fixed"),
@@ -27,10 +28,10 @@ GFEVD(
 \method{print}{gfevd}(x, ..., digits = 2, N_to_print)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
-\item{shock_size}{What shocks size should be used for all shocks? By the definition of the SGMVAR model,
-the conditional covariance matrix of the structural shock is identity matrix.}
+\item{shock_size}{What shocks size should be used for all shocks? By the definition of the SGMVAR,
+SStMVAR, and SG-StMVAR model, the conditional covariance matrix of the structural shock is identity matrix.}
 
 \item{N}{a positive integer specifying the horizon how far ahead should the GFEVD be calculated.}
 
@@ -101,11 +102,11 @@ Returns and object of class 'gfevd' containing the GFEVD for all the variables a
 }
 \description{
 \code{GFEVD} estimates generalized generalized forecast error variance decomposition for
- a structural GMVAR model.
+ a structural GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
 The model needs to be structural in order for this function to be applicable. A structural
-  GMVAR model can be estimated by specifying the argument \code{structural_pars} in the function \code{fitGMVAR}.
+  GMVAR, StMVAR, or G-StMVAR model can be estimated by specifying the argument \code{structural_pars} in the function \code{fitGSMVAR}.
 
   The GFEVD is a forecast error variance decomposition calculated with the generalized impulse response function (GIRF).
   Lanne and Nyberg (2016) for details. Note, however, that the related GIRFs are calculated using the algorithm given in
@@ -128,11 +129,11 @@ The model needs to be structural in order for this function to be applicable. A 
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
- mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+ mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s,
   structural_pars=list(W=W_22))
  mod22s
  # Alternatively, use:
- #fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
+ #fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
  #                   ncalls=20, seeds=1:20)
  # To obtain an estimated version of the same model.
 
@@ -174,6 +175,6 @@ The model needs to be structural in order for this function to be applicable. A 
  }
 }
 \seealso{
-\code{\link{GIRF}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{gmvar_to_sgmvar}},
- \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulateGMVAR}}
+\code{\link{GIRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{gsmvar_to_sgsmvar}},
+ \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulateGSMVAR}}
 }

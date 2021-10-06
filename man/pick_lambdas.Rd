@@ -31,7 +31,7 @@ pick_lambdas(p, M, d, params, structural_pars = NULL)
         \item \eqn{M1} is the number of GMVAR type regimes.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural model:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -71,7 +71,7 @@ a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 Returns a length \eqn{(d*(M - 1))} vector \eqn{(\lambda_{2},...,\lambda_{M})}
- (see the argument \code{params}) from a parameter vector of a SGMVAR model.
+ (see the argument \code{params}) from a parameter vector of a SGSMVAR model.
   Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 }
 \description{

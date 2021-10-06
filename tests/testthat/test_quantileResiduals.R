@@ -12,15 +12,15 @@ phi10_112 <- c(0.75, 0.8)
 A11_112 <- matrix(c(0.29, 0.02, -0.14, 0.9), nrow=2, byrow=FALSE)
 Omega1_112 <- matrix(c(0.60, 0.01, 0.01, 0.07), nrow=2, byrow=FALSE)
 theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
-mod_112 <- GMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
+mod_112 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
 
 W_112 <- t(chol(Omega1_112))
 theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR, W constrained by Cholesky
-mod_112s <- GMVAR(gdpdef, p=1, M=1, d=2, params=theta_112sWC, conditional=TRUE, parametrization="mean",
+mod_112s <- GSMVAR(gdpdef, p=1, M=1, d=2, params=theta_112sWC, conditional=TRUE, parametrization="mean",
                   structural_pars=list(W=W_112), calc_std_errors=FALSE)
 
-mod_112t <- GMVAR(gdpdef, p=1, M=1, d=2, params=c(theta_112, 10), model="StMVAR", conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
-mod_112ts <- GMVAR(gdpdef, p=1, M=1, d=2, params=c(theta_112sWC, 10), model="StMVAR", conditional=TRUE, parametrization="mean",
+mod_112t <- GSMVAR(gdpdef, p=1, M=1, d=2, params=c(theta_112, 10), model="StMVAR", conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
+mod_112ts <- GSMVAR(gdpdef, p=1, M=1, d=2, params=c(theta_112sWC, 10), model="StMVAR", conditional=TRUE, parametrization="mean",
                    structural_pars=list(W=W_112), calc_std_errors=FALSE)
 
 # p=2, M=2, d=2, no constraints
@@ -38,21 +38,21 @@ alpha1_222 <- 0.37
 upsilon1_222 <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222))
 upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
-mod_222 <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE)
+mod_222 <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE)
 
 WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
 W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
-mod_222s <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE,
+mod_222s <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE,
                  structural_pars=list(W=W_222))
 
-mod_222t <- GMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222, 10, 20), model="StMVAR", conditional=TRUE, parametrization="intercept",
+mod_222t <- GSMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222, 10, 20), model="StMVAR", conditional=TRUE, parametrization="intercept",
                   calc_std_errors=FALSE)
-mod_222ts <- GMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222s, 10, 20), model="StMVAR", conditional=TRUE, parametrization="intercept",
+mod_222ts <- GSMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222s, 10, 20), model="StMVAR", conditional=TRUE, parametrization="intercept",
                    calc_std_errors=FALSE, structural_pars=list(W=W_222))
-mod_222gs <- GMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222, 20), model="G-StMVAR", conditional=TRUE, parametrization="intercept",
+mod_222gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222, 20), model="G-StMVAR", conditional=TRUE, parametrization="intercept",
                    calc_std_errors=FALSE)
 
 # p=1, M=4, d=2
@@ -63,18 +63,18 @@ theta_142 <- c(0.680381, 0.099736, 0.502918, 0.080781, -0.627348, 0.674579,
                1.281068, 0.017391, 0.135752, 1.716725, 0.668851, -0.184389,
                -0.155109, -1.746672, -0.348001, 0.43192, -0.028927, 0.002053,
                0.428343, 0.347302, 0.152716)
-mod_142_int <- GMVAR(gdpdef, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE)
-mod_142_mean <- GMVAR(gdpdef, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
+mod_142_int <- GSMVAR(gdpdef, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="intercept", calc_std_errors=FALSE)
+mod_142_mean <- GSMVAR(gdpdef, p=1, M=4, d=2, params=theta_142, conditional=TRUE, parametrization="mean", calc_std_errors=FALSE)
 
-mod_142gs_1 <- GMVAR(gdpdef, p=1, M=c(1, 3), d=2, params=c(theta_142, 20, 30, 40), model="G-StMVAR", conditional=TRUE,
+mod_142gs_1 <- GSMVAR(gdpdef, p=1, M=c(1, 3), d=2, params=c(theta_142, 20, 30, 40), model="G-StMVAR", conditional=TRUE,
                      parametrization="intercept", calc_std_errors=FALSE)
-mod_142gs_1_mean <- GMVAR(gdpdef, p=1, M=c(1, 3), d=2, params=c(theta_142, 20, 30, 40), model="G-StMVAR", conditional=TRUE,
+mod_142gs_1_mean <- GSMVAR(gdpdef, p=1, M=c(1, 3), d=2, params=c(theta_142, 20, 30, 40), model="G-StMVAR", conditional=TRUE,
                           parametrization="mean", calc_std_errors=FALSE)
-mod_142gs_2 <- GMVAR(gdpdef, p=1, M=c(3, 1), d=2, params=c(theta_142, 3), model="G-StMVAR", conditional=TRUE,
+mod_142gs_2 <- GSMVAR(gdpdef, p=1, M=c(3, 1), d=2, params=c(theta_142, 3), model="G-StMVAR", conditional=TRUE,
                      parametrization="intercept", calc_std_errors=FALSE)
-mod_142gs_3 <- GMVAR(gdpdef, p=1, M=c(2, 2), d=2, params=c(theta_142, 10, 12), model="G-StMVAR", conditional=TRUE,
+mod_142gs_3 <- GSMVAR(gdpdef, p=1, M=c(2, 2), d=2, params=c(theta_142, 10, 12), model="G-StMVAR", conditional=TRUE,
                      parametrization="intercept", calc_std_errors=FALSE)
-mod_142t <- GMVAR(gdpdef, p=1, M=4, d=2, params=c(theta_142, 10, 20, 30, 40), model="StMVAR", conditional=TRUE,
+mod_142t <- GSMVAR(gdpdef, p=1, M=4, d=2, params=c(theta_142, 10, 20, 30, 40), model="StMVAR", conditional=TRUE,
                   parametrization="intercept", calc_std_errors=FALSE)
 
 
@@ -86,10 +86,10 @@ rbind_diags <- function(p, M, d) {
 C_222 <- rbind_diags(p=2, M=2, d=2)
 C_lambda_222 <- matrix(c(7, 1), nrow=2)
 theta_222cs <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 1, alpha1_222)
-mod_222csLAR <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222cs, conditional=TRUE, parametrization="intercept",
+mod_222csLAR <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222cs, conditional=TRUE, parametrization="intercept",
                       constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), calc_std_errors=FALSE)
 
-mod_222gscsLAR <- GMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222cs, 2.001), model="G-StMVAR", conditional=TRUE, parametrization="intercept",
+mod_222gscsLAR <- GSMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222cs, 2.001), model="G-StMVAR", conditional=TRUE, parametrization="intercept",
                         constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), calc_std_errors=FALSE)
 
 # p=2, M=2, d=2, AR parameters same for both regimes, non-diagonals zero, intercept
@@ -97,10 +97,10 @@ theta_222c <- c(0.33782, 0.183512, 0.472168, 0.095311, 0.201199, 0.600596, 0.237
                 0.23529, 1.077816, -0.016343, 0.112771, 0.22199, 0.005582, 0.028126, 0.492844)
 mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
 C_222c <- rbind(mat0, mat0)
-mod_222c <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c,
+mod_222c <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c,
                   calc_std_errors=FALSE)
 
-mod_222tc <- GMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222c, 5, 11), model="StMVAR", conditional=TRUE, parametrization="intercept", constraints=C_222c,
+mod_222tc <- GSMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222c, 5, 11), model="StMVAR", conditional=TRUE, parametrization="intercept", constraints=C_222c,
                    calc_std_errors=FALSE)
 
 # p=3, M=2, d=3, no constraints, rand_ind and simulated data
@@ -112,22 +112,22 @@ theta_323 <- c(-8.62904, -1.1294, 6.08939, 0.30181, -0.01918, 0.20814, 2.09997, 
                -1.14077, -0.29568, -0.61784, -0.36704, -0.79401, -0.92552, 0.51123, -0.52166, -0.45825, -0.24572, 0.3612,
                -0.10096, -0.58217, 0.17453, -0.19763, -0.2274, 0.77741, 1.09703, 1.24502, 0.74678, 0.90936, 0.71689, -0.086,
                2.57044, 0.81515, 0.45869, 0.84737)
-mod_323 <- GMVAR(p=3, M=2, d=3, params=theta_323, conditional=FALSE, parametrization="mean")
+mod_323 <- GSMVAR(p=3, M=2, d=3, params=theta_323, conditional=FALSE, parametrization="mean")
 sim_323 <- simulateGMVAR(mod_323, nsimu=500)$sample
-mod_323 <- add_data(data=sim_323, gmvar=mod_323)
+mod_323 <- add_data(data=sim_323, gsmvar=mod_323)
 
-mod_323t <- GMVAR(sim_323, p=3, M=2, params=c(theta_323, 10, 3), model="StMVAR", conditional=FALSE,
+mod_323t <- GSMVAR(sim_323, p=3, M=2, params=c(theta_323, 10, 3), model="StMVAR", conditional=FALSE,
                   parametrization="mean", calc_std_errors=FALSE)
-mod_323gs <- GMVAR(sim_323, p=3, M=c(1, 1), params=c(theta_323, 3), model="G-StMVAR", conditional=FALSE,
+mod_323gs <- GSMVAR(sim_323, p=3, M=c(1, 1), params=c(theta_323, 3), model="G-StMVAR", conditional=FALSE,
                   parametrization="mean", calc_std_errors=FALSE)
 
 # p=2, M=2, d=2, constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)
 theta_222csLAR_int <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222)
-mod_222csLAR_int <- GMVAR(gdpdef, p=2, M=2, params=theta_222csLAR_int, conditional=TRUE, parametrization="mean",
+mod_222csLAR_int <- GSMVAR(gdpdef, p=2, M=2, params=theta_222csLAR_int, conditional=TRUE, parametrization="mean",
                           constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2),
                           calc_std_errors=FALSE)
 
-mod_222tcsLAR_int <- GMVAR(gdpdef, p=2, M=2, params=c(theta_222csLAR_int, 20, 2.1), model="StMVAR", conditional=TRUE, parametrization="mean",
+mod_222tcsLAR_int <- GSMVAR(gdpdef, p=2, M=2, params=c(theta_222csLAR_int, 20, 2.1), model="StMVAR", conditional=TRUE, parametrization="mean",
                           constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2),
                           calc_std_errors=FALSE)
 

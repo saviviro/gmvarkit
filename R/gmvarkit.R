@@ -1,7 +1,9 @@
-#' @title gmvarkit: Estimate Gaussian Mixture Vector Autoregressive (GMVAR) model
+#' @title gmvarkit: Estimate Gaussian Mixture Vector Autoregressive, Student's t Mixture Vector Autoregressive,
+#'   or Gaussian and Student's t Mixture Vector Autoregressive model
 #'
 #' @description \code{gmvarkit} is a package for reduced form and structural Gaussian mixture vector
-#'   autoregressive (GMVAR) model analysis.
+#'   autoregressive (GMVAR), Student's t Mixture Vector Autoregressive (StMVAR),
+#'   or Gaussian and Student's t Mixture Vector Autoregressive (G-StMVAR) model analysis.
 #'   It provides functions for unconstrained and constrained maximum likelihood estimation of the model parameters,
 #'   quantile residuals tests, graphical diagnostics, estimation of generalized impulse response function,
 #'   estimation of generalized forecast error variance decomposition, simulation from GMVAR processes,

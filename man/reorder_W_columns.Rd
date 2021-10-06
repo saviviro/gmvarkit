@@ -2,23 +2,23 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{reorder_W_columns}
 \alias{reorder_W_columns}
-\title{Reorder columns of the W-matrix and lambda parameters of a structural GMVAR model.}
+\title{Reorder columns of the W-matrix and lambda parameters of a structural GMVAR, StMVAR, or G-StMVAR model.}
 \usage{
-reorder_W_columns(gmvar, perm)
+reorder_W_columns(gsmvar, perm)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{perm}{an integer vector of length \eqn{d} specifying the new order of the columns of \eqn{W}.
 Also lambda parameters of each regime will be reordered accordingly.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+Returns an object of class \code{'gsmvar'} defining a structural GMVAR, StMVAR, or G-StMVAR model with the modified
   structural parameters and constraints.
 }
 \description{
 \code{reorder_W_columns} reorder columns of the W-matrix and lambda parameters
-  of a structural GMVAR model.
+  of a structural GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
 The order of the columns of \eqn{W} can be changed without changing the implied reduced
@@ -37,7 +37,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
 mod22s
 
 # The same reduced form model, reordered W and lambda in the structual model:
@@ -54,6 +54,6 @@ mod22s_2
  @keywords internal
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{gmvar_to_sgmvar}},
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{gsmvar_to_sgsmvar}},
  \code{\link{swap_W_signs}}
 }

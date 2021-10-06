@@ -3,12 +3,12 @@
 \name{uncond_moments}
 \alias{uncond_moments}
 \title{Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
- of a GMVAR process}
+ of a GMVAR, StMVAR, or G-StMVAR process}
 \usage{
-uncond_moments(gmvar)
+uncond_moments(gsmvar)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Returns a list with three components:
@@ -21,7 +21,7 @@ Returns a list with three components:
 }
 \description{
 \code{uncond_moments} calculates the unconditional mean, variance, the first p autocovariances,
- and the first p autocorrelations of the given GMVAR process.
+ and the first p autocorrelations of the given GMVAR, StMVAR, or G-StMVAR process.
 }
 \details{
 The unconditional moments are based on the stationary distribution of the process.
@@ -31,7 +31,7 @@ The unconditional moments are based on the stationary distribution of the proces
 params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
  0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
  0.136, 0.674)
-mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 uncond_moments(mod12)
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -39,7 +39,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 mod22s
 uncond_moments(mod22s)
 }

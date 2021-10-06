@@ -15,8 +15,7 @@ in_paramspace(
   structural_pars = NULL,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
-  df_tol = 1e-08,
-  df_max = 1e+05
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -67,7 +66,7 @@ in_paramspace(
           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural models:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -148,9 +147,6 @@ evaluation of the log-likelihood might fail and cause error.}
 
 \item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
 freedom parameters are not larger than \code{2 + df_tol}.}
-
-\item{df_max}{the largest allowed value for a degrees of freedom parameter (extremely large values
-will cause numerical problems and are not useful)}
 }
 \value{
 Returns \code{TRUE} if the given parameter vector lies in the parameter space

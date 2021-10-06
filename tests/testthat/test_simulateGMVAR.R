@@ -10,7 +10,7 @@ phi10_112 <- c(0.75, 0.8)
 A11_112 <- matrix(c(0.29, 0.02, -0.14, 0.9), nrow=2, byrow=FALSE)
 Omega1_112 <- matrix(c(0.60, 0.01, 0.01, 0.07), nrow=2, byrow=FALSE)
 theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
-mod_112 <- GMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
+mod_112 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
 
 # p=2, M=2, d=2, no constraints, structural
 phi10_222 <- c(0.36, 0.12)
@@ -30,7 +30,7 @@ W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
 theta_222s <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
                 vec(A22_222), vec(W_222), lambdas_222, alpha1_222) # SGMVAR
-mod_222s <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", constraints=NULL,
+mod_222s <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222s, conditional=TRUE, parametrization="intercept", constraints=NULL,
                   structural_pars=list(W=W_222))
 
 
@@ -39,14 +39,14 @@ theta_222c <- c(0.33782, 0.183512, 0.472168, 0.095311, 0.201199, 0.600596, 0.237
                 0.23529, 1.077816, -0.016343, 0.112771, 0.22199, 0.005582, 0.028126, 0.492844)
 mat0 <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1), nrow=2*2^2, byrow=FALSE)
 C_222c <- rbind(mat0, mat0)
-mod_222c <- GMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c)
+mod_222c <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, parametrization="intercept", constraints=C_222c)
 
 # p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 params_222cm <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
                   0.235827, 0.013962, 0.053267, 0.262703, 1.06105, -0.013519,
                   0.114109, 0.229542, 0.003092, 0.027266, 0.424341)
-mod_222cm <- GMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
+mod_222cm <- GSMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
 
 set.seed(1); sim_112 <- simulateGMVAR(mod_112, nsimu=1)
 set.seed(2); sim_222 <- simulateGMVAR(mod_222c, nsimu=3)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{n_params}
 \alias{n_params}
-\title{Calculate the number of parameters in GMVAR model parameter vector}
+\title{Calculate the number of parameters in a GMVAR, StMVAR, or G-StMVAR model's parameter vector}
 \usage{
 n_params(
   p,
@@ -60,7 +60,8 @@ See Virolainen (2020) for the conditions required to identify the shocks and for
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns the number of parameters in parameter vector of the specified GMVAR model.
+Returns the number of parameters in the parameter vector of the specified
+ GMVAR, StMVAR, or G-StMVAR model.
 }
 \description{
 \code{n_params} calculates the number of parameters in the model.

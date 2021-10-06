@@ -2,23 +2,23 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{swap_W_signs}
 \alias{swap_W_signs}
-\title{Swap all signs in pointed columns a the \eqn{W} matrix of a structural GMVAR model.}
+\title{Swap all signs in pointed columns a the \eqn{W} matrix of a structural GMVAR, StMVAR, or G-StMVAR model.}
 \usage{
-swap_W_signs(gmvar, which_to_swap)
+swap_W_signs(gsmvar, which_to_swap)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_to_swap}{a numeric vector of length at most \eqn{d} and elemnts in \eqn{1,..,d}
 specifying the columns of \eqn{W} whose sign should be swapped.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+Returns an object of class \code{'gsmvar'} defining a structural GMVAR, StMVAR, or G-StMVAR model with the modified
   structural parameters and constraints.
 }
 \description{
 \code{swap_W_signs} swaps all signs in pointed columns a the \eqn{W} matrix
- of a structural GMVAR model. Consequently, signs in the columns of the B-matrix are also swapped
+ of a structural GMVAR, StMVAR, or G-StMVAR model. Consequently, signs in the columns of the B-matrix are also swapped
  accordingly.
 }
 \details{
@@ -36,7 +36,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
 mod22s
 
 # The same reduced form model, with signs in the second column of W swapped:
@@ -55,6 +55,6 @@ swap_W_signs(mod22s, which_to_swap=1:2)
  @keywords internal
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
- \code{\link{gmvar_to_sgmvar}}
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+ \code{\link{gsmvar_to_sgsmvar}}
 }

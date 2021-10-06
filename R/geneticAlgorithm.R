@@ -1,6 +1,6 @@
-#' @title Genetic algorithm for preliminary estimation of a GMVAR model
+#' @title Genetic algorithm for preliminary estimation of a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{GAfit} estimates the specified GMVAR model using a genetic algorithm.
+#' @description \code{GAfit} estimates the specified GMVAR, StMVAR, or G-StMVAR model using a genetic algorithm.
 #'   It's designed to find starting values for gradient based methods.
 #'
 #' @inheritParams loglikelihood_int
@@ -36,7 +36,7 @@
 #'         constraint matrix.
 #'       }
 #'     }
-#'     \item{\strong{For structural GMVAR model:}}{
+#'     \item{\strong{For structural model:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
 #'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
@@ -141,7 +141,7 @@
 #'   Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
 #'   never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.
 #' @param seed a single value, interpreted as an integer, or NULL, that sets seed for the random number generator in the beginning of
-#'   the function call. If calling \code{GAfit} from \code{fitGMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.
+#'   the function call. If calling \code{GAfit} from \code{fitGSMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.
 #' @details
 #'  The core of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
 #'  It utilizes a slightly modified version of the individually adaptive crossover and mutation rates described

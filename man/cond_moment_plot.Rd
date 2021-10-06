@@ -2,17 +2,17 @@
 % Please edit documentation in R/morePlots.R
 \name{cond_moment_plot}
 \alias{cond_moment_plot}
-\title{Conditional mean or variance plot for a GMVAR model}
+\title{Conditional mean or variance plot for a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 cond_moment_plot(
-  gmvar,
+  gsmvar,
   which_moment = c("mean", "variance"),
   grid = FALSE,
   ...
 )
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_moment}{should conditional means or variances be plotted?}
 
@@ -34,7 +34,7 @@ The conditional mean plot works best if the data contains positive values only.
 params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
 
 cond_moment_plot(mod22, which_moment="mean")
 cond_moment_plot(mod22, which_moment="variance")
@@ -53,6 +53,6 @@ cond_moment_plot(mod22, which_moment="mean", grid=TRUE, lty=3)
  }
 }
 \seealso{
-\code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
+\code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{diagnostic_plot}}
 }

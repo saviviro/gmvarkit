@@ -1,6 +1,6 @@
-#' @title Check the stationary condition of a given GMVAR model
+#' @title Check the stationary condition of a given GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{is_stationary} checks the stationarity condition of a GMVAR model.
+#' @description \code{is_stationary} checks the stationarity condition of a GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams loglikelihood_int
 #' @param d the number of time series in the system.
@@ -18,7 +18,7 @@
 #'         \item \eqn{M1} is the number of GMVAR type regimes.
 #'       }
 #'     }
-#'     \item{\strong{For structural GMVAR model:}}{
+#'     \item{\strong{For structural model:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
 #'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -375,12 +375,13 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
 }
 
 
-#' @title Calculate the number of parameters in GMVAR model parameter vector
+#' @title Calculate the number of parameters in a GMVAR, StMVAR, or G-StMVAR model's parameter vector
 #'
 #' @description \code{n_params} calculates the number of parameters in the model.
 #'
 #' @inheritParams check_parameters
-#' @return Returns the number of parameters in parameter vector of the specified GMVAR model.
+#' @return Returns the number of parameters in the parameter vector of the specified
+#'  GMVAR, StMVAR, or G-StMVAR model.
 #' @section Warning:
 #'  No argument checks!
 #' @inherit in_paramspace references
@@ -484,33 +485,33 @@ check_pMd <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
 }
 
 
-#' @title Checks whether the given object has class attribute 'gmvar'
+#' @title Checks whether the given object has class attribute 'gsmvar'
 #'
-#' @description \code{check_gmvar} checks that the object has class attribute 'gmvar'.
+#' @description \code{check_gsmvar} checks that the object has class attribute 'gsmvar'.
 #'
 #' @param object S3 object to be tested
-#' @param object_name what is the name of the object that should of class 'gmvar'?
-#' @return Throws an error if the object doesn't have the class attribute 'gmvar'.
+#' @param object_name what is the name of the object that should of class 'gsmvar'?
+#' @return Throws an error if the object doesn't have the class attribute 'gsmvar'.
 #' @keywords internal
 
-check_gmvar <- function(object, object_name) {
-  if(missing(object_name)) object_name <- "gmvar"
-  if(!any(class(object) == "gmvar")) {
-    stop(paste("The object", object_name, "has to be of class 'gmvar', typically created with the function 'GMVAR' or 'fitGMVAR'"))
+check_gsmvar <- function(object, object_name) {
+  if(missing(object_name)) object_name <- "gsmvar"
+  if(!any(class(object) == "gsmvar")) {
+    stop(paste("The object", object_name, "has to be of class 'gsmvar', typically created with the function 'GSMVAR' or 'fitGSMVAR'"))
   }
 }
 
 
 #' @title Checks whether the given object contains data
 #'
-#' @description \code{check_null_data} checks that the gmvar object has data.
+#' @description \code{check_null_data} checks that the gsmvar object has data.
 #'
 #' @inheritParams simulateGMVAR
-#' @return Throws an error if is.null(gmvar$data).
+#' @return Throws an error if is.null(gsmvar$data).
 #' @keywords internal
 
-check_null_data <- function(gmvar) {
-  if(is.null(gmvar$data)) {
+check_null_data <- function(gsmvar) {
+  if(is.null(gsmvar$data)) {
     stop("The model has to contain data! Data can be added without parameter estimation with the function 'add_data'")
   }
 }
@@ -542,11 +543,11 @@ check_same_means <- function(parametrization, same_means) {
 #' @return Doesn't return anything.
 #' @keywords internal
 
-warn_eigens <- function(gmvar, tol=0.002) {
-  boldA_eigens <- get_boldA_eigens(gmvar)
-  omega_eigens <- get_omega_eigens(gmvar)
-  near_nonstat <- vapply(1:gmvar$model$M, function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
-  near_singular <- vapply(1:gmvar$model$M, function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
+warn_eigens <- function(gsmvar, tol=0.002) {
+  boldA_eigens <- get_boldA_eigens(gsmvar)
+  omega_eigens <- get_omega_eigens(gsmvar)
+  near_nonstat <- vapply(1:gsmvar$model$M, function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
+  near_singular <- vapply(1:gsmvar$model$M, function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
   if(any(near_nonstat)) {
     my_string1 <- ifelse(sum(near_nonstat) == 1,
                         paste("Regime", which(near_nonstat),"has near-unit-roots! "),
@@ -562,6 +563,6 @@ warn_eigens <- function(gmvar, tol=0.002) {
     my_string2 <- NULL
   }
   if(any(near_nonstat) || any(near_singular)) {
-    warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest local maximum with the function 'alt_gmvar' by adjusting its argument 'which_largest'."))
+    warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest local maximum with the function 'alt_gsmvar' by adjusting its argument 'which_largest'."))
   }
 }

@@ -3,7 +3,7 @@
 \name{get_Sigmas}
 \alias{get_Sigmas}
 \title{Calculate the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}} in the mixing weights
- of the GMVAR model.}
+ of the GMVAR, StMVAR, or G-StMVAR model.}
 \usage{
 get_Sigmas(p, M, d, all_A, all_boldA, all_Omega)
 }
@@ -30,7 +30,7 @@ Returns a \code{[dp, dp, M]} array containing the dp-dimensional covariance matr
 }
 \description{
 \code{get_Sigmas} calculates the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}}
- in the mixing weights of the GMVAR model so that the algorithm proposed by McElroy (2017) employed
+ in the mixing weights of the GMVAR, StMVAR, or G-StMVAR model so that the algorithm proposed by McElroy (2017) employed
  whenever it reduces the computation time.
 }
 \details{

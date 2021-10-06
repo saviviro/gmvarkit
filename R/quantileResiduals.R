@@ -1,8 +1,7 @@
-
-#' @title Calculate multivariate quantile residuals of a GMVAR model
+#' @title Calculate multivariate quantile residuals of a GMVAR, StMVAR, or G-StMVAR model
 #'
 #' @description \code{quantile_residuals} calculates multivariate quantile residuals
-#'  (described by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR model.
+#'  (proposed by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
@@ -10,21 +9,21 @@
 #'   quantile residuals are calculated so that the first column quantile residuals are the "unconditioned ones"
 #'   and the rest condition on all the previous ones in numerical order. Read the cited article by
 #'   \emph{Kalliovirta and Saikkonen 2010} for details.
-#' @inherit GMVAR references
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
-#'   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
+#' @inherit GSMVAR references
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
+#'   \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}}
 #' @examples
 #' # GMVAR(1,2), d=2 model:
 #' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005, 0.03,
 #'  0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136, 0.674)
-#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 #' quantile_residuals(mod12)
 #'
 #' # GMVAR(2,2), d=2 model with mean-parametrization:
 #' params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218, 0.02, -0.119,
 #'  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
+#' mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
 #' quantile_residuals(mod22)
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -32,34 +31,34 @@
 #'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 #' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' quantile_residuals(mod22s)
 #' @export
 
-quantile_residuals <- function(gmvar) {
+quantile_residuals <- function(gsmvar) {
 
   # Collect preliminary values
-  check_gmvar(gmvar)
+  check_gsmvar(gsmvar)
   epsilon <- round(log(.Machine$double.xmin) + 10)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  model <- gmvar$model$model
-  data <- gmvar$data
-  structural_pars <- gmvar$model$structural_pars
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  model <- gsmvar$model$model
+  data <- gsmvar$data
+  structural_pars <- gsmvar$model$structural_pars
   n_obs <- nrow(data)
   T_obs <- n_obs - p
 
   # Collect parameter values
-  params <- gmvar$params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=gmvar$model$constraints,
-                                    same_means=gmvar$model$same_means, structural_pars=structural_pars)
+  params <- gsmvar$params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  if(gmvar$model$parametrization == "mean") {
+  if(gsmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
-  all_mu <- get_regime_means(gmvar)
+  all_mu <- get_regime_means(gsmvar)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -84,7 +83,7 @@ quantile_residuals <- function(gmvar) {
   Y <- reform_data(data, p)
 
   # Mixing weights
-  alpha_mt <- gmvar$mixing_weights
+  alpha_mt <- gsmvar$mixing_weights
 
   # Calculate the conditional means mu_{m,t} (KMS 2016, Condition 1 (a)).
   # Map to dimensions of mu_mt: [t, p, m]
@@ -93,7 +92,7 @@ quantile_residuals <- function(gmvar) {
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
 
   # The arch scalars multiplying the error covariance matrices (ones for GMVAR type regimes)
-  arch_scalars <- gmvar$arch_scalars
+  arch_scalars <- gsmvar$arch_scalars
 
   ## Start computing the multivariate quantile residuals (Kalliovirta and Saikkonen 2010, eq.(4))
   # using properties of marginal and conditional distributions of multinormal random variables and
@@ -249,10 +248,10 @@ quantile_residuals <- function(gmvar) {
 }
 
 
-#' @title Calculate multivariate quantile residuals of GMVAR model
+#' @title Calculate multivariate quantile residuals of GMVAR, StMVAR, or G-StMVAR model
 #'
 #' @description \code{quantile_residuals_int} is a wrapper for \code{quantile_residuals} to compute
-#'   quantile residuals using parameter values instead of class \code{gmvar} object.
+#'   quantile residuals using parameter values instead of class \code{gsmvar} object.
 #'
 #' @inheritParams loglikelihood_int
 #' @section Warning:
@@ -296,7 +295,7 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
                         num_tols=list(stat_tol=stat_tol,
                                       posdef_tol=posdef_tol,
                                       df_tol=df_tol)),
-                   class="gmvar")
+                   class="gsmvar")
 
   quantile_residuals(mod)
 }

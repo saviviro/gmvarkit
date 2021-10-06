@@ -5,17 +5,17 @@
 \alias{GIRF}
 \alias{plot.girf}
 \alias{print.girf}
-\title{Estimate generalized impulse response function for a structural GMVAR
-  model.}
+\title{Estimate generalized impulse response function for a structural GMVAR,
+  StMVAR, or G-StMVAR model.}
 \usage{
 GIRF(
-  gmvar,
+  gsmvar,
   which_shocks,
   shock_size = 1,
   N = 30,
   R1 = 250,
   R2 = 250,
-  init_regimes = 1:gmvar$model$M,
+  init_regimes = 1:gsmvar$model$M,
   init_values = NULL,
   which_cumulative = numeric(0),
   scale = NULL,
@@ -32,7 +32,7 @@ GIRF(
 \method{print}{girf}(x, ..., digits = 2, N_to_print)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_shocks}{a numeric vector of length at most \eqn{d}
 (\code{=ncol(data)}) and elements in \eqn{1,...,d} specifying the
@@ -129,12 +129,12 @@ Returns a class \code{'girf'} list with the GIRFs in the first
 }
 \description{
 \code{GIRF} estimates generalized impulse response function for
-  a structural GMVAR model.
+  a structural GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
 The model needs to be structural in order for this function to be
-  applicable. A structural GMVAR model can be estimated by specifying the
-  argument \code{structural_pars} in the function \code{fitGMVAR}.
+  applicable. A structural GMVAR, StMVAR, or G-StMVAR model can be estimated
+  by specifying the argument \code{structural_pars} in the function \code{fitGSMVAR}.
 
   The confidence bounds reflect uncertainty about the initial state (but
   currently not about the parameter estimates) if initial values are not
@@ -162,11 +162,11 @@ The model needs to be structural in order for this function to be
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
- mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+ mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s,
   structural_pars=list(W=W_22))
  mod22s
  # Alternatively, use:
- #fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
+ #fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
  #                   ncalls=20, seeds=1:20)
  # To obtain an estimated version of the same model.
 
@@ -201,10 +201,10 @@ The model needs to be structural in order for this function to be
  @keywords internal
 }
 \seealso{
-\code{\link{GFEVD}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}},
-  \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}},
+\code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
   \code{\link{swap_W_signs}}, \code{\link{simulateGMVAR}},
-  \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+  \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
   \code{\link{quantile_residual_tests}}, \code{\link{LR_test}},
   \code{\link{Wald_test}}
 }

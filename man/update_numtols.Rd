@@ -3,12 +3,12 @@
 \name{update_numtols}
 \alias{update_numtols}
 \title{Update the stationarity and positive definiteness numerical tolerances of an
-  existing class 'gmvar' model.}
+  existing class 'gsmvar' model.}
 \usage{
-update_numtols(gmvar, stat_tol = 0.001, posdef_tol = 1e-08)
+update_numtols(gsmvar, stat_tol = 0.001, posdef_tol = 1e-08)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
@@ -20,12 +20,12 @@ as not satisfying positive definiteness assumption. Note that if the tolerance i
 evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining a structural GMVAR model with the modified
+Returns an object of class \code{'gsmvar'} defining a structural GSMVAR model with the modified
   structural parameters and constraints.
 }
 \description{
 \code{update_numtols} updates the stationarity and positive definiteness
-  numerical tolerances of an existing class 'gmvar' model.
+  numerical tolerances of an existing class 'gsmvar' model.
 }
 \details{
 All signs in any column of \eqn{W} can be swapped without changing the implied reduced form model.
@@ -42,7 +42,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
 mod22s
 
 # Update numerical tolerances:
@@ -59,6 +59,6 @@ mod22s # The same model
  @keywords internal
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
- \code{\link{gmvar_to_sgmvar}}
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+ \code{\link{gsmvar_to_sgsmvar}}
 }

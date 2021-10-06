@@ -2,15 +2,15 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{add_data}
 \alias{add_data}
-\title{Add data to an object of class 'gmvar' defining a GMVAR model}
+\title{Add data to an object of class 'gsmvar' defining a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
-add_data(data, gmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
+add_data(data, gsmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
 }
 \arguments{
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 a univariate time series. \code{NA} values are not supported.}
 
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{calc_cond_moments}{should conditional means and covariance matrices should be calculated?
 Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
@@ -18,19 +18,19 @@ Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}
 \item{calc_std_errors}{should approximate standard errors be calculated?}
 }
 \value{
-Returns an object of class 'gmvar' defining the specified GMVAR model with the data added to the model.
+Returns an object of class 'gsmvar' defining the specified GSMVAR, StMVAR, or G-StMVAR model with the data added to the model.
   If the object already contained data, the data will be updated.
 }
 \description{
-\code{add_data} adds or updates data to object of class '\code{gmvar}' that defines a GMVAR model.
- Also calculates mixing weights and quantile residuals accordingly.
+\code{add_data} adds or updates data to object of class '\code{gsmvar}' that defines
+ a GMVAR, StMVAR, or G-StMVAR model. Also calculates mixing weights and quantile residuals accordingly.
 }
 \examples{
 # GMVAR(1,2), d=2 model:
 params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
   0.136, 0.674)
-mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
+mod12 <- GSMVAR(p=1, M=2, d=2, params=params12)
 mod12
 
 mod12_2 <- add_data(gdpdef, mod12)
@@ -42,7 +42,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
 mod22s
 
 mod22s_2 <- add_data(gdpdef, mod22s)
@@ -57,5 +57,5 @@ mod22s_2
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
 }

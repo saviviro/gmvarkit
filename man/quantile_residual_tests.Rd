@@ -12,7 +12,7 @@
 \method{print}{qrtest}(x, ..., digits = 3)
 
 quantile_residual_tests(
-  gmvar,
+  gsmvar,
   lags_ac = c(1, 3, 6, 12),
   lags_ch = lags_ac,
   nsimu = 1,
@@ -28,7 +28,7 @@ quantile_residual_tests(
 
 \item{digits}{the number of decimals to print}
 
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{lags_ac}{a positive integer vector specifying the lags used to test autocorrelation.}
 
@@ -79,7 +79,7 @@ heteroskedasticity tests.
 \examples{
 \donttest{
 # GMVAR(3,2) model
-fit32 <- fitGMVAR(gdpdef, p=3, M=2, ncalls=1, seeds=2)
+fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=1, seeds=2)
 qrtests32 <- quantile_residual_tests(fit32)
 qrtests32
 plot(qrtests32)
@@ -91,7 +91,7 @@ params12s <- c(0.55, 0.112, 0.619, 0.173, 0.344, 0.055, -0.009, 0.718,
  0.255, 0.017, -0.136, 0.858, 0.541, 0.057, -0.162, 0.162, 3.623,
  4.726, 0.674)
 W_12 <- matrix(c(1, 1, -1, 1), nrow=2)
-mod12s <- GMVAR(gdpdef, p=1, M=2, params=params12s,
+mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
                 structural_pars=list(W=W_12))
 qrtests12s <- quantile_residual_tests(mod12s, nsimu=1000)
 qrtests12s
@@ -110,7 +110,7 @@ qrtests12s
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
-  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
+  \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
   \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 }

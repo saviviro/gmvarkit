@@ -1,8 +1,9 @@
-#' @title Two-phase maximum likelihood estimation of a GMVAR model
+#' @title Two-phase maximum likelihood estimation of a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{fitGMVAR} estimates a GMVAR model in two phases: in the first phase it uses a genetic algorithm
-#'   to find starting values for a gradient based variable metric algorithm, which it then uses to finalize the
-#'   estimation in the second phase. Parallel computing is utilized to perform multiple rounds of estimations in parallel.
+#' @description \code{fitGSMVAR} estimates a GMVAR, StMVAR, or G-StMVAR model model in two phases:
+#'   in the first phase it uses a genetic algorithm to find starting values for a gradient based
+#'   variable metric algorithm, which it then uses to finalize the estimation in the second phase.
+#'   Parallel computing is utilized to perform multiple rounds of estimations in parallel.
 #'
 #' @inheritParams GAfit
 #' @param ncalls the number of estimation rounds that should be performed.
@@ -63,21 +64,21 @@
 #'  of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
 #'  definiteness conditions. The numerical tolerance of an existing model can be changed with the function
 #'  \code{update_numtols}.
-#' @return Returns an object of class \code{'gmvar'} defining the estimated (reduced form or structural) GMVAR model.
+#' @return Returns an object of class \code{'gsmvar'} defining the estimated (reduced form or structural) GMVAR, StMVAR, or G-StMVAR model.
 #'   Multivariate quantile residuals (Kalliovirta and Saikkonen 2010) are also computed and included in the returned object.
 #'   In addition, the returned object contains the estimates and log-likelihood values from all the estimation rounds performed.
-#'   The estimated parameter vector can be obtained at \code{gmvar$params} (and corresponding approximate standard errors
-#'   at \code{gmvar$std_errors}). See \code{?GMVAR} for the form of the parameter vector, if needed.
+#'   The estimated parameter vector can be obtained at \code{gsmvar$params} (and corresponding approximate standard errors
+#'   at \code{gsmvar$std_errors}). See \code{?GSMVAR} for the form of the parameter vector, if needed.
 #'
 #'   Remark that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
 #' @section S3 methods:
-#'   The following S3 methods are supported for class \code{'gmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
+#'   The following S3 methods are supported for class \code{'gsmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
 #'    \code{predict} and \code{plot}.
-#' @seealso \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+#' @seealso \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
 #'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
-#'   \code{\link{gmvar_to_sgmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
+#'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
 #'   \code{\link{update_numtols}}
 #' @references
 #'  \itemize{
@@ -100,7 +101,7 @@
 #'
 #' # GMVAR(1,2) model: 10 estimation rounds with seeds set
 #' # for reproducibility
-#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
@@ -116,16 +117,16 @@
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints.
 #' W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
-#' fit12s <- fitGMVAR(gdpdef, p=1, M=2, structural_pars=list(W=W_122),
+#' fit12s <- fitGSMVAR(gdpdef, p=1, M=2, structural_pars=list(W=W_122),
 #'   ncalls=1, seeds=1)
 #' fit12s
 #' # A statistically identified structural model can also be obtained with
-#' # gmvar_to_sgmvar(fit12)
+#' # gsmvar_to_sgsmvar(fit12)
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' fit22c <- fitGMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
+#' fit22c <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
 #' fit22c
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
@@ -134,14 +135,14 @@
 #' tmp <- matrix(c(1, rep(0, 10), 1, rep(0, 8), 1, rep(0, 10), 1),
 #'  nrow=2*2^2, byrow=FALSE)
 #' C_mat2 <- rbind(tmp, tmp)
-#' fit22c2 <- fitGMVAR(gdpdef, p=2, M=2, constraints=C_mat2, ncalls=1,
+#' fit22c2 <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat2, ncalls=1,
 #'   seeds=1)
 #' fit22c2
 #' }
 #' @export
 
-fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                     structural_pars=NULL, ncalls=100, ncores=2, maxit=500, seeds=NULL, print_res=TRUE, ...) {
+fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
+                      structural_pars=NULL, ncalls=100, ncores=2, maxit=500, seeds=NULL, print_res=TRUE, ...) {
 
   if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
   stopifnot(length(ncalls) == 1)
@@ -171,7 +172,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
   ### Optimization with the genetic algorithm ###
   cl <- parallel::makeCluster(ncores)
   on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
-  parallel::clusterExport(cl, ls(environment(fitGMVAR)), envir = environment(fitGMVAR)) # assign all variables from package:gmvarkit
+  parallel::clusterExport(cl, ls(environment(fitGSMVAR)), envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
   cat("Optimizing with a genetic algorithm...\n")
@@ -253,10 +254,10 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
   ### Wrap up ###
   cat("Calculating approximate standard errors...\n")
-  ret <- GMVAR(data=data, p=p, M=M, d=d, params=params,
-               conditional=conditional, parametrization=parametrization,
-               constraints=constraints, same_means=same_means,
-               structural_pars=structural_pars, calc_std_errors=TRUE)
+  ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params,
+                conditional=conditional, parametrization=parametrization,
+                constraints=constraints, same_means=same_means,
+                structural_pars=structural_pars, calc_std_errors=TRUE)
   ret$all_estimates <- all_estimates
   ret$all_logliks <- loks
   ret$which_converged <- converged
@@ -267,23 +268,23 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 }
 
 
-#' @title Maximum likelihood estimation of a GMVAR model with preliminary estimates
+#' @title Maximum likelihood estimation of a GMVAR, StMVAR, or G-StMVAR model with preliminary estimates
 #'
 #' @description \code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
-#'  estimation of a GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
+#'  estimation of a GMVAR, StMVAR, or G-StMVAR model (object of class \code{'gsmvar'}) which already has preliminary estimates.
 #'
 #' @inheritParams simulateGMVAR
-#' @inheritParams fitGMVAR
-#' @inheritParams GMVAR
+#' @inheritParams fitGSMVAR
+#' @inheritParams GSMVAR
 #' @details The purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
-#'   the estimation when the maximum number of iterations is reached when estimating a GMVAR model
-#'   with the main estimation function \code{fitGMVAR}. \code{iterate_more} is essentially a wrapper
-#'   around the function \code{optim} from the package \code{stats} and \code{GMVAR} from the package
+#'   the estimation when the maximum number of iterations is reached when estimating a GMVAR, StMVAR, or G-StMVAR model
+#'   with the main estimation function \code{fitGSMVAR}. \code{iterate_more} is essentially a wrapper
+#'   around the function \code{optim} from the package \code{stats} and \code{GSMVAR} from the package
 #'   \code{gmvarkit}.
-#' @return Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}},
+#' @return Returns an object of class \code{'gsmvar'} defining the estimated GMVAR, StMVAR, or G-StMVAR model.
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link[stats]{optim}},
 #'  \code{\link{profile_logliks}}, \code{\link{update_numtols}}
-#' @inherit GMVAR references
+#' @inherit GSMVAR references
 #' @examples
 #' \donttest{
 #' ## These are long running examples that use parallel computing!
@@ -291,7 +292,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #'
 #' # GMVAR(1,2) model, only 5 iterations of the variable metric
 #' # algorithm
-#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, maxit=5, seeds=1)
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=1, maxit=5, seeds=1)
 #' fit12
 #'
 #' # Iterate more:
@@ -300,16 +301,16 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 #' }
 #' @export
 
-iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, posdef_tol=1e-8) {
-  check_gmvar(gmvar)
+iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, posdef_tol=1e-8) {
+  check_gsmvar(gsmvar)
   stopifnot(maxit %% 1 == 0 & maxit >= 1)
-  minval <- get_minval(gmvar$data)
+  minval <- get_minval(gsmvar$data)
 
   fn <- function(params) {
-    tryCatch(loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=params,
-                               conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-                               constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
-                               structural_pars=gmvar$model$structural_pars, check_params=TRUE,
+    tryCatch(loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=params,
+                               conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                               constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                               structural_pars=gsmvar$model$structural_pars, check_params=TRUE,
                                to_return="loglik", minval=minval,
                                stat_tol=stat_tol, posdef_tol=posdef_tol),
              error=function(e) minval)
@@ -318,23 +319,23 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
     calc_gradient(x=params, fn=fn)
   }
 
-  res <- optim(par=gmvar$params, fn=fn, gr=gr, method=c("BFGS"), control=list(fnscale=-1, maxit=maxit))
+  res <- optim(par=gsmvar$params, fn=fn, gr=gr, method=c("BFGS"), control=list(fnscale=-1, maxit=maxit))
   if(res$convergence == 1) message("The maximum number of iterations was reached! Consired iterating more.")
 
-  ret <- GMVAR(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=res$par,
-               conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-               constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
-               structural_pars=gmvar$model$structural_pars, calc_std_errors=calc_std_errors,
+  ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=res$par,
+               conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+               constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+               structural_pars=gsmvar$model$structural_pars, calc_std_errors=calc_std_errors,
                stat_tol=stat_tol, posdef_tol=posdef_tol)
 
-  ret$all_estimates <- gmvar$all_estimates
-  ret$all_logliks <- gmvar$all_logliks
-  ret$which_converged <- gmvar$which_converged
-  if(!is.null(gmvar$which_round)) {
-    ret$which_round <- gmvar$which_round
-    ret$all_estimates[[gmvar$which_round]] <- ret$params
-    ret$all_logliks[gmvar$which_round] <- ret$loglik
-    ret$which_converged[gmvar$which_round] <- res$convergence == 0
+  ret$all_estimates <- gsmvar$all_estimates
+  ret$all_logliks <- gsmvar$all_logliks
+  ret$which_converged <- gsmvar$which_converged
+  if(!is.null(gsmvar$which_round)) {
+    ret$which_round <- gsmvar$which_round
+    ret$all_estimates[[gsmvar$which_round]] <- ret$params
+    ret$all_logliks[gsmvar$which_round] <- ret$loglik
+    ret$which_converged[gsmvar$which_round] <- res$convergence == 0
   }
   warn_eigens(ret)
   ret
@@ -348,7 +349,7 @@ iterate_more <- function(gmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, 
 #' @inheritParams GAfit
 #' @details This function exists to avoid dublication inside the package.
 #' @return Returns \code{-(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)}
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GAfit}}
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GAfit}}
 #' @keywords internal
 
 get_minval <- function(data) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/argumentChecks.R
 \name{is_stationary}
 \alias{is_stationary}
-\title{Check the stationary condition of a given GMVAR model}
+\title{Check the stationary condition of a given GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 is_stationary(
   p,
@@ -39,7 +39,7 @@ is_stationary(
         \item \eqn{M1} is the number of GMVAR type regimes.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural model:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -88,7 +88,7 @@ Returns \code{TRUE} if the model is stationary and \code{FALSE} if not. Based on
   very close to the boundary (this is used to ensure numerical stability in estimation of the model parameters).
 }
 \description{
-\code{is_stationary} checks the stationarity condition of a GMVAR model.
+\code{is_stationary} checks the stationarity condition of a GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
 If the model is constrained, remove the constraints first with the function \code{reform_constrained_pars}.

@@ -240,7 +240,7 @@ pick_df <- function(M, params, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
 #'
 #' @inheritParams is_stationary
 #' @details Constrained parameter vectors are not supported. Not even constraints in \eqn{W}!
-#' @return Returns a \eqn{(d x d)} matrix \eqn{W} from a parameter vector of a SGMVAR model.
+#' @return Returns a \eqn{(d x d)} matrix \eqn{W} from a parameter vector of a SGSMVAR model.
 #'   Returns \code{NULL} for reduced form models.
 #' @inheritSection pick_Ami Warning
 #' @inherit in_paramspace_int references
@@ -259,7 +259,7 @@ pick_W <- function(p, M, d, params, structural_pars=NULL) {
 #'
 #' @inheritParams is_stationary
 #' @return Returns a length \eqn{(d*(M - 1))} vector \eqn{(\lambda_{2},...,\lambda_{M})}
-#'  (see the argument \code{params}) from a parameter vector of a SGMVAR model.
+#'  (see the argument \code{params}) from a parameter vector of a SGSMVAR model.
 #'   Returns \code{numeric(0)} for reduced form models or when \eqn{M=1}.
 #' @inherit pick_W details
 #' @inheritSection pick_Ami Warning
@@ -340,20 +340,20 @@ pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#' mod22 <- GMVAR(p=2, M=2, d=2, params=params22)
+#' mod22 <- GSMVAR(p=2, M=2, d=2, params=params22)
 #' get_boldA_eigens(mod22)
 #' @export
 
-get_boldA_eigens <- function(gmvar) {
-  check_gmvar(gmvar)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params,
-                                    constraints=gmvar$model$constraints,
-                                    same_means=gmvar$model$same_means,
-                                    structural_pars=gmvar$model$structural_pars)
-  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+get_boldA_eigens <- function(gsmvar) {
+  check_gsmvar(gsmvar)
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params,
+                                    constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means,
+                                    structural_pars=gsmvar$model$structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_boldA <- form_boldA(p=p, M=M, d=d, all_A=all_A)
   matrix(vapply(1:M, function(m) abs(eigen(all_boldA[, , m], symmetric=FALSE, only.values=TRUE)$'values'), numeric(d*p)),
@@ -376,20 +376,20 @@ get_boldA_eigens <- function(gmvar) {
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#' mod22 <- GMVAR(p=2, M=2, d=2, params=params22)
+#' mod22 <- GSMVAR(p=2, M=2, d=2, params=params22)
 #' get_omega_eigens(mod22)
 #' @export
 
-get_omega_eigens <- function(gmvar) {
-  check_gmvar(gmvar)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params,
-                                    constraints=gmvar$model$constraints,
-                                    same_means=gmvar$model$same_means,
-                                    structural_pars=gmvar$model$structural_pars)
-  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+get_omega_eigens <- function(gsmvar) {
+  check_gsmvar(gsmvar)
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params,
+                                    constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means,
+                                    structural_pars=gsmvar$model$structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   matrix(vapply(1:M, function(m) eigen(all_Omega[, , m], symmetric=TRUE, only.values=TRUE)$'values', numeric(d)),
          nrow=d, ncol=M, byrow=FALSE)

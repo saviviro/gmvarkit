@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{random_ind2}
 \alias{random_ind2}
-\title{Create somewhat random parameter vector of a GMVAR model that is always stationary}
+\title{Create somewhat random parameter vector of a GMVAR, StMVAR, or G-StMVAR model that is always stationary}
 \usage{
 random_ind2(
   p,

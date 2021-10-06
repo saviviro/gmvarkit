@@ -1,10 +1,10 @@
 
 
-#' @title Simulate from GMVAR process
+#' @title Simulate from GMVAR, StMVAR, or G-StMVAR process
 #'
-#' @description \code{simulateGMVAR} simulates observations from a GMVAR process.
+#' @description \code{simulateGMVAR} simulates observations from a GMVAR, StMVAR, or G-StMVAR process.
 #'
-#' @param gmvar an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.
+#' @param gsmvar an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.
 #' @param nsimu number of observations to be simulated.
 #' @param init_values a size \eqn{(pxd)} matrix specifying the initial values to be used in the simulation, where
 #'   d is the number of time series in the system.
@@ -16,7 +16,7 @@
 #' @param seed set seed for the random number generator?
 #' @param girf_pars This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
 #'   should ignore it.
-#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
+#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating its possible future values.
 #'  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
 #'  intervals (see the forecasting example).
 #' @return If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
@@ -31,7 +31,7 @@
 #'      sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
 #'      \code{[, , i]} indicates the i:th set of simulations.}
 #'   }
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}, \code{\link{GFEVD}}
 #' @inherit loglikelihood_int references
 #' @examples
@@ -40,7 +40,7 @@
 #'  params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136,
 #'   0.674)
-#'  mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
+#'  mod12 <- GSMVAR(p=1, M=2, d=2, params=params12)
 #'  set.seed(1)
 #'  sim12 <- simulateGMVAR(mod12, nsimu=500)
 #'  plot.ts(sim12$sample)
@@ -52,7 +52,7 @@
 #'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 #'  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#'  mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+#'  mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s,
 #'   structural_pars=list(W=W_22))
 #'  sim22s <- simulateGMVAR(mod22s, nsimu=100)
 #'  plot.ts(sim22s$sample)
@@ -64,7 +64,7 @@
 #'  params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'   0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'    0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#'  mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+#'  mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
 #'  sim22 <- simulateGMVAR(mod22, nsimu=5, ntimes=500)
 #'
 #'  # Point forecast + 95% prediction intervals:
@@ -75,7 +75,7 @@
 #'        probs=c(0.025, 0.5, 0.972))
 #' @export
 
-simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
+simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
   # girf_pars$shock_numb - which shock?
   # girf_pars$shock_size - size of the structural shock?
   # girf_pars$init_regimes - init values generated from which regimes? Ignored if !is.null(init_values)
@@ -88,14 +88,14 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   # The first row for response at impact
   if(!is.null(seed)) set.seed(seed)
 
-  check_gmvar(gmvar)
+  check_gsmvar(gsmvar)
   epsilon <- round(log(.Machine$double.xmin) + 10)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  constraints <- gmvar$model$constraints
-  same_means <- gmvar$model$same_means
-  structural_pars <- gmvar$model$structural_pars
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  constraints <- gsmvar$model$constraints
+  same_means <- gsmvar$model$same_means
+  structural_pars <- gsmvar$model$structural_pars
   if(!all_pos_ints(c(nsimu, ntimes))) stop("Arguments n and ntimes must be positive integers")
   if(!is.null(init_values)) {
     if(!is.matrix(init_values)) stop("init_values must be a numeric matrix")
@@ -104,16 +104,16 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   }
 
   # Collect parameter values
-  params <- gmvar$params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=gmvar$model$constraints,
-                                    same_means=gmvar$model$same_means, structural_pars=structural_pars)
+  params <- gsmvar$params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  if(gmvar$model$parametrization == "mean") {
+  if(gsmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
 
-  all_mu <- get_regime_means(gmvar)
+  all_mu <- get_regime_means(gsmvar)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -264,8 +264,8 @@ simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, s
   # Calculate a single GIRF for the given structural shock: (N + 1 x d) matrix
   if(!is.null(girf_pars)) {
     one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
-    if(!is.null(gmvar$data)) {
-      colnames(one_girf) <- colnames(gmvar$data)
+    if(!is.null(gsmvar$data)) {
+      colnames(one_girf) <- colnames(gsmvar$data)
     } else {
       colnames(one_girf) <- paste("shock", 1:d)
     }

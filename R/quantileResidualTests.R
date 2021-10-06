@@ -23,13 +23,13 @@
 #'   associated (vectorized) individual statistics divided by their standard errors
 #'   (see \emph{Kalliovirta and Saikkonen 2010}, s.17-20) under the label \code{$ind_stats}.
 #' @inherit quantile_residuals references
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
-#'   \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}},
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residuals}}, \code{\link{GIRF}},
+#'   \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 #' @examples
 #' \donttest{
 #' # GMVAR(3,2) model
-#' fit32 <- fitGMVAR(gdpdef, p=3, M=2, ncalls=1, seeds=2)
+#' fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=1, seeds=2)
 #' qrtests32 <- quantile_residual_tests(fit32)
 #' qrtests32
 #' plot(qrtests32)
@@ -41,31 +41,31 @@
 #'  0.255, 0.017, -0.136, 0.858, 0.541, 0.057, -0.162, 0.162, 3.623,
 #'  4.726, 0.674)
 #' W_12 <- matrix(c(1, 1, -1, 1), nrow=2)
-#' mod12s <- GMVAR(gdpdef, p=1, M=2, params=params12s,
+#' mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
 #'                 structural_pars=list(W=W_12))
 #' qrtests12s <- quantile_residual_tests(mod12s, nsimu=1000)
 #' qrtests12s
 #' }
 #' @export
 
-quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsimu=1, print_res=TRUE,
+quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsimu=1, print_res=TRUE,
                                     stat_tol, posdef_tol) {
-  check_gmvar(gmvar)
-  check_null_data(gmvar)
+  check_gsmvar(gsmvar)
+  check_null_data(gsmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  data <- gmvar$data
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  data <- gsmvar$data
   n_obs <- nrow(data)
   T_obs <- n_obs - p
-  if(missing(stat_tol)) stat_tol <- gmvar$num_tols$stat_tol
-  if(missing(posdef_tol)) posdef_tol <- gmvar$num_tols$posdef_tol
+  if(missing(stat_tol)) stat_tol <- gsmvar$num_tols$stat_tol
+  if(missing(posdef_tol)) posdef_tol <- gsmvar$num_tols$posdef_tol
   if(max(c(lags_ac, lags_ch)) >= T_obs) stop("The lags are too large compared to the data size")
 
-  qresiduals <- gmvar$quantile_residuals
+  qresiduals <- gsmvar$quantile_residuals
   if(nsimu > n_obs) {
-    omega_data <- simulateGMVAR(gmvar, nsimu=nsimu, init_values=NULL, ntimes=1)$sample
+    omega_data <- simulateGMVAR(gsmvar, nsimu=nsimu, init_values=NULL, ntimes=1)$sample
   } else {
     omega_data <- data
   }
@@ -82,12 +82,12 @@ quantile_residual_tests <- function(gmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_
       }
     }
     omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M,
-                                   params=gmvar$params,
-                                   conditional=gmvar$model$conditional,
-                                   parametrization=gmvar$model$parametrization,
-                                   constraints=gmvar$model$constraints,
-                                   same_means=gmvar$model$same_means,
-                                   structural_pars=gmvar$model$structural_pars,
+                                   params=gsmvar$params,
+                                   conditional=gsmvar$model$conditional,
+                                   parametrization=gsmvar$model$parametrization,
+                                   constraints=gsmvar$model$constraints,
+                                   same_means=gsmvar$model$same_means,
+                                   structural_pars=gsmvar$model$structural_pars,
                                    g=g, dim_g=dim_g, stat_tol=stat_tol,
                                    posdef_tol=posdef_tol),
                     error=function(e) {

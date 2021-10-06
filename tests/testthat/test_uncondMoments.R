@@ -365,7 +365,7 @@ test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=1, M=2, d=3, params=theta_123tc_mu, model="StMVAR", parametrization="mean", constraints=C_123),
                calc_mu(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", constraints=C_123))
 
-  # SGMVAR
+  # SGSMVAR
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL,
                                     structural_pars=list(W=W_112)),
                pick_phi0(p=1, M=1, d=2, params=theta_112sWC_mu, structural_pars=list(W=W_112)))
@@ -437,7 +437,7 @@ test_that("get_regime_autocovs_int works correctly", {
                c(102.509805, 3.535469), tolerance=1e-6)
 
 
-  # SGMVAR
+  # SGSMVAR
   expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112sWC, constraints=NULL, structural_pars=list(W=W_112))[, 2, 2, 1],
                c(0.2201706, 1.9959185), tolerance=1e-6)
   expect_equal(get_regime_autocovs_int(p=1, M=1, d=2, params=theta_112tsWC, model="StMVAR", constraints=NULL, structural_pars=list(W=W_112))[, 2, 2, 1],
@@ -530,7 +530,7 @@ test_that("uncond_moments_int works correctly", {
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222c, parametrization="intercept", constraints=C_222)$autocors[, 2, 1],
                c(0.1983422, 1.0000000), tolerance=1e-6)
 
-  # SGMVAR
+  # SGSMVAR
   expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$uncond_mean,
                c(1.571661, 3.718636), tolerance=1e-6)
   expect_equal(uncond_moments_int(p=1, M=1, d=2, params=theta_112sWC, parametrization="intercept", constraints=NULL, structural_pars=list(W=W_112))$autocors[, 1, 1],
@@ -597,11 +597,11 @@ test_that("uncond_moments_int works correctly", {
 
 
 test_that("non_int uncond moment functions work", {
-  mod122 <- GMVAR(p=1, M=2, d=2, params=theta_122)
-  mod112csWAR <- GMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
-  mod222csLAR <- GMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
+  mod122 <- GSMVAR(p=1, M=2, d=2, params=theta_122)
+  mod112csWAR <- GSMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
+  mod222csLAR <- GSMVAR(p=2, M=2, d=2, params=theta_222csLAR, constraints=C_222,
                        structural_pars=list(W=W_222, C_lambda=C_lambda_222))
-  mod222c_int <- GMVAR(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
+  mod222c_int <- GSMVAR(p=2, M=2, d=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
 
   unc122 <- uncond_moments(mod122)
   unc112csWAR <- uncond_moments(mod112csWAR)

@@ -53,11 +53,11 @@ random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pa
 }
 
 
-#' @title Create random parameter vector of a GMVAR model fairly close to a given
+#' @title Create random parameter vector of a GMVAR, StMVAR, or G-StMVAR model fairly close to a given
 #'   parameter vector
 #'
-#' @description \code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR model fairly
-#'  close to a given parameter vector. The result may not be stationary.
+#' @description \code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR, StMVAR, or G-StMVAR
+#'   model fairly close to a given parameter vector. The result may not be stationary.
 #'
 #' @inheritParams is_stationary
 #' @inheritParams GAfit
@@ -184,7 +184,7 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
   }
 
 
-#' @title Create somewhat random parameter vector of a GMVAR model that is always stationary
+#' @title Create somewhat random parameter vector of a GMVAR, StMVAR, or G-StMVAR model that is always stationary
 #'
 #' @description \code{random_ind2} generates random mean-parametrized parameter vector
 #'  that is always stationary.

@@ -1,6 +1,6 @@
 #' @import graphics
 #'
-#' @title  Conditional mean or variance plot for a GMVAR model
+#' @title  Conditional mean or variance plot for a GMVAR, StMVAR, or G-StMVAR model
 #'
 #' @description \code{cond_moment_plot} plots the one-step in-sample conditional means/variances of the model along with
 #'  the individual time series contained in the model (e.g. the time series the model was fitted to). Also plots
@@ -13,41 +13,41 @@
 #' @details The conditional mean plot works best if the data contains positive values only.
 #'  \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is employed.
 #' @inherit simulateGMVAR references
-#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
+#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
 #'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{diagnostic_plot}}
 #' @examples
 #' # GMVAR(2, 2), d=2 model;
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-#' mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+#' mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
 #'
 #' cond_moment_plot(mod22, which_moment="mean")
 #' cond_moment_plot(mod22, which_moment="variance")
 #' cond_moment_plot(mod22, which_moment="mean", grid=TRUE, lty=3)
 #' @export
 
-cond_moment_plot <- function(gmvar, which_moment=c("mean", "variance"), grid=FALSE, ...) {
-  check_gmvar(gmvar)
-  stopifnot(!is.null(gmvar$data))
+cond_moment_plot <- function(gsmvar, which_moment=c("mean", "variance"), grid=FALSE, ...) {
+  check_gsmvar(gsmvar)
+  stopifnot(!is.null(gsmvar$data))
   which_moment <- match.arg(which_moment)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  data <- gmvar$data
-  if(is.null(gmvar$regime_cmeans)) stop("Conditional moments were not calculated when building this model")
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  data <- gsmvar$data
+  if(is.null(gsmvar$regime_cmeans)) stop("Conditional moments were not calculated when building this model")
 
   if(which_moment == "mean") {
-    total_moments <- gmvar$total_cmeans # [t, d]
-    mw_x_reg <- lapply(1:d, function(d1) gmvar$mixing_weights*gmvar$regime_cmeans[, d1, ]) # [[d]][t, m]
+    total_moments <- gsmvar$total_cmeans # [t, d]
+    mw_x_reg <- lapply(1:d, function(d1) gsmvar$mixing_weights*gsmvar$regime_cmeans[, d1, ]) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]]), data[,d1]))
   } else {
-    total_moments <- t(vapply(1:dim(gmvar$total_ccovs)[3], function(i1) diag(gmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
-    params <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$params, constraints=gmvar$model$constraints,
-                                      same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars)
-    omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gmvar$model$structural_pars))
+    total_moments <- t(vapply(1:dim(gsmvar$total_ccovs)[3], function(i1) diag(gsmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
+    params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, constraints=gsmvar$model$constraints,
+                                      same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
+    omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gsmvar$model$structural_pars))
     vars <- vapply(1:M, function(m) diag(omegas[, , m]), numeric(d)) # Regs in cols, d in rows
-    mw_x_reg <- lapply(1:d, function(d1) t(t(gmvar$mixing_weights)*vars[d1,])) # [[d]][t, m]
+    mw_x_reg <- lapply(1:d, function(d1) t(t(gsmvar$mixing_weights)*vars[d1,])) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]])))
   }
 

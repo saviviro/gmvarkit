@@ -1,8 +1,9 @@
 
-#' @title Calculate standard errors for estimates of GMVAR model
+#' @title Calculate standard errors for estimates of a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{standard_errors} numerically calculates approximate standard errors for the GMVAR model using square
-#'   roots of the diagonal of inverse of observed information matrix.
+#' @description \code{standard_errors} calculates approximate standard errors for the GMVAR,
+#'   StMVAR, or G-StMVAR model using square roots of the diagonal of inverse of observed information matrix
+#'   and central-difference approximation for the differentiation.
 #'
 #' @inheritParams loglikelihood_int
 #' @return A vector containing the approximate standard errors of the estimates.
@@ -15,6 +16,7 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
 
+  # The log-likelihood function to differentiate
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional, parametrization=parametrization,
                                constraints=constraints, same_means=same_means, structural_pars=structural_pars,
@@ -30,15 +32,14 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
   inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=length(params), ncol=length(params)))
 
   # Calculate the standard errors
-  diag_inv_obs_inf <- diag(inv_obs_inf)
-  unlist(lapply(diag_inv_obs_inf, function(x) ifelse(is.na(x) | x < 0, NA, sqrt(x))))
+  unlist(lapply(diag(inv_obs_inf), function(x) ifelse(is.na(x) | x < 0, NA, sqrt(x))))
 }
 
 
-#' @title Print standard errors of GMVAR model in the same form as the model estimates are printed
+#' @title Print standard errors of a GMVAR, StMVAR, or G-StMVAR model in the same form as the model estimates are printed
 #'
-#' @description \code{print_std_errors} prints the approximate standard errors of GMVAR model in the
-#'   same form as the parameters of objects of class \code{'gmvar'} are printed.
+#' @description \code{print_std_errors} prints the approximate standard errors of a GMVAR, StMVAR, or G-StMVAR model in the
+#'   same form as the parameters of objects of class \code{'gsmvar'} are printed.
 #'
 #' @inheritParams simulateGMVAR
 #' @param digits how many digits should be printed?
@@ -50,30 +51,30 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
 #'   Note that if linear constraints are imposed and they involve summations or multiplications, then the AR
 #'   parameter standard errors are printed separately as they don't correspond one-to-one to the model parameter
 #'   standard errors.
-#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{print.gmvar}},
+#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{print.gsmvar}},
 #'  \code{\link{swap_parametrization}}
-#' @inherit GMVAR references
+#' @inherit GSMVAR references
 #' @examples
 #' \donttest{
 #' # GMVAR(1,2) model
-#' fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
 #' fit12
 #' print_std_errors(fit12)
 #' }
 #' @export
 
-print_std_errors <- function(gmvar, digits=3) {
+print_std_errors <- function(gsmvar, digits=3) {
   if(!all_pos_ints(digits)) stop("Argument digits must be positive integer")
   format_value <- format_valuef(digits)
-  p <- gmvar$model$p
-  M <- gmvar$model$M
-  d <- gmvar$model$d
-  constraints <- gmvar$model$constraints
-  parametrization <- gmvar$model$parametrization
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gmvar$std_errors, constraints=constraints,
-                                  same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars,
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  constraints <- gsmvar$model$constraints
+  parametrization <- gsmvar$model$parametrization
+  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$std_errors, constraints=constraints,
+                                  same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
                                   change_na=TRUE)
-  structural_pars <- get_unconstrained_structural_pars(structural_pars=gmvar$model$structural_pars)
+  structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   if(is.null(structural_pars)) {
@@ -98,7 +99,7 @@ print_std_errors <- function(gmvar, digits=3) {
     if(any(constraints != 1 & constraints != 0) | any(rowSums(constraints) > 1)) {
       sep_AR <- TRUE # The AR parameter std errors must be printed separately
       all_A <- array(" ", dim=c(d, d, p, M))
-      AR_stds <- gmvar$std_errors[(M*d + 1):(M*d + ncol(constraints))] # Constrained AR param std errors
+      AR_stds <- gsmvar$std_errors[(M*d + 1):(M*d + ncol(constraints))] # Constrained AR param std errors
     } else {
       sep_AR <- FALSE
     }
@@ -108,7 +109,7 @@ print_std_errors <- function(gmvar, digits=3) {
 
   cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
   cat(paste0("p = ", p, ", M = ", M, ","),
-      ifelse(gmvar$model$conditional, "conditional", "exact"),
+      ifelse(gsmvar$model$conditional, "conditional", "exact"),
       "log-likelihood,",
       ifelse(parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
       ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
@@ -164,13 +165,13 @@ print_std_errors <- function(gmvar, digits=3) {
       # Similarly to the AR parameters, constrained lambda parameter standard errors multiplied open
       # in 'pars' are valid iff the constraint matrix "C_lambda" contains zeros and ones only, and
       # there is at most one one in each row (no multiplications or summations).
-      C_lambda <- gmvar$model$structural_pars$C_lambda
+      C_lambda <- gsmvar$model$structural_pars$C_lambda
       if(!is.null(C_lambda)) {
         if(any(C_lambda != 1 & C_lambda != 0) | any(rowSums(C_lambda) > 1)) {
           sep_lambda <- TRUE # The lambda parameter std errors must be printed separately
           lambdas <- matrix(NA, nrow=d, ncol=M - 1)
           n_zeros <- sum(W == 0, na.rm=TRUE)
-          lambda_stds <- gmvar$std_errors[(M*d + M*d^2*p + d^2 - n_zeros + 1):(M*d + M*d^2*p + d^2 - n_zeros + ncol(C_lambda))]
+          lambda_stds <- gsmvar$std_errors[(M*d + M*d^2*p + d^2 - n_zeros + 1):(M*d + M*d^2*p + d^2 - n_zeros + ncol(C_lambda))]
         } else {
           sep_lambda <- FALSE
         }
@@ -202,16 +203,16 @@ print_std_errors <- function(gmvar, digits=3) {
     colnames(df2)[names_to_omit] <- " "
     print(df2)
     cat("\n")
-    W_orig <- gmvar$model$structural_pars$W
+    W_orig <- gsmvar$model$structural_pars$W
     n_zero <- sum(W_orig == 0, na.rm=TRUE)
     n_free <- sum(is.na(W_orig))
     n_sign <- d^2 - n_zero - n_free
     if(sep_lambda) cat(paste0("lambda parameters: ", paste0(format_value(lambda_stds), collapse=", ")), "\n\n")
     cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
-    cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
+    cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gsmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
                                                   "subject to linear constraints."))
     cat("\n")
   }
-  invisible(gmvar)
+  invisible(gsmvar)
 }
 

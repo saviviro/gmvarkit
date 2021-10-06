@@ -2,12 +2,12 @@
 % Please edit documentation in R/WaldAndLR.R
 \name{Wald_test}
 \alias{Wald_test}
-\title{Perform Wald test for a GMVAR or SGMVAR model}
+\title{Perform Wald test for a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
-Wald_test(gmvar, A, c, h = 6e-06)
+Wald_test(gsmvar, A, c, h = 6e-06)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{A}{a size \eqn{(k x n_params)} matrix with full row rank specifying part of the null hypothesis
 where \eqn{n_params} is the number of parameters in the (unconstrained) model.
@@ -25,20 +25,20 @@ A list with class "htest" containing the following components:
   \item{alternative}{a character string describing the alternative hypothesis.}
   \item{method}{a character string indicating the type of the test (Wald test).}
   \item{data.name}{a character string giving the names of the supplied model, constraint matrix A, and vector c.}
-  \item{gmvar}{the supplied argument gmvar.}
+  \item{gsmvar}{the supplied argument gsmvar.}
   \item{A}{the supplied argument A.}
   \item{c}{the supplied argument c.}
   \item{h}{the supplied argument h.}
 }
 \description{
-\code{Wald_test} performs a Wald test for a GMVAR or SGMVAR model
+\code{Wald_test} performs a Wald test for a GMVAR, StMVAR, or G-StMVAR model
 }
 \details{
 Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothesis \eqn{A\theta_{0}=c}.
   Under the null, the test statistic is asymptotically \eqn{\chi^2}-distributed with \eqn{k}
   (\code{=nrow(A)}) degrees of freedom. The parameter \eqn{\theta_{0}} is assumed to have the same form as in
-  the model supplied in the argument \code{gmvar} and it is presented in the documentation of the argument
-  \code{params} in the function \code{GMVAR} (see \code{?GMVAR}).
+  the model supplied in the argument \code{gsmvar} and it is presented in the documentation of the argument
+  \code{params} in the function \code{GSMVAR} (see \code{?GSMVAR}).
 
   Finally, note that this function does \strong{not} check whether the specified constraints are feasible (e.g. whether
   the implied constrained model would be stationary or have positive definite error term covariance matrices).
@@ -47,7 +47,7 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
 \donttest{
  # Structural GMVAR(2, 2), d=2 model with recursive identification
  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
- fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
+ fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
                     ncalls=1, seeds=2)
  fit22s
 
@@ -79,6 +79,6 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
  @keywords internal
 }
 \seealso{
-\code{\link{LR_test}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}},
+\code{\link{LR_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 }

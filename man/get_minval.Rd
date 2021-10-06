@@ -20,6 +20,6 @@ Returns \code{-(10^(ceiling(log10(nrow(data)) + ncol(data))) - 1)}
 This function exists to avoid dublication inside the package.
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GAfit}}
+\code{\link{fitGSMVAR}}, \code{\link{GAfit}}
 }
 \keyword{internal}

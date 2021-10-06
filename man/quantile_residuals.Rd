@@ -2,12 +2,12 @@
 % Please edit documentation in R/quantileResiduals.R
 \name{quantile_residuals}
 \alias{quantile_residuals}
-\title{Calculate multivariate quantile residuals of a GMVAR model}
+\title{Calculate multivariate quantile residuals of a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
-quantile_residuals(gmvar)
+quantile_residuals(gsmvar)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
@@ -18,20 +18,20 @@ Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residu
 }
 \description{
 \code{quantile_residuals} calculates multivariate quantile residuals
- (described by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR model.
+ (proposed by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR, StMVAR, or G-StMVAR model.
 }
 \examples{
 # GMVAR(1,2), d=2 model:
 params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005, 0.03,
  0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136, 0.674)
-mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 quantile_residuals(mod12)
 
 # GMVAR(2,2), d=2 model with mean-parametrization:
 params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
  0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218, 0.02, -0.119,
  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
+mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
 quantile_residuals(mod22)
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -39,7 +39,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 quantile_residuals(mod22s)
 }
 \references{
@@ -55,6 +55,6 @@ quantile_residuals(mod22s)
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
-  \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}}, \code{\link{profile_logliks}}
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
+  \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}}
 }

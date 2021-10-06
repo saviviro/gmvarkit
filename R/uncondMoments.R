@@ -29,7 +29,7 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 #' @title Calculate regime means \eqn{\mu_{m}}
 #'
 #' @description \code{get_regime_means} calculates regime means \eqn{\mu_{m} = (I - \sum A_{m,i})^(-1))}
-#'   for the given GMVAR model.
+#'   for the given GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @return Returns a \eqn{(dxM)} matrix containing regime mean \eqn{\mu_{m}} in the m:th column, \eqn{m=1,..,M}.
@@ -41,7 +41,7 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 #' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'  0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
 #'  0.136, 0.674)
-#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 #' mod12
 #' get_regime_means(mod12)
 #'
@@ -50,16 +50,16 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 #'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 #' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' mod22s
 #' get_regime_means(mod22s)
 #' @export
 
-get_regime_means <- function(gmvar) {
-  check_gmvar(gmvar)
-  get_regime_means_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                       parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
-                       same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars)
+get_regime_means <- function(gsmvar) {
+  check_gsmvar(gsmvar)
+  get_regime_means_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
+                       parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
+                       same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
 }
 
 
@@ -67,7 +67,7 @@ get_regime_means <- function(gmvar) {
 #' @title Calculate regimewise autocovariance matrices
 #'
 #' @description \code{get_regime_autocovs_int} calculates the regimewise autocovariance matrices \eqn{\Gamma_{m}(j)}
-#'  \eqn{j=0,1,...,p} for the given GMVAR model.
+#'  \eqn{j=0,1,...,p} for the given GSMVAR model.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams reform_constrained_pars
@@ -108,7 +108,7 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 #' @title Calculate regimewise autocovariance matrices
 #'
 #' @description \code{get_regime_autocovs} calculates the first p regimewise autocovariance
-#'  matrices \eqn{\Gamma_{m}(j)} for the given GMVAR model.
+#'  matrices \eqn{\Gamma_{m}(j)} for the given GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams simulateGMVAR
 #' @family moment functions
@@ -119,7 +119,7 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 #' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'  0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
 #'  0.136, 0.674)
-#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 #' get_regime_autocovs(mod12)
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -127,24 +127,24 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 #'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 #' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' mod22s
 #' get_regime_autocovs(mod22s)
 #' @export
 
-get_regime_autocovs <- function(gmvar) {
-  check_gmvar(gmvar)
-  get_regime_autocovs_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                          constraints=gmvar$model$constraints, same_means=gmvar$model$same_means,
-                          structural_pars=gmvar$model$structural_pars)
+get_regime_autocovs <- function(gsmvar) {
+  check_gsmvar(gsmvar)
+  get_regime_autocovs_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
+                          constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                          structural_pars=gsmvar$model$structural_pars)
 }
 
 
 #' @title Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
-#'  of a GMVAR process
+#'  of a GMVAR, StMVAR, or G-StMVAR process
 #'
 #' @description \code{uncond_moments_int} calculates the unconditional mean, variance, the first p autocovariances,
-#'  and the first p autocorrelations of the specified GMVAR process.
+#'  and the first p autocorrelations of the specified GMVAR, StMVAR, or G-StMVAR process.
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams reform_constrained_pars
@@ -191,10 +191,10 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 
 
 #' @title Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
-#'  of a GMVAR process
+#'  of a GMVAR, StMVAR, or G-StMVAR process
 #'
 #' @description \code{uncond_moments} calculates the unconditional mean, variance, the first p autocovariances,
-#'  and the first p autocorrelations of the given GMVAR process.
+#'  and the first p autocorrelations of the given GMVAR, StMVAR, or G-StMVAR process.
 #'
 #' @inheritParams simulateGMVAR
 #' @family moment functions
@@ -205,7 +205,7 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 #' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'  0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
 #'  0.136, 0.674)
-#' mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#' mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 #' uncond_moments(mod12)
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -213,16 +213,16 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 #'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 #' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' mod22s
 #' uncond_moments(mod22s)
 #' @export
 
-uncond_moments <- function(gmvar) {
-  check_gmvar(gmvar)
-  uncond_moments_int(p=gmvar$model$p, M=gmvar$model$M, d=gmvar$model$d, params=gmvar$params,
-                     parametrization=gmvar$model$parametrization, constraints=gmvar$model$constraints,
-                     same_means=gmvar$model$same_means, structural_pars=gmvar$model$structural_pars)
+uncond_moments <- function(gsmvar) {
+  check_gsmvar(gsmvar)
+  uncond_moments_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
+                     parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
+                     same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
 }
 
 
@@ -332,10 +332,10 @@ VAR_pcovmat <- function(p, d, all_Am, Omega_m) {
 
 
 #' @title Calculate the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}} in the mixing weights
-#'  of the GMVAR model.
+#'  of the GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @description \code{get_Sigmas} calculates the dp-dimensional covariance matrices \eqn{\Sigma_{m,p}}
-#'  in the mixing weights of the GMVAR model so that the algorithm proposed by McElroy (2017) employed
+#'  in the mixing weights of the GMVAR, StMVAR, or G-StMVAR model so that the algorithm proposed by McElroy (2017) employed
 #'  whenever it reduces the computation time.
 #'
 #' @inheritParams is_stationary

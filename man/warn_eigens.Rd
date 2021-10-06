@@ -4,10 +4,10 @@
 \alias{warn_eigens}
 \title{Warn about near-unit-roots in some regimes}
 \usage{
-warn_eigens(gmvar, tol = 0.002)
+warn_eigens(gsmvar, tol = 0.002)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{tol}{if eigenvalue is closer than \code{tol} to its bound, a warning is thrown}
 }

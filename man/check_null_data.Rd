@@ -4,15 +4,15 @@
 \alias{check_null_data}
 \title{Checks whether the given object contains data}
 \usage{
-check_null_data(gmvar)
+check_null_data(gsmvar)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
-Throws an error if is.null(gmvar$data).
+Throws an error if is.null(gsmvar$data).
 }
 \description{
-\code{check_null_data} checks that the gmvar object has data.
+\code{check_null_data} checks that the gsmvar object has data.
 }
 \keyword{internal}

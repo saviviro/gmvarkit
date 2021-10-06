@@ -13,13 +13,13 @@ calc_gradient(x, fn, h = 6e-06, ...)
 
 calc_hessian(x, fn, h = 6e-06, ...)
 
-get_gradient(gmvar, h = 6e-06)
+get_gradient(gsmvar, h = 6e-06)
 
-get_hessian(gmvar, h = 6e-06)
+get_hessian(gsmvar, h = 6e-06)
 
-get_soc(gmvar, h = 6e-06)
+get_soc(gsmvar, h = 6e-06)
 
-get_foc(gmvar, h = 6e-06)
+get_foc(gsmvar, h = 6e-06)
 }
 \arguments{
 \item{x}{a numeric vector specifying the point where the gradient or Hessian should be calculated.}
@@ -30,7 +30,7 @@ get_foc(gmvar, h = 6e-06)
 
 \item{...}{other arguments passed to \code{fn}}
 
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Gradient functions return numerical approximation of the gradient and Hessian functions return
@@ -40,7 +40,7 @@ Gradient functions return numerical approximation of the gradient and Hessian fu
 \code{calc_gradient} or \code{calc_hessian} calculates the gradient or Hessian matrix
   of the given function at the given point using central difference numerical approximation.
   \code{get_gradient} or \code{get_hessian} calculates the gradient or Hessian matrix of the
-  log-likelihood function at the parameter estimates of a class \code{'gmvar'} object. \code{get_soc}
+  log-likelihood function at the parameter estimates of a class \code{'gsmvar'} object. \code{get_soc}
   returns eigenvalues of the Hessian matrix, and \code{get_foc} is the same as \code{get_gradient}
   but named conveniently.
 }
@@ -69,7 +69,7 @@ In particular, the functions \code{get_foc} and \code{get_soc} can be used to ch
   params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
    0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
    0.136, 0.674)
-  mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+  mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
   get_gradient(mod12)
   get_hessian(mod12)
   get_soc(mod12)

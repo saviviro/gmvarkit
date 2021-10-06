@@ -2,10 +2,10 @@
 % Please edit documentation in R/MAINest.R
 \name{iterate_more}
 \alias{iterate_more}
-\title{Maximum likelihood estimation of a GMVAR model with preliminary estimates}
+\title{Maximum likelihood estimation of a GMVAR, StMVAR, or G-StMVAR model with preliminary estimates}
 \usage{
 iterate_more(
-  gmvar,
+  gsmvar,
   maxit = 100,
   calc_std_errors = TRUE,
   stat_tol = 0.001,
@@ -13,7 +13,7 @@ iterate_more(
 )
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{maxit}{the maximum number of iterations in the variable metric algorithm.}
 
@@ -29,17 +29,17 @@ as not satisfying positive definiteness assumption. Note that if the tolerance i
 evaluation of the log-likelihood might fail and cause error.}
 }
 \value{
-Returns an object of class \code{'gmvar'} defining the estimated GMVAR model.
+Returns an object of class \code{'gsmvar'} defining the estimated GMVAR, StMVAR, or G-StMVAR model.
 }
 \description{
 \code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
- estimation of a GMVAR model (object of class \code{'gmvar'}) which already has preliminary estimates.
+ estimation of a GMVAR, StMVAR, or G-StMVAR model (object of class \code{'gsmvar'}) which already has preliminary estimates.
 }
 \details{
 The purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
-  the estimation when the maximum number of iterations is reached when estimating a GMVAR model
-  with the main estimation function \code{fitGMVAR}. \code{iterate_more} is essentially a wrapper
-  around the function \code{optim} from the package \code{stats} and \code{GMVAR} from the package
+  the estimation when the maximum number of iterations is reached when estimating a GMVAR, StMVAR, or G-StMVAR model
+  with the main estimation function \code{fitGSMVAR}. \code{iterate_more} is essentially a wrapper
+  around the function \code{optim} from the package \code{stats} and \code{GSMVAR} from the package
   \code{gmvarkit}.
 }
 \examples{
@@ -49,7 +49,7 @@ The purpose of \code{iterate_more} is to provide a simple and convenient tool to
 
 # GMVAR(1,2) model, only 5 iterations of the variable metric
 # algorithm
-fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, maxit=5, seeds=1)
+fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=1, maxit=5, seeds=1)
 fit12
 
 # Iterate more:
@@ -70,6 +70,6 @@ fit12_2
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link[stats]{optim}},
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link[stats]{optim}},
  \code{\link{profile_logliks}}, \code{\link{update_numtols}}
 }

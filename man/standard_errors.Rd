@@ -2,7 +2,7 @@
 % Please edit documentation in R/standardErrors.R
 \name{standard_errors}
 \alias{standard_errors}
-\title{Calculate standard errors for estimates of GMVAR model}
+\title{Calculate standard errors for estimates of a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 standard_errors(
   data,
@@ -17,7 +17,8 @@ standard_errors(
   structural_pars = NULL,
   minval,
   stat_tol = 0.001,
-  posdef_tol = 1e-08
+  posdef_tol = 1e-08,
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -69,7 +70,7 @@ a univariate time series. \code{NA} values are not supported.}
           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural models:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -156,13 +157,17 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
 A vector containing the approximate standard errors of the estimates.
 }
 \description{
-\code{standard_errors} numerically calculates approximate standard errors for the GMVAR model using square
-  roots of the diagonal of inverse of observed information matrix.
+\code{standard_errors} calculates approximate standard errors for the GMVAR,
+  StMVAR, or G-StMVAR model using square roots of the diagonal of inverse of observed information matrix
+  and central-difference approximation for the differentiation.
 }
 \references{
 \itemize{

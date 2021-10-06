@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{smart_ind}
 \alias{smart_ind}
-\title{Create random parameter vector of a GMVAR model fairly close to a given
+\title{Create random parameter vector of a GMVAR, StMVAR, or G-StMVAR model fairly close to a given
   parameter vector}
 \usage{
 smart_ind(
@@ -49,7 +49,7 @@ smart_ind(
         \item \eqn{M1} is the number of GMVAR type regimes.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural model:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -173,8 +173,8 @@ Returns random mean-parametrized parameter vector that has the same form as the 
   in the other functions, for instance, in the function \code{loglikelihood}.
 }
 \description{
-\code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR model fairly
- close to a given parameter vector. The result may not be stationary.
+\code{smart_ind} creates random mean-parametrized parameter vector of a GMVAR, StMVAR, or G-StMVAR
+  model fairly close to a given parameter vector. The result may not be stationary.
 }
 \section{Warning}{
 

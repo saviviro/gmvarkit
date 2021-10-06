@@ -4,10 +4,10 @@
 \alias{get_omega_eigens}
 \title{Calculate the eigenvalues of the "Omega" error term covariance matrices}
 \usage{
-get_omega_eigens(gmvar)
+get_omega_eigens(gsmvar)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Returns a matrix with \eqn{d} rows and \eqn{M} columns - one column for each regime.
@@ -23,7 +23,7 @@ Returns a matrix with \eqn{d} rows and \eqn{M} columns - one column for each reg
 params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
-mod22 <- GMVAR(p=2, M=2, d=2, params=params22)
+mod22 <- GSMVAR(p=2, M=2, d=2, params=params22)
 get_omega_eigens(mod22)
 }
 \references{

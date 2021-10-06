@@ -4,17 +4,10 @@
 \alias{swap_parametrization}
 \title{Swap the parametrization of a GMVAR model}
 \usage{
-swap_parametrization(gmvar)
+swap_parametrization(gsmvar)
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
-}
-\value{
-Returns an object of class \code{'gsmvar'} defining the specified reduced form or structural GMVAR,
-  StMVAR, or G-StMVAR model. Can be used to work with other functions provided in \code{gmvarkit}.
-
-  Note that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
-  the second one for the lag one, etc.
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \description{
 \code{swap_parametrization} swaps the parametrization of a GMVAR model
@@ -32,7 +25,7 @@ params22 <- c(0.869, 0.549, 0.223, 0.059, -0.151, 0.395, 0.406,
  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.576, 1.168, 0.218,
  0.02, -0.119, 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004,
  0.105, 0.58)
-mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
+mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22, parametrization="mean")
 mod22 # mean parametrization
 
 mod22_2 <- swap_parametrization(mod22)
@@ -44,25 +37,13 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-mod22s <- GMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
+mod22s <- GSMVAR(p=2, M=2, d=2, params=params22s, structural_pars=list(W=W_22))
 mod22s # intercept parametrization
 
 mod22s_2 <- swap_parametrization(mod22s)
 mod22s_2 # mean parametrization
 }
 }
-\references{
-\itemize{
-   \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
-         \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
-         Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2109.13648.
- }
-}
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{update_numtols}}
 }

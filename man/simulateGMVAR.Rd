@@ -2,10 +2,10 @@
 % Please edit documentation in R/simulateGMVAR.R
 \name{simulateGMVAR}
 \alias{simulateGMVAR}
-\title{Simulate from GMVAR process}
+\title{Simulate from GMVAR, StMVAR, or G-StMVAR process}
 \usage{
 simulateGMVAR(
-  gmvar,
+  gsmvar,
   nsimu,
   init_values = NULL,
   ntimes = 1,
@@ -15,7 +15,7 @@ simulateGMVAR(
 )
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{nsimu}{number of observations to be simulated.}
 
@@ -49,10 +49,10 @@ If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$comp
   }
 }
 \description{
-\code{simulateGMVAR} simulates observations from a GMVAR process.
+\code{simulateGMVAR} simulates observations from a GMVAR, StMVAR, or G-StMVAR process.
 }
 \details{
-The argument \code{ntimes} is intended for forecasting: a GMVAR process can be forecasted by simulating its possible future values.
+The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating its possible future values.
  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
  intervals (see the forecasting example).
 }
@@ -62,7 +62,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
  params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136,
   0.674)
- mod12 <- GMVAR(p=1, M=2, d=2, params=params12)
+ mod12 <- GSMVAR(p=1, M=2, d=2, params=params12)
  set.seed(1)
  sim12 <- simulateGMVAR(mod12, nsimu=500)
  plot.ts(sim12$sample)
@@ -74,7 +74,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
  W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
- mod22s <- GMVAR(gdpdef, p=2, M=2, params=params22s,
+ mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s,
   structural_pars=list(W=W_22))
  sim22s <- simulateGMVAR(mod22s, nsimu=100)
  plot.ts(sim22s$sample)
@@ -86,7 +86,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
  params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
   0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
    0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
- mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+ mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
  sim22 <- simulateGMVAR(mod22, nsimu=5, ntimes=500)
 
  # Point forecast + 95\% prediction intervals:
@@ -109,6 +109,6 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR process can be f
  }
 }
 \seealso{
-\code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gmvar}},
+\code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}},
  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{GIRF}}, \code{\link{GFEVD}}
 }

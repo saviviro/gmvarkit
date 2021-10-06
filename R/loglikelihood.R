@@ -50,7 +50,7 @@
 #'           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
 #'       }
 #'     }
-#'     \item{\strong{For structural GMVAR model:}}{
+#'     \item{\strong{For structural models:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
 #'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -127,7 +127,7 @@
 #'  See the section "Return" for all the options.
 #' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 #' @return
-#'   \item{By default:}{log-likelihood value of the specified GMVAR model,}
+#'   \item{By default:}{log-likelihood value of the specified GMVAR, StMVAR, or G-StMVAR model,}
 #'   \item{If \code{to_return=="mw"}:}{a size ((n_obs-p)xM) matrix containing the mixing weights: for m:th component in m:th column.}
 #'   \item{If \code{to_return=="mw_tplus1"}:}{a size ((n_obs-p+1)xM) matrix containing the mixing weights: for m:th component in m:th column.
 #'     The last row is for \eqn{\alpha_{m,T+1}}.}
@@ -418,14 +418,14 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
 #' @title Compute log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector
 #'
 #' @description \code{loglikelihood} computes log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector
-#'   instead of an object of class 'gmvar'. Exists for convenience if one wants to for example
-#'   employ other estimation algorithms than the ones used in \code{fitGMVAR}. Use \code{minval} to
+#'   instead of an object of class 'gsmvar'. Exists for convenience if one wants to for example
+#'   employ other estimation algorithms than the ones used in \code{fitGSMVAR}. Use \code{minval} to
 #'   control what happens when the parameter vector is outside the parameter space.
 #'
 #' @inheritParams loglikelihood_int
 #' @return Returns log-likelihood if \code{params} is in the parameters space and \code{minval} if not.
 #' @inherit loglikelihood_int details references
-#' @seealso \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{calc_gradient}}
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{calc_gradient}}
 #' @examples
 #' # GMVAR(2, 2), d=2 model;
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,

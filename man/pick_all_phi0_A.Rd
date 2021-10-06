@@ -31,7 +31,7 @@ pick_all_phi0_A(p, M, d, params, structural_pars = NULL)
         \item \eqn{M1} is the number of GMVAR type regimes.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural model:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where

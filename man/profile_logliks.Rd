@@ -5,7 +5,7 @@
 \title{Plot profile log-likehoods around the estimates}
 \usage{
 profile_logliks(
-  gmvar,
+  gsmvar,
   which_pars,
   scale = 0.02,
   nrows,
@@ -16,7 +16,7 @@ profile_logliks(
 )
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_pars}{the profile log-likelihood function of which parameters should be plotted? An integer
  vector specifying the positions of the parameters in the parameter vector. The parameter vector has the
@@ -85,7 +85,7 @@ The red vertical line points the estimate.
 # Running all the below examples takes approximately 2 minutes.
 
 # GMVAR(1,2) model
-fit12 <- fitGMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
+fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=1, seeds=1)
 fit12
 profile_logliks(fit12)
 
@@ -94,7 +94,7 @@ profile_logliks(fit12)
 W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
 params12s <- c(0.55, 0.11, 0.62, 0.17, 0.34, 0.05, -0.01, 0.72, 0.25,
  0.02, -0.14, 0.86, 0.54, 0.06, -0.16, 0.16, 3.62, 4.73, 0.67)
-mod12s <- GMVAR(gdpdef, p=1, M=2, params=params12s,
+mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
                 structural_pars=list(W=W_122))
 profile_logliks(mod12s)
 }
@@ -112,6 +112,6 @@ profile_logliks(mod12s)
  }
 }
 \seealso{
-\code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}},
+\code{\link{get_soc}}, \code{\link{diagnostic_plot}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
   \code{\link{GIRF}}, \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}
 }

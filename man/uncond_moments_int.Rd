@@ -3,7 +3,7 @@
 \name{uncond_moments_int}
 \alias{uncond_moments_int}
 \title{Calculate the unconditional mean, variance, the first p autocovariances, and the first p autocorrelations
- of a GMVAR process}
+ of a GMVAR, StMVAR, or G-StMVAR process}
 \usage{
 uncond_moments_int(
   p,
@@ -65,7 +65,7 @@ uncond_moments_int(
           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
       }
     }
-    \item{\strong{For structural GMVAR model:}}{
+    \item{\strong{For structural models:}}{
       Should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
@@ -149,7 +149,7 @@ Returns a list with three components:
 }
 \description{
 \code{uncond_moments_int} calculates the unconditional mean, variance, the first p autocovariances,
- and the first p autocorrelations of the specified GMVAR process.
+ and the first p autocorrelations of the specified GMVAR, StMVAR, or G-StMVAR process.
 }
 \details{
 The unconditional moments are based on the stationary distribution of the process.

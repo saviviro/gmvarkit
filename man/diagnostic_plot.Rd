@@ -2,17 +2,17 @@
 % Please edit documentation in R/diagnosticPlot.R
 \name{diagnostic_plot}
 \alias{diagnostic_plot}
-\title{Quantile residual diagnostic plot for a GMVAR model}
+\title{Quantile residual diagnostic plot for a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 diagnostic_plot(
-  gmvar,
+  gsmvar,
   type = c("all", "series", "ac", "ch", "norm"),
   maxlag = 12,
   wait_time = 4
 )
 }
 \arguments{
-\item{gmvar}{an object of class \code{'gmvar'} created with \code{fitGMVAR} or \code{GMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{type}{which type of diagnostic plot should be plotted?
 \itemize{
@@ -42,7 +42,7 @@ Auto- and cross-correlations (types \code{"ac"} and \code{"ch"}) are calculated 
 params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319,
  0.005, 0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185,
  -0.012, 0.136, 0.674)
-mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 diagnostic_plot(mod12, type="series")
 diagnostic_plot(mod12, type="ac")
 
@@ -51,7 +51,7 @@ params22 <-  c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406,
  -0.005, 0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218,
  0.02, -0.119, 0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004,
   0.105, 0.58)
-mod22 <- GMVAR(gdpdef, p=2, M=2, params=params22)
+mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
 diagnostic_plot(mod22, type="ch")
 diagnostic_plot(mod22, type="norm")
 
@@ -61,7 +61,7 @@ C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 params22c <- c(0.418, 0.153, 0.513, 0.057, 0.204, 0.028, -0.169,
  0.591, 0.241, 0.014, 0.091, 0.248, 1.068, -0.01, 0.111, 0.219,
  0.004, 0.027, 0.501)
-mod22c <- GMVAR(gdpdef, p=2, M=2, params=params22c, constraints=C_mat)
+mod22c <- GSMVAR(gdpdef, p=2, M=2, params=params22c, constraints=C_mat)
 diagnostic_plot(mod22c, wait_time=0.2)
 diagnostic_plot(mod22c, type="ac", maxlag=12)
 }
@@ -78,7 +78,7 @@ diagnostic_plot(mod22c, type="ac", maxlag=12)
  }
 }
 \seealso{
-\code{\link{profile_logliks}}, \code{\link{fitGMVAR}}, \code{\link{GMVAR}}, \code{\link{quantile_residual_tests}},
+\code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
-  \code{\link[stats]{density}}, \code{\link{predict.gmvar}}
+  \code{\link[stats]{density}}, \code{\link{predict.gsmvar}}
 }

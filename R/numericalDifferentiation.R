@@ -3,7 +3,7 @@
 #' @description \code{calc_gradient} or \code{calc_hessian} calculates the gradient or Hessian matrix
 #'   of the given function at the given point using central difference numerical approximation.
 #'   \code{get_gradient} or \code{get_hessian} calculates the gradient or Hessian matrix of the
-#'   log-likelihood function at the parameter estimates of a class \code{'gmvar'} object. \code{get_soc}
+#'   log-likelihood function at the parameter estimates of a class \code{'gsmvar'} object. \code{get_soc}
 #'   returns eigenvalues of the Hessian matrix, and \code{get_foc} is the same as \code{get_gradient}
 #'   but named conveniently.
 #'
@@ -35,7 +35,7 @@
 #'   params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'    0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
 #'    0.136, 0.674)
-#'   mod12 <- GMVAR(gdpdef, p=1, M=2, params=params12)
+#'   mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 #'   get_gradient(mod12)
 #'   get_hessian(mod12)
 #'   get_soc(mod12)
@@ -71,39 +71,39 @@ calc_hessian <- function(x, fn, h=6e-06, ...) {
 
 #' @rdname calc_gradient
 #' @export
-get_gradient <- function(gmvar, h=6e-06) {
-  check_gmvar(gmvar)
+get_gradient <- function(gsmvar, h=6e-06) {
+  check_gsmvar(gsmvar)
   foo <- function(x) {
-    loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=x,
-                      conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-                      constraints=gmvar$model$constraints, to_return="loglik", check_params=TRUE,
-                      minval=NA, stat_tol=gmvar$num_tols$stat_tol, posdef_tol=gmvar$num_tols$posdef_tol)
+    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x,
+                      conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                      constraints=gsmvar$model$constraints, to_return="loglik", check_params=TRUE,
+                      minval=NA, stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol)
   }
-  calc_gradient(x=gmvar$params, fn=foo, h=h)
+  calc_gradient(x=gsmvar$params, fn=foo, h=h)
 }
 
 #' @rdname calc_gradient
 #' @export
-get_hessian <- function(gmvar, h=6e-06) {
-  check_gmvar(gmvar)
+get_hessian <- function(gsmvar, h=6e-06) {
+  check_gsmvar(gsmvar)
   foo <- function(x) {
-    loglikelihood_int(data=gmvar$data, p=gmvar$model$p, M=gmvar$model$M, params=x,
-                      conditional=gmvar$model$conditional, parametrization=gmvar$model$parametrization,
-                      constraints=gmvar$model$constraints, to_return="loglik", check_params=TRUE,
-                      minval=NA, stat_tol=gmvar$num_tols$stat_tol, posdef_tol=gmvar$num_tols$posdef_tol)
+    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x,
+                      conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                      constraints=gsmvar$model$constraints, to_return="loglik", check_params=TRUE,
+                      minval=NA, stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol)
   }
-  calc_hessian(x=gmvar$params, fn=foo, h=h)
+  calc_hessian(x=gsmvar$params, fn=foo, h=h)
 }
 
 
 #' @rdname calc_gradient
 #' @export
-get_soc <- function(gmvar, h=6e-6) {
-  eigen(get_hessian(gmvar, h))$value
+get_soc <- function(gsmvar, h=6e-6) {
+  eigen(get_hessian(gsmvar, h))$value
 }
 
 #' @rdname calc_gradient
 #' @export
-get_foc <- function(gmvar, h=6e-6) {
-  get_gradient(gmvar, h=h)
+get_foc <- function(gsmvar, h=6e-6) {
+  get_gradient(gsmvar, h=h)
 }
