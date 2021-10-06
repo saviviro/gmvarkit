@@ -93,7 +93,7 @@ Returns an object of class \code{'gsmvar'} defining the estimated (reduced form 
   the second one for the lag one, etc.
 }
 \description{
-\code{fitGMVAR} estimates a GMVAR, StMVAR, or G-StMVAR model model in two phases:
+\code{fitGSMVAR} estimates a GMVAR, StMVAR, or G-StMVAR model model in two phases:
   in the first phase it uses a genetic algorithm to find starting values for a gradient based
   variable metric algorithm, which it then uses to finalize the estimation in the second phase.
   Parallel computing is utilized to perform multiple rounds of estimations in parallel.

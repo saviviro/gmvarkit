@@ -217,7 +217,7 @@ simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, 
       if(!is.null(girf_pars)) {
         matprods2 <- get_matprods(Y2)
         log_mvnvalues2 <- get_logmvnvalues(matprods2)
-        alpha_mt2 <- get_alpha_mt(M=M, log_mvnvalues=log_mvnvalues2, alphas=alphas,
+        alpha_mt2 <- get_alpha_mt(M=M, log_mvvalues=log_mvnvalues2, alphas=alphas,
                                   epsilon=epsilon, also_l_0=FALSE)
         mixing_weights2[i1, , j1] <- alpha_mt2
 
