@@ -26,7 +26,7 @@ Returns an object of class 'gsmvar' defining the specified GSMVAR, StMVAR, or G-
  a GMVAR, StMVAR, or G-StMVAR model. Also calculates mixing weights and quantile residuals accordingly.
 }
 \examples{
-# GMVAR(1,2), d=2 model:
+# GMVAR(1, 2), d=2 model:
 params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
   0.136, 0.674)
@@ -36,6 +36,11 @@ mod12
 mod12_2 <- add_data(gdpdef, mod12)
 mod12_2
 
+# StMVAR(1, 2), d=2 model:
+mod12t <- GSMVAR(p=1, M=2, d=2, params=c(params12, 10, 12), model="StMVAR")
+mod12t
+mod12t_2 <- add_data(gdpdef, mod12t)
+mod12t_2
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,

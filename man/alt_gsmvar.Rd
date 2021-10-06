@@ -2,7 +2,7 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{alt_gsmvar}
 \alias{alt_gsmvar}
-\title{Construct a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}}
+\title{Construct a GMVAR, StMVAR, or G-StMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}}
 \usage{
 alt_gsmvar(
   gsmvar,
@@ -34,7 +34,8 @@ Returns an object of class \code{'gsmvar'} defining the specified reduced form o
   the second one for the lag one, etc.
 }
 \description{
-\code{alt_gsmvar} constructs a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}.
+\code{alt_gsmvar} constructs a GMVAR, StMVAR, or G-StMVAR model based on results from
+  an arbitrary estimation round of \code{fitGSMVAR}.
 }
 \details{
 It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function

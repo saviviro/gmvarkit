@@ -44,6 +44,13 @@ mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
 # Form a structural model based on the reduced form model:
 mod12s <- gsmvar_to_sgsmvar(mod12)
 mod12s
+
+#' # Reduced form StMVAR(1,2) model
+mod12t <- GSMVAR(gdpdef, p=1, M=2, params=c(params12, 11, 12), model="StMVAR")
+
+# Form a structural model based on the reduced form model:
+mod12ts <- gsmvar_to_sgsmvar(mod12t)
+mod12ts
 }
 }
 \references{

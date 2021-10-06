@@ -43,6 +43,15 @@ mod22s
 # The same reduced form model, reordered W and lambda in the structual model:
 mod22s_2 <- reorder_W_columns(mod22s, perm=2:1)
 mod22s_2
+
+# Structural StMVAR(2, 2), d=2 model identified with sign-constraints:
+mod22ts <- GSMVAR(p=2, M=2, d=2, params=c(params22s, 10, 20), model="StMVAR",
+                 structural_pars=list(W=W_22))
+mod22ts
+
+# The same reduced form model, reordered W and lambda in the structual model:
+mod22ts_2 <- reorder_W_columns(mod22ts, perm=2:1)
+mod22ts_2
 }
 \references{
 \itemize{

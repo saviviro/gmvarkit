@@ -2,7 +2,7 @@
 % Please edit documentation in R/GMVARconstruction.R
 \name{swap_parametrization}
 \alias{swap_parametrization}
-\title{Swap the parametrization of a GMVAR model}
+\title{Swap the parametrization of a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
 swap_parametrization(gsmvar)
 }
@@ -17,7 +17,7 @@ Returns an object of class \code{'gsmvar'} defining the specified reduced form o
   the second one for the lag one, etc.
 }
 \description{
-\code{swap_parametrization} swaps the parametrization of a GMVAR model
+\code{swap_parametrization} swaps the parametrization of a GMVAR, StMVAR or G-StMVAR, model
  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 }
 \details{
@@ -38,6 +38,13 @@ mod22 # mean parametrization
 mod22_2 <- swap_parametrization(mod22)
 mod22_2 # intercept parametrization
 
+# G-StMVAR(2, 1, 1), d=2 model with mean-parametrization:
+mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=c(params22, 10), model="G-StMVAR",
+                  parametrization="mean")
+mod22gs # mean parametrization
+
+mod22gs_2 <- swap_parametrization(mod22gs)
+mod22gs_2 # intercept parametrization
 
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,

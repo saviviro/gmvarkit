@@ -218,7 +218,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples
-#' # GMVAR(1,2), d=2 model:
+#' # GMVAR(1, 2), d=2 model:
 #' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005,
 #'   0.03, 0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012,
 #'   0.136, 0.674)
@@ -228,6 +228,11 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #' mod12_2 <- add_data(gdpdef, mod12)
 #' mod12_2
 #'
+#' # StMVAR(1, 2), d=2 model:
+#' mod12t <- GSMVAR(p=1, M=2, d=2, params=c(params12, 10, 12), model="StMVAR")
+#' mod12t
+#' mod12t_2 <- add_data(gdpdef, mod12t)
+#' mod12t_2
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 #' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
@@ -243,17 +248,19 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 
 add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE) {
   check_gsmvar(gsmvar)
-  GSMVAR(data=data, p=gsmvar$model$p, M=gsmvar$model$M, params=gsmvar$params, conditional=gsmvar$model$conditional,
-        parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
-        same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
-        calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors,
-        stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol)
+  GSMVAR(data=data, p=gsmvar$model$p, M=gsmvar$model$M, params=gsmvar$params,
+         model=gsmvar$model$model, conditional=gsmvar$model$conditional,
+         parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
+         same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
+         calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors,
+         stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol,
+         df_tol=gsmvar$num_tols$df_tol)
 }
 
 
-#' @title Swap the parametrization of a GMVAR model
+#' @title Swap the parametrization of a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{swap_parametrization} swaps the parametrization of a GMVAR model
+#' @description \code{swap_parametrization} swaps the parametrization of a GMVAR, StMVAR or G-StMVAR, model
 #'  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 #'
 #' @inheritParams simulateGMVAR
@@ -275,6 +282,13 @@ add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE
 #' mod22_2 <- swap_parametrization(mod22)
 #' mod22_2 # intercept parametrization
 #'
+#' # G-StMVAR(2, 1, 1), d=2 model with mean-parametrization:
+#' mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=c(params22, 10), model="G-StMVAR",
+#'                   parametrization="mean")
+#' mod22gs # mean parametrization
+#'
+#' mod22gs_2 <- swap_parametrization(mod22gs)
+#' mod22gs_2 # intercept parametrization
 #'
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 #' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
@@ -292,22 +306,24 @@ add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE
 swap_parametrization <- function(gsmvar) {
   check_gsmvar(gsmvar)
   if(!is.null(gsmvar$model$same_means)) {
-    stop("Cannot change parametrization to intercept is the mean parameters are constrained")
+    stop("Cannot change parametrization to intercept if the mean parameters are constrained")
   }
   change_to <- ifelse(gsmvar$model$parametrization == "intercept", "mean", "intercept")
   new_params <- change_parametrization(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
-                                       constraints=gsmvar$model$constraints, structural_pars=gsmvar$model$structural_pars,
-                                       change_to=change_to)
-  GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=new_params, conditional=gsmvar$model$conditional,
-        parametrization=change_to, constraints=gsmvar$model$constraints, structural_pars=gsmvar$model$structural_pars,
-        calc_std_errors=ifelse(is.null(gsmvar$data), FALSE, TRUE), stat_tol=gsmvar$num_tols$stat_tol,
-        posdef_tol=gsmvar$num_tols$posdef_tol)
+                                       model=gsmvar$model$model, constraints=gsmvar$model$constraints,
+                                       structural_pars=gsmvar$model$structural_pars, change_to=change_to)
+  GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=new_params,
+         model=gsmvar$model$model, conditional=gsmvar$model$conditional, parametrization=change_to,
+         constraints=gsmvar$model$constraints, structural_pars=gsmvar$model$structural_pars,
+         calc_std_errors=ifelse(is.null(gsmvar$data), FALSE, TRUE), stat_tol=gsmvar$num_tols$stat_tol,
+         posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 }
 
 
-#' @title Construct a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}
+#' @title Construct a GMVAR, StMVAR, or G-StMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}
 #'
-#' @description \code{alt_gsmvar} constructs a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}.
+#' @description \code{alt_gsmvar} constructs a GMVAR, StMVAR, or G-StMVAR model based on results from
+#'   an arbitrary estimation round of \code{fitGSMVAR}.
 #'
 #' @inheritParams simulateGMVAR
 #' @inheritParams GSMVAR
@@ -336,11 +352,12 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
     stopifnot(which_largest >= 1 && which_largest <= length(gsmvar$all_estimates))
     which_round <- order(gsmvar$all_logliks, decreasing=TRUE)[which_largest]
   }
-  ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$all_estimates[[which_round]],
-               conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-               constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
-               calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
-               posdef_tol=gsmvar$num_tols$posdef_tol)
+  ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d,
+                params=gsmvar$all_estimates[[which_round]], model=gsmvar$model$model,
+                conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
+                calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
+                posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 
   # Pass the estimation results to the new object
   ret$all_estimates <- gsmvar$all_estimates
@@ -396,6 +413,13 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' # Form a structural model based on the reduced form model:
 #' mod12s <- gsmvar_to_sgsmvar(mod12)
 #' mod12s
+#'
+#' #' # Reduced form StMVAR(1,2) model
+#' mod12t <- GSMVAR(gdpdef, p=1, M=2, params=c(params12, 11, 12), model="StMVAR")
+#'
+#' # Form a structural model based on the reduced form model:
+#' mod12ts <- gsmvar_to_sgsmvar(mod12t)
+#' mod12ts
 #' }
 #' @export
 
@@ -405,14 +429,15 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
   if(!is.null(gsmvar$model$structural_pars)) stop("Only reduced form models are supported!")
   p <- gsmvar$model$p
   M <- gsmvar$model$M
-  if(M > 2) stop("Only models with at most two regimes are supported!")
+  if(sum(M) > 2) stop("Only models with at most two regimes are supported!")
   d <- gsmvar$model$d
+  model <- gsmvar$model$model
   constraints <- gsmvar$model$constraints
   same_means <- gsmvar$model$same_means
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, constraints=constraints,
-                                    same_means=same_means)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
+                                    constraints=constraints, same_means=same_means)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=NULL)
-  if(M == 1) {
+  if(sum(M) == 1) {
     W <- matrix(diag_Omegas(Omega1=all_Omega[, , 1]), nrow=d, ncol=d, byrow=FALSE)
     lambdas <- numeric(0)
   } else { # M == 2
@@ -427,27 +452,28 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
   }
 
   # Create SGSMVAR model parameter vector
-  g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
+  g <- ifelse(is.null(same_means), sum(M), length(same_means)) # Number of groups of regimes with the same mean parameters
   if(is.null(same_means)) {
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=NULL)
   } else {
     all_phi0 <- gsmvar$params[1:(d*g)]
   }
-  alphas <- pick_alphas(p=p, M=M, d=d, params=params)
+  alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
+  all_df <- pick_df(M=M, params=params, model=model)
   if(is.null(constraints)) {
     all_A <- as.vector(pick_allA(p=p, M=M, d=d, params=params))
   } else {
     all_A <- gsmvar$params[(d*g + 1):(d*g + ncol(constraints))] # \psi
   }
-  new_params <- c(all_phi0, all_A, vec(W), lambdas, alphas[-M])
+  new_params <- c(all_phi0, all_A, vec(W), lambdas, alphas[-sum(M)], all_df)
   new_W <- matrix(NA, nrow=d, ncol=d)
   diag(new_W) <- rep(1, times=d)
 
   # Construct the SGSMVAR model based on the obtained structural parameters
-  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, conditional=gsmvar$model$conditional,
-        parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
-        posdef_tol=gsmvar$num_tols$posdef_tol)
+  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, model=model, conditional=gsmvar$model$conditional,
+         parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
+         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
+         posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 }
 
 
@@ -485,6 +511,15 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #' # The same reduced form model, reordered W and lambda in the structual model:
 #' mod22s_2 <- reorder_W_columns(mod22s, perm=2:1)
 #' mod22s_2
+#'
+#' # Structural StMVAR(2, 2), d=2 model identified with sign-constraints:
+#' mod22ts <- GSMVAR(p=2, M=2, d=2, params=c(params22s, 10, 20), model="StMVAR",
+#'                  structural_pars=list(W=W_22))
+#' mod22ts
+#'
+#' # The same reduced form model, reordered W and lambda in the structual model:
+#' mod22ts_2 <- reorder_W_columns(mod22ts, perm=2:1)
+#' mod22ts_2
 #' @export
 
 reorder_W_columns <- function(gsmvar, perm) {
@@ -494,32 +529,35 @@ reorder_W_columns <- function(gsmvar, perm) {
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
+  model <- gsmvar$model$model
   stopifnot(length(perm) == d && all(perm %in% 1:d) && length(unique(perm)) == d)
   constraints <- gsmvar$model$constraints
   same_means <- gsmvar$model$same_means
   structural_pars <- gsmvar$model$structural_pars
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
+                                    constraints=constraints, same_means=same_means,
+                                    structural_pars=structural_pars)
   W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   lambdas <- pick_lambdas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_df <- pick_df(M=M, params=params, model=model)
 
   # Create the new parameter vector
   W <- W[, perm]
   W <- Wvec(W) # Zeros removed
-  if(M > 1) {
-    lambdas <- matrix(lambdas, nrow=d, ncol=M - 1, byrow=FALSE)
+  if(sum(M) > 1) {
+    lambdas <- matrix(lambdas, nrow=d, ncol=sum(M) - 1, byrow=FALSE)
     lambdas <- vec(lambdas[perm,])
   }
   new_params <- gsmvar$params
-  new_params[(length(new_params) - (M - 1 + length(W) + length(lambdas)) + 1):(length(new_params) - (M - 1))] <- c(W, lambdas)
+  new_params[(length(new_params) - (sum(M) - 1 + length(W) + length(lambdas) + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + length(all_df)))] <- c(W, lambdas)
   new_W <- structural_pars$W[, perm]
 
   # Construct the SGSMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gsmvar$std_errors)) || is.null(gsmvar$data), FALSE, TRUE)
-  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, conditional=gsmvar$model$conditional,
-        parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
-        posdef_tol=gsmvar$num_tols$posdef_tol)
+  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, model=model, conditional=gsmvar$model$conditional,
+         parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
+         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
+         posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 }
 
 
@@ -558,6 +596,14 @@ reorder_W_columns <- function(gsmvar, perm) {
 #'
 #' # The same reduced form model, with signs in both column of W swapped:
 #' swap_W_signs(mod22s, which_to_swap=1:2)
+#'
+#' #' # Structural G-StMVAR(2, 1, 1), d=2 model identified with sign-constraints:
+#' mod22gss <- GSMVAR(p=2, M=c(1, 1), d=2, params=c(params22s, 10), model="G-StMVAR",
+#'                    structural_pars=list(W=W_22))
+#' mod22gss
+#'
+#' # The same reduced form model, with signs in the first column of W swapped:
+#' swap_W_signs(mod22gss, which_to_swap=1)
 #' @export
 
 swap_W_signs <- function(gsmvar, which_to_swap) {
@@ -566,31 +612,34 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
+  model <- gsmvar$model$model
   stopifnot(length(which_to_swap) <= d && length(which_to_swap) >= 1 && all(which_to_swap %in% 1:d)
             && length(unique(which_to_swap)) == length(which_to_swap))
   constraints <- gsmvar$model$constraints
   same_means <- gsmvar$model$same_means
   structural_pars <- gsmvar$model$structural_pars
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
+                                    constraints=constraints, same_means=same_means,
+                                    structural_pars=structural_pars)
   W <- pick_W(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
+  all_df <- pick_df(M=M, params=params, model=model)
 
   # Create the new parameter vector
   W[, which_to_swap] <- -W[, which_to_swap]
   W <- Wvec(W) # Zeros removed
-  r <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), r <- ncol(structural_pars$C_lambda))
+  r <- ifelse(is.null(structural_pars$C_lambda), d*(sum(M) - 1), r <- ncol(structural_pars$C_lambda))
 
   new_params <- gsmvar$params
-  new_params[(length(new_params) - (M - 1 + length(W) + r) + 1):(length(new_params) - (M - 1 + r))] <- W
+  new_params[(length(new_params) - (sum(M) - 1 + length(W) + r + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + r + length(all_df)))] <- W
   new_W <- structural_pars$W
   new_W[, which_to_swap] <- -new_W[, which_to_swap]
 
   # Construct the SGSMVAR model based on the obtained structural parameters
   calc_std_errors <- ifelse(all(is.na(gsmvar$std_errors)) || is.null(gsmvar$data), FALSE, TRUE)
-  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, conditional=gsmvar$model$conditional,
-        parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
-        structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
-        posdef_tol=gsmvar$num_tols$posdef_tol)
+  GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, model=model, conditional=gsmvar$model$conditional,
+         parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
+         structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
+         posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 }
 
 
@@ -625,15 +674,15 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
 #' mod22s
 #'
 #' # Update numerical tolerances:
-#' mod22s <- update_numtols(mod22s, stat_tol=1e-4, posdef_tol=1e-9)
+#' mod22s <- update_numtols(mod22s, stat_tol=1e-4, posdef_tol=1e-9, df_tol=1e-10)
 #' mod22s # The same model
 #' @export
 
-update_numtols <- function(gsmvar, stat_tol=1e-3, posdef_tol=1e-8) {
-  GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
-        conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-        constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
-        structural_pars=gsmvar$model$structural_pars,
-        calc_std_errors=ifelse(is.null(gsmvar$data), FALSE, TRUE), stat_tol=stat_tol,
-        posdef_tol=posdef_tol)
+update_numtols <- function(gsmvar, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d,
+         params=gsmvar$params, model=gsmvar$model$model, conditional=gsmvar$model$conditional,
+         parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
+         same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
+         calc_std_errors=ifelse(is.null(gsmvar$data), FALSE, TRUE), stat_tol=stat_tol,
+         posdef_tol=posdef_tol, df_tol=df_tol)
 }

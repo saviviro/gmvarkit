@@ -44,6 +44,14 @@ swap_W_signs(mod22s, which_to_swap=2)
 
 # The same reduced form model, with signs in both column of W swapped:
 swap_W_signs(mod22s, which_to_swap=1:2)
+
+#' # Structural G-StMVAR(2, 1, 1), d=2 model identified with sign-constraints:
+mod22gss <- GSMVAR(p=2, M=c(1, 1), d=2, params=c(params22s, 10), model="G-StMVAR",
+                   structural_pars=list(W=W_22))
+mod22gss
+
+# The same reduced form model, with signs in the first column of W swapped:
+swap_W_signs(mod22gss, which_to_swap=1)
 }
 \references{
 \itemize{

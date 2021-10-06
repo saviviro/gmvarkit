@@ -184,11 +184,7 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     cat("\n")
   }
 
-#  if(model == "StMVAR" || model == "G-StMVAR") {
-#    cat("'ARCH_mt' is the time-varying ARCH-type scalar that multiplies the constant covariance matrix in the conditional covariance matrix of StMVAR type regimes.\n")
-#  }
   if(summary_print) {
-#    if(model == "StMVAR" || model == "G-StMVAR") cat("\n")
     cat("Print approximate standard errors with the function 'print_std_errors'.\n")
   }
   invisible(gsmvar)
@@ -217,11 +213,6 @@ print.gsmvarsum <- function(x, ..., digits) {
   gsmvarsum <- x
   if(missing(digits)) digits <- gsmvarsum$digits
   print.gsmvar(gsmvarsum$gsmvar, ..., digits=digits, summary_print=TRUE)
-  if(!is.null(gsmvarsum$qrtest)) {
-    cat("_____________________________________\n")
-    cat("Quantile residual tests based on data\n\n")
-    print.qrtest(gsmvarsum$qrtest)
-  }
   invisible(gsmvarsum)
 }
 

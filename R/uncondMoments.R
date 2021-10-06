@@ -58,8 +58,9 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 get_regime_means <- function(gsmvar) {
   check_gsmvar(gsmvar)
   get_regime_means_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
-                       parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
-                       same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
+                       model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,
+                       constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                       structural_pars=gsmvar$model$structural_pars)
 }
 
 
@@ -135,8 +136,8 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 get_regime_autocovs <- function(gsmvar) {
   check_gsmvar(gsmvar)
   get_regime_autocovs_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
-                          constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
-                          structural_pars=gsmvar$model$structural_pars)
+                          model=gsmvar$model$model, constraints=gsmvar$model$constraints,
+                          same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
 }
 
 
@@ -221,8 +222,9 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 uncond_moments <- function(gsmvar) {
   check_gsmvar(gsmvar)
   uncond_moments_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
-                     parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,
-                     same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
+                     model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,
+                     constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                     structural_pars=gsmvar$model$structural_pars)
 }
 
 
