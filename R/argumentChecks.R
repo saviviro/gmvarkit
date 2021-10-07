@@ -546,8 +546,8 @@ check_same_means <- function(parametrization, same_means) {
 warn_eigens <- function(gsmvar, tol=0.002) {
   boldA_eigens <- get_boldA_eigens(gsmvar)
   omega_eigens <- get_omega_eigens(gsmvar)
-  near_nonstat <- vapply(1:gsmvar$model$M, function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
-  near_singular <- vapply(1:gsmvar$model$M, function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
+  near_nonstat <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
+  near_singular <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
   if(any(near_nonstat)) {
     my_string1 <- ifelse(sum(near_nonstat) == 1,
                         paste("Regime", which(near_nonstat),"has near-unit-roots! "),
@@ -564,5 +564,32 @@ warn_eigens <- function(gsmvar, tol=0.002) {
   }
   if(any(near_nonstat) || any(near_singular)) {
     warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest local maximum with the function 'alt_gsmvar' by adjusting its argument 'which_largest'."))
+  }
+}
+
+
+
+#' @title Warn about large degrees of freedom parameter values
+#'
+#' @description \code{warn_df} warns if the model contains large degrees of freedom parameter values
+#'
+#' @inheritParams simulateGMVAR
+#' @inheritParams loglikelihood_int
+#' @details Warns if, for some regime, the degrees of freedom parameter value is larger than 100.
+#' @return Doesn't return anything.
+#' @keywords internal
+
+warn_df <- function(gsmvar, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
+  model <- match.arg(model)
+  if(!missing(gsmvar)) { # If the model is given as a class 'gsmvar' object, extract the information from it
+    M <- gsmvar$model$M
+    params <- gsmvar$params
+    model <- gsmvar$model$model
+  }
+  if(model == "StMVAR" || model == "G-StMVAR") { # Check whether there is large df parameter value in some regime
+    all_df <- pick_df(M=M, params=params, model=model)
+    if(any(all_df > 100)) {
+      warning("The model contains overly large degrees of freedom parameters. Consider switching to the appropriate G-StMVAR model by setting the corresponding regimes to GMVAR type with the function 'stmvar_to_gstmvar'.")
+    }
   }
 }

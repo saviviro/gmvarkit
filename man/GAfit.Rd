@@ -8,6 +8,7 @@ GAfit(
   data,
   p,
   M,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
@@ -44,6 +45,9 @@ a univariate time series. \code{NA} values are not supported.}
   \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
    first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
 }}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function}
 
@@ -93,56 +97,78 @@ close (or partially close) to the best fitting individual (which has the least r
 mixing weights practically at zero) so far.}
 
 \item{initpop}{a list of parameter vectors from which the initial population of the genetic algorithm
-will be generated from. The parameter vectors should be...
-\describe{
-  \item{\strong{For unconstrained models:}}{
-    Should be size \eqn{((M(pd^2+d+d(d+1)/2+1)-1)x1)} and have form
-    \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
-    ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1}}), where:
-    \itemize{
-      \item \strong{\eqn{\upsilon}}\eqn{_{m}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi}}\eqn{_{m}}\eqn{,\sigma_{m})}
-      \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
-      \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M.
+  will be generated from. The parameter vectors should be...
+  \describe{
+    \item{\strong{For unconstrained models:}}{
+      Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)x1)} and have the form
+      \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
+      ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+      \itemize{
+        \item \strong{\eqn{\upsilon}}\eqn{_{m}} \eqn{ = (\phi_{m,0},}\strong{\eqn{\phi}}\eqn{_{m}}\eqn{,\sigma_{m})}
+        \item \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p})}
+        \item and \eqn{\sigma_{m} = vech(\Omega_{m})}, m=1,...,M,
+        \item \strong{\eqn{\nu}}\eqn{=(\nu_{M1+1},...,\nu_{M})}
+        \item \eqn{M1} is the number of GMVAR type regimes.
+      }
+    }
+    \item{\strong{For constrained models:}}{
+      Should be size \eqn{((M(d+d(d+1)/2+2)+q-M1-1)x1)} and have the form
+      \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi},}
+      \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}), where
+      \itemize{
+        \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+        \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is a \eqn{(Mpd^2xq)}
+        constraint matrix.
+      }
+    }
+    \item{\strong{For same_means models:}}{
+      Should have the form
+      \strong{\eqn{\theta}}\eqn{ = (}\strong{\eqn{\mu},}\strong{\eqn{\psi},}
+      \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+      \itemize{
+        \item \strong{\eqn{\mu}}\eqn{= (\mu_{1},...,\mu_{g})} where
+          \eqn{\mu_{i}} is the mean parameter for group \eqn{i} and
+          \eqn{g} is the number of groups.
+        \item If AR constraints are employed, \strong{\eqn{\psi}} is as for constrained
+          models, and if AR constraints are not employed, \strong{\eqn{\psi}}\eqn{ = }
+          (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
+      }
+    }
+    \item{\strong{For structural models:}}{
+      Should have the form
+      \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
+      vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+      \itemize{
+        \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
+      }
+      \describe{
+        \item{\strong{If AR parameters are constrained: }}{Replace \strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+        \strong{\eqn{\phi}}\eqn{_{M}} with \strong{\eqn{\psi}} \eqn{(qx1)} that satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
+        \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}, as above.}
+        \item{\strong{If same_means: }}{Replace \eqn{(\phi_{1,0},...,\phi_{M,0})} with \eqn{(\mu_{1},...,\mu_{g})},
+          as above.}
+        \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
+         the sign constraints.}
+        \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
+         with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+        \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is a \eqn{(d(M-1) x r)}
+         constraint matrix.}
+      }
     }
   }
-  \item{\strong{For constrained models:}}{
-    Should be size \eqn{((M(d+d(d+1)/2+1)+q-1)x1)} and have form
-    \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi}}
-    \eqn{,\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1})}, where:
-    \itemize{
-      \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
-      \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}. Here \strong{\eqn{C}} is \eqn{(Mpd^2xq)}
-      constraint matrix.
-    }
-  }
-  \item{\strong{For structural model:}}{
-    Should have the form
-    \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-    vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1})}, where
-    \itemize{
-      \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
-    }
-    \describe{
-      \item{\strong{If AR parameters are constrained: }}{Replace \strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
-      \strong{\eqn{\phi}}\eqn{_{M}} with \strong{\eqn{\psi}} \eqn{(qx1)} that satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
-      \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}}, as above.}
-      \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
-       the sign constraints.}
-      \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
-       with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-      \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is a \eqn{(d(M-1) x r)}
-       constraint matrix.}
-    }
-  }
-}
-Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
-mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
-\eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
-error term covariance matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
-If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
-\eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
-of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
-The notation is in line with the cited article by \emph{Kalliovirta, Meitz and Saikkonen (2016)} introducing the GMVAR model.}
+  Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
+  mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
+  \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
+  error term covariance matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+  If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
+  \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
+  of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
+
+  In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
+  In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
+  In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+
+  The notation is similar to the cited literature.}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
 mean parameter \eqn{\mu_{m}} is drawn from in random mutations. Default is \code{colMeans(data)}. Note that
@@ -270,4 +296,11 @@ The core of the genetic algorithm is mostly based on the description by \emph{Do
      paper, available as arXiv:2007.04713.
  }
  @export
+ @examples
+ \donttest{
+ # Preliminary estimation of a G-StMVAR(1, 1, 1) model with 50 generations.
+ GA_estimates <- GAfit(gdpdef, p=1, M=c(1, 1), model="G-StMVAR",
+                       ngen=50, seed=1)
+ GA_estimates
+ }
 }

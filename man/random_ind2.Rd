@@ -8,6 +8,7 @@ random_ind2(
   p,
   M,
   d,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   same_means = NULL,
   structural_pars = NULL,
   mu_scale,
@@ -28,6 +29,9 @@ random_ind2(
 }}
 
 \item{d}{the number of time series in the system.}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
 such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if

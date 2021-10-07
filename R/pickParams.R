@@ -278,8 +278,9 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #' @description \code{pick_regime} picks the regime-parameters from the given parameter vector.
 #'
 #' @inheritParams pick_Am
+#' @inheritParams loglikelihood_int
 #' @param with_df should the degrees of freedom parameter (if any) be included?
-#' @details Models with AR, mean, or lambda parameter constraints are currently not supported.
+#' @details Note that in some cases, a numeric vector of length zero is returned (see section Return)
 #' @return
 #'   \describe{
 #'     \item{For reduced form models:}{
@@ -300,27 +301,60 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #'         \item{For \strong{G-StMVAR} model:}{Same as GMVAR for GMVAR type regimes and same as StMVAR for StMVAR type regimes.}
 #'       }
 #'     }
+#'     \item{When AR constraints are employed:}{As above, but without \strong{\eqn{\phi_{m}}}.}
+#'     \item{When mean constaints are employed:}{As above, but without \eqn{\phi_{m,0}} (which are \eqn{\mu_m} in this case).}
+#'     \item{When lambda constraints are employed:}{As above. Note that lambda parameters are not returned in any specification.}
 #'   }
+#' Note that if both, AR and mean constraints are employed, a lenght zero numeric vector is returned for
+#' structural GMVAR type regimes (or structural StMVAR type regimes if \code{with_df=FALSE}).
 #' @inheritSection pick_Ami Warning
 #' @inherit is_stationary references
 #' @keywords internal
 
-pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR"), structural_pars=NULL, with_df=TRUE) {
+pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL,
+                        same_means=NULL, structural_pars=NULL, with_df=TRUE) {
   model <- match.arg(model)
+  if(!is.null(constraints) || !is.null(same_means) || !is.null(structural_pars)) {
+    params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model,
+                                      constraints=constraints, same_means=same_means,
+                                      structural_pars=structural_pars)
+    structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
+    phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[,m]
+    all_Am <- pick_Am(p=p, M=M, d=d, params=params, m=m, structural_pars=structural_pars)
+    Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[, , m]
+  }
+
   if(model == "GMVAR" || with_df == FALSE) {
     df <- numeric(0)
   } else {
     M1 <- ifelse(model == "StMVAR", 0, M[1])
     df <- pick_df(M=M, params=params, model=model)[m - M1]
   }
-  if(is.null(structural_pars)) {
-    qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
-    return(c(params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)], df))
-  } else {
-    n_zeros <- sum(structural_pars$W == 0, na.rm=TRUE)
-    phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[,m]
-    all_Am <- pick_Am(p=p, M=M, d=d, params=params, m=m, structural_pars=structural_pars)
-    return(c(phi0, as.vector(all_Am), df))
+  if(is.null(structural_pars)) { # Reduced form models
+    if(is.null(constraints) && is.null(same_means)) { # No constraints
+      qm1 <- (m - 1)*(d + p*d^2 + d*(d + 1)/2)
+      return(c(params[(qm1 + 1):(qm1 + d + p*d^2 + d*(d + 1)/2)], df))
+    } else { # Mean or AR constraints
+      if(is.null(same_means) && !is.null(constraints)) { # Only AR constraints
+        return(c(phi0, vech(Omega), df))
+      } else if(!is.null(same_means) && !is.null(constraints)) { # AR constraints and mean constraints
+        return(c(vech(Omega), df))
+      } else { # Only mean constraints
+        return(c(all_Am, vech(Omega), df))
+      }
+    }
+  } else { # Structural models
+    if(is.null(constraints) && is.null(same_means)) { # No AR constraints, no mean constraints
+      return(c(phi0, all_Am, df))
+    } else { # AR constraints or mean constraints
+      if(is.null(same_means) && !is.null(constraints)) { # Only AR constraints
+        return(c(phi0, df))
+      } else if(!is.null(same_means) && !is.null(constraints)) { # AR constraints and mean constraints
+        return(df)
+      } else { # Only mean constraints
+        return(c(all_Am, df))
+      }
+    }
   }
 }
 

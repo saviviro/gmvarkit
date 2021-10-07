@@ -10,6 +10,7 @@ smart_ind(
   M,
   d,
   params,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
@@ -71,6 +72,9 @@ smart_ind(
   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
 
   The notation is similar to the cited literature.}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form

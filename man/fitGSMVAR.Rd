@@ -8,12 +8,13 @@ fitGSMVAR(
   data,
   p,
   M,
+  model = c("GMVAR", "StMVAR", "G-StMVAR"),
   conditional = TRUE,
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  ncalls = 100,
+  ncalls = M^6,
   ncores = 2,
   maxit = 500,
   seeds = NULL,
@@ -32,6 +33,9 @@ a univariate time series. \code{NA} values are not supported.}
   \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
    first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
 }}
+
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function}
 
@@ -163,7 +167,7 @@ If you wish to estimate a structural model without overidentifying constraints t
 
 # GMVAR(1,2) model: 10 estimation rounds with seeds set
 # for reproducibility
-fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
+fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10, ncores=4)
 fit12
 plot(fit12)
 summary(fit12)
@@ -176,6 +180,8 @@ profile_logliks(fit12)
 # rounds (ncalls = a large number) should be performed to ensure reliability
 # of the estimates (see the section details).
 
+# One-regime StMVAR(4, 1) model
+
 # Structural GMVAR(1,2) model identified with sign
 # constraints.
 W_122 <- matrix(c(1, 1, -1, 1), nrow=2)
@@ -185,11 +191,20 @@ fit12s
 # A statistically identified structural model can also be obtained with
 # gsmvar_to_sgsmvar(fit12)
 
+fit12ts <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", structural_pars=list(W=W_122),
+  ncalls=12, seeds=1:12)
+
+ fit12gss <- fitGSMVAR(gdpdef, p=1, M=c(1, 1), model="G-StMVAR", structural_pars=list(W=W_122),
+  ncalls=12, seeds=1:12)
+
 # GMVAR(2,2) model with autoregressive parameters restricted
 # to be the same for both regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fit22c <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
 fit22c
+
+fit22gscm <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", constraints=C_mat,
+   parametrization="mean", same_means=list(1:2), ncalls=1, seeds=1)
 
 # GMVAR(2,2) model with autoregressive parameters restricted
 # to be the same for both regimes and non-diagonal elements

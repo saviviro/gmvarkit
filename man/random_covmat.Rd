@@ -87,4 +87,9 @@ a time-varying diagonal matrix with positive diagonal entries).}
   from (scaled) Wishart distribution for reduced form models and the parameters \eqn{W},\eqn{\lambda_1,...,\lambda_M}
   for structural models (from normal distributions).
 }
+\details{
+Note that for StMVAR type regimes, the error term covariance matrix is consists of an ARCH type scalar that
+  multiplies a constant covariance matrix. This function generates the constant covariance matrix part of the
+  error term covariance matrix.
+}
 \keyword{internal}

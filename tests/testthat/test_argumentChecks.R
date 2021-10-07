@@ -763,11 +763,21 @@ params44_2 <- c(-13.9054, 20.1997, 0.6993, 0.27, 0.3735, 0.9154, -0.1393, -0.202
                 -3.2228, 20.6817, 0.5301, 0.2762, 0.1756)
 mod44_2 <- GSMVAR(p=4, M=4, d=2, params=params44_2)
 
+mod44t_2 <- GSMVAR(p=4, M=4, d=2, params=c(params44_2, 10, 20, 30, 500), model="StMVAR")
+mod44gs_2 <- GSMVAR(p=4, M=c(2, 2), d=2, params=c(params44_2, 30, 400), model="G-StMVAR")
+
 params112 <- c(1.03, 2.36, 0.85, 0.06, 0.04, 0.94, 0.93, -0.913, 0.90)
 mod112 <- GSMVAR(p=1, M=1, d=2, params=params112)
 
 test_that("warn_eigens works correctly", {
   expect_warning(warn_eigens(mod44, tol=0.002))
   expect_warning(warn_eigens(mod44_2, tol=0.002))
+  expect_warning(warn_eigens(mod44t_2, tol=0.002))
+  expect_warning(warn_eigens(mod44gs_2, tol=0.002))
   expect_warning(warn_eigens(mod112, tol=0.002))
+})
+
+test_that("warn_eigens works correctly", {
+  expect_warning(warn_eigens(mod44t_2))
+  expect_warning(warn_eigens(mod44gs_2))
 })

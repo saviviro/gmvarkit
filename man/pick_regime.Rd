@@ -11,6 +11,8 @@ pick_regime(
   params,
   m,
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
+  constraints = NULL,
+  same_means = NULL,
   structural_pars = NULL,
   with_df = TRUE
 )
@@ -101,6 +103,25 @@ pick_regime(
 
 \item{m}{which component?}
 
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
+
+\item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
+to the autoregressive parameters. We consider constraints of form
+(\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M}) = }\strong{\eqn{C \psi}},
+where \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p}) (pd^2 x 1), m=1,...,M},
+contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains the related parameters.
+For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
+[\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
+Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
+
+\item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
+such that each numeric vector contains the regimes that should share the common mean parameters. For instance, if
+\code{M=3}, the argument \code{list(1, 2:3)} restricts the mean parameters of the second and third regime to be
+the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
+should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
+that is, when \code{parametrization="mean"}.}}
+
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
 the following elements:
 \itemize{
@@ -138,13 +159,18 @@ a time-varying diagonal matrix with positive diagonal entries).}
         \item{For \strong{G-StMVAR} model:}{Same as GMVAR for GMVAR type regimes and same as StMVAR for StMVAR type regimes.}
       }
     }
+    \item{When AR constraints are employed:}{As above, but without \strong{\eqn{\phi_{m}}}.}
+    \item{When mean constaints are employed:}{As above, but without \eqn{\phi_{m,0}} (which are \eqn{\mu_m} in this case).}
+    \item{When lambda constraints are employed:}{As above. Note that lambda parameters are not returned in any specification.}
   }
+Note that if both, AR and mean constraints are employed, a lenght zero numeric vector is returned for
+structural GMVAR type regimes (or structural StMVAR type regimes if \code{with_df=FALSE}).
 }
 \description{
 \code{pick_regime} picks the regime-parameters from the given parameter vector.
 }
 \details{
-Models with AR, mean, or lambda parameter constraints are currently not supported.
+Note that in some cases, a numeric vector of length zero is returned (see section Return)
 }
 \section{Warning}{
 

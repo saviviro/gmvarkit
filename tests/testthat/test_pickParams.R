@@ -148,6 +148,67 @@ theta_213s <- c(phi10_213, vec(A11_213), vec(A12_213), vec(W_213)) # SGMVAR
 Omega1_213s <- tcrossprod(W_213)
 
 
+## A(M)(p)_(p)(M)(d)
+rbind_diags <- function(p, M, d) {
+  I <- diag(p*d^2)
+  Reduce(rbind, replicate(M, I, simplify=FALSE))
+}
+
+# Constraining AR-parameters to be the same for all regimes
+
+# p=1, M=1, d=2
+C_112 <- rbind_diags(p=1, M=1, d=2)
+theta_112c <- c(phi10_112, vec(A11_112), vech(Omega1_112))
+
+theta_112csWAR <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR W and AR
+
+theta_112tc <- c(theta_112c, 10) # StMVAR
+theta_112tcsWAR <- c(theta_112csWAR, 10) # StMVAR
+
+# p=2, M=2, d=2
+C_222 <- rbind_diags(p=2, M=2, d=2)
+theta_222c <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+
+C_lambda_222 <- matrix(c(1, 2), nrow=2)
+theta_222csL <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(A21_222),
+                  vec(A22_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas
+theta_222csLAR <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2, alpha1_222) # SGMVAR lambdas and AR
+
+theta_222gscsL <- c(theta_222csL, 20) # SG-StMVAR, M1=1, M2=1
+theta_222tcsLAR <- c(theta_222csLAR, 10, 20) # SStMVAR
+
+# p=1, M=2, d=3
+C_123 <- rbind_diags(p=1, M=2, d=3)
+theta_123c <- c(phi10_123, phi20_123, vec(A11_123), vech(Omega1_123), vech(Omega2_123), alpha1_123)
+
+C_lambda_123 <- matrix(c(1, 1, 0, 0, 0, 1), nrow=3, byrow=FALSE)
+theta_123csL <- c(phi10_123, phi20_123, vec(A11_123), vec(A21_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas
+theta_123csLAR <- c(phi10_123, phi20_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
+
+theta_123tc <- c(theta_123c, 10, 20) # StMVAR
+theta_123tcsL <- c(theta_123csL, 10, 20) # StMVAR
+
+## Models with same_means
+
+# p=1, M=1, d=2, same_means=list(1)
+theta_112_int <- c(phi10_112, vec(A11_112), vech(Omega1_112))
+theta_112t_int <- c(theta_112_int, 10)
+
+# p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
+theta_222c_int <- c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega1_222), vech(Omega2_222), alpha1_222)
+theta_222tc_int <- c(theta_222c_int, 10, 20) # StMVAR
+
+# p=3, M=3, d=2, constraints=C_332, same_means=list(1, 2:3)
+C_332 <- rbind_diags(p=3, M=3, d=2)
+theta_332c_int <- c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+                    vech(Omega3_332), alpha1_332, alpha2_332)
+theta_332gsc_int <- c(theta_332c_int, 20, 30) # G-StMVAR, M1=1, M2=2
+
+# p=1, M=2, d=3, constraints=C_123, structural_pars=list(W=W_123, C_lambda=C_lambda_123) same_means=list(1:2)
+theta_123csLAR_int <- c(phi10_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) # SGMVAR lambdas and AR
+theta_123tcsLAR_int <- c(theta_123csLAR_int, 10, 20) # SStMVAR
+
+
 
 test_that("pick_Ami works correctly", {
   expect_equal(pick_Ami(p=1, M=1, d=2, params=theta_112, m=1, i=1, unvec=TRUE), A11_112)
@@ -545,42 +606,31 @@ theta_112tsWC <- c(theta_112sWC, 15) # StMVAR
 
 test_that("pick_regime works correctly", {
   expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112, m=1), upsilon1_112)
-
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122, m=1), upsilon1_122)
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122, m=2), upsilon2_122)
-
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222, m=1), upsilon1_222)
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222, m=2), upsilon2_222)
-
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222t, m=1, model="StMVAR", with_df=TRUE), c(upsilon1_222, 20))
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222t, m=2, model="StMVAR", with_df=TRUE), c(upsilon2_222, 25))
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222t, m=2, model="StMVAR", with_df=FALSE), upsilon2_222)
-
   expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gs, m=1, model="G-StMVAR", with_df=TRUE), c(upsilon1_222))
   expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gs, m=2, model="G-StMVAR", with_df=TRUE), c(upsilon2_222, 25))
   expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gs, m=2, model="G-StMVAR", with_df=FALSE), c(upsilon2_222))
-
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=1), upsilon1_332)
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=2), upsilon2_332)
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332, m=3), upsilon3_332)
-
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332t, m=1, model="StMVAR"), c(upsilon1_332, 10))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332t, m=2, model="StMVAR"), c(upsilon2_332, 20))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332t, m=3, model="StMVAR"), c(upsilon3_332, 30))
-
   expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gs, m=1, model="G-StMVAR"), upsilon1_332)
   expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gs, m=2, model="G-StMVAR"), c(upsilon2_332, 20))
   expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gs, m=3, model="G-StMVAR"), c(upsilon3_332, 30))
-
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123, m=1), upsilon1_123)
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123, m=2), upsilon2_123)
-
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123t, m=1, model="StMVAR"), c(upsilon1_123, 20))
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123t, m=2, model="StMVAR"), c(upsilon2_123, 25))
-
   expect_equal(pick_regime(p=1, M=c(1, 1), d=3, params=theta_123t, m=1, model="G-StMVAR"), c(upsilon1_123))
   expect_equal(pick_regime(p=1, M=c(1, 1), d=3, params=theta_123t, m=2, model="G-StMVAR"), c(upsilon2_123, 25))
-
   expect_equal(pick_regime(p=2, M=1, d=3, params=theta_213, m=1), upsilon1_213)
 
   # Structural
@@ -590,57 +640,97 @@ test_that("pick_regime works correctly", {
                c(phi10_112, vec(A11_112), 15))
   expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112tsWC, m=1, model="StMVAR", structural_pars=list(W=W_112), with_df=FALSE),
                c(phi10_112, vec(A11_112)))
-
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122s, m=1, structural_pars=list(W=W_122)),
                c(phi10_122, vec(A11_122)))
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122s, m=2, structural_pars=list(W=W_122)),
                c(phi20_122, vec(A21_122)))
-
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222s, m=1, structural_pars=list(W=W_222)),
                c(phi10_222, vec(A11_222), vec(A12_222)))
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222s, m=2, structural_pars=list(W=W_222)),
                c(phi20_222, vec(A21_222), vec(A22_222)))
-
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222ts, m=1, model="StMVAR", structural_pars=list(W=W_222)),
                c(phi10_222, vec(A11_222), vec(A12_222), 10))
   expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222ts, m=2, model="StMVAR", structural_pars=list(W=W_222)),
                c(phi20_222, vec(A21_222), vec(A22_222), 15))
-
   expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gss, m=1, model="G-StMVAR", structural_pars=list(W=W_222)),
                c(phi10_222, vec(A11_222), vec(A12_222)))
   expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gss, m=2, model="G-StMVAR", structural_pars=list(W=W_222)),
                c(phi20_222, vec(A21_222), vec(A22_222), 15))
-
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=1, structural_pars=list(W=W_332)),
                c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332)))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=2, structural_pars=list(W=W_332)),
                c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332)))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332s, m=3, structural_pars=list(W=W_332)),
                c(phi30_332, vec(A31_332), vec(A32_332), vec(A33_332)))
-
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332ts, m=1, model="StMVAR", structural_pars=list(W=W_332)),
                c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332), 10))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332ts, m=2, model="StMVAR", structural_pars=list(W=W_332)),
                c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332), 20))
   expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332ts, m=3, model="StMVAR", structural_pars=list(W=W_332)),
                c(phi30_332, vec(A31_332), vec(A32_332), vec(A33_332), 30))
-
   expect_equal(pick_regime(p=3, M=c(2, 1), d=2, params=theta_332gss, m=1, model="G-StMVAR", structural_pars=list(W=W_332)),
                c(phi10_332, vec(A11_332), vec(A12_332), vec(A13_332)))
   expect_equal(pick_regime(p=3, M=c(2, 1), d=2, params=theta_332gss, m=2, model="G-StMVAR", structural_pars=list(W=W_332)),
                c(phi20_332, vec(A21_332), vec(A22_332), vec(A23_332)))
   expect_equal(pick_regime(p=3, M=c(2, 1), d=2, params=theta_332gss, m=3, model="G-StMVAR", structural_pars=list(W=W_332)),
                c(phi30_332, vec(A31_332), vec(A32_332), vec(A33_332), 30))
-
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123s, m=1, structural_pars=list(W=W_123)),
                c(phi10_123, vec(A11_123)))
   expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123s, m=2, structural_pars=list(W=W_123)),
                c(phi20_123, vec(A21_123)))
-
   expect_equal(pick_regime(p=2, M=1, d=3, params=theta_213sWC, m=1, structural_pars=list(W=W_213)),
                c(phi10_213, vec(A11_213), vec(A12_213)))
   expect_equal(pick_regime(p=2, M=1, d=3, params=theta_213tsWC, m=1, model="StMVAR", structural_pars=list(W=W_213)),
                c(phi10_213, vec(A11_213), vec(A12_213), 10))
+
+  # Constrained model
+  expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112c, model="GMVAR", m=1, constraints=C_112),
+               c(phi10_112, vech(Omega1_112)))
+  expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112tc, model="StMVAR", m=1, constraints=C_112),
+               c(phi10_112, vech(Omega1_112), 10))
+  expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112tcsWAR, model="StMVAR", m=1, constraints=C_112, structural_pars=list(W=W_112)),
+               c(phi10_112, 10))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222c, model="GMVAR", m=1, constraints=C_222),
+               c(phi10_222, vech(Omega1_222)))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222csL, model="GMVAR", m=1, structural_pars=list(W=W_222, C_lambda=C_lambda_222)),
+               c(phi10_222, vec(A11_222), vec(A12_222)))
+  expect_equal(pick_regime(p=2, M=c(1, 1), d=2, params=theta_222gscsL, model="G-StMVAR", m=2, structural_pars=list(W=W_222, C_lambda=C_lambda_222)),
+               c(phi20_222, vec(A21_222), vec(A22_222), 20))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222csLAR, model="GMVAR", m=1, constraints=C_222,
+                           structural_pars=list(W=W_222, C_lambda=C_lambda_222)), c(phi10_222))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222tcsLAR, model="StMVAR", m=2, constraints=C_222,
+                           structural_pars=list(W=W_222, C_lambda=C_lambda_222)), c(phi20_222, 20))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222tcsLAR, model="StMVAR", m=2, constraints=C_222,
+                           structural_pars=list(W=W_222, C_lambda=C_lambda_222), with_df=FALSE), c(phi20_222))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123c, model="GMVAR", m=2, constraints=C_123),
+               c(phi20_123, vech(Omega2_123)))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", m=2, constraints=C_123),
+               c(phi20_123, vech(Omega2_123), 20))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", m=2, constraints=C_123, with_df=FALSE),
+               c(phi20_123, vech(Omega2_123)))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tc, model="StMVAR", m=1, constraints=C_123, with_df=FALSE),
+               c(phi10_123, vech(Omega1_123)))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tcsL, model="StMVAR", m=1, constraints=C_123,
+                           structural_pars=list(W=W_123, C_lambda=C_lambda_123)), c(phi10_123, 10))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222c_int, model="GMVAR", m=1, constraints=C_222, same_means=list(1:2)),
+               c(vech(Omega1_222)))
+  expect_equal(pick_regime(p=2, M=2, d=2, params=theta_222tc_int, model="StMVAR", m=2, constraints=C_222, same_means=list(1:2)),
+               c(vech(Omega2_222), 20))
+  expect_equal(pick_regime(p=3, M=3, d=2, params=theta_332c_int, model="GMVAR", m=3, constraints=C_332, same_means=list(1, 2:3)),
+               c(vech(Omega3_332)))
+  expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gsc_int, model="G-StMVAR", m=1, constraints=C_332, same_means=list(1, 2:3)),
+               c(vech(Omega1_332)))
+  expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gsc_int, model="G-StMVAR", m=2, constraints=C_332, same_means=list(1, 2:3)),
+               c(vech(Omega2_332), 20))
+  expect_equal(pick_regime(p=3, M=c(1, 2), d=2, params=theta_332gsc_int, model="G-StMVAR", m=3, constraints=C_332, same_means=list(1, 2:3)),
+               c(vech(Omega3_332), 30))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123csLAR_int, model="GMVAR", m=2, constraints=C_123,
+                           structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)), numeric(0))
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tcsLAR_int, model="StMVAR", m=1, constraints=C_123,
+                           structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2)), 10)
+  expect_equal(pick_regime(p=1, M=2, d=3, params=theta_123tcsLAR_int, model="StMVAR", m=2, constraints=C_123,
+                           structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2), with_df=FALSE), numeric(0))
+
 })
 
 

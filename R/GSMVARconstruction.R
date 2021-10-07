@@ -108,6 +108,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     IC <- data.frame(AIC=NA, HQIC=NA, BIC=NA)
     qresiduals <- NA
   } else {
+    warn_df(p=p, M=M, params=params, model=model)
     if(npars >= d*nrow(data)) warning("There are at least as many parameters in the model as there are observations in the data")
     lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                     conditional=conditional, parametrization=parametrization,

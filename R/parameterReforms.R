@@ -489,3 +489,56 @@ sort_and_standardize_alphas <- function(alphas, M, model=c("GMVAR", "StMVAR", "G
   }
   alphas/sum(alphas)
 }
+
+
+
+#' @title Transform a StMVAR (or G-StMVAR) model parameter vector to the corresponding G-StMVAR model parameter vector
+#'  with the large df parameters removed.
+#'
+#' @description \code{stmvarpars_to_gstmvar} transforms a StMVAR (or G-StMVAR) model parameter vector to the corresponding
+#'   G-StMVAR model parameter vector with the large df parameters removed.
+#'
+#' @inheritParams loglikelihood_int
+#' @param max_df regimes with degrees of freedom parameter value larger than this will be turned into
+#'  GMVAR type.
+#' @return Returns a list with three elements: \code{$params} contains the corresponding G-StMVAR model
+#'  parameter vector, \code{$reg_order} contains the permutation that was applied to the regimes
+#'  (GMVAR type regimes first, and decreasing ordering by mixing weight parameters), and
+#'  \code{$M} a vector of length two containing the number of GMVAR type regimes in the first element
+#'  and the number of StMVAR type regimes in the second.
+#' @section Warning:
+#'  No argument checks!
+#' @keywords internal
+
+stmvarpars_to_gstmvar <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"),
+                                  constraints=NULL, same_means=NULL, structural_pars=NULL) {
+  model <- match.arg(model)
+  stopifnot(model %in% c("StMVAR", "G-StMVAR"))
+  if(model == "StMVAR") {
+    M1 <- 0
+    M2 <- M
+  } else { # model == "G-StMVAR"
+    M1 <- M[1]
+    M2 <- M[2]
+  }
+  M_orig <- M
+  M <- sum(M)
+  all_df <- pick_df(M=M, params=params, model=model)
+  if(!any(all_df > max_df)) { # Nothing is changed in the model
+    warning("No degrees of freedom parameter is larger than 'max_df'. The original model is returned.")
+    if(model == "StMVAR") {
+      ret_M <- c(0, M)
+    } else { # model == "G-StMVAR"
+      ret_M <- M_orig
+    }
+    return(list(params=params,
+                reg_order=1:M,
+                M=ret_M))
+  }
+  regs_to_change <- which(all_df > maxdf) + M1 # Which regimes to change to GMVAR type
+  if(length(regs_to_change) == M2) message("All regimes are changed to GMVAR type. The result is therefore a GMVAR model and not a G-StMVAR model.")
+  alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params, model=model)
+  all_regs <- lapply(1:M, function(i1) pick_regime(p=p, M=M_orig, d=d, params=params, model=model,
+                                                   constraints=constraints, same_means=same_means,
+                                                   structural_pars=structural_pars))
+}

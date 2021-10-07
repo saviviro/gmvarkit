@@ -108,43 +108,13 @@
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
 #'
-#' fit11t <- fitGSMVAR(gdpdef, p=1, M=1, model="StMVAR", ncalls=10, seeds=1:10, ncores=4) # Kaikki maksimiin, kokeile suurempaa p?
-#' fit31t <- fitGSMVAR(gdpdef, p=3, M=1, model="StMVAR", ncalls=8, seeds=1:8, ncores=4) # Kaikki maksimiin
-#'
-#' fit31 <- fitGSMVAR(gdpdef, p=3, M=1, model="GMVAR", ncalls=4, seeds=1:4, ncores=4)
-#' (fit31$loglik - fit31t$loglik)/fit31$loglik # 0.19
-#'
-#' fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=10, seeds=1:10, ncores=4)
-#' fit12t_alt <- alt_gsmvar(fit12t, which_largest=2) # Get_foc antaa NA NA NA?
-#' fit12t_alt_2 <- alt_gsmvar(fit12t, which_largest=7) # Vastaavien maksimien välillä noin 0.01% heittoa loglikeissä, 1+5/10 löysi, vrt GMVAR 9/10
-#'
-#' fit12gs <- fitGSMVAR(gdpdef, p=1, M=c(1, 1), model="G-StMVAR", ncalls=20, seeds=1:20, ncores=4)
-#' fit22gs <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", ncalls=30, seeds=1:20, ncores=4)
-#' fit32gs <- fitGSMVAR(gdpdef, p=3, M=c(1, 1), model="G-StMVAR", ncalls=30, seeds=1:20, ncores=4)
-#'
-#' fit22 <- fitGSMVAR(gdpdef, p=2, M=2, ncalls=20, seeds=1:20, ncores=4)
-#' sort(fit22$all_logliks, T) # 17/20 löysi globaalin maksimin
-#'
-#' fit22t <- fitGSMVAR(gdpdef, p=2, M=2, model="StMVAR", ncalls=20, seeds=1:20, ncores=4)
-#' sort(fit22t$all_logliks, T)
-#' fit22t_alt <- alt_gsmvar(fit22t, which_largest=5) # 4 + 4/20 löysi maksimin, sitten eroaa
-#' fit22t_alt_2 <- alt_gsmvar(fit22t, which_largest=9, calc_std_errors=F)
-#' summary(fit22t_alt, digits=6)
-#'
-#' fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=30, seeds=1:30, ncores=4)
-#' sort(fit32$all_logliks, T) # 20/30 finds MLE
-#'
-#' fit32t <- fitGSMVAR(gdpdef, p=3, M=2, model="StMVAR", ncalls=30, seeds=1:30, ncores=4)
-#' sort(fit32t$all_logliks, T)
-#' fit32t_alt <- alt_gsmvar(fit32t, which_largest=10)
-#' summary(fit32t_alt, digits=6)
-#'
-#'
 #' # The rest of the examples only use a single estimation round with a given
 #' # seed that produces the MLE to reduce running time of the examples. When
 #' # estimating models for empirical applications, a large number of estimation
 #' # rounds (ncalls = a large number) should be performed to ensure reliability
 #' # of the estimates (see the section details).
+#'
+#' # One-regime StMVAR(4, 1) model
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints.
@@ -155,11 +125,20 @@
 #' # A statistically identified structural model can also be obtained with
 #' # gsmvar_to_sgsmvar(fit12)
 #'
+#' fit12ts <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", structural_pars=list(W=W_122),
+#'   ncalls=12, seeds=1:12)
+#'
+#'  fit12gss <- fitGSMVAR(gdpdef, p=1, M=c(1, 1), model="G-StMVAR", structural_pars=list(W=W_122),
+#'   ncalls=12, seeds=1:12)
+#'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
 #' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 #' fit22c <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
 #' fit22c
+#'
+#' fit22gscm <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", constraints=C_mat,
+#'    parametrization="mean", same_means=list(1:2), ncalls=1, seeds=1)
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes and non-diagonal elements
@@ -174,7 +153,7 @@
 #' @export
 
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=100, ncores=2, maxit=500,
+                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=M^6, ncores=2, maxit=500,
                       seeds=NULL, print_res=TRUE, ...) {
 
   model <- match.arg(model)
@@ -200,7 +179,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   }
   if(ncores > ncalls) {
     ncores <- ncalls
-    message("ncores was set to be larger than the number of estimation rounds")
+#    message("ncores was set to be larger than the number of estimation rounds")
   }
   cat(paste("Using", ncores, "cores for", ncalls, "estimations rounds..."), "\n")
 
