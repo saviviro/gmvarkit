@@ -101,12 +101,44 @@
 #'
 #' # GMVAR(1,2) model: 10 estimation rounds with seeds set
 #' # for reproducibility
-#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10, ncores=4)
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
+#'
+#' fit11t <- fitGSMVAR(gdpdef, p=1, M=1, model="StMVAR", ncalls=10, seeds=1:10, ncores=4) # Kaikki maksimiin, kokeile suurempaa p?
+#' fit31t <- fitGSMVAR(gdpdef, p=3, M=1, model="StMVAR", ncalls=8, seeds=1:8, ncores=4) # Kaikki maksimiin
+#'
+#' fit31 <- fitGSMVAR(gdpdef, p=3, M=1, model="GMVAR", ncalls=4, seeds=1:4, ncores=4)
+#' (fit31$loglik - fit31t$loglik)/fit31$loglik # 0.19
+#'
+#' fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=10, seeds=1:10, ncores=4)
+#' fit12t_alt <- alt_gsmvar(fit12t, which_largest=2) # Get_foc antaa NA NA NA?
+#' fit12t_alt_2 <- alt_gsmvar(fit12t, which_largest=7) # Vastaavien maksimien välillä noin 0.01% heittoa loglikeissä, 1+5/10 löysi, vrt GMVAR 9/10
+#'
+#' fit12gs <- fitGSMVAR(gdpdef, p=1, M=c(1, 1), model="G-StMVAR", ncalls=20, seeds=1:20, ncores=4)
+#' fit22gs <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", ncalls=30, seeds=1:20, ncores=4)
+#' fit32gs <- fitGSMVAR(gdpdef, p=3, M=c(1, 1), model="G-StMVAR", ncalls=30, seeds=1:20, ncores=4)
+#'
+#' fit22 <- fitGSMVAR(gdpdef, p=2, M=2, ncalls=20, seeds=1:20, ncores=4)
+#' sort(fit22$all_logliks, T) # 17/20 löysi globaalin maksimin
+#'
+#' fit22t <- fitGSMVAR(gdpdef, p=2, M=2, model="StMVAR", ncalls=20, seeds=1:20, ncores=4)
+#' sort(fit22t$all_logliks, T)
+#' fit22t_alt <- alt_gsmvar(fit22t, which_largest=5) # 4 + 4/20 löysi maksimin, sitten eroaa
+#' fit22t_alt_2 <- alt_gsmvar(fit22t, which_largest=9, calc_std_errors=F)
+#' summary(fit22t_alt, digits=6)
+#'
+#' fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=30, seeds=1:30, ncores=4)
+#' sort(fit32$all_logliks, T) # 20/30 finds MLE
+#'
+#' fit32t <- fitGSMVAR(gdpdef, p=3, M=2, model="StMVAR", ncalls=30, seeds=1:30, ncores=4)
+#' sort(fit32t$all_logliks, T)
+#' fit32t_alt <- alt_gsmvar(fit32t, which_largest=10)
+#' summary(fit32t_alt, digits=6)
+#'
 #'
 #' # The rest of the examples only use a single estimation round with a given
 #' # seed that produces the MLE to reduce running time of the examples. When
@@ -141,19 +173,22 @@
 #' }
 #' @export
 
-fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                      structural_pars=NULL, ncalls=100, ncores=2, maxit=500, seeds=NULL, print_res=TRUE, ...) {
+fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
+                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=100, ncores=2, maxit=500,
+                      seeds=NULL, print_res=TRUE, ...) {
 
-  if(!all_pos_ints(c(p, M, ncalls, ncores, maxit))) stop("Arguments p, M, ncalls, ncores, and maxit must be positive integers")
+  model <- match.arg(model)
+  parametrization <- match.arg(parametrization)
+  check_pMd(p=p, M=M, model=model)
+  if(!all_pos_ints(c(ncalls, ncores, maxit))) stop("Arguments ncalls, ncores, and maxit must be positive integers")
   stopifnot(length(ncalls) == 1)
   if(!is.null(seeds) && length(seeds) != ncalls) stop("The argument 'seeds' should be NULL or a vector of length 'ncalls'")
-  parametrization <- match.arg(parametrization)
   data <- check_data(data=data, p=p)
   d <- ncol(data)
   n_obs <- nrow(data)
   check_same_means(parametrization=parametrization, same_means=same_means)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  npars <- n_params(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
@@ -176,11 +211,12 @@ fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept
   parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
   cat("Optimizing with a genetic algorithm...\n")
-  GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, conditional=conditional, parametrization=parametrization,
-                                                              constraints=constraints, same_means=same_means, structural_pars=structural_pars,
+  GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, model=model, conditional=conditional,
+                                                              parametrization=parametrization, constraints=constraints,
+                                                              same_means=same_means, structural_pars=structural_pars,
                                                               seed=seeds[i1], ...), cl=cl)
 
-  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data, p, M, params=GAresults[[i1]],
+  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=GAresults[[i1]], model=model,
                                                           conditional=conditional, parametrization=parametrization,
                                                           constraints=constraints, same_means=same_means,
                                                           structural_pars=structural_pars, check_params=TRUE,
@@ -197,9 +233,27 @@ fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept
     print_loks()
   }
 
-  ### Optimization with the variable metric algorithm###
+  ### Optimization with the variable metric algorithm ###
+
+  # Logarithmize degrees of freedom parameters to get overly large degrees of freedom parameters
+  # value to the same range as other parameters. This adjusts the difference 'h' to be larger
+  # for larger df parameters in non-log scale to avoid the numerical problems associated with overly
+  # large degrees of freedom parameters.
+  manipulateDFS <- function(M, params, model, FUN) { # The function to log/exp the dfs
+    FUN <- match.fun(FUN)
+    M2 <- ifelse(model == "StMVAR", M, M[2])
+    params[(npars - M2 + 1):npars] <- FUN(params[(npars - M2 + 1):npars])
+    params
+  }
+  if(model == "StMVAR" | model == "G-StMVAR") { # Logarithmize the degrees of freedom parameters
+    GAresults <- lapply(1:ncalls, function(i1) manipulateDFS(M=M, params=GAresults[[i1]], model=model, FUN=log))
+  }
+
   loglik_fn <- function(params) {
-    tryCatch(loglikelihood_int(data, p, M, params=params,
+    if(model == "StMVAR" | model == "G-StMVAR") {
+      params <- manipulateDFS(M=M, params=params, model=model, FUN=exp) # Unlogarithmize dfs for calculating log-likelihood
+    }
+    tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                conditional=conditional, parametrization=parametrization,
                                constraints=constraints, same_means=same_means,
                                structural_pars=structural_pars, check_params=TRUE,
@@ -217,13 +271,9 @@ fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept
                                                                   control=list(fnscale=-1, maxit=maxit)), cl=cl)
   parallel::stopCluster(cl=cl)
 
-  converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1))
+  loks <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$value, numeric(1)) # Log-likelihoods
+  converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1)) # Which coverged
 
-  loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=NEWTONresults[[i1]]$par,
-                                                          conditional=conditional, parametrization=parametrization,
-                                                          constraints=constraints, same_means=same_means,
-                                                          structural_pars=structural_pars, check_params=TRUE,
-                                                          to_return="loglik", minval=minval), numeric(1))
   if(print_res) {
     cat("Results from the variable metric algorithm:\n")
     print_loks()
@@ -232,29 +282,32 @@ fitGSMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept
 
   ### Obtain estimates and standard errors, calculate IC ###
   all_estimates <- lapply(NEWTONresults, function(x) x$par)
-  which_best_fit <- which(loks == max(loks))[1]
-  best_fit <- NEWTONresults[[which_best_fit]]
-  params <- best_fit$par
-  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
-    params <- sort_components(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
-    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, structural_pars=structural_pars))
+  if(model == "StMVAR" || model == "G-StMVAR") { # Unlogarithmize degrees of freedom parameter values
+    all_estimates <- lapply(1:ncalls, function(i1) manipulateDFS(M=M, params=all_estimates[[i1]], model=model, FUN=exp))
   }
-  if(best_fit$convergence == 1) {
+  which_best_fit <- which(loks == max(loks))[1]
+  best_fit <- all_estimates[[which_best_fit]]
+  params <- best_fit
+  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
+    params <- sort_components(p=p, M=M, d=d, params=params, model=model, structural_pars=structural_pars)
+    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, model=model, structural_pars=structural_pars))
+  }
+  if(NEWTONresults[[which_best_fit]]$convergence == 1) {
     message("Iteration limit was reached when estimating the best fitting individual! Consider further estimation with the function 'iterate_more'")
   }
-  mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params,
+  mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                       conditional=conditional, parametrization=parametrization,
                                       constraints=constraints, same_means=same_means,
                                       structural_pars=structural_pars, to_return="mw",
                                       check_params=TRUE, minval=NULL)
-  if(any(vapply(1:M, function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
+  if(any(vapply(1:sum(M), function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
     message("At least one of the mixture components in the estimated model seems to be wasted!")
   }
 
 
   ### Wrap up ###
   cat("Calculating approximate standard errors...\n")
-  ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params,
+  ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params, model=model,
                 conditional=conditional, parametrization=parametrization,
                 constraints=constraints, same_means=same_means,
                 structural_pars=structural_pars, calc_std_errors=TRUE)

@@ -1,4 +1,3 @@
-
 #' @title Create random mean-parametrized parameter vector of a GMVAR, StMVAR, or G-StMVAR model that may not be stationary
 #'
 #' @description \code{random_ind} generates random mean-parametrized parameter vector that may not be stationary.
@@ -10,8 +9,11 @@
 #' @inherit in_paramspace references
 #' @keywords internal
 
-random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale,
-                       W_scale, lambda_scale, ar_scale2=1) {
+random_ind <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL,
+                       mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale, ar_scale2=1) {
+  model <- match.arg(model)
+  M_orig <- M
+  M <- sum(M)
   scale_A <- ar_scale2*ifelse(is.null(constraints),
                               1 + log(2*mean(c((p - 0.2)^(1.25), d))),
                               1 + (sum(constraints)/(M*d^2))^0.85)
@@ -46,10 +48,11 @@ random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pa
     alphas <- runif(n=M)
     alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=constraints, same_means=same_means,
                                           structural_pars=structural_pars)
-    return(c(x, alphas[-M]))
+    ret <- c(x, alphas[-M])
   } else {
-    return(x)
+    ret <- x
   }
+  c(ret, random_df(M=M_orig, model=model))
 }
 
 
@@ -71,117 +74,123 @@ random_ind <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pa
 #' @inherit random_ind return references
 #' @keywords internal
 
-smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, structural_pars=NULL, accuracy=1, which_random=numeric(0),
-                      mu_scale, mu_scale2, omega_scale, ar_scale=1, ar_scale2=1, W_scale, lambda_scale) {
-    scale_A <- ar_scale2*(1 + log(2*mean(c((p - 0.2)^(1.25), d))))
-    params_std <- reform_constrained_pars(p=p, M=M, d=d, params=params, constraints=constraints, same_means=same_means,
-                                          structural_pars=structural_pars)
-    unc_structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-    alphas <- pick_alphas(p=p, M=M, d=d, params=params_std)
-    if(is.null(structural_pars)) {
-      all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params_std)
+smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL,
+                      accuracy=1, which_random=numeric(0), mu_scale, mu_scale2, omega_scale, ar_scale=1, ar_scale2=1,
+                      W_scale, lambda_scale) {
+  model <- match.arg(model)
+  M_orig <- M
+  M <- sum(M)
+  scale_A <- ar_scale2*(1 + log(2*mean(c((p - 0.2)^(1.25), d))))
+  params_std <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model,
+                                        constraints=constraints, same_means=same_means,
+                                        structural_pars=structural_pars)
+  unc_structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
+  alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params_std, model=model)
+  all_df <- pick_df(M=M_orig, params=params_std, model=model)
+  if(is.null(structural_pars)) {
+    all_Omega <- pick_Omegas(p=p, M=M_orig, d=d, params=params_std)
+  }
+  if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
+    # No AR constraints, reduced form model, no same_means
+    all_phi0_A <- pick_all_phi0_A(p=p, M=M_orig, d=d, params=params_std) # all_mu if called from GA
+    pars <- vapply(1:M, function(m) {
+      if(any(which_random == m)) {
+        if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
+          coefmats <- random_coefmats2(p=p, d=d, ar_scale=ar_scale)
+        } else {
+          coefmats <- random_coefmats(d=d, how_many=p, scale=scale_A)
+        }
+        c(rnorm(d, mean=mu_scale, sd=mu_scale2),
+          coefmats,
+          random_covmat(d=d, omega_scale=omega_scale))
+      } else {
+        c(rnorm(length(all_phi0_A[,m]), mean=all_phi0_A[,m], sd=pmax(0.2, abs(all_phi0_A[,m]))/accuracy),
+          smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy))
+      }
+    }, numeric(d + p*d^2 + d*(d + 1)/2))
+  } else { # AR constraints, structural model, or same_means
+    g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
+    if(length(which_random) == 0) {
+      smart_regs <- 1:M
+    } else {
+      smart_regs <- (1:M)[-which_random]
     }
-    if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
-      # No AR constraints, reduced form model, no same_means
-      all_phi0_A <- pick_all_phi0_A(p=p, M=M, d=d, params=params_std) # all_mu if called from GA
-      pars <- vapply(1:M, function(m) {
+    less_pars <- ifelse(is.null(same_means), 0, d*(M - g)) # Number of (mean) parameters less in same_means models
+    all_phi0 <- matrix(params[1:(d*g)], nrow=d, ncol=g, byrow=FALSE) # Always mean parameters (not intercept) when called from GA
+    phi0_pars <- as.vector(vapply(1:g, function(m) {
+      which_reg <- ifelse(is.null(same_means), m, same_means[[m]]) # Can be many if same_means used
+      if(any(which_reg %in% smart_regs)) { # Smart parameters
+        rnorm(d, mean=all_phi0[,m], sd=abs(all_phi0[,m]/accuracy))
+      } else { # Random parameters
+        rnorm(d, mean=mu_scale, sd=mu_scale2)
+      }
+    }, numeric(d)))
+    if(is.null(constraints)) { # Structural model with AR parameters not constrained, possibly with same_means
+      all_A <- pick_allA(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars)
+      AR_pars <- as.vector(vapply(1:M, function(m) {
         if(any(which_random == m)) {
           if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
-            coefmats <- random_coefmats2(p=p, d=d, ar_scale=ar_scale)
+            random_coefmats2(p=p, d=d, ar_scale=ar_scale)
           } else {
-            coefmats <- random_coefmats(d=d, how_many=p, scale=scale_A)
+            random_coefmats(d=d, how_many=p, scale=scale_A)
           }
-          c(rnorm(d, mean=mu_scale, sd=mu_scale2),
-            coefmats,
-            random_covmat(d=d, omega_scale=omega_scale))
         } else {
-          c(rnorm(length(all_phi0_A[,m]), mean=all_phi0_A[,m], sd=pmax(0.2, abs(all_phi0_A[,m]))/accuracy),
-            smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy))
+          all_Am <- as.vector(all_A[, , , m])
+          rnorm(n=length(all_Am), mean=all_Am, sd=pmax(0.2, abs(all_Am))/accuracy)
         }
-      }, numeric(d + p*d^2 + d*(d + 1)/2))
-    } else { # AR constraints, structural model, or same_means
-      g <- ifelse(is.null(same_means), M, length(same_means)) # Number of groups of regimes with the same mean parameters
-      if(length(which_random) == 0) {
-        smart_regs <- 1:M
-      } else {
-        smart_regs <- (1:M)[-which_random]
-      }
-      less_pars <- ifelse(is.null(same_means), 0, d*(M - g)) # Number of (mean) parameters less in same_means models
-      all_phi0 <- matrix(params[1:(d*g)], nrow=d, ncol=g, byrow=FALSE) # Always mean parameters when called from GA
-      phi0_pars <- as.vector(vapply(1:g, function(m) {
-        which_reg <- ifelse(is.null(same_means), m, same_means[[m]]) # Can be many if same_means used
-        if(any(which_reg %in% smart_regs)) { # Smart parameters
-          rnorm(d, mean=all_phi0[,m], sd=abs(all_phi0[,m]/accuracy))
-        } else { # Random parameters
-          rnorm(d, mean=mu_scale, sd=mu_scale2)
-        }
-      }, numeric(d)))
-      if(is.null(constraints)) { # Structural model with AR parameters not constrained, possibly with same_means
-        all_A <- pick_allA(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars)
-        AR_pars <- as.vector(vapply(1:M, function(m) {
-          if(any(which_random == m)) {
-            if(runif(1) > 0.5) { # Use algorithm to force stationarity of coefficient matrices
-              random_coefmats2(p=p, d=d, ar_scale=ar_scale)
-            } else {
-              random_coefmats(d=d, how_many=p, scale=scale_A)
-            }
-          } else {
-            all_Am <- as.vector(all_A[, , , m])
-            rnorm(n=length(all_Am), mean=all_Am, sd=pmax(0.2, abs(all_Am))/accuracy)
-          }
-
-        }, numeric(p*d^2)))
-      } else { # Structural or reduced form model with AR parameters constrained, possibly with same_means
-        q <- ncol(constraints)
-        psi <- params[(M*d + 1 - less_pars):(M*d + q - less_pars)]
-        AR_pars <- rnorm(q, mean=psi, sd=pmax(0.2, abs(psi))/accuracy)
-      }
-      if(is.null(structural_pars)) { # Reduced form model, possibly with same_means
-        covmat_pars <- as.vector(vapply(1:M, function(m) {
-          if(any(which_random == m)) {
-            random_covmat(d=d, omega_scale=omega_scale)
-          } else {
-            smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy)
-          }
-        }, numeric(d*(d + 1)/2)))
-      } else { # Structural model, possibly with same_means
-        # For the covarince matrix parameters, there is the problem that the parameters of the first regime (W)
-        # affect the covariance matrices of the other regimes as well. So using random W messes up the covariance
-        # matrices of the other regimes too even if the lambda-parameters are "smart mutated". For this reason,
-        # if the first regime is "redundant" and randomly mutated, with probability 0.5 all the covariance matrix parameters
-        # will be random, and with probability 0.5 the W parameters will be smart but lambda parameters of redundant
-        # regimes are still random.
-        if(any(which_random == 1)  && runif(1) < 0.5) {
-          # If first regime is random, then W must be random so the lambdas may as well be random too.
-          covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
-        } else { # First regime is smart
-          W_pars <- Wvec(pick_W(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars))
-          if(M > 1) {
-            n_lambs <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
-            W_and_lambdas <- c(W_pars, params[(length(params) - (M - 1) - n_lambs + 1):(length(params) - (M - 1))])
-          } else {
-            W_and_lambdas <- W_pars # No lambdas when M == 1
-          }
-          covmat_pars <- smart_covmat(d=d, M=M, W_and_lambdas=W_and_lambdas, accuracy=accuracy, structural_pars=structural_pars)
-        }
-        if(is.null(structural_pars$C_lambda) && M > 1) {
-          # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
-          for(m in 2:M) {
-            if(any(which_random == m)) {
-              covmat_pars[(length(covmat_pars) - d*(M - 1) + d*(m - 2) + 1):(length(covmat_pars) - d*(M - 1) + d*(m - 2) + d)] <- abs(rnorm(n=d, mean=0, sd=lambda_scale[m - 1]))
-            }
-          }
-        }
-      }
-      pars <- c(phi0_pars, AR_pars, covmat_pars)
+      }, numeric(p*d^2)))
+    } else { # Structural or reduced form model with AR parameters constrained, possibly with same_means
+      q <- ncol(constraints)
+      psi <- params[(M*d + 1 - less_pars):(M*d + q - less_pars)]
+      AR_pars <- rnorm(q, mean=psi, sd=pmax(0.2, abs(psi))/accuracy)
     }
-    if(M > 1) {
-      alphas <- abs(rnorm(M, mean=alphas, sd=0.1))
-      return(c(pars, (alphas/sum(alphas))[-M]))
-    } else {
-      return(pars)
+    if(is.null(structural_pars)) { # Reduced form model, possibly with same_means
+      covmat_pars <- as.vector(vapply(1:M, function(m) {
+        if(any(which_random == m)) {
+          random_covmat(d=d, omega_scale=omega_scale)
+        } else {
+          smart_covmat(d=d, Omega=all_Omega[, , m], accuracy=accuracy)
+        }
+      }, numeric(d*(d + 1)/2)))
+    } else { # Structural model, possibly with same_means
+      # For the covarince matrix parameters, there is the problem that the parameters of the first regime (W)
+      # affect the covariance matrices of the other regimes as well. So using random W messes up the covariance
+      # matrices of the other regimes too even if the lambda-parameters are "smart mutated". For this reason,
+      # if the first regime is "redundant" and randomly mutated, with probability 0.5 all the covariance matrix parameters
+      # will be random, and with probability 0.5 the W parameters will be smart but lambda parameters of redundant
+      # regimes are still random.
+      if(any(which_random == 1)  && runif(1) < 0.5) {
+        # If first regime is random, then W must be random so the lambdas may as well be random too.
+        covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
+      } else { # First regime is smart
+        W_pars <- Wvec(pick_W(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars))
+        if(M > 1) {
+          n_lambs <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
+          W_and_lambdas <- c(W_pars, params[(length(params) - (M - 1) - n_lambs + 1):(length(params) - (M - 1))])
+        } else {
+          W_and_lambdas <- W_pars # No lambdas when M == 1
+        }
+        covmat_pars <- smart_covmat(d=d, M=M, W_and_lambdas=W_and_lambdas, accuracy=accuracy, structural_pars=structural_pars)
+      }
+      if(is.null(structural_pars$C_lambda) && M > 1) {
+        # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
+        for(m in 2:M) {
+          if(any(which_random == m)) {
+            covmat_pars[(length(covmat_pars) - d*(M - 1) + d*(m - 2) + 1):(length(covmat_pars) - d*(M - 1) + d*(m - 2) + d)] <- abs(rnorm(n=d, mean=0, sd=lambda_scale[m - 1]))
+          }
+        }
+      }
     }
+    pars <- c(phi0_pars, AR_pars, covmat_pars)
   }
+  if(M > 1) {
+    alphas <- abs(rnorm(M, mean=alphas, sd=0.1))
+    ret <- c(pars, (alphas/sum(alphas))[-M])
+  } else {
+    ret <- pars
+  }
+  c(ret, smart_df(M=M_orig, df=all_df, accuracy=accuracy, which_random=which_random, model=model))
+}
 
 
 #' @title Create somewhat random parameter vector of a GMVAR, StMVAR, or G-StMVAR model that is always stationary
@@ -213,8 +222,11 @@ smart_ind <- function(p, M, d, params, constraints=NULL, same_means=NULL, struct
 #'  }
 #'  @keywords internal
 
-random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale, mu_scale2, omega_scale, ar_scale=1,
-                        W_scale, lambda_scale) {
+random_ind2 <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), same_means=NULL, structural_pars=NULL,
+                        mu_scale, mu_scale2, omega_scale, ar_scale=1, W_scale, lambda_scale) {
+  model <- match.arg(model)
+  M_orig <- M
+  M <- sum(M)
   if(is.null(structural_pars) && is.null(same_means)) { # Reduced form, no same_means
       x <- as.vector(vapply(1:M, function(m) c(rnorm(d, mean=mu_scale, sd=mu_scale2),
                                                random_coefmats2(p=p, d=d, ar_scale=ar_scale),
@@ -232,10 +244,11 @@ random_ind2 <- function(p, M, d, same_means=NULL, structural_pars=NULL, mu_scale
     alphas <- runif(n=M)
     alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=NULL, same_means=same_means,
                                           structural_pars=structural_pars)
-    return(c(x, alphas[-M]))
+    ret <- c(x, alphas[-M])
   } else {
-    return(x)
+    ret <- x
   }
+  c(ret, random_df(M=M_orig, model=model))
 }
 
 
@@ -324,8 +337,9 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
       L <- t(chol(Sigma))
     }
   }
-  all_A <- all_phi[, , p, 1:p]
-  as.vector(all_A)
+  #all_A <- all_phi[, , p, 1:p]
+  #as.vector(all_A)
+  as.vector(all_phi[, , p, 1:p])
 }
 
 
@@ -337,6 +351,9 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 #'
 #' @inheritParams is_stationary
 #' @inheritParams GAfit
+#' @details Note that for StMVAR type regimes, the error term covariance matrix is consists of an ARCH type scalar that
+#'   multiplies a constant covariance matrix. This function generates the constant covariance matrix part of the
+#'   error term covariance matrix.
 #' @return
 #'   \describe{
 #'     \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
@@ -353,8 +370,9 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
   if(is.null(structural_pars)) {
     return(smart_covmat(d=d, Omega=diag(x=omega_scale), accuracy=1))
   } else {
+    M <- sum(M)
     W <- structural_pars$W
-    n_zeros <- vapply(1:d, function(i1) sum(W[i1,] == 0, na.rm=TRUE), numeric(1))
+    n_zeros <- vapply(1:d, function(i1) sum(W[i1,] == 0, na.rm=TRUE), numeric(1)) # Number of zeros in each row
     std_devs <- sqrt(W_scale/(d - n_zeros))
     new_W <- matrix(rnorm(n=d^2, mean=0, sd=std_devs), nrow=d, byrow=FALSE) # The standard deviations are recycled
     new_W[W == 0 & !is.na(W)] <- 0
@@ -366,7 +384,6 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
       } else {
         lambdas <- abs(rnorm(n=ncol(structural_pars$C_lambda), mean=0, sd=lambda_scale)) # gammas
       }
-      lambdas[lambdas == Inf | lambdas == -Inf] <- 1 # If the df is very close to zero, Inf values may appear
       return(c(Wvec(new_W), lambdas))
     } else {
       return(Wvec(new_W))
@@ -420,6 +437,7 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
     }
     return(vech(covmat))
   } else {
+    M <- sum(M)
     pars <- rnorm(n=length(W_and_lambdas), mean=W_and_lambdas, sd=sqrt(abs(W_and_lambdas)/(d + accuracy)))
     W_const <- structural_pars$W[structural_pars$W != 0] # Non-zero constraints/free values - first length(W_const) values in pars are W parameters
     pars[1:length(W_const)][W_const > 0 & !is.na(W_const)] <- abs(pars[1:length(W_const)][W_const > 0 & !is.na(W_const)]) # We enforce W to satisfy the sign constraints

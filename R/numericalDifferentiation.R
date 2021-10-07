@@ -74,7 +74,7 @@ calc_hessian <- function(x, fn, h=6e-06, ...) {
 get_gradient <- function(gsmvar, h=6e-06) {
   check_gsmvar(gsmvar)
   foo <- function(x) {
-    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x,
+    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                       constraints=gsmvar$model$constraints, to_return="loglik", check_params=TRUE,
                       minval=NA, stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol)
@@ -87,7 +87,7 @@ get_gradient <- function(gsmvar, h=6e-06) {
 get_hessian <- function(gsmvar, h=6e-06) {
   check_gsmvar(gsmvar)
   foo <- function(x) {
-    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x,
+    loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                       constraints=gsmvar$model$constraints, to_return="loglik", check_params=TRUE,
                       minval=NA, stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol)

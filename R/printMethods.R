@@ -127,7 +127,7 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
       df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
-    if(regime_type == "StMVAR") { # Time varying ARCH scalar multiplying the error term
+    if(regime_type == "StMVAR") { # Time varying ARCH scalar multiplying the constant part of error term covariance matrix
       df <- cbind(df, round_lbrackets, arch_scalar)
     }
     df[, tmp_names[p*(d + 2) + 1]] <- left_brackets

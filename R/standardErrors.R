@@ -69,9 +69,10 @@ print_std_errors <- function(gsmvar, digits=3) {
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
+  model <- gsmvar$model$model
   constraints <- gsmvar$model$constraints
   parametrization <- gsmvar$model$parametrization
-  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$std_errors, constraints=constraints,
+  pars <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$std_errors, model=model, constraints=constraints,
                                   same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars,
                                   change_na=TRUE)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
@@ -83,8 +84,11 @@ print_std_errors <- function(gsmvar, digits=3) {
     # No standard errors for cov. mats. as the model is parametrized with W and lambdas
     all_Omega <- array(" ", dim=c(d, d, M))
   }
-  alphas <- pick_alphas(p=p, M=M, d=d, params=pars)
-  alphas[M] <- NA
+  alphas <- pick_alphas(p=p, M=M, d=d, params=pars, model=model)
+  all_df <- pick_df(M=M, params=pars, model=model)
+  M_orig <- M
+  M <- sum(M)
+  alphas[M] <- NA # No standard error for the last alpha (it is not displayed anyway, though)
   if(parametrization == "mean") {
     all_mu <- all_phi0_or_mu
     all_phi0 <- matrix(" ", nrow=d, ncol=M)
@@ -119,14 +123,32 @@ print_std_errors <- function(gsmvar, digits=3) {
   left_brackets <- rep("[", times=d)
   right_brackets <- rep("]", times=d)
   plus <- c("+", rep(" ", d - 1))
+  arch_scalar <- c(rep(" ", times=d-1), "ARCH_mt")
+  round_lbrackets <- rep("(", times=d)
+  round_rbrackets <- rep(")", times=d)
   Y <- paste0("Y", 1:d)
   tmp_names <- paste0("tmp", 1:(p*(d + 2) + d + 2))
 
   for(m in seq_len(M)) {
     count <- 1
-    cat(paste("Regime", m), "\n")
+    if(model == "GMVAR") {
+      regime_type <- "GMVAR"
+    } else if(model == "StMVAR") {
+      regime_type <- "StMVAR"
+      M1 <- 0
+    } else {
+      M1 <- M[1]
+      regime_type <- ifelse(m <= M1, "GMVAR", "StMVAR")
+    }
+
+    cat(paste("Regime", m))
+    if(model == "G-StMVAR") cat(paste0(" (", regime_type, " type)"))
+    cat("\n")
     if(m < M) cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     if(parametrization == "mean") cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n")
+    if(regime_type == "StMVAR") { # Print degrees of freedom parameter for StMVAR type regimes
+      cat("\nDf parameter: ", format_value(all_df[m - M1]), "\n")
+    }
     cat("\n")
     df <- data.frame(Y=Y,
                      eq=c("=", rep(" ", d - 1)),
@@ -142,12 +164,15 @@ print_std_errors <- function(gsmvar, digits=3) {
       df[, tmp_names[count]] <- paste0(Y, ".", i1); count <- count + 1
       df <- cbind(df, plus)
     }
+    if(regime_type == "StMVAR") { # Time varying ARCH scalar multiplying the constant part of error term covariance matrix
+      df <- cbind(df, round_lbrackets, arch_scalar)
+    }
     df[, tmp_names[p*(d + 2) + 1]] <- left_brackets
     df[, c("Omega", tmp_names[(p*(d + 2) + 2):(p*(d + 2) + d)])] <- format_value(all_Omega[, , m])
     df[, tmp_names[p*(d + 2) + d + 1]] <- right_brackets
     df[, "1/2"] <- rep(" ", d)
     df[, tmp_names[p*(d + 2) + d + 2]] <- paste0("eps", 1:d)
-    names_to_omit <- unlist(lapply(c("plus", "eq", tmp_names), function(nam) grep(nam, colnames(df))))
+    names_to_omit <- unlist(lapply(c("plus", "eq", "arch_scalar", "round_lbrackets", "round_rbrackets", tmp_names), function(nam) grep(nam, colnames(df))))
     colnames(df)[names_to_omit] <- " "
     print(df)
     cat("\n")
