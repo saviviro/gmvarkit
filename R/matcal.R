@@ -211,7 +211,8 @@ diag_Omegas <- function(Omega1, Omega2) {
 #'  new_W%*%tcrossprod(diag(new_lambdas), new_W) # = Omega1
 #' @export
 
-redecompose_Omegas <- function(M, d, W, lambdas, perm=1:M) {
+redecompose_Omegas <- function(M, d, W, lambdas, perm=1:sum(M)) {
+  M <- sum(M)
   if(all(perm == 1:M)) {
     return(c(W, lambdas))
   } else if(perm[1] == 1) {

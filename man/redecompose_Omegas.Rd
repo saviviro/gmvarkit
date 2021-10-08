@@ -5,7 +5,7 @@
 \title{In the decomposition of the covariance matrices (Muirhead, 1982, Theorem A9.9), change
   the order of the covariance matrices.}
 \usage{
-redecompose_Omegas(M, d, W, lambdas, perm = 1:M)
+redecompose_Omegas(M, d, W, lambdas, perm = 1:sum(M))
 }
 \arguments{
 \item{M}{\describe{

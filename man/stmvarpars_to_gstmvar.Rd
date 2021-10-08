@@ -136,11 +136,12 @@ a time-varying diagonal matrix with positive diagonal entries).}
 GMVAR type.}
 }
 \value{
-Returns a list with three elements: \code{$params} contains the corresponding G-StMVAR model
+Returns a list with four elements: \code{$params} contains the corresponding G-StMVAR model
  parameter vector, \code{$reg_order} contains the permutation that was applied to the regimes
- (GMVAR type regimes first, and decreasing ordering by mixing weight parameters), and
+ (GMVAR type regimes first, and decreasing ordering by mixing weight parameters),
  \code{$M} a vector of length two containing the number of GMVAR type regimes in the first element
- and the number of StMVAR type regimes in the second.
+ and the number of StMVAR type regimes in the second, \code{$same_means} constains the \code{same_mean}
+ constraints of the new model.
 }
 \description{
 \code{stmvarpars_to_gstmvar} transforms a StMVAR (or G-StMVAR) model parameter vector to the corresponding
