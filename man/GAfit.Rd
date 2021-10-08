@@ -278,6 +278,14 @@ The core of the genetic algorithm is mostly based on the description by \emph{Do
  zero for almost all t. A model including redundant regimes would have about the same log-likelihood value without
  the redundant regimes and there is no purpose to have redundant regimes in a model.
 }
+\examples{
+\donttest{
+ # Preliminary estimation of a G-StMVAR(1, 1, 1) model with 50 generations.
+ GA_estimates <- GAfit(gdpdef, p=1, M=c(1, 1), model="G-StMVAR",
+                       ngen=50, seed=1)
+ GA_estimates
+}
+}
 \references{
 \itemize{
    \item Ansley C.F., Kohn R. 1986. A note on reparameterizing a vector autoregressive
@@ -294,13 +302,5 @@ The core of the genetic algorithm is mostly based on the description by \emph{Do
          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
- }
- @export
- @examples
- \donttest{
- # Preliminary estimation of a G-StMVAR(1, 1, 1) model with 50 generations.
- GA_estimates <- GAfit(gdpdef, p=1, M=c(1, 1), model="G-StMVAR",
-                       ngen=50, seed=1)
- GA_estimates
  }
 }

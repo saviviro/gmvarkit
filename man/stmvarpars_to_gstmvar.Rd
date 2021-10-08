@@ -13,7 +13,8 @@ stmvarpars_to_gstmvar(
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
-  structural_pars = NULL
+  structural_pars = NULL,
+  max_df = 100
 )
 }
 \arguments{

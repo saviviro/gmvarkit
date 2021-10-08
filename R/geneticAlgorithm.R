@@ -191,14 +191,14 @@
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'  }
-#'  @export
-#'  @examples
-#'  \donttest{
+#' @examples
+#' \donttest{
 #'  # Preliminary estimation of a G-StMVAR(1, 1, 1) model with 50 generations.
 #'  GA_estimates <- GAfit(gdpdef, p=1, M=c(1, 1), model="G-StMVAR",
 #'                        ngen=50, seed=1)
 #'  GA_estimates
-#'  }
+#' }
+#' @export
 
 GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                   constraints=NULL, same_means=NULL, structural_pars=NULL,
