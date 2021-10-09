@@ -139,4 +139,5 @@
 * The package is not yeat completely updated to accommodate StMVAR and G-StMVAR models!
 * Changed the model class from 'gmvar' to 'gsmvar' to accommodate also StMVAR and G-StMVAR models.
 * Renamed functions: GMVAR -> GSMVAR; fitGMVAR -> fitGSMVAR; alt_gmvar -> alt_gsmvar; gmvar_to_sgmvar -> gsmvar_to_sgsmvars; also all the class 'gmvar' methods were changed to class 'gsmvar' methods.
+* New exported function 'stmvar_to_gstmvar': estimate a G-StMVAR model based on a StMVAR model with large degrees of freedom parameters.
 * Fixed a bug in the argument scale of the function GIRF.

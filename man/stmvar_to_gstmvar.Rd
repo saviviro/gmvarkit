@@ -47,7 +47,16 @@ If a StMVAR model contains large estimates for the degrees of freedom parameters
 }
 \examples{
 \donttest{
-1+1
+# StMVAR(1, 2), d=2 model:
+params12t <- c(0.5453, 0.1157, 0.331, 0.0537, -0.0422, 0.7089, 0.4181, 0.0018,
+  0.0413, 1.6004, 0.4843, 0.1256, -0.0311, -0.6139, 0.7221, 1.2123, -0.0357,
+  0.1381, 0.8337, 7.5564, 90000)
+mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
+mod12t
+
+# Switch to the G-StMVAR model:
+mod12gs <- stmvar_to_gstmvar(mod12t)
+mod12gs
 }
 }
 \references{
