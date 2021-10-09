@@ -16,6 +16,7 @@ standard_errors(
   same_means = NULL,
   structural_pars = NULL,
   minval,
+  custom_h = NULL,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08
@@ -148,6 +149,11 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{minval}{the value that will be returned if the parameter vector does not lie in the parameter space
 (excluding the identification condition).}
+
+\item{custom_h}{A numeric vector with same the length as the parameter vector: i:th element of custom_h is the difference
+used in central difference approximation for partial differentials of the log-likelihood function for the i:th parameter.
+If \code{NULL} (default), then the difference used for differentiating overly large degrees of freedom parameters
+is adjusted to avoid numerical problems, and the difference is \code{6e-6} for the other parameters.}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the

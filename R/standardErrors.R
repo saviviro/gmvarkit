@@ -6,12 +6,16 @@
 #'   and central-difference approximation for the differentiation.
 #'
 #' @inheritParams loglikelihood_int
+#' @param custom_h A numeric vector with same the length as the parameter vector: i:th element of custom_h is the difference
+#'  used in central difference approximation for partial differentials of the log-likelihood function for the i:th parameter.
+#'  If \code{NULL} (default), then the difference used for differentiating overly large degrees of freedom parameters
+#'  is adjusted to avoid numerical problems, and the difference is \code{6e-6} for the other parameters.
 #' @return A vector containing the approximate standard errors of the estimates.
 #' @inherit in_paramspace_int references
 #' @keywords internal
 
 standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                            constraints=NULL, same_means=NULL, structural_pars=NULL, minval,
+                            constraints=NULL, same_means=NULL, structural_pars=NULL, minval, custom_h=NULL,
                             stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -26,7 +30,13 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
   }
 
   # Calculate Hessian
-  Hess <- calc_hessian(x=params, fn=loglik_fn, h=6e-6)
+  if(is.null(custom_h)) { # Adjust h for overly large degrees of freedom parameters
+    varying_h <- get_varying_h(M=M, params=params, model=model)
+  } else { # Utilize user-specified h
+    stopifnot(length(custom_h) == length(params))
+    varying_h <- custom_h
+  }
+  Hess <- calc_hessian(x=params, fn=loglik_fn, varying_h=varying_h)
 
   # Inverse of the observed information matrix
   inv_obs_inf <- tryCatch(solve(-Hess), error=function(e) matrix(NA, nrow=length(params), ncol=length(params)))

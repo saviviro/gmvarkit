@@ -308,4 +308,28 @@ test_that("update_numtols works correctly", {
 })
 
 
+# StMVAR(1, 2), d=2 model:
+params12 <- c(0.5453, 0.1157, 0.331, 0.0537, -0.0422, 0.7089, 0.4181, 0.0018,
+              0.0413, 1.6004, 0.4843, 0.1256, -0.0311, -0.6139, 0.7221, 1.2123, -0.0357,
+              0.1381, 0.8337)
+mod12t <- suppressWarnings(GSMVAR(gdpdef, p=1, M=2, params=c(params12, 7, 90000), model="StMVAR"))
+mod12gs <- suppressWarnings(GSMVAR(gdpdef, p=1, M=c(1, 1), params=c(params12, 90), model="G-StMVAR"))
 
+test_that("sgmvar_to_gstmvar works correctly", {
+  new_mod12t_1 <- suppressMessages(stmvar_to_gstmvar(mod12t, max_df=100, maxit=1))
+  new_mod12t_2 <- suppressMessages(stmvar_to_gstmvar(mod12t, max_df=5, maxit=1))
+  new_mod12t_3 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12t, max_df=90001, maxit=1)))
+  new_mod12gs_1 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, max_df=100, maxit=1)))
+  new_mod12gs_2 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, max_df=50, maxit=1)))
+
+  expect_equal(new_mod12t_1$model$model, "G-StMVAR")
+  expect_equal(new_mod12t_1$model$M, c(1, 1))
+  expect_equal(new_mod12t_2$model$model, "GMVAR")
+  expect_equal(new_mod12t_2$model$M, 2)
+  expect_equal(new_mod12t_3$model$model, "StMVAR")
+  expect_equal(new_mod12t_3$model$M, 2)
+  expect_equal(new_mod12gs_1$model$model, "G-StMVAR")
+  expect_equal(new_mod12gs_1$model$M, c(1, 1))
+  expect_equal(new_mod12gs_2$model$model, "GMVAR")
+  expect_equal(new_mod12gs_2$model$M, 2)
+})

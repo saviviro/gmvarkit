@@ -75,11 +75,11 @@
 #' @section S3 methods:
 #'   The following S3 methods are supported for class \code{'gsmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
 #'    \code{predict} and \code{plot}.
-#' @seealso \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
-#'   \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
-#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
-#'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}},
-#'   \code{\link{update_numtols}}
+#' @seealso \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{predict.gsmvar}},
+#'   \code{\link{profile_logliks}}, \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
+#'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}},
+#'   \code{\link{Wald_test}}, \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}},
+#'   \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 #' @references
 #'  \itemize{
 #'    \item Dorsey R. E. and Mayer W. J. 1995. Genetic algorithms for estimation problems with multiple optima,
@@ -308,6 +308,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 #' @inheritParams simulateGMVAR
 #' @inheritParams fitGSMVAR
 #' @inheritParams GSMVAR
+#' @inheritParams standard_errors
 #' @details The purpose of \code{iterate_more} is to provide a simple and convenient tool to finalize
 #'   the estimation when the maximum number of iterations is reached when estimating a GMVAR, StMVAR, or G-StMVAR model
 #'   with the main estimation function \code{fitGSMVAR}. \code{iterate_more} is essentially a wrapper
@@ -333,32 +334,39 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 #' }
 #' @export
 
-iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, stat_tol=1e-3, posdef_tol=1e-8) {
+iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
+                         stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   check_gsmvar(gsmvar)
   stopifnot(maxit %% 1 == 0 & maxit >= 1)
+  if(is.null(custom_h)) { # Adjust h for overly large degrees of freedom parameters
+    varying_h <- get_varying_h(M=gsmvar$model$M, params=gsmvar$params, model=gsmvar$model$model)
+  } else { # Utilize user-specified h
+    stopifnot(length(custom_h) == length(gmvar$params))
+    varying_h <- custom_h
+  }
   minval <- get_minval(gsmvar$data)
 
   fn <- function(params) {
-    tryCatch(loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=params,
+    tryCatch(loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=params, model=gsmvar$model$model,
                                conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                                constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
                                structural_pars=gsmvar$model$structural_pars, check_params=TRUE,
                                to_return="loglik", minval=minval,
-                               stat_tol=stat_tol, posdef_tol=posdef_tol),
+                               stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
              error=function(e) minval)
   }
   gr <- function(params) {
-    calc_gradient(x=params, fn=fn)
+    calc_gradient(x=params, fn=fn, varying_h=varying_h)
   }
 
   res <- optim(par=gsmvar$params, fn=fn, gr=gr, method=c("BFGS"), control=list(fnscale=-1, maxit=maxit))
   if(res$convergence == 1) message("The maximum number of iterations was reached! Consired iterating more.")
 
-  ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=res$par,
-               conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-               constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
-               structural_pars=gsmvar$model$structural_pars, calc_std_errors=calc_std_errors,
-               stat_tol=stat_tol, posdef_tol=posdef_tol)
+  ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=res$par, model=gsmvar$model$model,
+                conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                structural_pars=gsmvar$model$structural_pars, calc_std_errors=calc_std_errors,
+                stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 
   ret$all_estimates <- gsmvar$all_estimates
   ret$all_logliks <- gsmvar$all_logliks

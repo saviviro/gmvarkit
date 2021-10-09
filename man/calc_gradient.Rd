@@ -5,21 +5,21 @@
 \alias{calc_hessian}
 \alias{get_gradient}
 \alias{get_hessian}
-\alias{get_soc}
 \alias{get_foc}
+\alias{get_soc}
 \title{Calculate gradient or Hessian matrix}
 \usage{
-calc_gradient(x, fn, h = 6e-06, ...)
+calc_gradient(x, fn, h = 6e-06, varying_h = NULL, ...)
 
-calc_hessian(x, fn, h = 6e-06, ...)
+calc_hessian(x, fn, h = 6e-06, varying_h = NULL, ...)
 
-get_gradient(gsmvar, h = 6e-06)
+get_gradient(gsmvar, custom_h = NULL)
 
-get_hessian(gsmvar, h = 6e-06)
+get_hessian(gsmvar, custom_h = NULL)
 
-get_soc(gsmvar, h = 6e-06)
+get_foc(gsmvar, custom_h = NULL)
 
-get_foc(gsmvar, h = 6e-06)
+get_soc(gsmvar, custom_h = NULL)
 }
 \arguments{
 \item{x}{a numeric vector specifying the point where the gradient or Hessian should be calculated.}
@@ -28,9 +28,17 @@ get_foc(gsmvar, h = 6e-06)
 
 \item{h}{difference used to approximate the derivatives.}
 
+\item{varying_h}{a numeric vector with the same length as \code{x} specifying the difference \code{h}
+for each dimension separately. If \code{NULL} (default), then the difference given as parameter \code{h}
+will be used for all dimensions.}
+
 \item{...}{other arguments passed to \code{fn}}
 
 \item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+
+\item{custom_h}{same as \code{varying_h} but if \code{NULL} (default), then the difference \code{h} used
+for differentiating overly large degrees of freedom parameters is adjusted to avoid numerical problems,
+and the difference is \code{6e-6} for the other parameters.}
 }
 \value{
 Gradient functions return numerical approximation of the gradient and Hessian functions return

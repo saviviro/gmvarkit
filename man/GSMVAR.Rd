@@ -24,6 +24,7 @@ GSMVAR(
   structural_pars = NULL,
   calc_cond_moments,
   calc_std_errors = FALSE,
+  custom_h = NULL,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08

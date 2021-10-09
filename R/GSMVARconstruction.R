@@ -79,7 +79,7 @@
 #' @export
 
 GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
+                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE, custom_h=NULL,
                   stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -108,7 +108,6 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     IC <- data.frame(AIC=NA, HQIC=NA, BIC=NA)
     qresiduals <- NA
   } else {
-    warn_df(p=p, M=M, params=params, model=model)
     if(npars >= d*nrow(data)) warning("There are at least as many parameters in the model as there are observations in the data")
     lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                     conditional=conditional, parametrization=parametrization,
@@ -124,9 +123,10 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
                                          posdef_tol=posdef_tol, df_tol=df_tol)
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=ifelse(conditional, nrow(data) - p, nrow(data)))
   }
+  warn_df(p=p, M=M, params=params, model=model)
   if(calc_std_errors) {
     if(is.null(data)) {
-      warning("Approximate standard errors can't be calculated")
+      warning("Approximate standard errors can't be calculated without data")
       std_errors <- rep(NA, npars)
     } else {
       std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, model=model,
@@ -136,7 +136,8 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
                                              minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1),
                                              stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
                              error=function(e) {
-                               warning("Approximate standard errors can't be calculated")
+                               warning("Approximate standard errors can't be calculated:")
+                               warning(e)
                                std_errors=rep(NA, npars)
                              })
     }
@@ -421,6 +422,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' # Form a structural model based on the reduced form model:
 #' mod12ts <- gsmvar_to_sgsmvar(mod12t)
 #' mod12ts
+
 #' }
 #' @export
 
@@ -475,6 +477,120 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
          parametrization=gsmvar$model$parametrization, constraints=constraints, same_means=same_means,
          structural_pars=list(W=new_W), calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
          posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
+}
+
+
+
+#' @title Estimate a G-StMVAR model based on a StMVAR model that has large degrees of freedom parameters
+#'
+#' @description \code{stmvar_to_gstmvar} estimates a G-StMVAR model based on a StMVAR model that has
+#'  large degrees of freedom parameters.
+#'
+#' @inheritParams simulateGMVAR
+#' @inheritParams GSMVAR
+#' @inheritParams fitGSMVAR
+#' @param estimate set \code{TRUE} if the new model should be estimated with a variable metric algorithm
+#'  using the StMAR model parameter value as the initial value. By default \code{TRUE} iff the model
+#'  contains data.
+#' @param calc_std_errors set \code{TRUE} if the approximate standard errors should be calculated.
+#' @param maxit the maximum number of iterations for the variable metric algorithm. Ignored if \code{estimate==FALSE}.
+#' @details If a StMVAR model contains large estimates for the degrees of freedom parameters,
+#'   one should consider switching to the corresponding G-StMAR model that lets the corresponding
+#'   regimes to be GMVAR type. \code{stmvar_to_gstmvar} does this switch conveniently. Also G-StMVAR models
+#'   are supported if some of the StMVAR type regimes have large degrees of freedom paraters.
+#'
+#'   Note that if the model imposes constraints on the autoregressive parameters, or if a structural model imposes
+#'   constraints on the lambda parameters, and the ordering the regimes changes, the constraints are removed from
+#'   the model. This is because of the form of the constraints that does not generally allow to switch the ordering
+#'   of the regimes. If you wish to keep the constraints, you may construct the resulting G-StMVAR model parameter
+#'   vector by hand, redefine your constraints accordingly, build the model with the function \code{GSMVAR}, and then
+#'   estimate it with the function \code{iterate_more}. Alternatively, you can always directly estimate the constrained
+#'   G-StMVAR model with the function \code{fitGSMVAR}.
+#' @return Returns an object of class \code{'gsmvar'} defining a G-StMVAR model based on the provided StMVAR (or G-StMVAR)
+#'   model with the regimes that had large degrees of freedom parameters changed to GMVAR type.
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
+#'  \code{\link{swap_W_signs}}
+#' @references
+#'  \itemize{
+#'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
+#'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
+#'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
+#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2007.04713.
+#'  }
+#' @examples
+#' \donttest{
+#' # StMVAR(1, 2), d=2 model:
+#' params12t <- c(0.5453, 0.1157, 0.331, 0.0537, -0.0422, 0.7089, 0.4181, 0.0018,
+#'   0.0413, 1.6004, 0.4843, 0.1256, -0.0311, -0.6139, 0.7221, 1.2123, -0.0357,
+#'   0.1381, 0.8337, 7.5564, 90000)
+#' mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
+#' mod12t
+#'
+#' # Switch to the G-StMVAR model:
+#' mod12gs <- stmvar_to_gstmvar(mod12t)
+#' mod12gs
+#' }
+#' @export
+
+stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df=100, maxit=100) {
+  check_gsmvar(gsmvar)
+  if(missing(estimate)) estimate <- ifelse(is.null(gsmvar$data), FALSE, TRUE)
+  stopifnot(all_pos_ints(c(max_df, maxit)))
+  M <- gsmvar$model$M
+
+  # G-StMVAR model parameter vector with the large df regimes changed to GMVAR type
+  new_params <- stmvarpars_to_gstmvar(p=gsmvar$model$p, M=M, d=gsmvar$model$d,
+                                      params=gsmvar$params, model=gsmvar$model$model,
+                                      constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                                      structural_pars=gsmvar$structural_pars, max_df=max_df)
+
+  # New constraints, if they we removed
+  if(!all(new_params$reg_order == 1:sum(M))) {
+    new_constraints <- NULL
+    if(!is.null(gsmvar$structural_pars)) {
+      new_structural_pars <- list(W=gsmvar$structural_pars$W, C_lambda=NULL)
+    }
+  } else {
+    new_constraints <- gsmvar$constraints
+    new_structural_pars <- gsmvar$structural_pars
+  }
+  if(is.null(gsmvar$structural_pars)) new_structural_pars <- NULL
+  new_same_means <- new_params$same_means
+
+ # print(new_structural_pars)
+
+  #check_constraints(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, structural_pars = new_structural_pars)
+  #print("lol")
+  # The type and order M of the new model
+  if(new_params$M[2] == 0) {
+    new_model <- "GMVAR"
+    new_M <- new_params$M[1]
+  } else if(new_params$M[1] == 0) {
+    new_model <- "StMVAR"
+    new_M <- new_params$M[2]
+  } else {
+    new_model <- "G-StMVAR"
+    new_M <- new_params$M
+  }
+  new_params <- new_params$params
+
+  if(estimate) { # Build and estimate the new model
+    tmp_mod <- suppressWarnings(GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=new_M, d=gsmvar$model$d, params=new_params, model=new_model,
+                                conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                                constraints=new_constraints, same_means=new_same_means, structural_pars=new_structural_pars,
+                                calc_std_errors=FALSE, calc_cond_moments=FALSE, stat_tol=gsmvar$num_tols$stat_tol,
+                                posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol))
+    new_mod <- iterate_more(tmp_mod, maxit=maxit, calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$posdef_tol,
+                            posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
+  } else { # Build the new model without estimation
+    new_mod <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=new_M, d=gsmvarar$model$d, params=new_params, model=new_model,
+                      conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
+                      constraints=new_constraints, same_means=new_same_means, structural_pars=new_structural_pars,
+                      calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,
+                      posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
+  }
+  new_mod
 }
 
 
