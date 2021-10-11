@@ -12,6 +12,7 @@
 
 print.gmvar <- function(gmvar, ..., digits=2) {
   class(gmvar) <- "gsmvar"
+  gmvar$model$model <- "GMVAR"
   print(gmvar, digits=digits)
 }
 
@@ -20,6 +21,7 @@ print.gmvar <- function(gmvar, ..., digits=2) {
 
 summary.gmvar <- function(gmvar, ...., digits=2) {
   class(gmvar) <- "gsmvar"
+  gmvar$model$model <- "GMVAR"
   summary(gmvar, digits=digits)
 }
 
@@ -28,6 +30,7 @@ summary.gmvar <- function(gmvar, ...., digits=2) {
 
 summary.gmvar <- function(gmvar) {
   class(gmvar) <- "gsmvar"
+  gmvar$model$model <- "GMVAR"
   plot(gmvar)
 }
 
