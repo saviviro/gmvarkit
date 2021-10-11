@@ -79,7 +79,7 @@
 #' @export
 
 GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE, custom_h=NULL,
+                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
                   stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -489,6 +489,7 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #' @inheritParams simulateGMVAR
 #' @inheritParams GSMVAR
 #' @inheritParams fitGSMVAR
+#' @inheritParams stmvarpars_to_gstmvar
 #' @param estimate set \code{TRUE} if the new model should be estimated with a variable metric algorithm
 #'  using the StMAR model parameter value as the initial value. By default \code{TRUE} iff the model
 #'  contains data.
@@ -584,7 +585,7 @@ stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df
     new_mod <- iterate_more(tmp_mod, maxit=maxit, calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$posdef_tol,
                             posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
   } else { # Build the new model without estimation
-    new_mod <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=new_M, d=gsmvarar$model$d, params=new_params, model=new_model,
+    new_mod <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=new_M, d=gsmvar$model$d, params=new_params, model=new_model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                       constraints=new_constraints, same_means=new_same_means, structural_pars=new_structural_pars,
                       calc_std_errors=calc_std_errors, stat_tol=gsmvar$num_tols$stat_tol,

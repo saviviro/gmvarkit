@@ -21,6 +21,9 @@ contains data.}
 
 \item{calc_std_errors}{set \code{TRUE} if the approximate standard errors should be calculated.}
 
+\item{max_df}{regimes with degrees of freedom parameter value larger than this will be turned into
+GMVAR type.}
+
 \item{maxit}{the maximum number of iterations for the variable metric algorithm. Ignored if \code{estimate==FALSE}.}
 }
 \value{

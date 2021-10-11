@@ -342,7 +342,7 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
   if(is.null(custom_h)) { # Adjust h for overly large degrees of freedom parameters
     varying_h <- get_varying_h(M=gsmvar$model$M, params=gsmvar$params, model=gsmvar$model$model)
   } else { # Utilize user-specified h
-    stopifnot(length(custom_h) == length(gmvar$params))
+    stopifnot(length(custom_h) == length(gsmvar$params))
     varying_h <- custom_h
   }
   minval <- get_minval(gsmvar$data)

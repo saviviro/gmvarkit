@@ -24,7 +24,6 @@ GSMVAR(
   structural_pars = NULL,
   calc_cond_moments,
   calc_std_errors = FALSE,
-  custom_h = NULL,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08
@@ -216,7 +215,7 @@ If data is provided, then also multivariate quantile residuals (\emph{Kalliovirt
   definiteness conditions.
 
 The first plot displays the time series together with estimated mixing weights.
-  The second plot displays (Gaussian) kernel density estimates of the individual series
+  The second plot displays a (Gaussian) kernel density estimates of the individual series
   together with the marginal stationary density implied by the model. The colored regimewise
   stationary densities are multiplied with the mixing weight parameter estimates.
 }
