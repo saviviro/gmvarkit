@@ -28,7 +28,7 @@ summary.gmvar <- function(gmvar, ...., digits=2) {
 #' @rdname print.gmvar
 #' @export
 
-summary.gmvar <- function(gmvar) {
+plot.gmvar <- function(gmvar) {
   class(gmvar) <- "gsmvar"
   gmvar$model$model <- "GMVAR"
   plot(gmvar)
