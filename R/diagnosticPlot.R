@@ -54,6 +54,13 @@
 #' @export
 
 diagnostic_plot <- function(gsmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=12, wait_time=4) {
+  # Backward compatibility
+  if(class(gsmvar) == "gmvar") {
+    class(gsmvar) <- "gsvmar"
+    gsmvar$mode$model <- "GMVAR"
+  }
+
+  # Proceed with class 'gsmvar' object
   check_gsmvar(gsmvar)
   check_null_data(gsmvar)
   stopifnot(wait_time >= 0)
