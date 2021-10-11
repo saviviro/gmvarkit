@@ -34,6 +34,7 @@
 /Users/savi/Documents/gmvarkit/tests/testthat/test_argumentChecks.R="AE918022"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_generateParams.R="3EBE5582"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_gmvarConstruction.R="FAB10BD1"
+/Users/savi/Documents/gmvarkit/tests/testthat/test_gsmvarConstruction.R="3D58DE71"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_loglikelihood.R="D6B4DAFA"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_matcal.R="8134CFDE"
 /Users/savi/Documents/gmvarkit/tests/testthat/test_numericalDifferentiation.R="B1B7A68F"

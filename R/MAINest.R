@@ -114,7 +114,13 @@
 #' # rounds (ncalls = a large number) should be performed to ensure reliability
 #' # of the estimates (see the section details).
 #'
-#' # One-regime StMVAR(4, 1) model
+#' # StMVAR(2, 2) model
+#' fit22t <- fitGSMVAR(gdpdef, p=2, M=2, model="StMVAR", ncalls=1, seeds=1)
+#' fit22t # Overly large degrees of freedom estimate in the 2nd regime!
+#' fit22gs <- stmvar_to_gstmvar(fit22t) # So switch it to GMVAR type!
+#' fit22gs # This is the appropriate G-StMVAR model based on the above StMVAR model.
+#' fit22gss <- gsmvar_to_sgsmvar(fit22gs) # Switch to structural model
+#' fit22gss # This is the implied statistically identified structural model.
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints.
@@ -125,11 +131,6 @@
 #' # A statistically identified structural model can also be obtained with
 #' # gsmvar_to_sgsmvar(fit12)
 #'
-#' fit12ts <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", structural_pars=list(W=W_122),
-#'   ncalls=12, seeds=1:12)
-#'
-#'  fit12gss <- fitGSMVAR(gdpdef, p=1, M=c(1, 1), model="G-StMVAR", structural_pars=list(W=W_122),
-#'   ncalls=12, seeds=1:12)
 #'
 #' # GMVAR(2,2) model with autoregressive parameters restricted
 #' # to be the same for both regimes
@@ -179,7 +180,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   }
   if(ncores > ncalls) {
     ncores <- ncalls
-#    message("ncores was set to be larger than the number of estimation rounds")
+    message("ncores was set to be larger than the number of estimation rounds")
   }
   cat(paste("Using", ncores, "cores for", ncalls, "estimations rounds..."), "\n")
 

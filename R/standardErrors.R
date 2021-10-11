@@ -92,7 +92,7 @@ print_std_errors <- function(gsmvar, digits=3) {
     all_Omega <- pick_Omegas(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)
   } else {
     # No standard errors for cov. mats. as the model is parametrized with W and lambdas
-    all_Omega <- array(" ", dim=c(d, d, M))
+    all_Omega <- array(" ", dim=c(d, d, sum(M)))
   }
   alphas <- pick_alphas(p=p, M=M, d=d, params=pars, model=model)
   all_df <- pick_df(M=M, params=pars, model=model)
@@ -147,7 +147,7 @@ print_std_errors <- function(gsmvar, digits=3) {
       regime_type <- "StMVAR"
       M1 <- 0
     } else {
-      M1 <- M[1]
+      M1 <- M_orig[1]
       regime_type <- ifelse(m <= M1, "GMVAR", "StMVAR")
     }
 
@@ -157,7 +157,7 @@ print_std_errors <- function(gsmvar, digits=3) {
     if(m < M) cat(paste("Mixing weight:", format_value(alphas[m])), "\n")
     if(parametrization == "mean") cat("Regime means:", paste0(format_value(all_mu[,m]), collapse=", "), "\n")
     if(regime_type == "StMVAR") { # Print degrees of freedom parameter for StMVAR type regimes
-      cat("\nDf parameter: ", format_value(all_df[m - M1]), "\n")
+      cat("Df parameter: ", format_value(all_df[m - M1]), "\n")
     }
     cat("\n")
     df <- data.frame(Y=Y,
