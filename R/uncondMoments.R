@@ -56,6 +56,7 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 #' @export
 
 get_regime_means <- function(gsmvar) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   get_regime_means_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                        model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,
@@ -134,6 +135,7 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 #' @export
 
 get_regime_autocovs <- function(gsmvar) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   get_regime_autocovs_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                           model=gsmvar$model$model, constraints=gsmvar$model$constraints,
@@ -220,6 +222,7 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 #' @export
 
 uncond_moments <- function(gsmvar) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   uncond_moments_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                      model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,

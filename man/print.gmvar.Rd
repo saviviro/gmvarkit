@@ -4,25 +4,36 @@
 \alias{print.gmvar}
 \alias{summary.gmvar}
 \alias{plot.gmvar}
+\alias{logLik.gmvar}
+\alias{residuals.gmvar}
 \title{Deprecated S3 methods for the deprecated class 'gmvar'}
 \usage{
-\method{print}{gmvar}(gmvar, ..., digits = 2)
+\method{print}{gmvar}(x, ..., digits = 2)
 
-\method{summary}{gmvar}(gmvar, ...., digits = 2)
+\method{summary}{gmvar}(object, ..., digits)
 
-\method{plot}{gmvar}(gmvar)
+\method{plot}{gmvar}(x, ...)
+
+\method{logLik}{gmvar}(object, ...)
+
+\method{residuals}{gmvar}(object, ...)
 }
 \arguments{
-\item{gmvar}{a class 'gmvar' object. THIS CLASS IS DEPRECATED FROM THE VERSION
+\item{x}{a class 'gmvar' object. THIS CLASS IS DEPRECATED FROM THE VERSION
 2.0.0 ONWARDS.}
 
+\item{...}{See the usage from the documentation of the appropriate class 'gsmvar' S3 method.}
+
 \item{digits}{number of digits to be printed.}
+
+\item{object}{object of class \code{'gmvar'}. THIS CLASS IS DEPRECATED FROM THE VERSION
+2.0.0 ONWARDS.}
 }
 \description{
 Deprecated S3 methods for the deprecated class 'gmvar'. From
   the gmvarkit version 2.0.0 onwards, class 'gsmvar' is used instead.
 }
 \details{
-These methods exists so that models estimated with earlier versions
-  of the package can be used.
+These methods exist so that models estimated with earlier versions
+  of the package can be used normally.
 }

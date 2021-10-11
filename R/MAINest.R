@@ -101,7 +101,7 @@
 #'
 #' # GMVAR(1,2) model: 10 estimation rounds with seeds set
 #' # for reproducibility
-#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10, ncores=4)
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
 #' fit12
 #' plot(fit12)
 #' summary(fit12)
@@ -337,6 +337,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 
 iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
                          stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   stopifnot(maxit %% 1 == 0 & maxit >= 1)
   if(is.null(custom_h)) { # Adjust h for overly large degrees of freedom parameters

@@ -167,7 +167,7 @@ If you wish to estimate a structural model without overidentifying constraints t
 
 # GMVAR(1,2) model: 10 estimation rounds with seeds set
 # for reproducibility
-fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10, ncores=4)
+fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=10, seeds=1:10)
 fit12
 plot(fit12)
 summary(fit12)

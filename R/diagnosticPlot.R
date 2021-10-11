@@ -55,10 +55,7 @@
 
 diagnostic_plot <- function(gsmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=12, wait_time=4) {
   # Backward compatibility
-  if(class(gsmvar) == "gmvar") {
-    class(gsmvar) <- "gsvmar"
-    gsmvar$mode$model <- "GMVAR"
-  }
+  gsmvar <- gmvar_to_gsmvar(gsmvar)
 
   # Proceed with class 'gsmvar' object
   check_gsmvar(gsmvar)

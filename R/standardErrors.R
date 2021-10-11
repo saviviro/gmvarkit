@@ -74,6 +74,7 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
 #' @export
 
 print_std_errors <- function(gsmvar, digits=3) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   if(!all_pos_ints(digits)) stop("Argument digits must be positive integer")
   format_value <- format_valuef(digits)
   p <- gsmvar$model$p

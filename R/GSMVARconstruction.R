@@ -249,6 +249,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #' @export
 
 add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   GSMVAR(data=data, p=gsmvar$model$p, M=gsmvar$model$M, params=gsmvar$params,
          model=gsmvar$model$model, conditional=gsmvar$model$conditional,
@@ -306,6 +307,7 @@ add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE
 #' @export
 
 swap_parametrization <- function(gsmvar) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   if(!is.null(gsmvar$model$same_means)) {
     stop("Cannot change parametrization to intercept if the mean parameters are constrained")
@@ -348,6 +350,7 @@ swap_parametrization <- function(gsmvar) {
 #' @export
 
 alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=TRUE, calc_std_errors=TRUE) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   stopifnot(!is.null(gsmvar$all_estimates))
   stopifnot(which_round >= 1 && which_round <= length(gsmvar$all_estimates))
   if(!missing(which_largest)) {
@@ -427,6 +430,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' @export
 
 gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   if(is.null(gsmvar$data)) calc_std_errors <- FALSE
   if(!is.null(gsmvar$model$structural_pars)) stop("Only reduced form models are supported!")
@@ -641,6 +645,7 @@ stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df
 #' @export
 
 reorder_W_columns <- function(gsmvar, perm) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported!")
   if(!is.null(gsmvar$model$structural_pars$C_lambda)) stop("Models with constraints imposed on the lambda parameters are not supported!")
@@ -725,6 +730,7 @@ reorder_W_columns <- function(gsmvar, perm) {
 #' @export
 
 swap_W_signs <- function(gsmvar, which_to_swap) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported!")
   p <- gsmvar$model$p
@@ -797,6 +803,7 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
 #' @export
 
 update_numtols <- function(gsmvar, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d,
          params=gsmvar$params, model=gsmvar$model$model, conditional=gsmvar$model$conditional,
          parametrization=gsmvar$model$parametrization, constraints=gsmvar$model$constraints,

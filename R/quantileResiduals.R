@@ -36,6 +36,7 @@
 #' @export
 
 quantile_residuals <- function(gsmvar) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
 
   # Collect preliminary values
   check_gsmvar(gsmvar)
