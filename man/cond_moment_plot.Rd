@@ -35,10 +35,25 @@ params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
 mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
-
 cond_moment_plot(mod22, which_moment="mean")
 cond_moment_plot(mod22, which_moment="variance")
 cond_moment_plot(mod22, which_moment="mean", grid=TRUE, lty=3)
+
+# G-StMVAR(2, 1, 1), d=2 model:
+params22gs <- c(0.697, 0.154, 0.049, 0.374, 0.476, 0.318, -0.645, -0.302,
+ -0.222, 0.193, 0.042, -0.013, 0.048, 0.554, 0.033, 0.184, 0.005, -0.186,
+  0.683, 0.256, 0.031, 0.026, 0.204, 0.583, -0.002, 0.048, 0.182, 4.334)
+mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=params22gs, model="G-StMVAR")
+cond_moment_plot(mod22gs, which_moment="mean")
+cond_moment_plot(mod22gs, which_moment="variance")
+
+#StMVAR(4, 1), d=2 model:
+params41t <- c(0.512, -0.002, 0.243, 0.024, -0.088, 0.452, 0.242, 0.011,
+  0.093, 0.162, -0.097, 0.033, -0.339, 0.19, 0.091, 0.006, 0.168, 0.101,
+  0.516, -0.005, 0.054, 4.417)
+mod41t <- GSMVAR(gdpdef, p=4, M=1, params=params41t, model="StMVAR")
+cond_moment_plot(mod41t, which_moment="mean")
+cond_moment_plot(mod41t, which_moment="variance")
 }
 \references{
 \itemize{

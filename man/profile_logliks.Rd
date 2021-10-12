@@ -12,7 +12,8 @@ profile_logliks(
   ncols,
   precision = 200,
   stat_tol = 0.001,
-  posdef_tol = 1e-08
+  posdef_tol = 1e-08,
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -67,6 +68,9 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
 Only plots to a graphical device and doesn't return anything.
@@ -97,6 +101,13 @@ params12s <- c(0.55, 0.11, 0.62, 0.17, 0.34, 0.05, -0.01, 0.72, 0.25,
 mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
                 structural_pars=list(W=W_122))
 profile_logliks(mod12s)
+
+#' # G-StMVAR(2, 1, 1), d=2 model:
+params22gs <- c(0.697, 0.154, 0.049, 0.374, 0.476, 0.318, -0.645, -0.302,
+ -0.222, 0.193, 0.042, -0.013, 0.048, 0.554, 0.033, 0.184, 0.005, -0.186,
+  0.683, 0.256, 0.031, 0.026, 0.204, 0.583, -0.002, 0.048, 0.182, 4.334)
+mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=params22gs, model="G-StMVAR")
+profile_logliks(mod22gs, which_pars=c(1, 3, 28))
 }
 }
 \references{

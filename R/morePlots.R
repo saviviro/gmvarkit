@@ -21,33 +21,55 @@
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'  0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
 #' mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
-#'
 #' cond_moment_plot(mod22, which_moment="mean")
 #' cond_moment_plot(mod22, which_moment="variance")
 #' cond_moment_plot(mod22, which_moment="mean", grid=TRUE, lty=3)
+#'
+#' # G-StMVAR(2, 1, 1), d=2 model:
+#' params22gs <- c(0.697, 0.154, 0.049, 0.374, 0.476, 0.318, -0.645, -0.302,
+#'  -0.222, 0.193, 0.042, -0.013, 0.048, 0.554, 0.033, 0.184, 0.005, -0.186,
+#'   0.683, 0.256, 0.031, 0.026, 0.204, 0.583, -0.002, 0.048, 0.182, 4.334)
+#' mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=params22gs, model="G-StMVAR")
+#' cond_moment_plot(mod22gs, which_moment="mean")
+#' cond_moment_plot(mod22gs, which_moment="variance")
+#'
+#' #StMVAR(4, 1), d=2 model:
+#' params41t <- c(0.512, -0.002, 0.243, 0.024, -0.088, 0.452, 0.242, 0.011,
+#'   0.093, 0.162, -0.097, 0.033, -0.339, 0.19, 0.091, 0.006, 0.168, 0.101,
+#'   0.516, -0.005, 0.054, 4.417)
+#' mod41t <- GSMVAR(gdpdef, p=4, M=1, params=params41t, model="StMVAR")
+#' cond_moment_plot(mod41t, which_moment="mean")
+#' cond_moment_plot(mod41t, which_moment="variance")
 #' @export
 
 cond_moment_plot <- function(gsmvar, which_moment=c("mean", "variance"), grid=FALSE, ...) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   stopifnot(!is.null(gsmvar$data))
   which_moment <- match.arg(which_moment)
   p <- gsmvar$model$p
-  M <- gsmvar$model$M
+  M_orig <- gsmvar$model$M
+  M <- sum(M_orig)
   d <- gsmvar$model$d
   data <- gsmvar$data
+  model <- gsmvar$model$model
   if(is.null(gsmvar$regime_cmeans)) stop("Conditional moments were not calculated when building this model")
 
   if(which_moment == "mean") {
     total_moments <- gsmvar$total_cmeans # [t, d]
     mw_x_reg <- lapply(1:d, function(d1) gsmvar$mixing_weights*gsmvar$regime_cmeans[, d1, ]) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]]), data[,d1]))
-  } else {
+  } else { # which_moment == "variance"
     total_moments <- t(vapply(1:dim(gsmvar$total_ccovs)[3], function(i1) diag(gsmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
-    params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, constraints=gsmvar$model$constraints,
+    regime_moments <- array(vapply(1:M,
+                             function(m) t(vapply(1:(nrow(data) - p),
+                                                     function(t) diag(gsmvar$regime_ccovs[, , t, m, drop=TRUE]), numeric(d))),
+                                                numeric(d*(nrow(data) - p))),
+                            dim=c(nrow(data) - p, d, M)) # [t, d, m]
+    params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=gsmvar$params, constraints=gsmvar$model$constraints, model=model,
                                       same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
-    omegas <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gsmvar$model$structural_pars))
-    vars <- vapply(1:M, function(m) diag(omegas[, , m]), numeric(d)) # Regs in cols, d in rows
-    mw_x_reg <- lapply(1:d, function(d1) t(t(gsmvar$mixing_weights)*vars[d1,])) # [[d]][t, m]
+    omegas <- pick_Omegas(p=p, M=M_orig, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gsmvar$model$structural_pars))
+    mw_x_reg <- lapply(1:d, function(i1) gsmvar$mixing_weights*regime_moments[, i1, ]) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]])))
   }
 
