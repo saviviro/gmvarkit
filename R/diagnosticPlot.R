@@ -42,15 +42,12 @@
 #' diagnostic_plot(mod22, type="ch")
 #' diagnostic_plot(mod22, type="norm")
 #'
-#' # GMVAR(2,2), d=2 model with AR-parameters restricted to be
-#' # the same for both regimes:
-#' C_mat <- rbind(diag(2*2^2), diag(2*2^2))
-#' params22c <- c(0.418, 0.153, 0.513, 0.057, 0.204, 0.028, -0.169,
-#'  0.591, 0.241, 0.014, 0.091, 0.248, 1.068, -0.01, 0.111, 0.219,
-#'  0.004, 0.027, 0.501)
-#' mod22c <- GSMVAR(gdpdef, p=2, M=2, params=params22c, constraints=C_mat)
-#' diagnostic_plot(mod22c, wait_time=0.2)
-#' diagnostic_plot(mod22c, type="ac", maxlag=12)
+#' # G-StMVAR(2, 1, 1), d=2 model:
+#' params22gs <- c(0.697, 0.154, 0.049, 0.374, 0.476, 0.318, -0.645, -0.302,
+#'  -0.222, 0.193, 0.042, -0.013, 0.048, 0.554, 0.033, 0.184, 0.005, -0.186,
+#'   0.683, 0.256, 0.031, 0.026, 0.204, 0.583, -0.002, 0.048, 0.182, 4.334)
+#' mod22gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=params22gs, model="G-StMVAR")
+#' diagnostic_plot(mod22gs, wait_time=0)
 #' @export
 
 diagnostic_plot <- function(gsmvar, type=c("all", "series", "ac", "ch", "norm"), maxlag=12, wait_time=4) {
