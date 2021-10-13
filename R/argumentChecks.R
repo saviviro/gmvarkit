@@ -506,7 +506,7 @@ check_gsmvar <- function(object, object_name) {
 #'
 #' @description \code{check_null_data} checks that the gsmvar object has data.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @return Throws an error if is.null(gsmvar$data).
 #' @keywords internal
 
@@ -536,7 +536,7 @@ check_same_means <- function(parametrization, same_means) {
 #'
 #' @description \code{warn_ar_roots} warns if the model contains near-unit-roots in some regimes
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @param tol if eigenvalue is closer than \code{tol} to its bound, a warning is thrown
 #' @details Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
 #'  some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
@@ -573,7 +573,7 @@ warn_eigens <- function(gsmvar, tol=0.002) {
 #'
 #' @description \code{warn_df} warns if the model contains large degrees of freedom parameter values
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @inheritParams loglikelihood_int
 #' @details Warns if, for some regime, the degrees of freedom parameter value is larger than 100.
 #' @return Doesn't return anything.

@@ -6,13 +6,13 @@
 #'  the individual time series contained in the model (e.g. the time series the model was fitted to). Also plots
 #'  the regimewise conditional means/variances multiplied with mixing weights.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @param which_moment should conditional means or variances be plotted?
 #' @param grid add grid to the plots?
 #' @param ... additional paramters passed to \code{grid(...)} plotting the grid if \code{grid == TRUE}.
 #' @details The conditional mean plot works best if the data contains positive values only.
 #'  \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is employed.
-#' @inherit simulateGMVAR references
+#' @inherit simulate.gsmvar references
 #' @seealso \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
 #'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{diagnostic_plot}}
 #' @examples
@@ -75,8 +75,9 @@ cond_moment_plot <- function(gsmvar, which_moment=c("mean", "variance"), grid=FA
 
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
-  right_marg <- ifelse(which_moment == "mean", 1, 2.5)
-  graphics::par(mfrow=c(d, 1), mar=c(0.5, 2.5, 2.1, right_marg))
+  right_marg <- ifelse(which_moment == "mean", 1, 3)
+  left_marg <- 3
+  graphics::par(mfrow=c(d, 1), mar=c(0.5, left_marg, 2.1, right_marg), las=1)
   colpal_reg <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
   names_ts <- colnames(as.ts(data))
   names_reg <- paste0("mix.comp.", 1:M)
@@ -86,12 +87,12 @@ cond_moment_plot <- function(gsmvar, which_moment=c("mean", "variance"), grid=FA
     xaxt <- "n"
     if(d1 == d) {
       xaxt <- "s"
-      par(mar=c(2.5, 2.5, 0.5, right_marg))
+      par(mar=c(2.5, left_marg, 0.5, right_marg))
     } else if(d1 > 1) {
-      par(mar=c(0.5, 2.5, 0.5, right_marg))
+      par(mar=c(0.5, left_marg, 0.5, right_marg))
     }
     ymin <- floor(min(vals[[d1]]))
-    ymax <- ceiling(max(vals[[d1]]))
+    ymax <-  max(vals[[d1]]) # ceiling(max(vals[[d1]]))
     if(which_moment == "mean") {
       main <- ifelse(d1 == 1, "Conditional means", "")
       plot(data[,d1], ylim=c(ymin, ymax), xlab="", ylab="", xaxt=xaxt, main=main)

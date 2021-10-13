@@ -7,7 +7,7 @@
 print_std_errors(gsmvar, digits = 3)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{digits}{how many digits should be printed?}
 }

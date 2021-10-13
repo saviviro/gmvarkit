@@ -13,7 +13,7 @@ stmvar_to_gstmvar(
 )
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{estimate}{set \code{TRUE} if the new model should be estimated with a variable metric algorithm
 using the StMAR model parameter value as the initial value. By default \code{TRUE} iff the model

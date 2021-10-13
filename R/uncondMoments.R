@@ -31,7 +31,7 @@ get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-
 #' @description \code{get_regime_means} calculates regime means \eqn{\mu_{m} = (I - \sum A_{m,i})^(-1))}
 #'   for the given GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @return Returns a \eqn{(dxM)} matrix containing regime mean \eqn{\mu_{m}} in the m:th column, \eqn{m=1,..,M}.
 #' @family moment functions
 #' @seealso \code{\link{uncond_moments}}, \code{\link{get_regime_autocovs}}, \code{\link{cond_moments}}
@@ -112,7 +112,7 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
 #' @description \code{get_regime_autocovs} calculates the first p regimewise autocovariance
 #'  matrices \eqn{\Gamma_{m}(j)} for the given GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @family moment functions
 #' @inherit get_regime_autocovs_int return
 #' @inherit loglikelihood_int references
@@ -199,7 +199,7 @@ uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 #' @description \code{uncond_moments} calculates the unconditional mean, variance, the first p autocovariances,
 #'  and the first p autocorrelations of the given GMVAR, StMVAR, or G-StMVAR process.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @family moment functions
 #' @inherit uncond_moments_int return
 #' @inherit uncond_moments_int details references

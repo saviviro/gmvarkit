@@ -7,7 +7,7 @@
 warn_eigens(gsmvar, tol = 0.002)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{tol}{if eigenvalue is closer than \code{tol} to its bound, a warning is thrown}
 }

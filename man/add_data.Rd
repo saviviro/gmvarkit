@@ -10,7 +10,7 @@ add_data(data, gsmvar, calc_cond_moments = TRUE, calc_std_errors = FALSE)
 \item{data}{a matrix or class \code{'ts'} object with \code{d>1} columns. Each column is taken to represent
 a univariate time series. \code{NA} values are not supported.}
 
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{calc_cond_moments}{should conditional means and covariance matrices should be calculated?
 Default is \code{TRUE} if the model contains data and \code{FALSE} otherwise.}

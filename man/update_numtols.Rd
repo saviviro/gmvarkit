@@ -8,7 +8,7 @@
 update_numtols(gsmvar, stat_tol = 0.001, posdef_tol = 1e-08, df_tol = 1e-08)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the

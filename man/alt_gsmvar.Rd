@@ -13,7 +13,7 @@ alt_gsmvar(
 )
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_round}{based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.}
 

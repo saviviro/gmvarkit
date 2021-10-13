@@ -4,7 +4,7 @@
 #' @description \code{GIRF} estimates generalized impulse response function for
 #'   a structural GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @inheritParams fitGSMVAR
 #' @param which_shocks a numeric vector of length at most \eqn{d}
 #'   (\code{=ncol(data)}) and elements in \eqn{1,...,d} specifying the
@@ -22,20 +22,6 @@
 #'   distribution of the process or of a specific regime? The confidence bounds
 #'   will be sample quantiles of the GIRFs based on different initial values.
 #'   Ignored if the argument \code{init_value} is specified.
-#' @param init_regimes a numeric vector of length at most \eqn{M} and elements
-#'   in \eqn{1,...,M} specifying the regimes from which the initial values
-#'   should be generated from. The initial values will be generated from a
-#'   mixture distribution with the mixture components being the stationary
-#'   distributions of the specific regimes and the (proportional) mixing weights
-#'   given by the mixing weight parameters of those regimes. Note that if
-#'   \code{init_regimes=1:M}, the initial values are generated from the
-#'   stationary distribution of the process and if \code{init_regimes=m}, the
-#'   initial value are generated from the stationary distribution of the
-#'   \eqn{m}th regime. Ignored if \code{init_value} is specified.
-#' @param init_values a matrix or a multivariate class \code{'ts'} object with
-#'   \eqn{d} columns and at least \eqn{p} rows specifying an initial value for
-#'   the GIRF. The last \eqn{p} rows are taken to be the initial value assuming
-#'   that the \strong{last} row is the most recent observation.
 #' @param which_cumulative a numeric vector with values in \eqn{1,...,d}
 #'   (\code{d=ncol(data)}) specifying which the variables for which the impulse
 #'   responses should be cumulative. Default is none.
@@ -84,7 +70,7 @@
 #'   for \eqn{n=1}, the third for \eqn{n=2}, and so on.
 #' @seealso \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
 #'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
-#'   \code{\link{swap_W_signs}}, \code{\link{simulateGMVAR}},
+#'   \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}},
 #'   \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
 #'   \code{\link{quantile_residual_tests}}, \code{\link{LR_test}},
 #'   \code{\link{Wald_test}}
@@ -175,10 +161,10 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   # Function that estimates GIRF
   get_one_girf <- function(shock_numb, shock_size, seed) {
-    simulateGMVAR(gsmvar, nsimu=N + 1, init_values=init_values, ntimes=R1, seed=seed, girf_pars=list(shock_numb=shock_numb,
-                                                                                                    shock_size=shock_size,
-                                                                                                    init_regimes=init_regimes,
-                                                                                                    include_mixweights=include_mixweights))
+    simulate.gsmvar(gsmvar, nsim=N + 1, seed=seed, init_values=init_values, init_regimes=init_regimes, ntimes=R1,
+                    girf_pars=list(shock_numb=shock_numb,
+                                   shock_size=shock_size,
+                                   include_mixweights=include_mixweights))
   }
 
   if(ncores > parallel::detectCores()) {
@@ -303,7 +289,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #'   \code{include_mixweights=TRUE} also to the mixing weights. Note that the decomposition does not
 #'   exist at horizon zero for mixing weights because the related GIRFs are always zero at impact.
 #' @seealso \code{\link{GIRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{gsmvar_to_sgsmvar}},
-#'  \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulateGMVAR}}
+#'  \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
 #' @references
 #' @references
 #'  \itemize{
@@ -400,7 +386,7 @@ GFEVD <- function(gsmvar, shock_size=1, N=30, initval_type=c("data", "random", "
   # Function that estimates GIRF
   get_one_girf <- function(shock_numb, shock_size, seed, init_values_for_1girf) {
     if(initval_type == "random") init_values_for_1girf <- NULL
-    simulateGMVAR(gsmvar, nsimu=N + 1, init_values=init_values_for_1girf, ntimes=R1, seed=seed,
+    simulate.gsmvar(gsmvar, nsim=N + 1, init_values=init_values_for_1girf, ntimes=R1, seed=seed,
                   girf_pars=list(shock_numb=shock_numb,
                                  shock_size=shock_size,
                                  init_regimes=init_regimes,

@@ -7,7 +7,7 @@
 quantile_residuals(gsmvar)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,

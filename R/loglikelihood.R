@@ -313,8 +313,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   mvd_vals <- matrix(nrow=T_obs, ncol=M)
   if(M1 > 0) { # GMVAR type regimes
     mvd_vals[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
-  } # StMVAR type regimes
-  if(M2 > 0) {
+  }
+  if(M2 > 0) { # StMVAR type regimes
     for(m in (M1 + 1):M) {
       df_m <- all_df[m - M1] + d*p # Degrees of freedom in regime m
       chol_Omega_m <- chol(all_Omega[, , m]) # Faster determinant and matrix inversion useing Cholesky decomposition
@@ -413,6 +413,7 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
                 l_0=l_0))
   }
 }
+
 
 
 #' @title Compute log-likelihood of a GMVAR, StMVAR, or G-StMVAR model using parameter vector

@@ -65,7 +65,7 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
 
   qresiduals <- gsmvar$quantile_residuals
   if(nsimu > n_obs) {
-    omega_data <- simulateGMVAR(gsmvar, nsimu=nsimu, init_values=NULL, ntimes=1)$sample
+    omega_data <- simulate.gsmvar(gsmvar, nsim=nsimu, init_values=NULL, ntimes=1)$sample
   } else {
     omega_data <- data
   }

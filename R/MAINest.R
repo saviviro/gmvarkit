@@ -76,7 +76,7 @@
 #'   The following S3 methods are supported for class \code{'gsmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
 #'    \code{predict} and \code{plot}.
 #' @seealso \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{predict.gsmvar}},
-#'   \code{\link{profile_logliks}}, \code{\link{simulateGMVAR}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
+#'   \code{\link{profile_logliks}}, \code{\link{simulate.gsmvar}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
 #'   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}},
 #'   \code{\link{Wald_test}}, \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}},
 #'   \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
@@ -306,7 +306,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 #' @description \code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
 #'  estimation of a GMVAR, StMVAR, or G-StMVAR model (object of class \code{'gsmvar'}) which already has preliminary estimates.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @inheritParams fitGSMVAR
 #' @inheritParams GSMVAR
 #' @inheritParams standard_errors

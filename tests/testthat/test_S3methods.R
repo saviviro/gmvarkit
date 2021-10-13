@@ -50,7 +50,7 @@ mod_222c <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, p
 set.seed(13)
 theta_123 <- random_ind2(p=1, M=2, d=3, mu_scale=c(-10, 0, 5), mu_scale2=1:3, omega_scale=1:3, ar_scale=1)
 mod_123 <- GSMVAR(p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
-sim_123 <- simulateGMVAR(mod_123, nsimu=300)
+sim_123 <- simulate.gsmvar(mod_123, nsim=300)
 data_123 <- sim_123$sample
 mod_123 <- GSMVAR(data_123, p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
 

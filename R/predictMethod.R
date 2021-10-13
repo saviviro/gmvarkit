@@ -27,7 +27,7 @@
 #'    \item{$mix_pred}{Point forecasts for the mixing weights}
 #'    \item{mix_pred_int}{Individual prediction intervals for mixing weights, as \code{[, , m]}, m=1,..,M.}
 #'  }
-#' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulateGMVAR}}
+#' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulate.gsmvar}}
 #' @inherit in_paramspace_int references
 #' @examples
 #' # GMVAR(2, 2), d=2 model
@@ -132,7 +132,7 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
   } else { # pred_type != cond_mean
 
     # Simulations
-    simulations <- simulateGMVAR(gsmvar, nsimu=n_ahead, init_values=gsmvar$data, ntimes=n_simu)
+    simulations <- simulate.gsmvar(gsmvar, nsim=n_ahead, init_values=gsmvar$data, ntimes=n_simu)
     sample <- simulations$sample
     alpha_mt <- simulations$mixing_weights
     colnames(sample) <- colnames(data)

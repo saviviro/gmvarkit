@@ -212,3 +212,11 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
   gsmvar <- gmvar_to_gsmvar(gsmvar)
   gsmvar_to_sgsmvar(gsmvar, calc_std_errors=calc_std_errors)
 }
+
+
+
+
+
+#simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
+#
+#}

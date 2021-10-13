@@ -28,7 +28,7 @@ quantile_residual_tests(
 
 \item{digits}{the number of decimals to print}
 
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{lags_ac}{a positive integer vector specifying the lags used to test autocorrelation.}
 

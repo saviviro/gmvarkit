@@ -7,7 +7,7 @@
 get_regime_autocovs(gsmvar)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
 Returns an \eqn{(d x d x p+1 x M)} array containing the first p regimewise autocovariance matrices.

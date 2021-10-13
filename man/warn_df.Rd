@@ -7,7 +7,7 @@
 warn_df(gsmvar, p, M, params, model = c("GMVAR", "StMVAR", "G-StMVAR"))
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{p}{a positive integer specifying the autoregressive order of the model.}
 

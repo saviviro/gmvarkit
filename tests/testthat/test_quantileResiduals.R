@@ -1,7 +1,7 @@
 context("quantile residuals")
 library(gmvarkit)
 
-# NOTE that some test use random elements that might change if simulateGMVAR is modified
+# NOTE that some test use random elements that might change if simulate.gsmvar is modified
 # ALSO: These tests do not really cover the numerical integration as is!
 # Set: which_def <- numeric(0) in the appropriate place in the function quantile_residuals to test numerical integration.
 
@@ -113,7 +113,7 @@ theta_323 <- c(-8.62904, -1.1294, 6.08939, 0.30181, -0.01918, 0.20814, 2.09997, 
                -0.10096, -0.58217, 0.17453, -0.19763, -0.2274, 0.77741, 1.09703, 1.24502, 0.74678, 0.90936, 0.71689, -0.086,
                2.57044, 0.81515, 0.45869, 0.84737)
 mod_323 <- GSMVAR(p=3, M=2, d=3, params=theta_323, conditional=FALSE, parametrization="mean")
-sim_323 <- simulateGMVAR(mod_323, nsimu=500)$sample
+sim_323 <- simulate.gsmvar(mod_323, nsim=500)$sample
 mod_323 <- add_data(data=sim_323, gsmvar=mod_323)
 
 mod_323t <- GSMVAR(sim_323, p=3, M=2, params=c(theta_323, 10, 3), model="StMVAR", conditional=FALSE,

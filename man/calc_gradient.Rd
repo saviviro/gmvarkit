@@ -34,7 +34,7 @@ will be used for all dimensions.}
 
 \item{...}{other arguments passed to \code{fn}}
 
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{custom_h}{same as \code{varying_h} but if \code{NULL} (default), then the difference \code{h} used
 for differentiating overly large degrees of freedom parameters is adjusted to avoid numerical problems,

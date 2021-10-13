@@ -12,7 +12,7 @@ diagnostic_plot(
 )
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{type}{which type of diagnostic plot should be plotted?
 \itemize{

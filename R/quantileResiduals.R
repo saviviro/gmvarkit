@@ -3,7 +3,7 @@
 #' @description \code{quantile_residuals} calculates multivariate quantile residuals
 #'  (proposed by \emph{Kalliovirta and Saikkonen 2010}) for a GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulateGMVAR
+#' @inheritParams simulate.gsmvar
 #' @return Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate quantile residuals,
 #'   \eqn{j}:th column corresponds to the time series in the \eqn{j}:th column of the data. The multivariate
 #'   quantile residuals are calculated so that the first column quantile residuals are the "unconditioned ones"

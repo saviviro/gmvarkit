@@ -91,5 +91,5 @@ p1 <- predict(mod22s, n_ahead=10, n_simu=500)
  @keywords internal
 }
 \seealso{
-\code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulateGMVAR}}
+\code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{simulate.gsmvar}}
 }

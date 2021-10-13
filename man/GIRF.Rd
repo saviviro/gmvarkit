@@ -32,7 +32,7 @@ GIRF(
 \method{print}{girf}(x, ..., digits = 2, N_to_print)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_shocks}{a numeric vector of length at most \eqn{d}
 (\code{=ncol(data)}) and elements in \eqn{1,...,d} specifying the
@@ -64,12 +64,12 @@ given by the mixing weight parameters of those regimes. Note that if
 \code{init_regimes=1:M}, the initial values are generated from the
 stationary distribution of the process and if \code{init_regimes=m}, the
 initial value are generated from the stationary distribution of the
-\eqn{m}th regime. Ignored if \code{init_value} is specified.}
+\eqn{m}th regime. Ignored if the argument \code{init_values} is specified.}
 
-\item{init_values}{a matrix or a multivariate class \code{'ts'} object with
-\eqn{d} columns and at least \eqn{p} rows specifying an initial value for
-the GIRF. The last \eqn{p} rows are taken to be the initial value assuming
-that the \strong{last} row is the most recent observation.}
+\item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values, where d is the number
+of time series in the system. The \strong{last} row will be used as initial values for the first lag,
+the second last row for second lag etc. If not specified, initial values will be drawn according to
+mixture distribution specifed by the argument \code{init_regimes}.}
 
 \item{which_cumulative}{a numeric vector with values in \eqn{1,...,d}
 (\code{d=ncol(data)}) specifying which the variables for which the impulse
@@ -203,7 +203,7 @@ The model needs to be structural in order for this function to be
 \seealso{
 \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
-  \code{\link{swap_W_signs}}, \code{\link{simulateGMVAR}},
+  \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}},
   \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
   \code{\link{quantile_residual_tests}}, \code{\link{LR_test}},
   \code{\link{Wald_test}}

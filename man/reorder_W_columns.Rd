@@ -7,7 +7,7 @@
 reorder_W_columns(gsmvar, perm)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{perm}{an integer vector of length \eqn{d} specifying the new order of the columns of \eqn{W}.
 Also lambda parameters of each regime will be reordered accordingly.}

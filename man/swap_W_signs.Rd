@@ -7,7 +7,7 @@
 swap_W_signs(gsmvar, which_to_swap)
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'} created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{which_to_swap}{a numeric vector of length at most \eqn{d} and elemnts in \eqn{1,..,d}
 specifying the columns of \eqn{W} whose sign should be swapped.}

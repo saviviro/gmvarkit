@@ -48,14 +48,14 @@ params_222cm <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
                   0.114109, 0.229542, 0.003092, 0.027266, 0.424341)
 mod_222cm <- GSMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
 
-set.seed(1); sim_112 <- simulateGMVAR(mod_112, nsimu=1)
-set.seed(2); sim_222 <- simulateGMVAR(mod_222c, nsimu=3)
-set.seed(3); sim_222s <- simulateGMVAR(mod_222c, nsimu=2, init_values=matrix(rep(1, times=4), nrow=2))
-set.seed(4); sim_112_2 <- simulateGMVAR(mod_112, nsimu=3, ntimes=3)
-set.seed(5); sim_222_2 <- simulateGMVAR(mod_222c, nsimu=1, ntimes=2)
-set.seed(6); sim_222cm <- simulateGMVAR(mod_222cm, nsimu=2, ntimes=2)
+set.seed(1); sim_112 <- simulate.gsmvar(mod_112, nsim=1)
+set.seed(2); sim_222 <- simulate.gsmvar(mod_222c, nsim=3)
+set.seed(3); sim_222s <- simulate.gsmvar(mod_222c, nsim=2, init_values=matrix(rep(1, times=4), nrow=2))
+set.seed(4); sim_112_2 <- simulate.gsmvar(mod_112, nsim=3, ntimes=3)
+set.seed(5); sim_222_2 <- simulate.gsmvar(mod_222c, nsim=1, ntimes=2)
+set.seed(6); sim_222cm <- simulate.gsmvar(mod_222cm, nsim=2, ntimes=2)
 
-test_that("simulateGMVAR works correctly", {
+test_that("simulate.gsmvar works correctly", {
   expect_equal(sim_112$sample[1,], c(1.797594, 1.629599), tolerance=1e-5)
   expect_equal(sim_112$component, 1)
   expect_equal(sim_112$mixing_weights, as.matrix(1))
