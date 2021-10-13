@@ -2,7 +2,8 @@
 % Please edit documentation in R/backwardCompatibility.R
 \name{alt_gmvar}
 \alias{alt_gmvar}
-\title{DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! Construct a GMVARmodel based on results from an arbitrary estimation round of \code{fitGSMVAR}}
+\title{DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD!
+Construct a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}}
 \usage{
 alt_gmvar(
   gmvar,
@@ -38,7 +39,7 @@ DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! \code{alt_gsmvar} constructs
   a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}.
 }
 \details{
-DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
+It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
   is wrapper around \code{GSMVAR} that picks the correct estimates from an object returned by \code{fitGSMVAR}.
 }
 \references{

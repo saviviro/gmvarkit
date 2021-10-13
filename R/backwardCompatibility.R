@@ -134,18 +134,11 @@ print.gmvarsum <- function(x, ..., digits) {
 #'  a reduced form or structural GMVAR model DEPRECATED! USE THE FUNCTION GSMVAR INSTEAD!
 #'
 #' @inheritParams GSMVAR
-#' @details  DEPRECATED! USE THE FUNCTION GSMVAR INSTEAD!
-#'   If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
-#'   are computed and included in the returned object.
-#'
-#'   If the function fails to calculate approximative standard errors and the parameter values are near the border
-#'   of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
-#'   definiteness conditions.
 #' @section About S3 methods:
 #'   Only the \code{print} method is available if data is not provided.
 #'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
 #' @seealso \code{\link{GSMVAR}}
-#' @inherit GSMVAR references return
+#' @inherit GSMVAR references return details
 #' @export
 
 GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("intercept", "mean"),
@@ -159,16 +152,15 @@ GMVAR <- function(data, p, M, d, params, conditional=TRUE, parametrization=c("in
 }
 
 
-#' @title DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! Construct a GMVARmodel based on results from an arbitrary estimation round of \code{fitGSMVAR}
+#' @title DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD!
+#' Construct a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}
 #'
 #' @description DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! \code{alt_gsmvar} constructs
 #'   a GMVAR model based on results from an arbitrary estimation round of \code{fitGSMVAR}.
 #'
 #' @inheritParams alt_gsmvar
 #' @param gmvar object of class 'gmvar'
-#' @details DEPRECATED! USE THE FUNCTION alt_gsmvar INSTEAD! It's sometimes useful to examine other estimates than the one with the highest log-likelihood. This function
-#'   is wrapper around \code{GSMVAR} that picks the correct estimates from an object returned by \code{fitGSMVAR}.
-#' @inherit alt_gsmvar references return
+#' @inherit alt_gsmvar references return details
 #' @seealso \code{\link{alt_gsmvar}}
 #' @export
 
@@ -177,4 +169,46 @@ alt_gmvar <- function(gmvar, which_round=1, which_largest, calc_cond_moments=TRU
   gsmvar <- gmvar_to_gsmvar(gmvar)
   alt_gsmvar(gsmvar, which_round=which_round, which_largest=which_largest,
              calc_cond_moments=calc_cond_moments, calc_std_errors=calc_std_errors)
+}
+
+
+#' @title DEPRECATED! USE THE FUNCTION fitGSMVAR INSTEAD! Two-phase maximum likelihood estimation of a GMVAR model
+#'
+#' @description DEPRECATED! USE THE FUNCTION fitGSMVAR INSTEAD!
+#'   \code{fitGMVAR} estimates a GMVAR model model in two phases:
+#'   in the first phase it uses a genetic algorithm to find starting values for a gradient based
+#'   variable metric algorithm, which it then uses to finalize the estimation in the second phase.
+#'   Parallel computing is utilized to perform multiple rounds of estimations in parallel.
+#'
+#' @inheritParams fitGSMVAR
+#' @seealso \code{\link{fitGSMVAR}}
+#' @inherit fitGSMVAR details return references
+#' @export
+
+fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept", "mean"),
+                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=M^6, ncores=2, maxit=1000,
+                      seeds=NULL, print_res=TRUE, ...) {
+  .Deprecated("fitGSMVAR")
+  fitGSMVAR(data=data, p=p, M=M, model="GMVAR", conditional=conditional, parametrization=parametrization,
+            constraints=constraints, same_means=same_means, structural_pars=structural_pars, ncalls=ncalls,
+            ncores=ncores, maxit=maxit, seeds=seeds, print_res=print_res, ...)
+}
+
+
+#' @title DEPRECATED! USE THE FUNCTION fitGSMVAR INSTEAD!
+#' Switch from two-regime reduced form GMVAR model to a structural model.
+#'
+#' @description DEPRECATED! USE THE FUNCTION fitGSMVAR INSTEAD!
+#' \code{gsmvar_to_sgsmvar} constructs SGMVAR model based on a reduced
+#'   form GMVAR, StMVAR, or G-StMVAR model.
+#'
+#' @inheritParams alt_gmvar
+#' @seealso \code{\link{gsmvar_to_sgsmvar}}
+#' @inherit gsmvar_to_sgsmvar details return references
+#' @export
+
+gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
+  .Deprecated("gsmvar_to_sgsmvar")
+  gsmvar <- gmvar_to_gsmvar(gsmvar)
+  gsmvar_to_sgsmvar(gsmvar, calc_std_errors=calc_std_errors)
 }

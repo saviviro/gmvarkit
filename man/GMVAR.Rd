@@ -173,13 +173,17 @@ Returns an object of class \code{'gsmvar'} defining the specified reduced form o
  a reduced form or structural GMVAR model DEPRECATED! USE THE FUNCTION GSMVAR INSTEAD!
 }
 \details{
-DEPRECATED! USE THE FUNCTION GSMVAR INSTEAD!
-  If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
+If data is provided, then also multivariate quantile residuals (\emph{Kalliovirta and Saikkonen 2010})
   are computed and included in the returned object.
 
   If the function fails to calculate approximative standard errors and the parameter values are near the border
   of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
   definiteness conditions.
+
+The first plot displays the time series together with estimated mixing weights.
+  The second plot displays a (Gaussian) kernel density estimates of the individual series
+  together with the marginal stationary density implied by the model. The colored regimewise
+  stationary densities are multiplied with the mixing weight parameter estimates.
 }
 \section{About S3 methods}{
 

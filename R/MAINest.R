@@ -154,7 +154,7 @@
 #' @export
 
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=M^6, ncores=2, maxit=500,
+                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=M^6, ncores=2, maxit=1000,
                       seeds=NULL, print_res=TRUE, ...) {
 
   model <- match.arg(model)
