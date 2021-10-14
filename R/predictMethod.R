@@ -7,7 +7,7 @@
 #'
 #' @inheritParams simulate.gsmvar
 #' @param n_ahead how many steps ahead should be predicted?
-#' @param n_simu to how many independent simulations should the forecast be based on?
+#' @param nsim to how many independent simulations should the forecast be based on?
 #' @param pi a numeric vector specifying the confidence levels of the prediction intervals.
 #' @param pi_type should the prediction intervals be "two-sided", "upper", or "lower"?
 #' @param pred_type should the prediction be based on sample "median" or "mean"? Or should it
@@ -37,23 +37,22 @@
 #' mod22 <- GSMVAR(gdpdef, p=2, M=2, d=2, params=params22)
 #' p1 <- predict(mod22, n_ahead=10, pred_type="median", n_simu=500)
 #' p1
-#' p2 <- predict(mod22, n_ahead=10, nt=20, lty=1, n_simu=500)
+#' p2 <- predict(mod22, n_ahead=10, nt=20, lty=1, nsim=500)
 #' p2
 #' p3 <- predict(mod22, n_ahead=10, pi=c(0.99, 0.90, 0.80, 0.70),
-#'               nt=30, lty=0, n_simu=500)
+#'               nt=30, lty=0, nsim=500)
 #' p3
 #'
-#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
-#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
-#'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
-#'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
-#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, parametrization="mean",
-#'  structural_pars=list(W=W_22))
-#' p1 <- predict(mod22s, n_ahead=10, n_simu=500)
+#' # StMVAR(2, 2), d=2 model
+#' params22t <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
+#'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
+#'   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58, 3, 4)
+#' mod22t <- GSMVAR(gdpdef, p=2, M=2, d=2, params=params22t, model="StMVAR")
+#' p1 <- predict(mod22t, n_ahead=12, pred_type="median", nsim=500, pi=0.9)
+#' p1
 #' @export
 
-predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), pi_type=c("two-sided", "upper", "lower", "none"),
+predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi_type=c("two-sided", "upper", "lower", "none"),
                           pred_type=c("median", "mean", "cond_mean"), plot_res=TRUE, mix_weights=TRUE, nt) {
   gsmvar <- object
   check_gsmvar(gsmvar)
@@ -66,7 +65,7 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
     warning("Argument n_ahead is missing. Using n_ahead = 1.")
     n_ahead <- 1
   }
-  if(!all_pos_ints(c(n_ahead, n_simu))) stop("Arguments n_ahead and n_simu must be positive integers")
+  if(!all_pos_ints(c(n_ahead, nsim))) stop("Arguments n_ahead and nsim must be positive integers")
   stopifnot(all(pi > 0 & pi < 1))
   pi_type <- match.arg(pi_type)
   pred_type <- match.arg(pred_type)
@@ -87,14 +86,15 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
     p <- gsmvar$model$p
     M <- gsmvar$model$M
     d <- gsmvar$model$d
+    model <- gsmvar$model$model
     constraints <- gsmvar$model$constraints
     same_means <- gsmvar$model$same_means
     structural_pars <- gsmvar$model$structural_pars
 
     params <- gsmvar$params
     n_obs <- nrow(data)
-    mw <- loglikelihood_int(data, p, M,
-                            params=params,
+    mw <- loglikelihood_int(data=data, p=p, M=M,
+                            params=params, model=model,
                             conditional=gsmvar$model$conditional,
                             parametrization=gsmvar$model$parametrization,
                             constraints=constraints,
@@ -107,20 +107,20 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
 
     # Collect parameter values
     params <- reform_constrained_pars(p=p, M=M, d=d,
-                                      params=params,
+                                      params=params, model=model,
                                       constraints=constraints,
                                       same_means=same_means,
                                       structural_pars=structural_pars)
     structural_pars <- get_unconstrained_structural_pars(structural_pars)
     if(gsmvar$model$parametrization == "mean") {
-      params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
+      params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
                                        structural_pars=structural_pars, change_to="intercept")
     }
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
     # Calculate the conditional mean
-    pred <- rowSums(vapply(1:M, function(m) mw[m]*(all_phi0[, m] + rowSums(vapply(1:p, function(i1) all_A[, , i1, m]%*%data[n_obs + 1 - i1,],
+    pred <- rowSums(vapply(1:sum(M), function(m) mw[m]*(all_phi0[, m] + rowSums(vapply(1:p, function(i1) all_A[, , i1, m]%*%data[n_obs + 1 - i1,],
                                                                                   numeric(d)))), numeric(d)))
     pi <- NULL
     pi_type <- "none"
@@ -132,11 +132,11 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
   } else { # pred_type != cond_mean
 
     # Simulations
-    simulations <- simulate.gsmvar(gsmvar, nsim=n_ahead, init_values=gsmvar$data, ntimes=n_simu)
+    simulations <- simulate.gsmvar(gsmvar, nsim=n_ahead, init_values=gsmvar$data, ntimes=nsim)
     sample <- simulations$sample
     alpha_mt <- simulations$mixing_weights
     colnames(sample) <- colnames(data)
-    colnames(alpha_mt) <- vapply(1:gsmvar$model$M, function(m) paste("regime", m), character(1))
+    colnames(alpha_mt) <- vapply(1:sum(gsmvar$model$M), function(m) paste("regime", m), character(1))
 
     # Calculate quantiles from the third dimension of 3D simulation array
     dim3_quantiles <- function(x, q) {
@@ -191,7 +191,7 @@ predict.gsmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), 
                         mix_pred=mix_pred,
                         mix_pred_ints=mix_pred_ints,
                         n_ahead=n_ahead,
-                        n_simu=n_simu,
+                        nsim=nsim,
                         pi=pi,
                         pi_type=pi_type,
                         pred_type=pred_type,

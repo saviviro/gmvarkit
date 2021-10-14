@@ -10,8 +10,9 @@ phi10_112 <- c(0.75, 0.8)
 A11_112 <- matrix(c(0.29, 0.02, -0.14, 0.9), nrow=2, byrow=FALSE)
 Omega1_112 <- matrix(c(0.60, 0.01, 0.01, 0.07), nrow=2, byrow=FALSE)
 theta_112 <- c(phi10_112, vec(A11_112), vech(Omega1_112))
-mod_112 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean", constraints=NULL)
+mod_112 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=theta_112, conditional=TRUE, parametrization="mean")
 
+mod_112t <- GSMVAR(gdpdef, p=1, M=1, d=2, params=c(theta_112, 3), model="StMVAR", parametrization="mean")
 
 # p=2, M=2, d=2, no constraints
 phi10_222 <- c(0.36, 0.12)
@@ -30,6 +31,10 @@ upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
 mod_222 <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", constraints=NULL)
 
+mod_222gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222, 20), model="G-StMVAR",
+                    conditional=TRUE, parametrization="intercept")
+
+
 WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
 W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
@@ -47,17 +52,26 @@ mod_222c <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, conditional=TRUE, p
 
 
 # p=1, M=2, d=3, no constraints, rand_ind and simulated data
-set.seed(13)
-theta_123 <- random_ind2(p=1, M=2, d=3, mu_scale=c(-10, 0, 5), mu_scale2=1:3, omega_scale=1:3, ar_scale=1)
+theta_123 <- c(-9.44567, -0.56054, 10.32549, 0.0965, 0.63617, 0.35771, 0.63339,
+               0.2519, -0.32399, 0.56932, -0.47935, 0.32332, 1.04371, 0.08397,
+               0.71741, 0.46644, 0.23572, 1.14101, -8.16384, 0.7148, 1.86377,
+               0.2646, -0.07309, -0.78756, -0.86484, -0.16795, -0.26713,
+               -0.0035, 0.6088, -0.19626, 0.36186, -0.16349, 0.06036, 0.58441,
+               1.10884, 2.64874, 0.54711)
 mod_123 <- GSMVAR(p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
-sim_123 <- simulate.gsmvar(mod_123, nsim=300)
+sim_123 <- simulate.gsmvar(mod_123, nsim=300, seed=2)
 data_123 <- sim_123$sample
 mod_123 <- GSMVAR(data_123, p=1, M=2, d=3, params=theta_123, conditional=FALSE, parametrization="mean", constraints=NULL)
 
-set.seed(1)
-pred222 <- predict.gsmvar(mod_222, n_ahead=2, n_simu=10, pi=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
-pred222s <- predict.gsmvar(mod_222s, n_ahead=2, n_simu=10, pi=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
-pred123 <- predict.gsmvar(mod_123, n_ahead=1, n_simu=10, pi=0.99, pi_type="upper", pred_type="median", plot_res=FALSE)
+mod_123t <- GSMVAR(data_123, p=1, M=2, d=3, params=c(theta_123, 20, 30), model="StMVAR",
+                   conditional=FALSE, parametrization="mean")
+
+set.seed(1); pred112t <- predict.gsmvar(mod_112t, n_ahead=2, nsim=10, pi=c(0.80), plot_res=FALSE, pred_type="mean")
+set.seed(1); pred222 <- predict.gsmvar(mod_222, n_ahead=2, nsim=10, pi=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
+set.seed(1); pred222gs <- predict.gsmvar(mod_222gs, n_ahead=2, nsim=10, pi=c(0.95, 0.70), plot_res=FALSE, pred_type="mean")
+set.seed(2); pred222s <- predict.gsmvar(mod_222s, n_ahead=2, nsim=10, pi=c(0.95, 0.80), plot_res=FALSE, pred_type="mean")
+set.seed(3); pred123 <- predict.gsmvar(mod_123, n_ahead=1, nsim=10, pi=0.99, pi_type="upper", pred_type="median", plot_res=FALSE)
+set.seed(3); pred123t <- predict.gsmvar(mod_123t, n_ahead=2, nsim=5, pi=0.99, pi_type="lower", pred_type="median", plot_res=FALSE)
 tmp222 <- unname(pred222$pred[2,])
 
 # p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
@@ -72,15 +86,34 @@ test_that("predict works correctly", {
    expect_equal(predict.gsmvar(mod_112, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(0.7231782, 0.4431300), tolerance=1e-5)
    expect_equal(predict.gsmvar(mod_222c, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(0.7250053, 0.4209626), tolerance=1e-5)
 
+   expect_equal(unname(pred112t$pred[2, ]), c(0.8970004, 0.4217662), tolerance=1e-3)
+   expect_equal(pred112t$pred_ints[, 2, 2], c(0.5729150, 0.5105862), tolerance=1e-3)
+   expect_equal(pred112t$pred_ints[, 1, 1], c(0.4116595, 0.3756889), tolerance=1e-3)
+   expect_equal(pred112t$mix_pred_ints[, 1, 1], c(1, 1), tolerance=1e-3)
+
    expect_equal(tmp222, c(0.6709308, 0.4618839), tolerance=1e-5)
    expect_equal(pred222$pred_ints[, 1, 1], c(0.07127095, -0.32711717), tolerance=1e-3)
    expect_equal(pred222$pred_ints[, 3, 2], c(0.5783407, 0.5995812), tolerance=1e-3)
    expect_equal(pred222$mix_pred_ints[, 1, 1], c(0.9352294, 0.8441136), tolerance=1e-3)
 
-   expect_equal(unname(pred123$pred[1,]), c(-9.309146, 1.768539, 1.376839), tolerance=1e-5)
-   expect_equal(pred123$pred_ints[ , 1, ], c(-8.154824, 3.236734, 3.383006), tolerance=1e-5)
-   expect_equal(unname(pred123$mix_pred[1 ,]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
-   expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(1.947047e-10, 1.000000e+00), tolerance=1e-5)
+   expect_equal(pred222s$pred_ints[, 2, 1], c(0.5230737, -0.3738420), tolerance=1e-3)
+   expect_equal(pred222s$pred_ints[, 1, 2], c(0.09878082, 0.18761453), tolerance=1e-3)
+   expect_equal(pred222s$mix_pred_ints[, 2, 2], c(0.06477058, 0.05950152), tolerance=1e-3)
+
+   expect_equal(unname(pred222gs$pred[2, ]), c(0.7176830, 0.4060806), tolerance=1e-3)
+   expect_equal(pred222gs$pred_ints[, 4, 2], c(0.7705175, 0.5784606), tolerance=1e-3)
+   expect_equal(pred222gs$pred_ints[, 2, 2], c(0.1779556, 0.3322382), tolerance=1e-3)
+   expect_equal(pred222gs$mix_pred_ints[, 2, 1], c(0.9260951, 0.7668288), tolerance=1e-3)
+
+   expect_equal(unname(pred123$pred[1,]), c(-8.4121641, -0.3787007, 2.3372331), tolerance=1e-5)
+   expect_equal(pred123$pred_ints[ , 1, ], c(-7.987103, 1.036073, 4.507460), tolerance=1e-5)
+   expect_equal(unname(pred123$mix_pred[1 ,]), c(7.987841e-21, 1.000000e+00), tolerance=1e-5)
+   expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(7.987841e-21, 1.000000e+00), tolerance=1e-5)
+
+   expect_equal(unname(pred123t$pred[2,]), c(-7.782932, 1.377770, 2.024874), tolerance=1e-5)
+   expect_equal(pred123t$pred_ints[2 , 1, ], c(-7.9877016, 0.7730701, 0.2280571), tolerance=1e-5)
+   expect_equal(unname(pred123t$mix_pred[2,]), c(3.535557e-07, 9.999996e-01), tolerance=1e-5)
+   expect_equal(unname(pred123t$mix_pred_ints[2 , 1, ]), c(1.487353e-07, 9.999948e-01), tolerance=1e-5)
 
    expect_equal(unname(pred222cm$pred[2,]), c(0.7434035, 0.4107316), tolerance=1e-5)
    expect_equal(unname(pred222cm$pred_ints[2, 2, ]), c(1.6821331, 0.7858234), tolerance=1e-5)

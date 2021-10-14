@@ -31,8 +31,6 @@ mixture distribution specifed by the argument \code{init_regimes}.}
 
 \item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
 should ignore it.}
-
-\item{gmvar}{an object of class \code{'gmvar'}}
 }
 \value{
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.

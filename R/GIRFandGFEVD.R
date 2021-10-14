@@ -116,11 +116,12 @@
 #'  }
 #' @export
 
-GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:gsmvar$model$M, init_values=NULL,
+GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:sum(gsmvar$model$M), init_values=NULL,
                  which_cumulative=numeric(0), scale=NULL, ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
                  plot=TRUE, seeds=NULL, ...) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   p <- gsmvar$model$p
-  M <- gsmvar$model$M
+  M <- sum(gsmvar$model$M)
   d <- gsmvar$model$d
 
   if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported")

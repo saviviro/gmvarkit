@@ -16,7 +16,7 @@
 gmvar_to_gsmvar <- function(gsmvar) {
   stopifnot(class(gsmvar) %in% c("gsmvar", "gmvar"))
   if(class(gsmvar) == "gmvar") {
-    class(gsmvar) <- "gsvmar"
+    class(gsmvar) <- "gsmvar"
     gsmvar$mode$model <- "GMVAR"
   }
   gsmvar
@@ -221,7 +221,7 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
 #'   \code{simulateGMVAR} simulates observations from a GMVAR
 #'
 #' @inheritParams simulate.gsmvar
-#' @param gmvar an object of class \code{'gmvar'}
+#' @inheritParams alt_gmvar
 #' @param nsimu number of observations to be simulated.
 #' @seealso \code{\link{simulate.gsmvar}}
 #' @inherit simulate.gsmvar details return references
@@ -232,4 +232,25 @@ simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, 
   gsmvar <- gmvar_to_gsmvar(gsmvar)
   simulate.gsmvar(object=gsmvar, nsim=nsimu, seed=seed, init_values=init_values,
                   ntimes=ntimes, drop=drop, girf_pars=girf_pars)
+}
+
+#' @title DEPRECATED! USE THE FUNCTION predict.gsmvar INSTEAD! Predict method for class 'gmvar' objects
+#'
+#' @description \code{predict.gsmvar} is a predict method for class \code{'gsmvar'} objects. The forecasts of
+#'   the GMVAR model are computed by performing independent simulations and using the
+#'   sample medians or means as point forecasts and empirical quantiles as prediction intervals.
+#'   For one-step-ahead predictions using the exact conditional mean is also supported.
+#'
+#' @inheritParams predict.gsmvar
+#' @param object an object of class 'gmvar'
+#' @seealso \code{\link{predict.gsmvar}}
+#' @inherit predict.gsmvar details return references
+#' @export
+
+predict.gmvar <- function(object, ..., n_ahead, n_simu=2000, pi=c(0.95, 0.80), pi_type=c("two-sided", "upper", "lower", "none"),
+                          pred_type=c("median", "mean", "cond_mean"), plot_res=TRUE, mix_weights=TRUE, nt) {
+  .Deprecated("predict.gsmvar")
+  gsmvar <- gmvar_to_gsmvar(object)
+  predict.gsmvar(object=gsmvar, ..., n_ahead=n_ahead, nsim=n_simu, pi=pi, pi_type=pi_type, pred_type=pred_type,
+                 plot_res=plot_res, mix_weights=mix_weights, nt=nt)
 }
