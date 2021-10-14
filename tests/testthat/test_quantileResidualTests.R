@@ -35,6 +35,12 @@ upsilon2_222 <- c(phi20_222, vec(A21_222), vec(A22_222), vech(Omega2_222))
 theta_222 <- c(upsilon1_222, upsilon2_222, alpha1_222)
 mod_222 <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222, conditional=TRUE, parametrization="intercept", constraints=NULL)
 
+mod_222t <- GSMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222, 20, 30),  model="StMVAR",
+                   conditional=TRUE, parametrization="intercept", constraints=NULL)
+mod_222gs <- GSMVAR(gdpdef, p=2, M=c(1, 1), d=2, params=c(theta_222, 30),  model="G-StMVAR",
+                   conditional=TRUE, parametrization="intercept", constraints=NULL)
+
+
 WL_222 <- diag_Omegas(Omega1_222, Omega2_222)
 W_222 <- matrix(WL_222[1:(2^2)], nrow=2, byrow=FALSE)
 lambdas_222 <- WL_222[(2^2 + 1):length(WL_222)]
@@ -67,14 +73,17 @@ params_222cm <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
 mod_222cm <- GSMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
 
 set.seed(1)
-res_112 <- quantile_residual_tests(mod_112, lags_ac=1:2, lags_ch=1:2, nsimu=300, print_res=FALSE)
-res_222 <- quantile_residual_tests(mod_222, lags_ac=3, lags_ch=1, nsimu=1, print_res=FALSE)
-res_123 <- quantile_residual_tests(mod_123, lags_ac=1, lags_ch=2, nsimu=1, print_res=FALSE)
+res_112 <- quantile_residual_tests(mod_112, lags_ac=1:2, lags_ch=1:2, nsim=300, print_res=FALSE)
+res_222 <- quantile_residual_tests(mod_222, lags_ac=3, lags_ch=1, nsim=1, print_res=FALSE)
+res_123 <- quantile_residual_tests(mod_123, lags_ac=1, lags_ch=2, nsim=1, print_res=FALSE)
 
-set.seed(1); res_112s <- quantile_residual_tests(mod_112s, lags_ac=1:2, lags_ch=1:2, nsimu=1, print_res=FALSE)
-set.seed(1); res_222s <- quantile_residual_tests(mod_222s, lags_ac=1, lags_ch=2, nsimu=300, print_res=FALSE)
+set.seed(1); res_222t <- quantile_residual_tests(mod_222t, lags_ac=1, lags_ch=2, nsim=1, print_res=FALSE)
+set.seed(1); res_222gs <- quantile_residual_tests(mod_222gs, lags_ac=2, lags_ch=1, nsim=1, print_res=FALSE)
 
-set.seed(1); res_222cm <- quantile_residual_tests(mod_222cm, lags_ac=2, lags_ch=1, nsimu=1, print_res=FALSE)
+set.seed(1); res_112s <- quantile_residual_tests(mod_112s, lags_ac=1:2, lags_ch=1:2, nsim=1, print_res=FALSE)
+set.seed(1); res_222s <- quantile_residual_tests(mod_222s, lags_ac=1, lags_ch=2, nsim=300, print_res=FALSE)
+
+set.seed(1); res_222cm <- quantile_residual_tests(mod_222cm, lags_ac=2, lags_ch=1, nsim=1, print_res=FALSE)
 
 test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_112$norm_res$test_stat, 154.3486, tolerance=1)
@@ -84,6 +93,14 @@ test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_222$norm_res$p_val, 0.01583773, tolerance=1e-4)
   expect_equal(res_222$ac_res$test_results$p_val, 0.1168246, tolerance=1e-4)
   expect_equal(res_222$ch_res$test_results$test_stat, 5.045936, tolerance=1e-4)
+
+  expect_equal(res_222t$norm_res$p_val, 0.1554327, tolerance=1e-4)
+  expect_equal(res_222t$ac_res$test_results$p_val, 0.2866306, tolerance=1e-4)
+  expect_equal(res_222t$ch_res$test_results$p_val, 0.424535, tolerance=1e-4)
+
+  expect_equal(res_222gs$norm_res$p_val, 0.05590034, tolerance=1e-4)
+  expect_equal(res_222gs$ac_res$test_results$p_val, 0.07231058, tolerance=1e-4)
+  expect_equal(res_222gs$ch_res$test_results$p_val, 0.2983806, tolerance=1e-4)
 
   expect_equal(res_123$norm_res$test_stat, 22.50893, tolerance=1e-4)
   expect_equal(res_123$ac_res$test_results$test_stat, 13.70742, tolerance=1e-4)
@@ -110,6 +127,12 @@ test_that("quantile_residual_tests - ind_stats - works correctly", {
 
   expect_equal(res_222$ac_res$ind_stats$lag3, c(-1.022108, 1.337845, -1.045152, 1.079755), tolerance=1e-4)
   expect_equal(res_222$ch_res$ind_stats$lag1, c(-0.4215779, -1.0604109, -0.6596756, 1.5901816), tolerance=1e-4)
+
+  expect_equal(res_222t$ac_res$ind_stats$lag1, c(-0.0817922, -0.7530136, 0.1631821, -1.6861624), tolerance=1e-4)
+  expect_equal(res_222t$ch_res$ind_stats$lag2, c(-0.6548325, -0.8686823, 0.6983760, 1.3222143), tolerance=1e-4)
+
+  expect_equal(res_222gs$ac_res$ind_stats$lag2, c(0.4558164, -0.3540209, 0.6928812, -3.3972828), tolerance=1e-4)
+  expect_equal(res_222gs$ch_res$ind_stats$lag1, c(-0.3705498, -1.1441065, -0.8061067, 1.5904593), tolerance=1e-4)
 
   expect_equal(res_123$ac_res$ind_stats$lag1,
                c(0.35493268, 1.75181713, -0.31676151, 0.07667559, -2.97144849, -0.47202034, -0.26072843, -0.05403170, 0.47639484), tolerance=1e-4)
@@ -144,45 +167,54 @@ g_ac2 <- get_g(2); dim_g_ac2 <- 2*2^2 #lag*d^2
 
 
 test_that("get_test_Omega works correctly", {
-  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, model="GMVAR", conditional=TRUE, parametrization="mean",
                               constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[1,],
                c(1.1340811, 2.2652951, 15.5201108, 0.3014837, 0.6945552, 1.8175825), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=c(theta_112, 20), model="StMVAR", conditional=TRUE, parametrization="mean",
+                              constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[6,],
+               c(-0.6390766, -2.5941262, -20.5173315, 1.9402860, 5.7716302, 27.3629371), tolerance=1e-4)
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[,6],
                c(-0.8334590, -0.1859936, -5.9797771, 2.5482817, -0.9632214, 17.9082196), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=c(theta_222, 20, 30), model="StMVAR", conditional=TRUE, parametrization="intercept",
+                              constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[3,],
+               c(2.7171367, 1.9955770, 23.6659063, -0.7818911, 0.7877658, -2.7470121), tolerance=1e-4)
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=c(1, 1), params=c(theta_222, 30), model="G-StMVAR", conditional=TRUE, parametrization="intercept",
+                              constraints=NULL, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[4,],
+               c(-0.1684149, -0.4871592, -1.0006479, 1.0587743, -0.4385124, 5.5969645), tolerance=1e-4)
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, same_means=NULL, g=g_norm, dim_g=dim_g_norm)[3,],
                c(3.9829341, 9.0409142, 47.4316793, -1.6580935, -0.6015382, -7.9351451), tolerance=1e-4)
 
-  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, model="GMVAR", conditional=TRUE, parametrization="mean",
                               constraints=NULL, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[,1],
                c(0.193075103, 0.007521766, -0.175034038, -0.023736421), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, conditional=TRUE, parametrization="mean",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112, model="GMVAR", conditional=TRUE, parametrization="mean",
                               constraints=NULL, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[5,],
                c(-0.36497486, -0.03684782, 0.31026054, 0.15347275, 1.48304035, 0.26748799, -0.44855409, -0.26216707), tolerance=1e-4)
 
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=NULL, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[4,],
                c(0.056251016, -0.106900180, 0.006265508, 0.231235779), tolerance=1e-3)
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=NULL, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[8,],
                c(-0.01511927, 0.05053473, -0.02218766, 0.16288831, -0.01263294, -0.02870023, 0.10997098, 0.61942729), tolerance=1e-3)
 
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, same_means=NULL, g=g_ac1, dim_g=dim_g_ac1)[2,],
                c(0.004225044, 0.829299155, -0.018035216, 0.010810051), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222c, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=C_222c, same_means=NULL, g=g_ac2, dim_g=dim_g_ac2)[,2],
                c(0.007519279, 0.833487335, -0.015455803, 0.010043412, 0.079612914, 0.117168925, 0.095616855, 0.038757206), tolerance=1e-4)
 
   # SGSMVAR
-  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112sWC, model="GMVAR", conditional=TRUE, parametrization="mean",
                               constraints=NULL, same_means=NULL, structural_pars=list(W=W_112), g=g_norm, dim_g=dim_g_norm)[2,],
                c(2.2652950, 30.1582430, 68.7565902, -0.1180411, 0.2864592, 0.4527952), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112sWC, conditional=TRUE, parametrization="mean",
+  expect_equal(get_test_Omega(data=gdpdef, p=1, M=1, params=theta_112sWC, model="GMVAR", conditional=TRUE, parametrization="mean",
                               constraints=NULL, same_means=NULL, structural_pars=list(W=W_112), g=g_ac1, dim_g=dim_g_ac1)[4,],
                c(-0.02373642, -0.07959005, -0.15221360, 1.29820691), tolerance=1e-4)
-  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222s, conditional=TRUE, parametrization="intercept",
+  expect_equal(get_test_Omega(data=gdpdef, p=2, M=2, params=theta_222s, model="GMVAR", conditional=TRUE, parametrization="intercept",
                               constraints=NULL, same_means=NULL, structural_pars=list(W=W_222), g=g_ac2, dim_g=dim_g_ac2)[,8],
                c(-0.01511927, 0.05053473, -0.02218765, 0.16288831, -0.01263294, -0.02870023, 0.10997098, 0.61942729), tolerance=1e-4)
 })

@@ -8,7 +8,7 @@
 #' @param gsmvar an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.
 #' @param lags_ac a positive integer vector specifying the lags used to test autocorrelation.
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
-#' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
+#' @param nsim to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 #'   If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
 #'   of simulations might improve the tests size properties but it increases the computation time.
 #' @param print_res should the test results be printed while computing the tests?
@@ -36,36 +36,39 @@
 #'
 #' # Structural GMVAR(1,2) model identified with sign
 #' # constraints and build with hand-specified parameter values.
-#' # Tests based on simulation procedure with nsimu=1000:
+#' # Tests based on simulation procedure with nsim=1000:
 #' params12s <- c(0.55, 0.112, 0.619, 0.173, 0.344, 0.055, -0.009, 0.718,
 #'  0.255, 0.017, -0.136, 0.858, 0.541, 0.057, -0.162, 0.162, 3.623,
 #'  4.726, 0.674)
 #' W_12 <- matrix(c(1, 1, -1, 1), nrow=2)
 #' mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
 #'                 structural_pars=list(W=W_12))
-#' qrtests12s <- quantile_residual_tests(mod12s, nsimu=1000)
+#' qrtests12s <- quantile_residual_tests(mod12s, nsim=1000)
 #' qrtests12s
 #' }
 #' @export
 
-quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsimu=1, print_res=TRUE,
-                                    stat_tol, posdef_tol) {
+quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsim=1, print_res=TRUE,
+                                    stat_tol, posdef_tol, df_tol) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   check_null_data(gsmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
+  model <- gsmvar$model$model
   data <- gsmvar$data
   n_obs <- nrow(data)
   T_obs <- n_obs - p
   if(missing(stat_tol)) stat_tol <- gsmvar$num_tols$stat_tol
   if(missing(posdef_tol)) posdef_tol <- gsmvar$num_tols$posdef_tol
+  if(missing(df_tol)) df_tol <- gsmvar$num_tols$df_tol
   if(max(c(lags_ac, lags_ch)) >= T_obs) stop("The lags are too large compared to the data size")
 
   qresiduals <- gsmvar$quantile_residuals
-  if(nsimu > n_obs) {
-    omega_data <- simulate.gsmvar(gsmvar, nsim=nsimu, init_values=NULL, ntimes=1)$sample
+  if(nsim > n_obs) {
+    omega_data <- simulate.gsmvar(gsmvar, nsim=nsim, init_values=NULL, ntimes=1)$sample
   } else {
     omega_data <- data
   }
@@ -82,14 +85,14 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
       }
     }
     omg <- tryCatch(get_test_Omega(data=omega_data, p=p, M=M,
-                                   params=gsmvar$params,
+                                   params=gsmvar$params, model=model,
                                    conditional=gsmvar$model$conditional,
                                    parametrization=gsmvar$model$parametrization,
                                    constraints=gsmvar$model$constraints,
                                    same_means=gsmvar$model$same_means,
                                    structural_pars=gsmvar$model$structural_pars,
                                    g=g, dim_g=dim_g, stat_tol=stat_tol,
-                                   posdef_tol=posdef_tol),
+                                   posdef_tol=posdef_tol, df_tol=df_tol),
                     error=function(e) {
                       print_message(which_test, which_lag, because_of="because of numerical problems")
                       return(NA)
@@ -237,8 +240,8 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
 #' @inherit quantile_residuals references
 #' @keywords internal
 
-get_test_Omega <- function(data, p, M, params, conditional, parametrization, constraints, same_means, structural_pars=NULL, g, dim_g,
-                           stat_tol=1e-3, posdef_tol=1e-8) {
+get_test_Omega <- function(data, p, M, params, model, conditional, parametrization, constraints, same_means, structural_pars=NULL,
+                           g, dim_g, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   n_obs <- nrow(data)
   T_obs <- n_obs - p
@@ -247,7 +250,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
 
   # Function used to to calculate gradient for function g
   g_fn <- function(pars) {
-    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=pars, conditional=conditional,
+    qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=pars, model=model, conditional=conditional,
                                          parametrization=parametrization, constraints=constraints,
                                          same_means=same_means, structural_pars=structural_pars,
                                          stat_tol=stat_tol, posdef_tol=posdef_tol)
@@ -256,7 +259,7 @@ get_test_Omega <- function(data, p, M, params, conditional, parametrization, con
 
   # Function used to calculate gradient for log-likelihood
   loglik_fn <- function(pars) {
-    loglikelihood_int(data, p, M, params=pars, conditional=conditional, parametrization=parametrization,
+    loglikelihood_int(data, p, M, params=pars, model=model, conditional=conditional, parametrization=parametrization,
                       constraints=constraints, same_means=same_means, structural_pars=structural_pars,
                       check_params=TRUE, to_return="terms", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
   }

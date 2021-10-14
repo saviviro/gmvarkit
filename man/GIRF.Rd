@@ -15,7 +15,7 @@ GIRF(
   N = 30,
   R1 = 250,
   R2 = 250,
-  init_regimes = 1:gsmvar$model$M,
+  init_regimes = 1:sum(gsmvar$model$M),
   init_values = NULL,
   which_cumulative = numeric(0),
   scale = NULL,

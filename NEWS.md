@@ -137,7 +137,7 @@
 # gmvarkit 2.0.0
 
 * BEFORE USING THE DEVELOPMENT VERSION, NOT THAT THE PACKAGE IS NOT YET COMPLETELY UPDATED TO ACCOMMODATE StMVAR AND G-StMVAR MODELS!
-* gmvarkit now accommodates new models: the StMVAR model and the G-StMVAR model, as well their structural verions (see the references in the package description).
+* gmvarkit now accommodates new models: the StMVAR model and the G-StMVAR model, as well their structural versions (see the vignette or the references in the package description).
 * Changed the model class from 'gmvar' to 'gsmvar' to accommodate also StMVAR and G-StMVAR models.
 * Renamed functions: GMVAR -> GSMVAR; fitGMVAR -> fitGSMVAR; alt_gmvar -> alt_gsmvar; gmvar_to_sgmvar -> gsmvar_to_sgsmvars; also all the class 'gmvar' methods were changed to class 'gsmvar' methods.
 * The old simulation function 'simulateGMVAR' is now deprecated. Now, we use the class 'gsmvar' simulation method 'simulate.gsmvar' instead.
@@ -145,5 +145,6 @@
 * New exported function 'stmvar_to_gstmvar': estimate a G-StMVAR model based on a StMVAR model with large degrees of freedom parameters.
 * Changes to the defailt arguments 'M' and 'maxit' of the function  'fitGSMVAR'
 * In the method predict.gsmvar, changed the argument name n_simu to nsim, since nsim is now used in the simulation method as well.
+* Changed the argument name nsimu to nsim in quantile_residual_tests as well, so that the argument name is the same as in the predict and simulate methods (while this specific name was required by CRAN compatibility in the simulation method). 
 * Fixed a bug in the argument scale of the function GIRF.
 * Note that this version might produce different results with the same rndom number generator seed than the previous versions.
