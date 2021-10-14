@@ -243,9 +243,9 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   # i:th row for index i-1 etc, m:th column for m:th component.
   # We calculate in logarithm because the non-log values may be too close to zero for machine accuracy (if they are too close to zero
   # for all regimes and computer handles them as zero, we would divide by zero when calculating the mixing weights)
-  log_mvvalues <- matprods <- matrix(nrow=n_obs - p + 1, ncol=M) # The quadratic forms in Student's t density
+  log_mvdvalues <- matprods <- matrix(nrow=n_obs - p + 1, ncol=M) # The quadratic forms in Student's t density
   if(M1 > 0) { # Multinormals
-    log_mvvalues[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m],
+    log_mvdvalues[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=Y, mu=rep(mu[,m], p), sigma=chol_Sigmas[, , m],
                                                                    log=TRUE, ncores=1, isChol=TRUE), numeric(T_obs + 1))
   }
   if(M2 > 0) { # Multistudents
@@ -254,15 +254,15 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
       matprods[,m] <- rowSums(tmp_mat%*%inv_Sigmas[, , m]*tmp_mat)
       logC <- lgamma(0.5*(d*p + all_df[m - M1])) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df[m - M1] - 2) - lgamma(0.5*all_df[m - M1])
       log_det_Sigma <- 2*log(prod(diag(chol_Sigmas[, , m])))  #log(det(Sigmas[, , m]))
-      log_mvvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[,m]/(all_df[m - M1] - 2))
+      log_mvdvalues[,m] <- logC - 0.5*log_det_Sigma - 0.5*(d*p + all_df[m - M1])*log(1 + matprods[,m]/(all_df[m - M1] - 2))
     }
   }
 
   ## Calculate the mixing weights alpha_{m,t} (KMS 2016, eq.(7))
   if(to_return != "mw_tplus1") {
-    log_mvvalues <- log_mvvalues[1:T_obs, , drop=FALSE] # alpha_mt uses y_{t-1} so the last row is not needed
+    log_mvdvalues <- log_mvdvalues[1:T_obs, , drop=FALSE] # alpha_mt uses y_{t-1} so the last row is not needed
   }
-  alpha_mt_and_l_0 <- get_alpha_mt(M=M, log_mvvalues=log_mvvalues, alphas=alphas,
+  alpha_mt_and_l_0 <- get_alpha_mt(M=M, log_mvdvalues=log_mvdvalues, alphas=alphas,
                                    epsilon=epsilon, conditional=conditional, also_l_0=TRUE)
   alpha_mt <- alpha_mt_and_l_0$alpha_mt
   l_0 <- alpha_mt_and_l_0$l_0 # The first term in the exact log-likelihood function (=0 for conditional)
@@ -353,33 +353,33 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
 #'   the mixing weights.
 #'
 #' @inheritParams loglikelihood_int
-#' @param log_mvvalues \eqn{T x M} matrix containing the log multivariate normal densities.
+#' @param log_mvdvalues \eqn{T x M} matrix containing the log multivariate normal densities.
 #' @param alphas \eqn{M x 1} vector containing the mixing weight pa
 #' @param epsilon the smallest number such that its exponent is wont classified as numerically zero
 #'   (around \code{-698} is used).
 #' @param also_l_0 return also l_0 (the first term in the exact log-likelihood function)?
 #' @details Note that we index the time series as \eqn{-p+1,...,0,1,...,T} as in Kalliovirta et al. (2016).
-#' @return Returns the mixing weights a matrix of the same dimension as \code{log_mvvalues} so
+#' @return Returns the mixing weights a matrix of the same dimension as \code{log_mvdvalues} so
 #'   that the t:th row is for the time point t and m:th column is for the regime m.
 #' @inherit in_paramspace_int references
 #' @seealso \code{\link{loglikelihood_int}}
 #' @keywords internal
 
-get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0=FALSE) {
+get_alpha_mt <- function(M, log_mvdvalues, alphas, epsilon, conditional, also_l_0=FALSE) {
   if(M == 1) {
-    if(!is.matrix(log_mvvalues)) log_mvvalues <- as.matrix(log_mvvalues) # Possibly many time points but only one regime
-    alpha_mt <- as.matrix(rep(1, nrow(log_mvvalues)))
+    if(!is.matrix(log_mvdvalues)) log_mvdvalues <- as.matrix(log_mvdvalues) # Possibly many time points but only one regime
+    alpha_mt <- as.matrix(rep(1, nrow(log_mvdvalues)))
   } else {
-    if(!is.matrix(log_mvvalues)) log_mvvalues <- t(as.matrix(log_mvvalues)) # Only one time point but multiple regimes
+    if(!is.matrix(log_mvdvalues)) log_mvdvalues <- t(as.matrix(log_mvdvalues)) # Only one time point but multiple regimes
 
-    log_mvvalues_orig <- log_mvvalues
-    small_logmvns <- log_mvvalues < epsilon
+    log_mvdvalues_orig <- log_mvdvalues
+    small_logmvns <- log_mvdvalues < epsilon
     if(any(small_logmvns)) {
       # If too small or large non-log-density values are present (i.e., that would yield -Inf or Inf),
       # we replace them with ones that are not too small or large but imply the same mixing weights
       # up to negligible numerical tolerance.
       which_change <- rowSums(small_logmvns) > 0 # Which rows contain too small  values
-      to_change <- log_mvvalues[which_change, , drop=FALSE]
+      to_change <- log_mvdvalues[which_change, , drop=FALSE]
       largest_vals <- do.call(pmax, split(to_change, f=rep(1:ncol(to_change), each=nrow(to_change)))) # The largest values of those rows
       diff_to_largest <- to_change - largest_vals # Differences to the largest value of the row
 
@@ -387,11 +387,11 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
       # is smaller than epsilon, replace the with epsilon. The results are then the new log_mvn values.
       diff_to_largest[diff_to_largest < epsilon] <- epsilon
 
-      # Replace the old log_mvvalues with the new ones
-      log_mvvalues[which_change,] <- diff_to_largest
+      # Replace the old log_mvdvalues with the new ones
+      log_mvdvalues[which_change,] <- diff_to_largest
     }
 
-    mvnvalues <- exp(log_mvvalues)
+    mvnvalues <- exp(log_mvdvalues)
     denominator <- as.vector(mvnvalues%*%alphas)
     alpha_mt <- (mvnvalues/denominator)%*%diag(alphas)
   }
@@ -401,10 +401,10 @@ get_alpha_mt <- function(M, log_mvvalues, alphas, epsilon, conditional, also_l_0
     # First term of the exact log-likelihood (Kalliovirta et al. 2016, eq.(9))
     l_0 <- 0
     if(M == 1 && conditional == FALSE) {
-      l_0 <- log_mvvalues[1,]
+      l_0 <- log_mvdvalues[1,]
     } else if(M > 1 && conditional == FALSE) {
-      if(any(log_mvvalues_orig[1,] < epsilon)) { # Need to use Brobdingnag
-        l_0 <- log(Reduce("+", lapply(1:M, function(i1) alphas[i1]*exp(Brobdingnag::as.brob(log_mvvalues_orig[1, i1])))))
+      if(any(log_mvdvalues_orig[1,] < epsilon)) { # Need to use Brobdingnag
+        l_0 <- log(Reduce("+", lapply(1:M, function(i1) alphas[i1]*exp(Brobdingnag::as.brob(log_mvdvalues_orig[1, i1])))))
       } else {
         l_0 <- log(sum(alphas*mvnvalues[1,]))
       }

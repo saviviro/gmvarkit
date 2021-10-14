@@ -1,8 +1,9 @@
-#' @title Simulate from GMVAR, StMVAR, or G-StMVAR process
+#' @title Simulate method for class 'gsmvar' objects
 #'
-#' @description \code{simulate.gsmvar} simulates observations from a GMVAR, StMVAR, or G-StMVAR process.
+#' @description \code{simulate.gsmvar} is a simulate method for class 'gsmvar' objects.
+#'   It allows to simulate observations from a GMVAR, StMVAR, or G-StMVAR process.
 #'
-#' @param gsmvar an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.
+#' @param object an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.
 #' @param nsim number of observations to be simulated.
 #' @param seed set seed for the random number generator?
 #' @param ... currently not in use.
@@ -51,7 +52,7 @@
 #'   0.674)
 #'  mod12 <- GSMVAR(p=1, M=2, d=2, params=params12)
 #'  set.seed(1)
-#'  sim12 <- simulate.gsmvar(mod12, nsim=500)
+#'  sim12 <- simulate(mod12, nsim=500)
 #'  plot.ts(sim12$sample)
 #'  ts.plot(sim12$mixing_weights, col=c("blue", "red"), lty=2)
 #'  plot(sim12$component, type="l")
@@ -73,7 +74,7 @@
 #'   0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'    0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
 #'  mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
-#'  sim22 <- simulate.gsmvar(mod22, nsim=5, ntimes=500)
+#'  sim22 <- simulate(mod22, nsim=5, ntimes=500)
 #'
 #'  # Point forecast + 95% prediction intervals:
 #'  apply(sim22$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))
@@ -83,7 +84,7 @@
 #'        probs=c(0.025, 0.5, 0.972))
 #' @export
 
-simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, init_regimes=1:sum(gsmvar$model$M),
+simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, init_regimes=1:sum(gsmvar$model$M),
                             ntimes=1, drop=TRUE, girf_pars=NULL) {
   # girf_pars$shock_numb - which shock?
   # girf_pars$shock_size - size of the structural shock?
@@ -94,6 +95,7 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
   # If !is.null(girf_pars) and girf_pars$include_mixweights == FALSE, returns a size (N+1 x d) vector containing
   #                                                                   the estimated GIRFs for the variables only.
   # The first row for response at impact
+  gsmvar <- object
   if(!is.null(seed)) set.seed(seed)
   epsilon <- round(log(.Machine$double.xmin) + 10)
   p <- gsmvar$model$p
@@ -168,7 +170,7 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
     det_Sigmas[m] <- prod(diag(chol_Sigmas[, , m]))^2 # Faster determinant
   }
 
-  if(M1 > 0) { # Calculate statistics used for StMVAR type regimes
+  if(M1 < M) { # Calculate statistics used for StMVAR type regimes
     all_logC <- lgamma(0.5*(d*p + all_df)) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df - 2) - lgamma(0.5*all_df)
   }
 
@@ -183,7 +185,7 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
   # Set/generate initial values
   if(is.null(init_values)) {
     # Generate initial values from the stationary distribution of the process or of the given regime
-    m <- sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs)  # From which mixture component the initial values are drawn from?
+    m <- ifelse(length(init_regimes) == 1, init_regimes, sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs))  # From which mixture component the initial values are drawn from?
     mu <- rep(all_mu[, m], p)
     if(m <= M1) { # Draw initial values from a GMVAR type regime
       L <- t(chol_Sigmas[, , m]) # Lower triangle
@@ -231,7 +233,7 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
       # Calculated in logarithm because same values may be too close to zero for machine accuracy.
       matprods <- get_matprods(Y) # Not that get_matprods obtains i1 as non-formal argument
       log_mvdvalues <- get_logmvdvalues(matprods)
-      alpha_mt <- get_alpha_mt(M=M, log_mvvalues=log_mvdvalues, alphas=alphas,
+      alpha_mt <- get_alpha_mt(M=M, log_mvdvalues=log_mvdvalues, alphas=alphas,
                                epsilon=epsilon, also_l_0=FALSE)
 
       # Calculate the time varying arch-scalars for StMVAR type regimes
@@ -275,7 +277,7 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
       if(!is.null(girf_pars)) {
         matprods2 <- get_matprods(Y2)
         log_mvdvalues2 <- get_logmvdvalues(matprods2)
-        alpha_mt2 <- get_alpha_mt(M=M, log_mvvalues=log_mvdvalues2, alphas=alphas,
+        alpha_mt2 <- get_alpha_mt(M=M, log_mvdvalues=log_mvdvalues2, alphas=alphas,
                                   epsilon=epsilon, also_l_0=FALSE)
         mixing_weights2[i1, , j1] <- alpha_mt2
 
@@ -283,7 +285,6 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
         if(M1 < M) { # StMVAR and G-StMVAR models
           arch_scalars2 <- (all_df - 2 + matprods2[(M1 + 1):M])/(all_df - 2 + d*p) # [m - M1] indexing
         }
-
         if(i1 == 1) {
           m2 <- m # Common regime at impact (the mixing weights are the same so m is drawn from the same distribution)
         } else {
@@ -309,10 +310,12 @@ simulate.gsmvar <- function(gsmvar, nsim=1, seed=NULL, ..., init_values=NULL, in
           } else {
             tmp <- array(dim=c(d, d, M))
             if(model == "StMVAR") { # The first regime is StMVAR type
-              tmp[, , 1] <- arch_scalars[1]*alpha_mt2[1]*diag(d)
+              multiplier <- arch_scalars[1]*alpha_mt2[1]
             } else {
-              tmp[, , 1] <- alpha_mt2[1]*diag(d)
+              multiplier <-  alpha_mt2[1]
             }
+            tmp[, , 1] <- multiplier*diag(d)
+
             for(m in 2:M) {
               if(m <= M1) { # GMVAR type regime
                 multiplier <- alpha_mt2[m]

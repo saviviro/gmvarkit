@@ -51,7 +51,7 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
 #' @description \code{print_std_errors} prints the approximate standard errors of a GMVAR, StMVAR, or G-StMVAR model in the
 #'   same form as the parameters of objects of class \code{'gsmvar'} are printed.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @param digits how many digits should be printed?
 #' @details The main purpose of \code{print_std_errors} is to provide a convenient tool to match the standard
 #'   errors to certain parameter estimates. Note that if the model is intercept parametrized, there won't

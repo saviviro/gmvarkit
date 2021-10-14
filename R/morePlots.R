@@ -6,7 +6,7 @@
 #'  the individual time series contained in the model (e.g. the time series the model was fitted to). Also plots
 #'  the regimewise conditional means/variances multiplied with mixing weights.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @param which_moment should conditional means or variances be plotted?
 #' @param grid add grid to the plots?
 #' @param ... additional paramters passed to \code{grid(...)} plotting the grid if \code{grid == TRUE}.

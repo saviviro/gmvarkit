@@ -4,6 +4,7 @@
 #' @description \code{GIRF} estimates generalized impulse response function for
 #'   a structural GMVAR, StMVAR, or G-StMVAR model.
 #'
+#' @inheritParams quantile_residual_tests
 #' @inheritParams simulate.gsmvar
 #' @inheritParams fitGSMVAR
 #' @param which_shocks a numeric vector of length at most \eqn{d}

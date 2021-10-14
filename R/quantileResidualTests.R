@@ -4,8 +4,8 @@
 #'  by \emph{Kalliovirta and Saikkonen 2010}, testing autocorrelation, conditional heteroskedasticity,
 #'  and normality.
 #'
-#' @inheritParams quantile_residuals
 #' @inheritParams loglikelihood_int
+#' @param gsmvar an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.
 #' @param lags_ac a positive integer vector specifying the lags used to test autocorrelation.
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
 #' @param nsimu to how many simulations should the covariance matrix Omega used in the qr-tests be based on?

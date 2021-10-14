@@ -207,7 +207,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #'  a GMVAR, StMVAR, or G-StMVAR model. Also calculates mixing weights and quantile residuals accordingly.
 #'
 #' @inheritParams loglikelihood_int
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
 #' @return Returns an object of class 'gsmvar' defining the specified GSMVAR, StMVAR, or G-StMVAR model with the data added to the model.
 #'   If the object already contained data, the data will be updated.
@@ -266,7 +266,7 @@ add_data <- function(data, gsmvar, calc_cond_moments=TRUE, calc_std_errors=FALSE
 #' @description \code{swap_parametrization} swaps the parametrization of a GMVAR, StMVAR or G-StMVAR, model
 #'  to \code{"mean"} if the current parametrization is \code{"intercept"}, and vice versa.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @details \code{swap_parametrization} is a convenient tool if you have estimated the model in
 #'  "intercept"-parametrization, but wish to work with "mean"-parametrization in the future, or vice versa.
 #'  In \code{gmvarkit}, the approximate standard errors are only available for parametrized parameters.
@@ -329,7 +329,7 @@ swap_parametrization <- function(gsmvar) {
 #' @description \code{alt_gsmvar} constructs a GMVAR, StMVAR, or G-StMVAR model based on results from
 #'   an arbitrary estimation round of \code{fitGSMVAR}.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
 #' @param which_round based on which estimation round should the model be constructed? An integer value in 1,...,\code{ncalls}.
 #' @param which_largest based on estimation round with which largest log-likelihood should the model be constructed?
@@ -381,7 +381,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' @description \code{gsmvar_to_sgsmvar} constructs SGMVAR, SStMVAR, or SG-StMVAR model based on a reduced
 #'   form GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
 #' @details The switch is made by simultaneously diagonalizing the two error term covariance matrices
 #'   with a well known matrix decomposition (Muirhead, 1982, Theorem A9.9) and then normalizing the
@@ -490,7 +490,7 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #' @description \code{stmvar_to_gstmvar} estimates a G-StMVAR model based on a StMVAR model that has
 #'  large degrees of freedom parameters.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
 #' @inheritParams fitGSMVAR
 #' @inheritParams stmvarpars_to_gstmvar
@@ -604,7 +604,7 @@ stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df
 #' @description \code{reorder_W_columns} reorder columns of the W-matrix and lambda parameters
 #'   of a structural GMVAR, StMVAR, or G-StMVAR model.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @param perm an integer vector of length \eqn{d} specifying the new order of the columns of \eqn{W}.
 #'   Also lambda parameters of each regime will be reordered accordingly.
 #' @details The order of the columns of \eqn{W} can be changed without changing the implied reduced
@@ -690,7 +690,7 @@ reorder_W_columns <- function(gsmvar, perm) {
 #'  of a structural GMVAR, StMVAR, or G-StMVAR model. Consequently, signs in the columns of the B-matrix are also swapped
 #'  accordingly.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @param which_to_swap a numeric vector of length at most \eqn{d} and elemnts in \eqn{1,..,d}
 #'   specifying the columns of \eqn{W} whose sign should be swapped.
 #' @details All signs in any column of \eqn{W} can be swapped without changing the implied reduced form model.
@@ -774,7 +774,7 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
 #' @description \code{update_numtols} updates the stationarity and positive definiteness
 #'   numerical tolerances of an existing class 'gsmvar' model.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams in_paramspace_int
 #' @details All signs in any column of \eqn{W} can be swapped without changing the implied reduced form model.
 #'   Consequently, also the signs in the columns of the B-matrix are swapped. Note that the sign constraints

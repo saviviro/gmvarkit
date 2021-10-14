@@ -141,7 +141,7 @@
 * Changed the model class from 'gmvar' to 'gsmvar' to accommodate also StMVAR and G-StMVAR models.
 * Renamed functions: GMVAR -> GSMVAR; fitGMVAR -> fitGSMVAR; alt_gmvar -> alt_gsmvar; gmvar_to_sgmvar -> gsmvar_to_sgsmvars; also all the class 'gmvar' methods were changed to class 'gsmvar' methods.
 * The old simulation function 'simulateGMVAR' is now deprecated. Now, we use the class 'gsmvar' simulation method 'simulate.gsmvar' instead.
-* simulate.gsmvar now allows to generate initial values from the stationary distribution of a specific regime or from a mixture distribution of any set of regimes.
+* simulate.gsmvar now allows to generate initial values from the stationary distribution of a specific regime or from a mixture distribution of any set of regimes. Some argument names needed to be changed to make the method CRAN compatible.
 * New exported function 'stmvar_to_gstmvar': estimate a G-StMVAR model based on a StMVAR model with large degrees of freedom parameters.
 * Changes to the defailt arguments 'M' and 'maxit' of the function  'fitGSMVAR'
 * Fixed a bug in the argument scale of the function GIRF.

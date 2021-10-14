@@ -364,7 +364,7 @@ pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR
 #' @description \code{get_boldA_eigens} calculates absolute values of the eigenvalues of
 #'   the "bold A" matrices containing the AR coefficients for each mixture component.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @return Returns a matrix with \eqn{d*p} rows and \eqn{M} columns - one column for each regime.
 #'  The \eqn{m}th column contains the absolute values (or modulus) of the eigenvalues of the "bold A" matrix containing
 #'  the AR coefficients correspinding to regime \eqn{m}.
@@ -402,7 +402,7 @@ get_boldA_eigens <- function(gsmvar) {
 #' @description \code{get_omega_eigens} calculates the eigenvalues of the "Omega" error
 #'  term covariance matrices for each mixture component.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @return Returns a matrix with \eqn{d} rows and \eqn{M} columns - one column for each regime.
 #'  The \eqn{m}th column contains the eigenvalues of the "Omega" error term covariance matrix
 #'  of the \eqn{m}th regime.

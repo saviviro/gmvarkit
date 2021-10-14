@@ -3,7 +3,7 @@
 #'
 #' @description \code{Wald_test} performs a Wald test for a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams calc_gradient
 #' @param A a size \eqn{(k x n_params)} matrix with full row rank specifying part of the null hypothesis
 #'   where \eqn{n_params} is the number of parameters in the (unconstrained) model.

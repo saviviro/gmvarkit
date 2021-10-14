@@ -2,22 +2,22 @@
 % Please edit documentation in R/simulate.R
 \name{simulate.gsmvar}
 \alias{simulate.gsmvar}
-\title{Simulate from GMVAR, StMVAR, or G-StMVAR process}
+\title{Simulate method for class 'gsmvar' objects}
 \usage{
 \method{simulate}{gsmvar}(
-  gsmvar,
+  object,
   nsim = 1,
   seed = NULL,
   ...,
   init_values = NULL,
-  init_regimes = 1:gsvmar$model$M,
+  init_regimes = 1:sum(gsmvar$model$M),
   ntimes = 1,
   drop = TRUE,
   girf_pars = NULL
 )
 }
 \arguments{
-\item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
+\item{object}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
 \item{nsim}{number of observations to be simulated.}
 
@@ -53,18 +53,19 @@ should ignore it.}
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
   Otherwise, returns a list with...
   \describe{
-    \item{\code{$sample}}{a size (\code{nsimu}\eqn{ x d x }\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
+    \item{\code{$sample}}{a size (\code{nsim}\eqn{ x d x }\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
      the time index, the dimension \code{[, d, ]} indicates the marginal time series, and the dimension \code{[, , i]} indicates
      the i:th set of simulations.}
-    \item{\code{$component}}{a size (\code{nsimu}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component each
+    \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component each
      value was generated from.}
-    \item{\code{$mixing_weights}}{a size (\code{nsimu}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to the
+    \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to the
      sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
      \code{[, , i]} indicates the i:th set of simulations.}
   }
 }
 \description{
-\code{simulate.gsmvar} simulates observations from a GMVAR, StMVAR, or G-StMVAR process.
+\code{simulate.gsmvar} is a simulate method for class 'gsmvar' objects.
+  It allows to simulate observations from a GMVAR, StMVAR, or G-StMVAR process.
 }
 \details{
 The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating its possible future values.
@@ -79,7 +80,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-St
   0.674)
  mod12 <- GSMVAR(p=1, M=2, d=2, params=params12)
  set.seed(1)
- sim12 <- simulate.gsmvar(mod12, nsimu=500)
+ sim12 <- simulate(mod12, nsim=500)
  plot.ts(sim12$sample)
  ts.plot(sim12$mixing_weights, col=c("blue", "red"), lty=2)
  plot(sim12$component, type="l")
@@ -101,7 +102,7 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-St
   0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
    0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
  mod22 <- GSMVAR(gdpdef, p=2, M=2, params=params22)
- sim22 <- simulate.gsmvar(mod22, nsim=5, ntimes=500)
+ sim22 <- simulate(mod22, nsim=5, ntimes=500)
 
  # Point forecast + 95\% prediction intervals:
  apply(sim22$sample, MARGIN=1:2, FUN=quantile, probs=c(0.025, 0.5, 0.972))

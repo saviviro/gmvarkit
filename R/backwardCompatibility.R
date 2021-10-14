@@ -215,8 +215,21 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
 
 
 
+#' @title DEPRECATED! USE THE FUNCTION simulate.gsmvar INSTEAD! Simulate from GMVAR process
+#'
+#' @description DEPRECATED! USE THE FUNCTION simulate.gsmvar INSTEAD!
+#'   \code{simulateGMVAR} simulates observations from a GMVAR
+#'
+#' @inheritParams simulate.gsmvar
+#' @param gmvar an object of class \code{'gmvar'}
+#' @param nsimu number of observations to be simulated.
+#' @seealso \code{\link{simulate.gsmvar}}
+#' @inherit simulate.gsmvar details return references
+#' @export
 
-
-#simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
-#
-#}
+simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
+  .Deprecated("simulate.gsmvar")
+  gsmvar <- gmvar_to_gsmvar(gsmvar)
+  simulate.gsmvar(object=gsmvar, nsim=nsimu, seed=seed, init_values=init_values,
+                  ntimes=ntimes, drop=drop, girf_pars=girf_pars)
+}

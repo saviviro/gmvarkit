@@ -6,7 +6,7 @@
 #'   for either autocorrelation, conditional heteroskedasticity, or normality, or simply draws
 #'   the quantile residual time series.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @param type which type of diagnostic plot should be plotted?
 #'   \itemize{
 #'     \item{\code{"all"} all below sequentially.}
@@ -128,7 +128,7 @@ diagnostic_plot <- function(gsmvar, type=c("all", "series", "ac", "ch", "norm"),
 #'
 #' @description \code{profile_logliks} plots profile log-likelihoods around the estimates.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams in_paramspace_int
 #' @param which_pars the profile log-likelihood function of which parameters should be plotted? An integer
 #'  vector specifying the positions of the parameters in the parameter vector. The parameter vector has the

@@ -306,7 +306,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 #' @description \code{iterate_more} uses a variable metric algorithm to finalize maximum likelihood
 #'  estimation of a GMVAR, StMVAR, or G-StMVAR model (object of class \code{'gsmvar'}) which already has preliminary estimates.
 #'
-#' @inheritParams simulate.gsmvar
+#' @inheritParams quantile_residual_tests
 #' @inheritParams fitGSMVAR
 #' @inheritParams GSMVAR
 #' @inheritParams standard_errors

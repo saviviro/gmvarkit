@@ -77,9 +77,9 @@ set.seed(1); res_222s <- quantile_residual_tests(mod_222s, lags_ac=1, lags_ch=2,
 set.seed(1); res_222cm <- quantile_residual_tests(mod_222cm, lags_ac=2, lags_ch=1, nsimu=1, print_res=FALSE)
 
 test_that("quantile_residual_tests - test_results - works correctly", {
-  expect_equal(res_112$norm_res$test_stat, 126.6811, tolerance=1)
-  expect_equal(res_112$ac_res$test_results$test_stat, c(17.18153, 26.61443), tolerance=1e-4)
-  expect_equal(res_112$ch_res$test_results$test_stat, c(76.67278, 315.72935), tolerance=1e-4)
+  expect_equal(res_112$norm_res$test_stat, 154.3486, tolerance=1)
+  expect_equal(res_112$ac_res$test_results$test_stat, c(21.13147, 28.86697), tolerance=1e-4)
+  expect_equal(res_112$ch_res$test_results$test_stat, c(61.29593, 204.98674), tolerance=1e-4)
 
   expect_equal(res_222$norm_res$p_val, 0.01583773, tolerance=1e-4)
   expect_equal(res_222$ac_res$test_results$p_val, 0.1168246, tolerance=1e-4)
@@ -105,8 +105,8 @@ test_that("quantile_residual_tests - test_results - works correctly", {
 })
 
 test_that("quantile_residual_tests - ind_stats - works correctly", {
-  expect_equal(res_112$ac_res$ind_stats$lag2, c(3.2967696, 0.1803989, 0.7776112, -0.9903486), tolerance=1e-4)
-  expect_equal(res_112$ch_res$ind_stats$lag1, c(4.3842537, -0.1845799, 3.9875317, 4.8550917), tolerance=1e-4)
+  expect_equal(res_112$ac_res$ind_stats$lag2, c(2.5963913, 0.1874684, 0.7390084, -0.9374877), tolerance=1e-4)
+  expect_equal(res_112$ch_res$ind_stats$lag1, c(2.3595939, -0.1535945, 3.6163184, 5.7548554), tolerance=1e-4)
 
   expect_equal(res_222$ac_res$ind_stats$lag3, c(-1.022108, 1.337845, -1.045152, 1.079755), tolerance=1e-4)
   expect_equal(res_222$ch_res$ind_stats$lag1, c(-0.4215779, -1.0604109, -0.6596756, 1.5901816), tolerance=1e-4)
