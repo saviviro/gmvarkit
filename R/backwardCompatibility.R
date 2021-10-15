@@ -17,7 +17,7 @@ gmvar_to_gsmvar <- function(gsmvar) {
   stopifnot(class(gsmvar) %in% c("gsmvar", "gmvar"))
   if(class(gsmvar) == "gmvar") {
     class(gsmvar) <- "gsmvar"
-    gsmvar$mode$model <- "GMVAR"
+    gsmvar$model$model <- "GMVAR"
   }
   gsmvar
 }
