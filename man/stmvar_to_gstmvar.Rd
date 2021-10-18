@@ -73,5 +73,5 @@ mod12gs
 }
 \seealso{
 \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
- \code{\link{swap_W_signs}}
+ \code{\link{swap_W_signs}}, \code{\link{gsmvar_to_sgsmvar}}
 }

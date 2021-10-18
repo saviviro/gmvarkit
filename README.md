@@ -8,7 +8,9 @@
 <!-- badges: end -->
 
 The goal of gmvarkit is to provide tools to analyse structural and
-reduced form Gaussian mixture vector autoregressive (GMVAR) model.
+reduced form Gaussian mixture vector autoregressive (GMVAR) model,
+Student’s t mixtue vector autoregressive (StMVAR) model, and Gaussian
+and Student’s t mixture vector autoregressive (G-StMVAR) model.
 `gmvarkit` provides functions for unconstrained and constrained maximum
 likelihood estimation of the model parameters, quantile residual based
 model diagnostics, simulation from the processes, forecasting,
@@ -35,11 +37,11 @@ devtools::install_github("saviviro/gmvarkit")
 ## Simple example
 
 This is a basic example on how to use `gmvarkit` in time series
-analysis. The example data is the same that is used by Kalliovirta et
-al. (2016) in their paper introducing the GMVAR model. The estimation
-process is computationally demanding and takes advantage of parallel
-computing. After estimating the model, it is shown by simple examples
-how to conduct some further analysis.
+analysis. The estimation process is computationally demanding and takes
+advantage of parallel computing. After estimating the model, it is shown
+by simple examples how to conduct some further analysis. StMVAR and
+G-StMVAR model are briefly covered after giving examples related to the
+reduced form and structural GMVAR model.
 
 ``` r
 # These examples use the data 'gdpdef' which comes with the package, and contains the quarterly percentage growth rate
@@ -159,6 +161,28 @@ Wald_test(fit22s, A, c)
 
 # The same functions used in the demonstration of the reduced form model also
 # work with structural models.
+
+
+## StMVAR and G-StMVAR models ##
+
+# Fit a StMVAR(2, 2) model
+fit22t <- fitGSMVAR(gdpdef, p=2, M=2, model="StMVAR", ncalls=1, seeds=1)
+
+# Printout shows that there is an overly large degrees of freedom estimate
+# in the 2nd regime!
+fit22t
+
+# So we change it to GMVAR type by switching to the appropariate G-StMVAR model
+fit22gs <- stmvar_to_gstmvar(fit22t) 
+
+# Printout of the appropriate G-StMVAR model that is based on the above StMVAR model.
+fit22gs 
+
+# Switch to the stastitically identified structural model
+fit22gss <- gsmvar_to_sgsmvar(fit22gs)
+
+# Printout of the structural model that is implied by the reduced form model
+fit22gss
 ```
 
 ## References
@@ -171,3 +195,6 @@ Wald_test(fit22s, A, c)
   - Virolainen S. 2020. Structural Gaussian mixture vector
     autoregressive model. Unpublished working paper, available as
     arXiv:2007.04713.
+  - Virolainen S. 2021. Gaussian and Student’s t mixture vector
+    autoregressive model. Unpublished working paper, available as
+    arXiv:2109.13648.

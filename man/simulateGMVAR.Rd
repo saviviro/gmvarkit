@@ -5,7 +5,7 @@
 \title{DEPRECATED! USE THE FUNCTION simulate.gsmvar INSTEAD! Simulate from GMVAR process}
 \usage{
 simulateGMVAR(
-  gsmvar,
+  gmvar,
   nsimu,
   init_values = NULL,
   ntimes = 1,
@@ -15,6 +15,8 @@ simulateGMVAR(
 )
 }
 \arguments{
+\item{gmvar}{object of class 'gmvar'}
+
 \item{nsimu}{number of observations to be simulated.}
 
 \item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values, where d is the number
@@ -65,6 +67,8 @@ The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-St
          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
          paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
 }
 \seealso{

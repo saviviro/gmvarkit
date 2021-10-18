@@ -35,7 +35,7 @@
 #'  0.083, 0.299, 0.215, 0.002, 0.03, 0.484, 0.072, 0.218, 0.02, -0.119,
 #'   0.722, 0.093, 0.032, 0.044, 0.191, 1.101, -0.004, 0.105, 0.58)
 #' mod22 <- GSMVAR(gdpdef, p=2, M=2, d=2, params=params22)
-#' p1 <- predict(mod22, n_ahead=10, pred_type="median", n_simu=500)
+#' p1 <- predict(mod22, n_ahead=10, pred_type="median", nsim=500)
 #' p1
 #' p2 <- predict(mod22, n_ahead=10, nt=20, lty=1, nsim=500)
 #' p2

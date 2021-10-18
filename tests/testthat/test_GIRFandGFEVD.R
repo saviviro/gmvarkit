@@ -14,16 +14,17 @@ mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W22)
 mod22ts <- GSMVAR(gdpdef, p=2, M=2, params=c(params22s, 20, 30), model="StMVAR", structural_pars=list(W=W22))
 mod22gss <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=c(params22s, 30), model="G-StMVAR", structural_pars=list(W=W22))
 
-girf1 <- GIRF(mod22s, N=2, R2=2, R1=2, seeds=1:2, plot=FALSE)
+girf1 <- GIRF(mod22s, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
 girf2 <- GIRF(mod22s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
-              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot=FALSE)
-girf3 <- GIRF(mod22s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot=FALSE)
-girf4 <- GIRF(mod22s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot=FALSE)
+              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
+girf3 <- GIRF(mod22s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot_res=FALSE)
+girf4 <- GIRF(mod22s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot_res=FALSE)
 
-girf5 <- GIRF(mod22ts, N=2, R2=2, R1=2, seeds=1:2, plot=FALSE)
+girf5 <- GIRF(mod22ts, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
 girf6 <- GIRF(mod22ts, which_shocks=1, shock_size=1, N=1, R2=1, R1=1, seeds=1, which_cumulative=2,
-              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot=FALSE)
-girf7 <- GIRF(mod22gss, N=10, R2=6, R1=2, scale=c(2, 2, -1), seeds=1:6, plot=FALSE)
+              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
+girf7 <- GIRF(mod22gss, N=10, R2=6, R1=2, scale=c(2, 2, -1), seeds=1:6, plot_res=FALSE)
+girf8 <- GIRF(mod22gss, N=10, R2=5, R1=2, scale=c(1, 2, 0.3), scale_type="peak", seeds=1:5, plot_res=FALSE)
 
 
 
@@ -58,6 +59,11 @@ test_that("GIRF works correctly", {
   expect_equal(unname(girf7$girf_res[[2]]$point_est[11,]), c(-4.954503, 4.005653, -5.886440, 5.886440), tolerance=1e-4)
   expect_equal(unname(girf7$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.01271137, -0.15835522, -0.07584107, -0.17535997), tolerance=1e-4)
   expect_equal(unname(girf7$girf_res[[2]]$conf_ints[10, 4, ]), c(1.06440367, 15.01354442, -0.08135584, 10.13226946), tolerance=1e-4)
+
+  expect_equal(unname(girf8$girf_res[[1]]$point_est[11,]), c(0.17977678, -0.03994763, 0.01449259, -0.01449259), tolerance=1e-4)
+  expect_equal(unname(girf8$girf_res[[2]]$point_est[11,]), c(0.12182618, -0.09861772, 0.09722857, -0.09722857), tolerance=1e-4)
+  expect_equal(unname(girf8$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.008862332, -0.260877400, -0.355479659, -0.269946781), tolerance=1e-4)
+  expect_equal(unname(girf8$girf_res[[2]]$conf_ints[10, 4, ]), c(0.284564352, -0.006810979, 0.252877297, -0.007056435), tolerance=1e-4)
 })
 
 

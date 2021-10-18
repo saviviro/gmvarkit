@@ -234,8 +234,9 @@ The first plot displays the time series together with estimated mixing weights.
 
 \section{About S3 methods}{
 
-  Only the \code{print} method is available if data is not provided.
-  If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
+  If data is not provided, only the \code{print} and \code{simulate} methods are available.
+  If data is provided, then in addition to the ones listed above, \code{predict} method is also available.
+  See \code{?simulate.gsmvar} and \code{?predict.gsmvar} for details about the usage.
 }
 
 \examples{
@@ -291,5 +292,6 @@ mod22s
 }
 \seealso{
 \code{\link{fitGSMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}},
-  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{update_numtols}}
+  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{reorder_W_columns}},
+  \code{\link{swap_W_signs}}, \code{\link{update_numtols}}
 }

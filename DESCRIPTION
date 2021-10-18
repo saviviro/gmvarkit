@@ -1,14 +1,15 @@
 Package: gmvarkit
-Title: Estimate Gaussian Mixture Vector Autoregressive Model
+Title: Estimate Gaussian or Student's t Mixture Vector Autoregressive Model
 Version: 2.0.0
 Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
 Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
-    Gaussian mixture vector autoregressive (GMVAR) model, quantile residual tests, graphical diagnostics,
+    Gaussian mixture vector autoregressive, Student's t mixture vector autoregressive, and Gaussian and Student's t
+    mixture vector autoregresive models, quantile residual tests, graphical diagnostics,
     simulations, forecasting, and estimation of generalized impulse response function and generalized 
     forecast error variance decomposition.
     Leena Kalliovirta, Mika Meitz, Pentti Saikkonen (2016) <doi:10.1016/j.jeconom.2016.02.012>,
     Savi Virolainen (2020) <arXiv:2007.04713>,
-    Savi Virolainen (2021) <arXiv:arXiv:2109.13648>.
+    Savi Virolainen (2021) <arXiv:2109.13648>.
 Depends: R (>= 3.6.0)
 License: GPL-3
 Encoding: UTF-8

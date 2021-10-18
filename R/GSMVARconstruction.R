@@ -23,10 +23,12 @@
 #'   Note that the first autocovariance/correlation matrix in \code{$uncond_moments} is for the lag zero,
 #'   the second one for the lag one, etc.
 #' @section About S3 methods:
-#'   Only the \code{print} method is available if data is not provided.
-#'   If data is provided, then in addition to the ones listed above, the \code{predict} method is also available.
+#'   If data is not provided, only the \code{print} and \code{simulate} methods are available.
+#'   If data is provided, then in addition to the ones listed above, \code{predict} method is also available.
+#'   See \code{?simulate.gsmvar} and \code{?predict.gsmvar} for details about the usage.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{add_data}}, \code{\link{swap_parametrization}}, \code{\link{GIRF}},
-#'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{update_numtols}}
+#'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{reorder_W_columns}},
+#'   \code{\link{swap_W_signs}}, \code{\link{update_numtols}}
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -218,6 +220,8 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2109.13648.
 #'  }
 #' @examples
 #' # GMVAR(1, 2), d=2 model:
@@ -398,7 +402,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #'   two-regime reduced form GMVAR, StMVAR, or G-StMVAR model, with the main diagonal of the B-matrix normalized to be
 #'   positive.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
-#'  \code{\link{swap_W_signs}}
+#'  \code{\link{swap_W_signs}}, \code{\link{stmvar_to_gstmvar}}
 #' @references
 #'  \itemize{
 #'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
@@ -406,6 +410,8 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2109.13648.
 #'  }
 #' @examples
 #' \donttest{
@@ -514,7 +520,7 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #' @return Returns an object of class \code{'gsmvar'} defining a G-StMVAR model based on the provided StMVAR (or G-StMVAR)
 #'   model with the regimes that had large degrees of freedom parameters changed to GMVAR type.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
-#'  \code{\link{swap_W_signs}}
+#'  \code{\link{swap_W_signs}}, \code{\link{gsmvar_to_sgsmvar}}
 #' @references
 #'  \itemize{
 #'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
@@ -619,7 +625,7 @@ stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df
 #' @return Returns an object of class \code{'gsmvar'} defining a structural GMVAR, StMVAR, or G-StMVAR model with the modified
 #'   structural parameters and constraints.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{gsmvar_to_sgsmvar}},
-#'  \code{\link{swap_W_signs}}
+#'  \code{\link{stmvar_to_gstmvar}}, \code{\link{swap_W_signs}}
 #' @inherit in_paramspace_int references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -703,7 +709,7 @@ reorder_W_columns <- function(gsmvar, perm) {
 #' @return Returns an object of class \code{'gsmvar'} defining a structural GMVAR, StMVAR, or G-StMVAR model with the modified
 #'   structural parameters and constraints.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
-#'  \code{\link{gsmvar_to_sgsmvar}}
+#'  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}
 #' @inherit reorder_W_columns references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
@@ -786,7 +792,7 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
 #' @return Returns an object of class \code{'gsmvar'} defining a structural GSMVAR model with the modified
 #'   structural parameters and constraints.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
-#'  \code{\link{gsmvar_to_sgsmvar}}
+#'  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}
 #' @inherit reorder_W_columns references
 #' @examples
 #' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:

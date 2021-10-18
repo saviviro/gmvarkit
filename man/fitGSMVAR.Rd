@@ -157,7 +157,7 @@ If you wish to estimate a structural model without overidentifying constraints t
 \section{S3 methods}{
 
   The following S3 methods are supported for class \code{'gsmvar'}: \code{logLik}, \code{residuals}, \code{print}, \code{summary},
-   \code{predict} and \code{plot}.
+   \code{predict}, \code{simulate}, and \code{plot}.
 }
 
 \examples{
@@ -231,12 +231,14 @@ fit22c2
          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
 }
 \seealso{
 \code{\link{GSMVAR}}, \code{\link{iterate_more}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{predict.gsmvar}},
   \code{\link{profile_logliks}}, \code{\link{simulate.gsmvar}}, \code{\link{quantile_residual_tests}}, \code{\link{print_std_errors}},
   \code{\link{swap_parametrization}}, \code{\link{get_gradient}}, \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{LR_test}},
-  \code{\link{Wald_test}}, \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}},
-  \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
+  \code{\link{Wald_test}}, \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}, \code{\link{reorder_W_columns}},
+   \code{\link{swap_W_signs}}, \code{\link{cond_moment_plot}}, \code{\link{update_numtols}}
 }

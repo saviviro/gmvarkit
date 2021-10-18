@@ -58,10 +58,12 @@ mod22s # The same model
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
  @keywords internal
 }
 \seealso{
 \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{GIRF}}, \code{\link{reorder_W_columns}},
- \code{\link{gsmvar_to_sgsmvar}}
+ \code{\link{gsmvar_to_sgsmvar}}, \code{\link{stmvar_to_gstmvar}}
 }

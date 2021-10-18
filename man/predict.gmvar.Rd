@@ -25,6 +25,8 @@ grid to the figure.}
 
 \item{n_ahead}{how many steps ahead should be predicted?}
 
+\item{n_simu}{to how many independent simulations should the forecast be based on?}
+
 \item{pi}{a numeric vector specifying the confidence levels of the prediction intervals.}
 
 \item{pi_type}{should the prediction intervals be "two-sided", "upper", or "lower"?}
@@ -62,6 +64,8 @@ Returns a class '\code{gsmvarpred}' object containing, among the specifications,
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
  @keywords internal
 }

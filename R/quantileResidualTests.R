@@ -5,6 +5,7 @@
 #'  and normality.
 #'
 #' @inheritParams loglikelihood_int
+#' @inheritParams get_test_Omega
 #' @param gsmvar an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.
 #' @param lags_ac a positive integer vector specifying the lags used to test autocorrelation.
 #' @param lags_ch a positive integer vector specifying the lags used to test conditional heteroskedasticity.
@@ -48,7 +49,7 @@
 #' }
 #' @export
 
-quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsim=1, print_res=TRUE,
+quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsim=1, ncores=2, print_res=TRUE,
                                     stat_tol, posdef_tol, df_tol) {
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
@@ -91,9 +92,10 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
                                    constraints=gsmvar$model$constraints,
                                    same_means=gsmvar$model$same_means,
                                    structural_pars=gsmvar$model$structural_pars,
-                                   g=g, dim_g=dim_g, stat_tol=stat_tol,
+                                   g=g, dim_g=dim_g, ncores=ncores, stat_tol=stat_tol,
                                    posdef_tol=posdef_tol, df_tol=df_tol),
                     error=function(e) {
+                      print(e)
                       print_message(which_test, which_lag, because_of="because of numerical problems")
                       return(NA)
                     })
@@ -130,6 +132,9 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
       cat(" ", format_value0(lag), "| ", format_value3(p_val), "\n")
     }
   }
+
+  # Print information about the parallel computing procedure
+  message(paste("Using", ncores, "cores to calculate the tests..."), "\n")
 
   ######################
   # Test for normality # (Kalliovirta and Saikkonen 2010, sec. 3.3)
@@ -236,12 +241,13 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
 #' @inheritParams loglikelihood
 #' @param g function g specifying the transformation.
 #' @param dim_g output dimension of the transformation \code{g}.
+#' @param ncores the number of CPU cores to be used in numerical differentiation
 #' @return Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen 2010}.
 #' @inherit quantile_residuals references
 #' @keywords internal
 
 get_test_Omega <- function(data, p, M, params, model, conditional, parametrization, constraints, same_means, structural_pars=NULL,
-                           g, dim_g, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                           g, dim_g, ncores=2, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   n_obs <- nrow(data)
   T_obs <- n_obs - p
@@ -273,14 +279,14 @@ get_test_Omega <- function(data, p, M, params, model, conditional, parametrizati
   T0 <- nrow(g_qres)
 
   # Calculate matrix G (Kalliovirta ja Saikkonen 2010, s.13)
-  dg <- array(dim=c(T0, dim_g, npars))
-  for(i1 in 1:npars) {
-    dg[, , i1] <- central_diff(params, g_fn, i1)
-  }
+  dg <- array(simplify2array(parallel::mclapply(1:npars, function(i1) central_diff(params, g_fn, i1),
+                             mc.cores=ncores, mc.cleanup=TRUE)), dim=c(T0, dim_g, npars)) # [T0, dim_g, npars]
   G <- colMeans(dg)
 
-  # Calculate gradients of the terms l_t # TÄNNE PBAPPLY MULTICORE JA SITÄ ENNEN SOPIVA PRINTOUTTI KUTSUVASSA FUNKTIOSSA
-  dl <- vapply(1:npars, function(i1) central_diff(params, loglik_fn, i1), numeric(T_obs)) # (T x npars)
+
+  # Calculate gradients of the terms l_t
+   dl <- simplify2array(parallel::mclapply(1:npars, function(i1) central_diff(params, loglik_fn, i1),
+                                           mc.cores=ncores, mc.cleanup=TRUE)) # (T x npars)
 
   # Approximate Fisher information matrix, calculate Psi matrix and H matrix
   diff0 <- nrow(dl) - T0

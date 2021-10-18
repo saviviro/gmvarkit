@@ -19,10 +19,11 @@ GIRF(
   init_values = NULL,
   which_cumulative = numeric(0),
   scale = NULL,
+  scale_type = c("instant", "peak"),
   ci = c(0.95, 0.8),
   include_mixweights = TRUE,
   ncores = 2,
-  plot = TRUE,
+  plot_res = TRUE,
   seeds = NULL,
   ...
 )
@@ -76,14 +77,19 @@ mixture distribution specifed by the argument \code{init_regimes}.}
 responses should be cumulative. Default is none.}
 
 \item{scale}{should the GIRFs to some of the shocks be scaled so that they
-correspond to a specific magnitude of instantaneous movement of some specific
-variable? Provide a length three vector where the shock of interest
+correspond to a specific magnitude of instantaneous or peak response
+of some specific variable (see the argument \code{scale_type})?
+Provide a length three vector where the shock of interest
 is given in the first element (an integer in \eqn{1,...,d}), the variable of
 interest is given in the second element (an integer in \eqn{1,...,d}), and
-the magnitude of its instantaneous movement (a non-zero real number) in the
-third element. If the GIRFs of multiple shocks should be scaled, provide
+the magnitude of its instantaneous or peak response (a non-zero real number)
+in the third element. If the GIRFs of multiple shocks should be scaled, provide
 a matrix which has one column for each of the shocks with the columns being
 the length three vectors described above.}
+
+\item{scale_type}{If argument \code{scale} is specified, should the GIRFs be
+scaled to match an instantaneous response \code{"instant"} or peak response
+\code{"peak"}? Ignored if \code{scale} is not specified.}
 
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
 confidence levels of the confidence intervals.}
@@ -95,7 +101,7 @@ calculated for the mixing weights as well? \code{TRUE} or \code{FALSE}.}
 single core computing is supported if an initial value is specified (and
 the GIRF won't thus be estimated multiple times).}
 
-\item{plot}{\code{TRUE} if the results should be plotted, \code{FALSE} if
+\item{plot_res}{\code{TRUE} if the results should be plotted, \code{FALSE} if
 not.}
 
 \item{seeds}{a length \code{R2} vector containing the random number generator
@@ -197,6 +203,8 @@ The model needs to be structural in order for this function to be
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
  @keywords internal
 }

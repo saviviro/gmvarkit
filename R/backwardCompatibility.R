@@ -227,9 +227,9 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
 #' @inherit simulate.gsmvar details return references
 #' @export
 
-simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
+simulateGMVAR <- function(gmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, seed=NULL, girf_pars=NULL) {
   .Deprecated("simulate.gsmvar")
-  gsmvar <- gmvar_to_gsmvar(gsmvar)
+  gsmvar <- gmvar_to_gsmvar(gmvar)
   simulate.gsmvar(object=gsmvar, nsim=nsimu, seed=seed, init_values=init_values,
                   ntimes=ntimes, drop=drop, girf_pars=girf_pars)
 }
@@ -243,6 +243,7 @@ simulateGMVAR <- function(gsmvar, nsimu, init_values=NULL, ntimes=1, drop=TRUE, 
 #'
 #' @inheritParams predict.gsmvar
 #' @param object an object of class 'gmvar'
+#' @param n_simu to how many independent simulations should the forecast be based on?
 #' @seealso \code{\link{predict.gsmvar}}
 #' @inherit predict.gsmvar details return references
 #' @export

@@ -197,6 +197,8 @@ loglikelihood(data=gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_
          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
          paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
 }
 \seealso{

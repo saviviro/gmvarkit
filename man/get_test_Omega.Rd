@@ -9,6 +9,7 @@ get_test_Omega(
   p,
   M,
   params,
+  model,
   conditional,
   parametrization,
   constraints,
@@ -16,8 +17,10 @@ get_test_Omega(
   structural_pars = NULL,
   g,
   dim_g,
+  ncores = 2,
   stat_tol = 0.001,
-  posdef_tol = 1e-08
+  posdef_tol = 1e-08,
+  df_tol = 1e-08
 )
 }
 \arguments{
@@ -105,6 +108,9 @@ a univariate time series. \code{NA} values are not supported.}
 
   The notation is similar to the cited literature.}
 
+\item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
+are GMVAR type and the rest \code{M2} components are StMVAR type.}
+
 \item{conditional}{a logical argument specifying whether the conditional or exact log-likelihood function
 should be used.}
 
@@ -146,6 +152,8 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{dim_g}{output dimension of the transformation \code{g}.}
 
+\item{ncores}{the number of CPU cores to be used in numerical differentiation}
+
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
 tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
@@ -154,6 +162,9 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
 Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen 2010}.

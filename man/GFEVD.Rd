@@ -172,6 +172,8 @@ The model needs to be structural in order for this function to be applicable. A 
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+     paper, available as arXiv:2109.13648.
  }
 }
 \seealso{

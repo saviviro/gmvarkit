@@ -27,14 +27,18 @@
 #'   (\code{d=ncol(data)}) specifying which the variables for which the impulse
 #'   responses should be cumulative. Default is none.
 #' @param scale should the GIRFs to some of the shocks be scaled so that they
-#'   correspond to a specific magnitude of instantaneous movement of some specific
-#'   variable? Provide a length three vector where the shock of interest
+#'   correspond to a specific magnitude of instantaneous or peak response
+#'   of some specific variable (see the argument \code{scale_type})?
+#'   Provide a length three vector where the shock of interest
 #'   is given in the first element (an integer in \eqn{1,...,d}), the variable of
 #'   interest is given in the second element (an integer in \eqn{1,...,d}), and
-#'   the magnitude of its instantaneous movement (a non-zero real number) in the
-#'   third element. If the GIRFs of multiple shocks should be scaled, provide
+#'   the magnitude of its instantaneous or peak response (a non-zero real number)
+#'   in the third element. If the GIRFs of multiple shocks should be scaled, provide
 #'   a matrix which has one column for each of the shocks with the columns being
 #'   the length three vectors described above.
+#' @param scale_type If argument \code{scale} is specified, should the GIRFs be
+#'   scaled to match an instantaneous response \code{"instant"} or peak response
+#'   \code{"peak"}? Ignored if \code{scale} is not specified.
 #' @param ci a numeric vector with elements in \eqn{(0, 1)} specifying the
 #'   confidence levels of the confidence intervals.
 #' @param include_mixweights should the generalized impulse response be
@@ -42,7 +46,7 @@
 #' @param ncores the number CPU cores to be used in parallel computing. Only
 #'   single core computing is supported if an initial value is specified (and
 #'   the GIRF won't thus be estimated multiple times).
-#' @param plot \code{TRUE} if the results should be plotted, \code{FALSE} if
+#' @param plot_res \code{TRUE} if the results should be plotted, \code{FALSE} if
 #'   not.
 #' @param seeds a length \code{R2} vector containing the random number generator
 #'   seed for estimation of each GIRF. A single number of an initial value is
@@ -117,8 +121,10 @@
 #' @export
 
 GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:sum(gsmvar$model$M), init_values=NULL,
-                 which_cumulative=numeric(0), scale=NULL, ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2,
-                 plot=TRUE, seeds=NULL, ...) {
+                 which_cumulative=numeric(0), scale=NULL, scale_type=c("instant", "peak"), ci=c(0.95, 0.80),
+                 include_mixweights=TRUE, ncores=2,
+                 plot_res=TRUE, seeds=NULL, ...) {
+  scale_type <- match.arg(scale_type)
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   p <- gsmvar$model$p
   M <- sum(gsmvar$model$M)
@@ -150,7 +156,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
     # For the considered shocks, check that there are not zero-constraints for the variable whose initial response is scaled.
     for(i1 in 1:ncol(scale)) {
-      if(gsmvar$model$structural_pars$W[scale[2, i1], scale[1, i1]] == 0) {
+      if(!is.na(gsmvar$model$structural_pars$W[scale[2, i1], scale[1, i1]]) && gsmvar$model$structural_pars$W[scale[2, i1], scale[1, i1]] == 0) {
         stop(paste("Instantaneous response of the variable that has a zero constraint for the considered shock cannot be scaled"))
       }
     }
@@ -204,19 +210,26 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
         res_in_array[, i2, ] <- apply(res_in_array[, i2, , drop=FALSE], MARGIN=3, FUN=cumsum) # Replace GIRF with cumulative GIRF
       }
     }
+
+    # Scale the GIRFs if specified
     if(which_shocks[i1] %in% scale[1,]) { # GIRF of this shock should be scaled
       which_col <- which(which_shocks[i1] == scale[1,]) # which column of the scale-matrix contains the argument for this specific shock
-      which_var <- scale[2, which_col] # According to initial response of which variable the GIRFs should be scaled
-      init_magnitude <- scale[3, which_col] # What should be the magnitude of the initial response of this variable
+      which_var <- scale[2, which_col] # According to initial/peak response of which variable the GIRFs should be scaled
+      magnitude <- scale[3, which_col] # What should be the magnitude of the initial/peak response of this variable
 
-      # The scaling scalar is different for each MC repetition, because the instantaneous movement is generally
-      # different with different starting values.
-      scales <- init_magnitude/res_in_array[1, which_var, ] # Scale for each MC repetition
       for(i2 in 1:R2) { # Go through the MC repetitions
-        res_in_array[, , i2] <- scales[i2]*res_in_array[, , i2]
+        if(scale_type == "instant") {  # Scale by initial response
+          # The scaling scalar is different for each MC repetition, because the instantaneous movement is generally
+          # different with different starting values.
+          one_scale <- magnitude/res_in_array[1, which_var, i2]
+        } else {  # scale_type == "peak", scale by peak response
+          one_scale <- magnitude/res_in_array[which(res_in_array[, which_var, i2] == max(res_in_array[, which_var, i2])), which_var, i2]
+        }
+        res_in_array[, , i2] <- one_scale*res_in_array[, , i2]
       }
     }
 
+    # Point estimates, confidence intervals
     colnames(res_in_array) <- colnames(GIRF_shocks[[1]][[1]])
     point_estimate <- apply(X=res_in_array, MARGIN=1:2, FUN=mean)
     lower <- (1 - ci)/2
@@ -245,7 +258,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
                         seeds=seeds,
                         gsmvar=gsmvar),
                    class="girf")
-  if(plot) plot(ret, ...)
+  if(plot_res) plot(ret, ...)
   ret
 }
 
@@ -301,6 +314,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+#'      paper, available as arXiv:2109.13648.
 #'  }
 #' @examples
 #'  \donttest{

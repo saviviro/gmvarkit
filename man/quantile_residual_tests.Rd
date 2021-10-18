@@ -15,10 +15,12 @@ quantile_residual_tests(
   gsmvar,
   lags_ac = c(1, 3, 6, 12),
   lags_ch = lags_ac,
-  nsimu = 1,
+  nsim = 1,
+  ncores = 2,
   print_res = TRUE,
   stat_tol,
-  posdef_tol
+  posdef_tol,
+  df_tol
 )
 }
 \arguments{
@@ -34,9 +36,11 @@ quantile_residual_tests(
 
 \item{lags_ch}{a positive integer vector specifying the lags used to test conditional heteroskedasticity.}
 
-\item{nsimu}{to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
+\item{nsim}{to how many simulations should the covariance matrix Omega used in the qr-tests be based on?
 If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
 of simulations might improve the tests size properties but it increases the computation time.}
+
+\item{ncores}{the number of CPU cores to be used in numerical differentiation}
 
 \item{print_res}{should the test results be printed while computing the tests?}
 
@@ -48,6 +52,9 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
+
+\item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
+freedom parameters are not larger than \code{2 + df_tol}.}
 }
 \value{
 Returns an object of class \code{'qrtest'} which has its own print method. The returned object
@@ -86,14 +93,14 @@ plot(qrtests32)
 
 # Structural GMVAR(1,2) model identified with sign
 # constraints and build with hand-specified parameter values.
-# Tests based on simulation procedure with nsimu=1000:
+# Tests based on simulation procedure with nsim=1000:
 params12s <- c(0.55, 0.112, 0.619, 0.173, 0.344, 0.055, -0.009, 0.718,
  0.255, 0.017, -0.136, 0.858, 0.541, 0.057, -0.162, 0.162, 3.623,
  4.726, 0.674)
 W_12 <- matrix(c(1, 1, -1, 1), nrow=2)
 mod12s <- GSMVAR(gdpdef, p=1, M=2, params=params12s,
                 structural_pars=list(W=W_12))
-qrtests12s <- quantile_residual_tests(mod12s, nsimu=1000)
+qrtests12s <- quantile_residual_tests(mod12s, nsim=1000)
 qrtests12s
 }
 }
