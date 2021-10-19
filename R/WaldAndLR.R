@@ -59,6 +59,7 @@
 #' @export
 
 Wald_test <- function(gsmvar, A, c, h=6e-6) {
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   params <- gsmvar$params
   stopifnot(is.matrix(A) && ncol(A) == length(params) && nrow(A) <= ncol(A))
   stopifnot(length(c) == nrow(A))
@@ -164,6 +165,9 @@ Wald_test <- function(gsmvar, A, c, h=6e-6) {
 #' @export
 
 LR_test <- function(gsmvar1, gsmvar2) {
+  gsmvar1 <- gmvar_to_gsmvar(gsmvar1) # Backward compatibility
+  gsmvar2 <- gmvar_to_gsmvar(gsmvar2) # Backward compatibility
+
   check_gsmvar(gsmvar1, object_name="gsmvar1")
   check_gsmvar(gsmvar2, object_name="gsmvar2")
   stopifnot(length(gsmvar1$params) > length(gsmvar2$params))
