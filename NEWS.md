@@ -149,4 +149,5 @@
 * In the method predict.gsmvar, changed the argument name n_simu to nsim, since nsim is now used in the simulation method as well.
 * Changed the argument name nsimu to nsim in quantile_residual_tests as well, so that the argument name is the same as in the predict and simulate methods (while this specific name was required by CRAN compatibility in the simulation method). 
 * Fixed a bug in the argument scale of the function GIRF. Fixed also a bug that caused an error in some cases.
+* Now the plot method for class 'gsmvar' objects enables to plot only a single figure: series plot or density plot.
 * Note that this version might produce different results with the same random number generator seed than the previous versions.
