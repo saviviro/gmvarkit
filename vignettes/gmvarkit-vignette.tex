@@ -76,6 +76,8 @@ We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for es
 
 
 \section{Introduction}
+\textbf{If you came to read this vignette because you have trouble with the estimation, see Section~\ref{sec:example_estim}}.
+
 Linear vector autoregressive (VAR) model is a standard tool in time series econometrics. It can be employed to answer questions about the statistical relationships of different variables or to forecast future values of the process, for example. Structural VAR model allows to trace out the effects of economic shocks that have been identified by the researcher. With an appropriate choice of the autoregressive order $p$, a linear VAR is often able to filter out autocorrelation from the series very well. If the errors are assumed to follow an autoregressive conditional heteroskedasticity (ARCH) process, the model is often able to also filter out conditional heteroskedasticity from the series.
 
 In some cases, linear VAR models are not, however, not capable to capture all the relevant characteristics of the series. This includes shifts in the mean or volatility, and changes in the autoregressive dynamics of the process. Such nonlinear features frequently occur in economic time series when the underlying data generating dynamics vary in time, for example, depending the specific state of the economy. Various types of time series models capable of capturing such regime-switching behavior have been proposed, one of them being the class of mixture models introduced by \cite{Le+Martin+Raftery:1996} and further developed by, among others, \cite{Kalliovirta+Meitz+Saikkonen:2015}, \cite{Kalliovirta+Meitz+Saikkonen:2015}, \cite{Meitz+Preve+Saikkonen:2021}, \cite{Virolainen:2020}, and \cite{Virolainen:2021, Virolainen2:2021}. Following the recent developments by \cite{Kalliovirta+Meitz+Saikkonen:2016}, \cite{Virolainen:2020}, and \cite{Virolainen2:2021}, we consider the Gaussian mixture vector autoregressive (GMVAR) model, the Student's $t$ mixture vector autoregressive (StMVAR) model, and the Gaussian and Student's $t$ mixture autoregressive (G-StMVAR) model. These three models constitute an appealing family of mixture vector autoregressive models that we call the GSMVAR models.
@@ -89,7 +91,6 @@ The model parameters are estimated by running multiple rounds of a two-phase est
 The remainder of this paper is organized as follows... %Section~\ref{sec:models} introduces the GSMVAR models and discusses some of their properties. Section~\ref{sec:estimation} discusses estimation of the model parameters and model selection. It also illustrates how the GSMVAR models can be estimated and examined with \pkg{gmvarkit}, and how parameter constraints can be tested. In Section~\ref{sec:qres}, we describe quantile residuals and demonstrate how they can be utilized to evaluate model adequacy in \pkg{gmvarkit}. Section~\ref{sec:GSMAR} shows how the GSMAR models can be built with given parameter values. In Section~\ref{sec:simufore}, we first show how to simulate observations from a GSMAR process, and then we illustrate how to forecast future values of a GSMAR process with a simulation-based Monte Carlo method. Section~\ref{sec:summary} concludes and collects some useful functions in \pkg{uGMAR} to a single table for convenience. Appendix~\ref{sec:simuexp} explains why some maximum likelihood estimates, that are very near the boundary of the parameter space, might be inappropriate and demonstrates that a local maximum point that is clearly in the interior of the parameter space can often be a more reasonable estimate. Finally, Appendix~\ref{sec:qresexpr} derives closed form expressions for the quantile residuals of the GSMAR models.
 
 Throughout this paper, we illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. We deploy the notation $n_d(\boldsymbol{\mu},\boldsymbol{\Gamma})$ for the $d$-dimensional normal distribution with mean $\boldsymbol{\mu}$ and (positive definite) covariance matrix $\boldsymbol{\Gamma}$, and $t_d(\boldsymbol{\mu},\boldsymbol{\Gamma},\nu)$ for the $d$-dimensional $t$-distribution with mean $\boldsymbol{\mu}$, (positive definite) covariance matrix $\boldsymbol{\Gamma}$, and $\nu>2$ degrees of freedom. The corresponding density functions are denoted as $n_d(\cdot;\boldsymbol{\mu},\boldsymbol{\Gamma})$ and $t_d(\cdot;\boldsymbol{\mu},\boldsymbol{\Gamma},\nu)$, respectively. By $\boldsymbol{1}_p=(1,...,1)$ ($p \times 1$), we denote $p$-dimensional vector of ones.
-
 
 \section{Models}\label{sec:models}
 This section introduces the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021}, a family of mixture vector autoregressive models that we call the GSMVAR models. First, we define the component processes of the GSMVAR models - linear VARs based on either Gaussian or Student's $t$ distribution. Then, we introduce the reduced form GSMVAR models. For brevity, we only give the definition of the more general G-StMVAR model but explain how the GMVAR and StMVAR models are obtained as special cases of it, namely, by taking all the component models to be of either Gaussian or Student's $t$ type. After defining the reduced form GSMVAR model, we introduce structural version of the models incorporating statistically identified structural shocks. Identification of the shocks is also briefly discussed.
@@ -364,13 +365,15 @@ Finding the ML estimate amounts maximizing the log-likelihood function (\ref{eq:
 The genetic algorithm in \pkg{gmvarkit} is, at core, mostly based on the description by \cite{Dorsey+Mayer:1995} but several modifications have been deployed to improve its performance. The modifications include the ones proposed by \cite{Patnaik+Srinivas:1994} and \cite{Smith+Dike+Stegmann:1995} as well as further adjustments that take into account model specific issues related to the mixing weights' dependence on the preceding observations. For a more detailed description of the genetic algorithm and its modifications, see \citet[Appendix A]{Virolainen:2021}, where the genetic algorithm is discussed in the univariate context. After running the genetic algorithm, the estimation is finalized with a variable metric algorithm \cite[algorithm 21, implemented by \citealp{R}]{Nash:1990} using central difference approximation for the gradient of the log-likelihood function.
 
 \subsection{Examples of unconstrained estimation}\label{sec:example_estim}
-In this section, we demonstrate how to estimate GSMVAR models with \pkg{gmvarkit} and provide several examples in order to illustrate various frequently occurring situations. In addition to the ordinary estimation, we particularly show how a GSMVAR model can be built based on a local-only maximum point when the ML estimate seems unreasonable. We also consider the estimation of the appropriate G-StMVAR model when the estimated StMVAR model contains overly large degrees of freedom estimates \citep[see the related discussion in][]{Virolainen2:2021}. In the examples, we only consider $p=1$ models for simplicity and because then the code outputs fit in the margins, estimation times are shorter, etc.
+In this section, we demonstrate how to estimate GSMVAR models with \pkg{gmvarkit} and provide several examples in order to illustrate various frequently occurring situations. In addition to the ordinary estimation, we particularly show how a GSMVAR model can be built based on a local-only maximum point when the ML estimate seems unreasonable. We also consider the estimation of the appropriate G-StMVAR model when the estimated StMVAR model contains overly large degrees of freedom estimates \citep[see the related discussion in][]{Virolainen2:2021}. In the examples, we only consider $p=1$ models for simplicity and because then the code outputs fit in the margins better, estimation times are shorter, etc. This order may not be best in the modeling perspective, however.
 
 In \pkg{gmvarkit}, the GSMVAR models are defined as class \code{gsmvar} S3 objects, which can be created with given parameter values using the constructor function \code{GSMVAR} (see Section~\ref{sec:GSMVAR}) or by using the estimation function \code{fitGSMVAR}, which estimates the parameters and then builds the model. For estimation, \code{fitGSMVAR} needs to be supplied with a univariate time series and the arguments specifying the model. The necessary arguments for specifying the model include the autoregressive order \code{p}, the number of mixture components \code{M}, and \code{model}, which should be either \code{"GMVAR"}, \code{"StMVAR"}, or \code{"G-StMVAR"}. For GMVAR and StMVAR models, the argument \code{M} is a positive integer, whereas for the G-StMVAR model it is a length two numeric vector specifying the number of GMVAR type regimes in the first element and the number of StMVAR type regimes in the second.
 
 Additional arguments may be supplied to \code{fitGSMVAR} in order to specify, for example, whether the exact log-likelihood function should be used instead of the conditional one (\code{conditional}), how many estimation rounds should be performed (\code{ncalls}), and how many central processing unit (CPU) cores should be used in the estimation (\code{ncores}). Some of the estimation rounds may end up in local-only maximum points or saddle points, but reliability of the estimation results can be improved by increasing the number of estimation rounds. A large number of estimation rounds may be required particularly when the number of mixture components is large, as the surface of the log-likelihood function becomes increasingly more challenging. It is also possible to adjust the settings of the genetic algorithm that is used to find the starting values. The available options are listed in the documentation of the function \code{GAfit} to which the arguments adjusting the settings will be passed. \textbf{In general, we recommend being conservative with choice of M due to the identifation problems induced if the number of regimes is chosen too large. Also, estimation of models that contain more than two regimes can be extremely challenging.}
 
-We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) this model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing two estimation rounds with two CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only two estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, almost all the estimation rounds end up to the MLE, however).
+\textbf{Another important thing to know about estimation is that the estimation algorithm performs very poorly if some of the AR coefficients very large, signifcantly larger than one. This means that you need scale each component time series so that they vary approximately in the same magnite. For instance, typically in macroeconomic time series, log-differences should be multiplied by hundred. You can try out different scales and estimate a simple linear VAR with your favourite package to see whether the AR coeffients are in a reasonable range.}
+
+We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) this model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing two estimation rounds with two CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only two estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, almost all the estimation rounds end up to the MLE anyway, though).
 
 The argument \code{seeds} supplies the seeds that initialize the random number generator at the beginning of each call to the genetic algorithm, thereby yielding reproducible results.
 %
@@ -453,7 +456,7 @@ The parameter estimates are reported for each mixture component separately so th
 \begin{equation}
 y_t = \varphi_{m,0} + A_{m,1}y_{t - 1} + ... + A_{m,p}y_{t - p} + \Omega_{m,t}^{1/2}\varepsilon_{m,t}.
 \end{equation}
-If $\Omega_{m,t}^{1/2}$ is time varying, it printed in the form $\Omega_{m,t}^{1/2}=(\text{arch\_scalar_{m,t}}\Omega_m)^{1/2}$ where the arch\_scalar is the square root of $\sigma_{m,t}^2$ which is defined in (\ref{eq:sigma_mt}). No numerical value is given to the ARCH scalar, as it is time-varying. The other statistics are listed above the formula, including the mixing weight pameter $\alpha_m$, the unconditional mean $\mu_m$, and the degrees freedom parameter $\nu_m$.
+If $\Omega_{m,t}^{1/2}$ is time varying, it printed in the form $\Omega_{m,t}^{1/2}=(\text{arch}_{m,t}\Omega_m)^{1/2}$ where $\text{arch}_{m,t}$ is the square root of $\sigma_{m,t}^2$ which is defined in (\ref{eq:sigma_mt}). No numerical value is given to the ARCH scalar, as it is time-varying. The other statistics are listed above the formula, including the mixing weight pameter $\alpha_m$, the unconditional mean $\mu_m$, and the degrees freedom parameter $\nu_m$.
 
 The above printout shows that the second regime's degrees of freedom parameter estimate is very large, which might induce numerical problems. However, since a StMVAR model with some degrees of freedom parameters tending to infinity coincides with the G-StMVAR model with the corresponding regimes switched to GMVAR type, one may avoid the problems by switching to the appropriate G-StMVAR model \citep[see][]{Virolainen2:2021}. Switching to the appropriate G-StMVAR model is recommended also because it removes the redundant degrees of freedom parameters from the model, thereby reducing its complexity. The function \code{stmvar_to_gstmvar} does this switch automatically by first removing the large degrees of freedom parameters and then estimating the G-StMVAR model with a variable metric algorithm \citep[algorithm 21]{Nash:1990} using the induced parameter vector as the initial value.
 
@@ -462,3 +465,389 @@ To exemplify, the following code switches all the regimes of the StMVAR model \c
 \begin{Schunk}
 \begin{Sinput}
 R> fit12gs <- stmvar_to_gstmvar(fit12t_alt, maxdf=100)
+\end{Sinput}
+\end{Schunk}
+%
+We use the \code{summary} method to obtain a more detailed printout of the estimated the G-StMVAR model:
+%
+\begin{Schunk}
+\begin{Sinput}
+R> summary(fit12gs)
+\end{Sinput}
+\begin{Soutput}
+Reduced form G-StMVAR model:
+ p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+
+ log-likelihood: -247.50, AIC: 534.99, HQIC: 563.13, BIC: 604.85 
+
+Regime 1 (GMVAR type)
+Moduli of 'bold A' eigenvalues:  0.75, 0.10 
+Cov. matrix 'Omega' eigenvalues: 1.21, 0.14 
+Mixing weight: 0.17 
+Regime means: 0.66, 1.67
+
+   Y     phi0          A1                  Omega         1/2     
+1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
+2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
+
+Error term correlation matrix:
+       [,1]   [,2]
+[1,]  1.000 -0.088
+[2,] -0.088  1.000
+
+Regime 2 (StMVAR type)
+Moduli of 'bold A' eigenvalues:  0.70, 0.34 
+Cov. matrix 'Omega' eigenvalues: 0.42, 0.04 
+Mixing weight: 0.83 
+Regime means: 0.78, 0.54
+Df parameter:  7.57
+
+   Y     phi0          A1                            Omega         
+1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )
+2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )
+  1/2     
+1     eps1
+2     eps2
+
+Error term correlation matrix:
+      [,1]  [,2]
+[1,] 1.000 0.014
+[2,] 0.014 1.000
+
+Print approximate standard errors with the function 'print_std_errors'.
+\end{Soutput}
+\end{Schunk}
+%
+In the G-StMVAR model, estimates for GMVAR type regimes are reported before StMVAR type regimes, in a decreasing order according to the mixing weight parameter estimates. As shown above, the model \code{fit12gs} incorporates one GMVAR type regime and one StMVAR type regime. Estimates of the unconditional mean, the first $p$ autocovariances and autocorrelations (including the unconditional covariance matrix) can be obtained from the element \code{$uncond_moments} of the model object. The conditional moments calculated using the data are available for the process (\code{$total_cmeans} and \code{$total_ccovs}) as well as for the regimes separately (\code{$regime_cmeans} and \code{$regime_ccovs}). These conditional moments can be conveniently plotted along the series with the function \code{cond_moment_plot}.
+
+Approximate standard errors can be printed with the function \code{print_std_errors}, which prints the standard errors in the same form as the print method prints the estimates. Note that the last mixing weight parameter estimate does not have an approximate standard error because it is not parametrized. Likewise, there is no standard error for the intercepts if mean parametrization is used (by setting \code{parametrization = "mean"} in \code{fitGSMVAR}) and vice versa. In order to obtain standard errors for the regimewise unconditional means or intercepts, one can easily swap between the mean and intercept parametrizations with the function \code{swap_parametrization}.
+
+To exemplify, the following code prints approximate standard errors for the model \code{fit12gs}:
+%
+\begin{Schunk}
+\begin{Sinput}
+R> print_std_errors(fit12gs)
+\end{Sinput}
+\begin{Soutput}
+Reduced form model:
+p = 1, M = 2, conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+
+APPROXIMATE STANDARD ERRORS
+
+Regime 1 (GMVAR type)
+Mixing weight: 0.124 
+
+   Y      phi0          A1                  Omega         1/2     
+1 Y1 = [ 0.759 ] + [ 0.149 0.386 ] Y1.1 + [ 0.263 0.061 ]     eps1
+2 Y2   [ 0.234 ]   [ 0.050 0.118 ] Y2.1   [ 0.061 0.029 ]     eps2
+
+Regime 2 (StMVAR type)
+Df parameter:  2.778 
+
+   Y      phi0          A1                            Omega        
+1 Y1 = [ 0.127 ] + [ 0.079 0.196 ] Y1.1 + (         [ 0.070 0.011 ]
+2 Y2   [ 0.037 ]   [ 0.024 0.064 ] Y2.1   ( ARCH_mt [ 0.011 0.008 ]
+  1/2     
+1     eps1
+2     eps2
+\end{Soutput}
+\end{Schunk}
+%
+
+Missing values are reported when \pkg{gmvarkit} is not able to calculate the standard error. This typically happens either because there is an overly large degrees of freedom parameter estimate in the model or because the estimation algorithm did not stop a local maximum. In the former case, switch to the appropariate G-StMVAR with the function \code{stmvar_to_gstmvar}. In the latter case, make sure the estimate in not an unreasonable near-the-boundary point. If it is, it might appropriate the consider the next-best local maximum with the function \code{alt_gsmvar}. If it is not a near-the-boundary point, try running more iterations of the variable metric algorithm with the function \code{iterate_more}. Section~\ref{sec:examestim} discusses how to evaluate with \pkg{gmvarkit} whether the estimate is a local maximum (and how to improve the reliability of it being the global maximum).
+
+Other statistics reported in the summary printout include the log-likelihood and values of the information criteria, moduli of the eigenvalues of the 'bold A' matrix (see (\ref{eq:gausmatrices})) and eigenvalues of the covariance matrix $\Omega_m$. If some of the moduli are very close to one, the related estimates are near the boundary of the stationarity region. If some of the eigenvalues of $\Omega_m$ close to zero, the related estimates are near the boundary of positive-definiteness region. Then also the related error term correlation matrix reported in the summary printout has non-diagonal elements that are close to one. As mentioned already multiple times, this kind of near-the-boundary point might be unreasonable and maximize the log-likelihood function for a technical reason only, so it might be more appropriate to consider the next-best local maximum with the function \code{alt_gsmvar}.
+
+This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSMVAR} stores the estimates from all the estimation rounds so that a GSMVAR model can be built based on any one of them, most conveniently with the function \code{alt_gsmvar}. The desired estimation round can be specified either with the argument \code{which_round} or \code{which_largest}. The former specifies the round in the estimation order, whereas the latter specifies it in a decreasing order of the log-likelihoods.
+
+
+\subsection{Further examination of the estimates}\label{sec:examestim}
+In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. For instance, the following command creates Figure~\ref{fig:fit42gs}:
+%
+\begin{Schunk}
+\begin{Sinput}
+R> plot(fit12gs)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{gmvarkit-vignette-plot}
+%
+As Figure~\ref{fig:fit42gs} (the top and bottom left panels) shows, the first regime prevails when the spread takes small values, while the second regime mainly dominates when the spread takes large values. The graph of the model's marginal stationary density (the right panel), on the other hand, shows that the two regimes capture the two modes in the marginal distribution of the spread. The hump shape in the right tail of the kernel density estimate is not explained by the mixture of the two distributions, but a third regime could be added for the purpose (for brevity, we do not study the three regime model further).
+
+It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean \cite[see][Equation (2.19)]{Virolainen:2020}.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics{figures/plotfit42gs.png}
+  \caption{The figure produced by the command \code{plot(fit42gs)}. On the top left, the monthly spread between the 10-year and 1-year Treasury constant maturity rates, covering the period from 1982 January to 2020 December. On the bottom left, the estimated mixing weights of the G-StMAR model (\code{fit42gs}) fitted to the interest rate spread (blue dashed line for the first regime and red dashed line for the second regime). On the right, the one-dimensional marginal stationary density of the estimated G-StMAR model (grey dashed line) along with a kernel density estimate of the spread (black solid line) and marginal stationary densities of the regimes multiplied by the mixing weight parameter estimates (blue and red dotted lines).}
+\label{fig:fit42gs}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics{figures/proflogfit42gs.png}
+  \caption{The figure produced by the command \code{profile\_logliks(fit42gs)}. Graphs of the profile log-likelihood functions of the estimated G-StMAR model \code{fit42gs} with the red vertical lines pointing the estimates.}
+\label{fig:proflogfit42gs}
+\end{figure}
+
+The variable metric algorithm employed in the final estimation does not necessarily stop at a local maximum point. The algorithm might also stop at a saddle point or near a local maximum, when the algorithm is not able to increase the log-likelihood, or at any point, when the maximum number of iterations has been reached. In the latter case, the estimation function throws a warning, but saddle points and inaccurate estimates need to be detected by the researcher.
+
+It is well known that in a local maximum point, the gradient of the log-likelihood function is zero, and the eigenvalues of the Hessian matrix are all negative. In a local minimum, the eigenvalues of the Hessian matrix are all positive, whereas in a saddle point, some of them are positive and some negative. Nearly numerically singular Hessian matrices occur when the surface of the log-likelihood function is very flat about the estimate in some directions. This particularly happens when the model contains overly large degrees of freedom parameter estimates or the mixing weights $\alpha_{m,t}$ are estimated close to zero for all $t=1,...,T$ for some regime $m$.
+
+\pkg{uGMAR} provides several functions for evaluating whether the estimate is a local maximum point. The function \code{get_foc} returns the (numerically approximated) gradient of the log-likelihood function evaluated at the estimate, and the function \code{get_soc} returns eigenvalues of the (numerically approximated) Hessian matrix of the log-likelihood function evaluated at the estimate. The numerical derivatives are calculated using a central difference approximation
+\begin{equation}
+\frac{\partial L(\boldsymbol{\theta})}{\partial \theta_i} \approx \frac{f(\boldsymbol{\theta} + \boldsymbol{h}^{(i)}) - f(\boldsymbol{\theta} - \boldsymbol{h}^{(i)})}{2h}, \ \ h>0,
+\end{equation}
+where $\theta_i$ is the $i$th element of $\boldsymbol{\theta}$ and $\boldsymbol{h}^{(i)}=(0,...,0,h,0,...,0)$
+contains $h$ as its $i$th element. By default, the difference $h=6\cdot 10^{-6}$ is used for all parameters except for overly large degrees of freedom parameters, whose partial derivatives are approximated using larger differences. The difference is increased for large degrees of freedom parameters, because the limited precision of the float point presentation induces artificially rugged surfaces to the their profile log-likelihood functions, and the increased differences diminish the related numerical error. On the other hand, as the surface of the profile log-likelihood function is very flat about a large degrees of freedom parameter estimate, large differences work well for the approximation.
+
+For example, the following code calculates the first order condition for the G-StMAR model \code{fit42gs}:
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> get_foc(fit42gs)
+\end{CodeInput}
+\begin{CodeOutput}
+ [1]  0.1122667304  0.0443675437  0.0412785752  0.0423330799  0.0452292663
+ [6]  0.3538279050 -0.0812537190 -0.0732948896 -0.0755336131 -0.0767990779
+[11] -0.0825067588 -0.0117666801 -0.0004755852 -0.0003115161
+\end{CodeOutput}
+\end{CodeChunk}
+%
+and the following code calculates the second order condition:
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> get_soc(fit42gs)
+\end{CodeInput}
+\begin{CodeOutput}
+ [1] -5.532989e-02 -1.354613e+01 -4.393581e+01 -6.468623e+01 -1.208288e+02
+ [6] -1.672930e+02 -2.618770e+02 -8.870701e+02 -2.044356e+03 -4.862843e+03
+[11] -4.356473e+04 -5.459504e+04 -2.727102e+05 -5.568025e+05
+\end{CodeOutput}
+\end{CodeChunk}
+%
+All eigenvalues of the Hessian matrix are negative, which points to a local maximum, but the gradient of the log-likelihood function seems to somewhat deviate from zero. The gradient might be inaccurate, because it is based on a numerical approximation. It is also possible that the estimate is inaccurate, because it is based on approximative numerical estimation, and the estimates are therefore not expected to be exactly accurate. Whether the estimate is a local maximum point with accuracy that is reasonable enough, can be evaluated by plotting the graphs of the profile log-likelihood functions about the estimate. In \pkg{uGMAR}, this can be done conveniently with the function \code{profile_logliks}.
+
+The exemplify, the following command plots the graphs of profile log-likelihood functions of the estimated G-StMAR model \code{fit42gs}:
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> profile_logliks(fit42gs, scale = 0.02, precision = 200)
+\end{CodeInput}
+\end{CodeChunk}
+%
+The output is displayed in Figure~\ref{fig:proflogfit42gs}, showing that the estimate's accuracy is reasonable, as changing any individual parameter value marginally would not visibly increase the log-likelihood. The argument \code{scale} can be adjusted to shorten or lengthen the interval shown in the horizontal axis. If one zooms in enough by setting \code{scale} to a very small number, it can be seen that the estimate is not exactly at the local maximum, but it is so close that moving there would not increase the log-likelihood notably. The argument \code{precision} can be adjusted to increase the number of points the graph is based on. For faster plotting, it can be decreased, and for more precision, it can be increased.
+
+We have discussed tools that can be utilized to evaluate whether the found estimate is a local maximum with a reasonable accuracy. It is, however, more difficult to establish that the estimate is the global maximum. With \pkg{uGMAR}, the best way to increase the reliability that the found estimate is the global maximum, is to run more estimation rounds by adjusting the argument \code{ncalls} of the estimation function \code{fitGSMAR}. When a large number of estimation rounds is run (and $M>1$), \code{fitGSMAR} often finds peculiar near-the-boundary estimates that have extremely spiky profile log-likelihood functions for some parameters and are thus difficult to find (see Appendix~\ref{sec:simuexp}). Therefore, it seems plausible that \code{fitGSMAR} also finds a reasonable ML estimate with a good reliability.
+
+\subsection{Examples of constrained estimation}\label{sec:examp_const}
+Alternatively to the unconstrained estimation, one may impose linear constraints on the autoregressive (AR) parameters of the model; that is, on $\varphi_{m,1},...,\varphi_{m,p}$, $m=1,...,M$. \pkg{uGMAR} deploys two types of constraints: the AR parameters can be restricted to be the same for all regimes and linear constraints can be applied to each regime separately. In order to impose the former type of constraints, the estimation function simply needs to be supplied with the argument \code{restricted = TRUE}.
+
+
+
+\subsection{Testing parameter constraints}\label{sec:testconst}
+One way to asses the validity of the imposed constraints is to compare the values of information criteria of the constrained and unconstrained models. \pkg{uGMAR}, however, also provides functions for testing the constraints with the likelihood ratio test and Wald test, which are applicable as the ML estimator of a GSMAR model has the conventional asymptotic distribution \cite[as long as the model is correctly specified and one is willing to assume the validity of the required unverified assumptions, see][pp. 254-255, \citealp{Meitz+Preve+Saikkonen:2021}, Theorem 3, and \citealp{Virolainen:2020}, Theorem 2]{Kalliovirta+Meitz+Saikkonen:2015}. For a discussion on the likelihood ratio and Wald tests, see \citet{Buse:1982} and the references therein, for example.
+
+The likelihood ratio test considers the null hypothesis that the true parameter value $\boldsymbol{\theta}_0$ satisfies some constraints imposed on these parameters \cite[such that the constrained parameter space is a subset of the parameter space, which is presented in][Section 2.2 for the GSMAR models]{Virolainen:2020}. Denoting by $\hat{L}_U$ and $\hat{L}_C$ the (maximized) log-likelihoods based on the unconstrained and constrained ML estimates, respectively, the test statistic takes the form
+\begin{equation}
+LR=2(\hat{L}_U - \hat{L}_C).
+\end{equation}
+Under the null, the test statistic is asymptotically $\chi^2$-distributed with the degrees of freedom given by the difference in the dimensions of the unconstrained and constrained parameter spaces.
+
+With \pkg{uGMAR}, the likelihood ratio test can be calculated with the function \code{LR_test}, which takes the unconstrained model (a class \code{gsmar} object) as its first argument and the constrained model as the second argument. For instance, in Section~\ref{sec:examp_const} we estimated a G-StMAR, $p=4$, $M_1=1$, $M_2=1$ model such that the AR parameters are restricted to be equal in both regimes (the model \code{fit42gsr}). The following code tests those constraints against the unconstrained model \code{fit42gs} with the likelihood ratio test and prints the results.
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> LR_test(fit42gs, fit42gsr)
+\end{CodeInput}
+\begin{CodeOutput}
+	Likelihood ratio test
+
+data:  fit42gs and fit42gsr
+LR = 4.6695, df = 4, p-value = 0.3229
+alternative hypothesis: the true parameter does not satisfy the constraints
+imposed in fit42gsr
+\end{CodeOutput}
+\end{CodeChunk}
+%
+The large $p$~value indicates that we cannot reject the constraints at any conventional level of significance, and it might thereby be reasonable to consider the constrained model if it is found adequate.
+
+\pkg{uGMAR} implements the Wald test of the null hypothesis
+\begin{equation}
+A\boldsymbol{\theta}_0 = c,
+\end{equation}
+where $A$ is a $(k \times d)$ matrix with full row rank, $c$ is a $(k \times 1)$ vector, $\boldsymbol{\theta}_0$ is the true parameter value, $d$ is the dimension of the parameter space, and $k$ is the number of constraints. The Wald test statistic takes the form
+\begin{equation}
+W = (A\hat{\boldsymbol{\theta}} - c)^\top [A\mathcal{J}(\hat{\boldsymbol{\theta}})^{-1}A^\top]^{-1}(A\hat{\boldsymbol{\theta}} - c),
+\end{equation}
+where $\mathcal{J}(\hat{\boldsymbol{\theta}})$ is the observed information matrix evaluated at the ML estimate $\hat{\boldsymbol{\theta}}$. Under the null, the test statistic is asymptotically $\chi^2$-distributed with $k$ degrees of freedom (which is the difference in dimensions of the constrained and unconstrained parameter spaces).
+
+With \pkg{uGMAR}, the Wald test can be calculated with function \code{Wald_test}, which takes the estimated unconstrained model (as a class \code{gsmar} object) as the first argument, the matrix $A$ as the second argument, and the vector $c$ as the third argument. To exemplify, we test the same constraints as with the likelihood ratio test, i.e., that the AR parameters satisfy $\varphi_{1,i}=\varphi_{2,i}$ for $i=1,...,4$, in the G-StMAR, $p=4$, $M_1=1$, $M_2=1$ model. The $(d \times 1)$ parameter vector $\boldsymbol{\theta}$ (which is presented at the end of Section~\ref{sec:gstmar} and again in Section~\ref{sec:GSMAR}) contains the AR parameters of the first regime in the entries $2,...,5$ and the AR parameters of the second regime in the entries $8,...,11$. The appropriate matrix $A$ and vector $c$ that state the hypothesis are set in the first two lines of the following code, and the third line calculates the test.
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> c <- rep(0, times = 4)
+R> A <- cbind(c, diag(4), c, c, -diag(4), c, c, c)
+R> Wald_test(fit42gs, A = A, c = c)
+\end{CodeInput}
+\begin{CodeOutput}
+
+	Wald test
+
+data:  fit42gs, A, c
+W = 4.6272, df = 4, p-value = 0.3277
+alternative hypothesis: the true parameter theta does not satisfy
+A%*%theta = c
+\end{CodeOutput}
+\end{CodeChunk}
+%
+As the above printout shows, the $p$~value is similar to the one obtained by the likelihood ratio test. The Wald test, however, has the benefit that is does not require estimation of the constrained model, and it is, therefore, not limited to the type of constraints \pkg{uGMAR} accommodates. The likelihood ratio test, on the other hand, is more conveniently calculated once the constrained model has been estimated.
+
+Note that the standard tests are not applicable if the number of GMAR or StMAR type regimes is chosen too large, as then some of the parameters are not identified, causing the result of the asymptotic normality of the ML estimator to break down. This particularly happens when one tests for the number of regimes in the model, as the under the null some of the regimes are reduced from the model\footnote{\cite{Meitz+Saikkonen:2021} have, however, recently developed such tests for mixture models with Gaussian conditional densities} \citep[see the related discussion in][Section 3.3.2]{Kalliovirta+Meitz+Saikkonen:2015}. Similar caution applies for testing whether a regime is of the GMAR type against the alternative that it is of the StMAR type: then $\nu_m = \infty$ under the null for the regime $m$ to be tested, which violates the assumption that the parameter value is in the interior of a compact subset of the parameter space \citep[see][Theorem 2 and Assumption 1]{Virolainen:2020}.
+
+
+\section{Quantile residual based model diagnostics}\label{sec:qres}
+In the GSMAR models, the empirical counterparts of the error terms $\varepsilon_{m,t}$ in (\ref{eq:defeq}) cannot be calculated, because the regime that generated each observation is unknown, making the conventional residual based diagnostics unavailable. Therefore, \pkg{uGMAR} utilizes so called \emph{quantile residuals}, which are suitable for evaluating adequacy of the GSMAR models. Deploying the framework presented in \cite{Kalliovirta:2012}, quantile residuals are defined as
+%
+\begin{equation}\label{eq:qres}
+R_t=\Phi^{-1}(F(y_t|\mathcal{F}_{t-1})), \quad t=1,2,...,T,
+\end{equation}
+%
+where $\Phi^{-1}(\cdot)$ is the standard normal quantile function and $F(\cdot|\mathcal{F}_{t-1})$ is the conditional cumulative distribution function of the considered GSMAR process (conditional on the previous observations). Closed form expressions for the quantile residuals of the GSMAR processes are presented in Appendix~\ref{sec:qresexpr}.
+%
+
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> diagnostic_plot(fit42gsr, nlags = 20, plot_indstats = TRUE)
+\end{CodeInput}
+\end{CodeChunk}
+%
+
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagplotfit42gsr.png}
+  \caption{Diagnostic plot for the fitted model \code{fit42gsr} created using the function \code{diagnostic\_plot}. The quantile residual time series (top left), normal  quantile-quantile plot (top right), sample autocorrelation functions of the quantile residuals (middle left) and squared quantile residuals (middle right), and the individual autocorrelation (bottom left) and heteroskedasticity (bottom right) statistics discussed in \citet[pp. 369-370]{Kalliovirta:2012}. The blue dashed lines in the sample autocorrelation figures are the $1.96T^{-1/2}$ lines denoting 95\% critical bounds for IID-observations, whereas for \citeauthor{Kalliovirta:2012}'s (\citeyear{Kalliovirta:2012}) individual statistics they are the approximate 95\% critical bounds.}
+\label{fig:diagplotfit42gs}
+\end{figure}
+
+
+\section{Building a GSMAR model with specific parameter values}\label{sec:GSMAR}
+The function \code{GSMAR} facilitates building GSMAR models without estimation, for instance, in order to simulate observations from a GSMAR process with specific parameter values. The parameter vector (of length $M(p+3)+M_2-1$ for unconstrained models) has the form $\boldsymbol{\theta} = (\boldsymbol{\vartheta}_1,...,\boldsymbol{\vartheta}_M,\alpha_1,...,\alpha_{M-1},\boldsymbol{\nu})$ where
+\begin{align}
+\boldsymbol{\vartheta}_m &= (\varphi_{m,0},\varphi_{m,1},...,\varphi_{m,p},\sigma^2_m),\ \ m=1,...,M, \ \text{and}  \\
+\boldsymbol{\nu} &= (\nu_{M_1+1},...,\nu_M).
+\end{align}
+%
+In the GMAR model (when $M_1=M$), the vector $\boldsymbol{\nu}$ is omitted, as the GMAR model does not contain degrees of freedom parameters. For models with constraints on the autoregressive parameters, the parameter vectors are expressed in a different way. They are only presented in the package documentation for brevity, because the hand-specified parameter values can be set to satisfy any constraints as is.
+
+In addition to the parameter vector, \code{GSMAR} should be supplied with arguments \code{p} and \code{M} specifying the order of the model similarly to the estimation function \code{fitGSMAR} discussed in Sections \ref{sec:example_estim} and \ref{sec:examp_const}. If one wishes to parametrize the model with the regimewise unconditional means ($\mu_m$) instead of the intercepts ($\varphi_{m,0}$), the argument \code{parametrization} should be set to \code{"mean"} in which case the intercept parameters $\varphi_{m,0}$ are replaced with $\mu_m$ in the parameter vector. By default, \pkg{uGMAR} uses intercept parametrization.
+
+To exemplify, we build the GMAR $p=2$, $M=2$ model that is used in the simulation experiment in Appendix~\ref{sec:simuexp}. The model has intercept parametrization and parameter values $\boldsymbol{\vartheta}_1 = (0.9, 0.4, 0.2, 0.5)$, $\boldsymbol{\vartheta}_2 = (0.7, 0.5, -0.2, 0.7)$, and $\alpha_1 = 0.7$. After building the model, we use the \code{print} method to examine it:
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> params22 <- c(0.9, 0.4, 0.2, 0.5, 0.7, 0.5, -0.2, 0.7, 0.7)
+R> mod22 <- GSMAR(p = 2, M = 2, params = params22, model = "GMAR")
+R> mod22
+\end{CodeInput}
+\begin{CodeOutput}
+Model:
+ GMAR, p = 2, M = 2, #parameters = 9,
+ conditional, intercept parametrization, not restricted, no constraints.
+
+Regime 1
+Mix weight: 0.70
+Reg mean: 2.25
+
+y = [0.90] + [0.40]y.1 + [0.20]y.2 + sqrt[0.50]eps
+
+Regime 2
+Mix weight: 0.30
+Reg mean: 1.00
+
+y = [0.70] + [0.50]y.1 + [-0.20]y.2 + sqrt[0.70]eps
+\end{CodeOutput}
+\end{CodeChunk}
+%
+
+It is possible to include data in the models built with \code{GSMAR} by either providing the data in the argument \code{data} when creating the model or by adding the data afterwards with the function \code{add_data}. When the model is supplied with data, the mixing weights, one-step conditional means and variances, and quantile residuals can be calculated and included in the model. The function \code{add_data} can also be used to update data to an estimated GSMAR model without re-estimating the model.
+
+
+\section{Simulation and forecasting}\label{sec:simufore}
+
+\subsection{Simulation}\label{sec:simu}
+\pkg{uGMAR} implements the S3 method \code{simulate} for simulating observations from GSMAR processes. The method requires the process to be given as a class \code{gsmar} object, which are typically created either by estimating a model with the function \code{fitGSMAR} or by specifying the parameter values by hand and building the model with the constructor function \code{GSMAR}. The initial values required to simulate the first $p$ observations can be either set by hand (with the argument \code{init_values}) or drawn from the stationary distribution of the process (by default). The argument \code{nsim} sets the length of the sample path to be simulated.
+
+To give an example, the following code sets the random number generator seed to one and simulates the 500 observations long sample path that is used in the simulation experiment in Appendix~\ref{sec:simuexp} from the GMAR process built in Section~\ref{sec:GSMAR}:
+%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> mysim <- simulate(mod22, nsim = 500, seed = 1)
+\end{CodeInput}
+\end{CodeChunk}
+%
+Our implementation of \code{simulate} returns a list containing the simulated sample path in \code{$sample}, the mixture component that generated each observation in \code{$component}, and the mixing weights in \code{$mixing_weights}.
+
+\subsection{Simulation based forecasting}
+Deriving multiple-steps-ahead point predictions and prediction intervals analytically for the GSMAR models is very complicated, so \pkg{uGMAR} employs the following simulation-based method. By using the last $p$ observations of the data up to the date of forecasting as initial values, a large number of sample paths for the future values of the process are simulated. Then, sample quantiles from the simulated sample paths are calculated to obtain prediction intervals, and the median or mean is used for point predictions. A similar procedure is also applied to forecast future values of the mixing weights, which might be of interest because the researcher can often associate specific characteristics to different regimes.
+
+Forecasting is most conveniently done with the \code{predict} method. The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsimu}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
+
+%\begin{figure}
+%  \centering
+%  \includegraphics{figures/predictfit42gs.png}
+%  \caption{The figure created by the \code{predict} method for the G-StMAR model \code{fit42gs}. Twelve-months-ahead point prediction for the monthly interest rate spread (top) and the model's mixing weights (bottom) together with several preceding observations and prediction intervals with confidence levels $0.95$ (outer interval) and $0.80$ (inner interval).}
+%\label{fig:predictfit42gs}
+%\end{figure}
+
+
+
+\begin{table}
+\centering
+\begin{tabular}{llp{6.4cm}}
+\hline
+Related to     & Name                      & Description \\ \hline
+Estimation     & \code{fitGSMAR}           & Estimate a GSMAR model.\\
+               & \code{alt_gsmar}          & Build a GSMAR model based on results from any estimation round.\\
+               & \code{stmar_to_gstmar}    & Estimate a G-StMAR model based on a StMAR (or G-StMAR) model with large degrees of freedom parameters.\\
+               & \code{iterate_more}       & Run more iterations of the variable metric algorithm for a preliminary estimated GSMAR model.\\
+Estimates      & \code{summary} (method)   & Detailed printout of the estimates.\\
+               & \code{plot} (method)      & Plot the series with the estimated mixing weights and a kernel density estimate of the series with the stationary density of the model.\\
+               & \code{get_foc}            & Calculate numerically approximated gradient of the log-likelihood function evaluated at the estimate.\\
+               & \code{get_soc}            & Calculate eigenvalues of numerically approximated Hessian of the log-likelihood function evaluated at the estimate.\\
+               & \code{profile_logliks}    & Plot the graphs of the profile log-likelihood functions.\\
+               & \code{cond_moment_plot}   & Plot the model implied one-step conditional means or variances.\\
+Diagnostics    & \code{quantile_residual_tests} & Calculate quantile residual tests.\\
+               & \code{diagnostic_plot}    & Plot quantile residual diagnostics.\\
+               & \code{quantile_residual_plot}  & Plot quantile residual time series and histogram.\\
+Forecasting    & \code{predict} (method)   & Forecast future observations and mixing weights of the process.\\
+Simulation     & \code{simulate} (method)  & Simulate from a GSMAR process.\\
+Create model   & \code{GSMAR}              & Construct a GSMAR model based on specific parameter values.\\
+Hypothesis testing & \code{LR_test}        & Calculate likelihood ratio test.\\
+               & \code{Wald_test}          & Calculate Wald test.\\
+Other          & \code{add_data}           & Add data to a GSMAR model \\
+               & \code{swap_parametrization} & Swap between mean and intercept parametrizations \\
+\hline
+\end{tabular}
+\caption{Some useful functions in \pkg{uGMAR} sorted according to their usage. The note "method" in parentheses after the name of a function signifies that it is an S3 method for a class \code{gsmar} object (often generated by the function \code{fitGSMAR} or \code{GSMAR}).}
+\label{tab:functions}
+\end{table}
+
+\section{Summary}\label{sec:summary}
+FILL IN
+
+\section*{Computational details}
+The results in this paper were obtained using \proglang{R}~4.0.2 and \pkg{uGMAR}~2.0.0 package running on MacBook Pro 13", 2020, with Intel Core i5-8257U 1.40Ghz processor and 8 Gt 2133 Mhz LPDDR3 RAM.
+
+%\pkg{gmvarkit} takes use of the \proglang{R} package \pkg{Brobdingnag} \citep{Hankin:2007} to handle values extremely close to zero in the evaluation of the first term of the exact log-likelihood function (\ref{eq:loglik}). The package \pkg{gsl} \citep{Hankin:2006} is utilized to calculate some of the quantile residuals (\ref{eq:qres}) with a hypergeometric function. In order to improve computational efficiency in the numerical estimation procedure, the formula proposed by \cite{Galbraith+Galbraith:1974} is utilized to directly compute the inverses of the covariance matrices $\boldsymbol{\Gamma}_m$, $m=1,...,M$, (which appear in (\ref{eq:sigmamt}), (\ref{eq:dm}), (\ref{eq:alphamt}), and in the first term of (\ref{eq:loglik})), as only the inverses are required for calculating the quantities in the log-likelihood function. Finally, the algorithm proposed by \cite{Monahan:1984} is employed to generate random stationary autoregressive coefficients in the genetic algorithm.
+
+
+%\section*{Acknowledgments}
+% No acknowledgements in a vignette
+
+\pagebreak
+\bibliography{refs}
+
+\end{document}

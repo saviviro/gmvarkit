@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2020)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: gmvarkit-vignette.aux
+The style file: jss.bst
+Database file #1: refs.bib
+Warning--I didn't find a database entry for "Lanne+Nyberg:2016"
+Warning--I didn't find a database entry for "Buse:1982"
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 22 entries,
+            3215 wiz_defined-function locations,
+            803 strings with 9609 characters,
+and the built_in function-call counts, 19178 in all, are:
+= -- 1880
+> -- 412
+< -- 15
++ -- 161
+- -- 133
+* -- 1371
+:= -- 2367
+add.period$ -- 103
+call.type$ -- 22
+change.case$ -- 136
+chr.to.int$ -- 23
+cite$ -- 22
+duplicate$ -- 1974
+empty$ -- 1572
+format.name$ -- 194
+if$ -- 3887
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 217
+newline$ -- 140
+num.names$ -- 88
+pop$ -- 937
+preamble$ -- 1
+purify$ -- 132
+quote$ -- 0
+skip$ -- 394
+stack$ -- 0
+substring$ -- 1827
+swap$ -- 513
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 192
+warning$ -- 0
+while$ -- 133
+width$ -- 0
+write$ -- 328
+(There were 2 warnings)
