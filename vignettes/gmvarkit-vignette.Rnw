@@ -447,13 +447,13 @@ This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSM
 \subsection{Further examination of the estimates}\label{sec:examestim}
 In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. The following command creates the time series plot along with estimated mixing weights:
 %
-<<plot, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
+<<plotseries, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
 plot(fit12gs, type="series")
 @
 %
 And the following command creates the stationary density plot:
 %
-<<plot, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
+<<plotdensity, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
 plot(fit12gs, type="density")
 @
 %

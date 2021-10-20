@@ -363,21 +363,14 @@ plot.gsmvar <- function(x, ..., type=c("both", "series", "density")) {
     draw_legend(names_ts, cols=colpal_ts)
     ts.plot(ts_mw, gpars=list(main="Mixing weights", ylim=c(0, 1), col=colpal_mw, lty=2))
     draw_legend(names_mw, cols=colpal_mw)
-
-    print("paska1")
-
   }
 
   if(type == "both") {
     grDevices::devAskNewPage(TRUE)
-
-    print("paska2")
   }
 
 
   if(type %in% c("both", "density")) {
-    print("paska3")
-
     # Marginal stationary distributions
     nrows <- max(ceiling(log2(d) - 1), 1)
     ncols <- ceiling(d/nrows)
