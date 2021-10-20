@@ -567,10 +567,10 @@ In addition to examining the summary printout, it is often useful to visualize t
 %
 \begin{Schunk}
 \begin{Sinput}
-R> cond_moment_plot(fit12gs)
+R> plot(fit12gs, type="series")
 \end{Sinput}
 \end{Schunk}
-\includegraphics{gmvarkit-vignette-plot1}
+\includegraphics{gmvarkit-vignette-plotseries}
 %
 And the following command creates the stationary density plot:
 %
@@ -578,11 +578,8 @@ And the following command creates the stationary density plot:
 \begin{Sinput}
 R> plot(fit12gs, type="density")
 \end{Sinput}
-\begin{Soutput}
-[1] "paska3"
-\end{Soutput}
 \end{Schunk}
-\includegraphics{gmvarkit-vignette-plot2}
+\includegraphics{gmvarkit-vignette-plotdensity}
 %
 If the argument \code{type} is not specified, both of the figures will be plotted.
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  20 OCT 2021 15:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  20 OCT 2021 15:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -706,29 +706,31 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [17]
-<gmvarkit-vignette-plot1.pdf, id=402, 722.7pt x 375.4025pt>
-File: gmvarkit-vignette-plot1.pdf Graphic file (type pdf)
-<use gmvarkit-vignette-plot1.pdf>
-Package pdftex.def Info: gmvarkit-vignette-plot1.pdf  used on input line 573.
+<gmvarkit-vignette-plotseries.pdf, id=402, 722.7pt x 375.4025pt>
+File: gmvarkit-vignette-plotseries.pdf Graphic file (type pdf)
+<use gmvarkit-vignette-plotseries.pdf>
+Package pdftex.def Info: gmvarkit-vignette-plotseries.pdf  used on input line 5
+73.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 18 []
  []
 
-[18 <./gmvarkit-vignette-plot1.pdf>]
-<gmvarkit-vignette-plot2.pdf, id=415, 722.7pt x 375.4025pt>
-File: gmvarkit-vignette-plot2.pdf Graphic file (type pdf)
-<use gmvarkit-vignette-plot2.pdf>
-Package pdftex.def Info: gmvarkit-vignette-plot2.pdf  used on input line 585.
+[18 <./gmvarkit-vignette-plotseries.pdf>]
+<gmvarkit-vignette-plotdensity.pdf, id=415, 722.7pt x 375.4025pt>
+File: gmvarkit-vignette-plotdensity.pdf Graphic file (type pdf)
+<use gmvarkit-vignette-plotdensity.pdf>
+Package pdftex.def Info: gmvarkit-vignette-plotdensity.pdf  used on input line 
+582.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
 
-Overfull \hbox (12.05794pt too wide) in paragraph at lines 585--588
+Overfull \hbox (12.05794pt too wide) in paragraph at lines 582--585
 [] \T1/lmr/m/n/10.95 If the ar-gu-ment \T1/lmtt/m/n/10.95 type
  []
 
 
-LaTeX Warning: File `figures/plotfit42gs.png' not found on input line 593.
+LaTeX Warning: File `figures/plotfit42gs.png' not found on input line 590.
 
 
 ! Package pdftex.def Error: File `figures/plotfit42gs.png' not found: using dra
@@ -738,13 +740,13 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.593   \includegraphics{figures/plotfit42gs.png}
+l.590   \includegraphics{figures/plotfit42gs.png}
                                                  
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-LaTeX Warning: File `figures/proflogfit42gs.png' not found on input line 600.
+LaTeX Warning: File `figures/proflogfit42gs.png' not found on input line 597.
 
 
 ! Package pdftex.def Error: File `figures/proflogfit42gs.png' not found: using 
@@ -754,17 +756,20 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.600 ...cludegraphics{figures/proflogfit42gs.png}
+l.597 ...cludegraphics{figures/proflogfit42gs.png}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 19
  []
 
-[19 <./gmvarkit-vignette-plot2.pdf>]
+[19 <./gmvarkit-vignette-plotdensity.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 20 []
  []
@@ -776,7 +781,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [21]
 
-LaTeX Warning: Reference `sec:simuexp' on page 22 undefined on input line 654.
+LaTeX Warning: Reference `sec:simuexp' on page 22 undefined on input line 651.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -786,7 +791,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [22]
 
 Package natbib Warning: Citation `Buse:1982' on page 23 undefined on input line
- 662.
+ 659.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -795,7 +800,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [23]
 
-LaTeX Warning: Reference `sec:gstmar' on page 24 undefined on input line 698.
+LaTeX Warning: Reference `sec:gstmar' on page 24 undefined on input line 695.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -804,14 +809,14 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [24]
 
-LaTeX Warning: Reference `eq:defeq' on page 25 undefined on input line 723.
+LaTeX Warning: Reference `eq:defeq' on page 25 undefined on input line 720.
 
 
-LaTeX Warning: Reference `sec:qresexpr' on page 25 undefined on input line 729.
+LaTeX Warning: Reference `sec:qresexpr' on page 25 undefined on input line 726.
 
 
 
-LaTeX Warning: File `figures/diagplotfit42gsr.png' not found on input line 742.
+LaTeX Warning: File `figures/diagplotfit42gsr.png' not found on input line 739.
 
 
 
@@ -822,7 +827,7 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.742 ...udegraphics{figures/diagplotfit42gsr.png}
+l.739 ...udegraphics{figures/diagplotfit42gsr.png}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
@@ -834,7 +839,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [25]
 
-LaTeX Warning: Reference `sec:simuexp' on page 26 undefined on input line 759.
+LaTeX Warning: Reference `sec:simuexp' on page 26 undefined on input line 756.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -843,20 +848,20 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [26]
 
-LaTeX Warning: Reference `sec:simuexp' on page 27 undefined on input line 795.
+LaTeX Warning: Reference `sec:simuexp' on page 27 undefined on input line 792.
 
 
-Underfull \hbox (badness 1331) in paragraph at lines 830--831
+Underfull \hbox (badness 1331) in paragraph at lines 827--828
 []\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 831--832
+Underfull \hbox (badness 3449) in paragraph at lines 828--829
 \T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
  []
 
 
-Underfull \hbox (badness 1527) in paragraph at lines 843--844
+Underfull \hbox (badness 1527) in paragraph at lines 840--841
 []\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
  []
 
@@ -895,7 +900,7 @@ LaTeX Font Warning: Font shape `T1/lmr/b/it' in size <10.95> not available
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 865.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 862.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 31
@@ -907,21 +912,21 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [32]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 865.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 862.
  (./gmvarkit-vignette.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 865.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 865.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 862.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 862.
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
 (rerunfilecheck)             Checksum: 1209622AB8050BD69A747C286C480FAC;2730.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 865.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 862.
  ) 
 Here is how much of TeX's memory you used:
  8799 strings out of 480608
- 134030 string characters out of 5903630
+ 134096 string characters out of 5903630
  401771 words of memory out of 5000000
  24296 multiletter control sequences out of 15000+600000
  656768 words of font info for 105 fonts, out of 8000000 for 9000
@@ -955,7 +960,7 @@ ublic/lm/lmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lm
 tt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtto10.pfb>
 </usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.
 pfb>
-Output written on gmvarkit-vignette.pdf (32 pages, 580441 bytes).
+Output written on gmvarkit-vignette.pdf (32 pages, 575938 bytes).
 PDF statistics:
  698 PDF objects out of 1000 (max. 8388607)
  624 compressed objects within 7 object streams

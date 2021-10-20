@@ -405,7 +405,11 @@ plot.gsmvar <- function(x, ..., type=c("both", "series", "density")) {
       for(m in 1:M) {
         lines(x=xpp, y=reg_dens(d1=d1, m=m, xx=xpp), type="l", lty=3, col=colpal_mw[m])
       }
-      if(d1 == 1) draw_legend(names_mw, cols=colpal_mw)
+      if(d1 == 1) {
+        legend("topleft", legend=c("series", "model", names_mw), col=c("black", "darkgrey", colpal_mw),
+               bty="n", lty=c(1, 2, 2, 2), lwd=2, text.font=2, cex=0.6, x.intersp=0.5, y.intersp=1)#,
+               #seg.len=1, inset=c(-0.025, -0.01))
+      }
     }
   }
 }
