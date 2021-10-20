@@ -348,7 +348,7 @@ plot.gsmvar <- function(x, ..., type=c("both", "series", "density")) {
 
   old_par <- par(no.readonly=TRUE)
   on.exit(par(old_par))
-  graphics::par(mfrow=c(2, 1), mar=c(2.5, 2.5, 2.1, 1))
+  graphics::par(mfrow=c(2, 1), mar=c(2.5, 3.0, 2.1, 1), las=1)
   colpal_ts <- grDevices::colorRampPalette(c("darkgreen", "darkblue", "darkmagenta", "red3"))(d)
   colpal_mw <- grDevices::colorRampPalette(c("blue", "turquoise1", "green", "red"))(M)
   names_ts <- colnames(data)

@@ -371,7 +371,7 @@ In \pkg{gmvarkit}, the GSMVAR models are defined as class \code{gsmvar} S3 objec
 
 Additional arguments may be supplied to \code{fitGSMVAR} in order to specify, for example, whether the exact log-likelihood function should be used instead of the conditional one (\code{conditional}), how many estimation rounds should be performed (\code{ncalls}), and how many central processing unit (CPU) cores should be used in the estimation (\code{ncores}). Some of the estimation rounds may end up in local-only maximum points or saddle points, but reliability of the estimation results can be improved by increasing the number of estimation rounds. A large number of estimation rounds may be required particularly when the number of mixture components is large, as the surface of the log-likelihood function becomes increasingly more challenging. It is also possible to adjust the settings of the genetic algorithm that is used to find the starting values. The available options are listed in the documentation of the function \code{GAfit} to which the arguments adjusting the settings will be passed. \textbf{In general, we recommend being conservative with choice of M due to the identifation problems induced if the number of regimes is chosen too large. Also, estimation of models that contain more than two regimes can be extremely challenging.}
 
-\textbf{Another important thing to know about estimation is that the estimation algorithm performs very poorly if some of the AR coefficients very large, signifcantly larger than one. This means that you need scale each component time series so that they vary approximately in the same magnite. For instance, typically in macroeconomic time series, log-differences should be multiplied by hundred. You can try out different scales and estimate a simple linear VAR with your favourite package to see whether the AR coeffients are in a reasonable range.}
+\textbf{Another important thing to know about estimation is that the estimation algorithm performs very poorly if some of the AR coefficients very large, signifcantly larger than one. This means that you need scale each component time series so that they vary approximately in the same magnitude. For instance, typically in macroeconomic time series, log-differences should be multiplied by hundred. If the suitable scales are not obvious, you can try out different scales and estimate linear VARs with your favorite package to see whether the AR coeffients are in a reasonable range. When a suitable scale is found, proceed to the GSMVAR models.}
 
 We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) this model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing two estimation rounds with two CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only two estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, almost all the estimation rounds end up to the MLE anyway, though).
 
@@ -563,16 +563,25 @@ This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSM
 
 
 \subsection{Further examination of the estimates}\label{sec:examestim}
-In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. For instance, the following command creates Figure~\ref{fig:fit42gs}:
+In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. The following command creates the time series plot along with estimated mixing weights:
 %
 \begin{Schunk}
 \begin{Sinput}
-R> plot(fit12gs)
+R> plot(fit12gs, type="series")
 \end{Sinput}
 \end{Schunk}
 \includegraphics{gmvarkit-vignette-plot}
 %
-As Figure~\ref{fig:fit42gs} (the top and bottom left panels) shows, the first regime prevails when the spread takes small values, while the second regime mainly dominates when the spread takes large values. The graph of the model's marginal stationary density (the right panel), on the other hand, shows that the two regimes capture the two modes in the marginal distribution of the spread. The hump shape in the right tail of the kernel density estimate is not explained by the mixture of the two distributions, but a third regime could be added for the purpose (for brevity, we do not study the three regime model further).
+And the following command creates the stationary density plot:
+%
+\begin{Schunk}
+\begin{Sinput}
+R> plot(fit12gs, type="density")
+\end{Sinput}
+\end{Schunk}
+\includegraphics{gmvarkit-vignette-plot}
+%
+If the argument \code{type} is not specified, both of the figures will be plotted.
 
 It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean \cite[see][Equation (2.19)]{Virolainen:2020}.
 

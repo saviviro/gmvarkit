@@ -445,13 +445,19 @@ This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSM
 
 
 \subsection{Further examination of the estimates}\label{sec:examestim}
-In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. For instance, the following command creates Figure~\ref{fig:fit42gs}:
+In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. The following command creates the time series plot along with estimated mixing weights:
 %
 <<plot, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
-plot(fit12gs)
+plot(fit12gs, type="series")
 @
 %
-As Figure~\ref{fig:fit42gs} (the top and bottom left panels) shows, the first regime prevails when the spread takes small values, while the second regime mainly dominates when the spread takes large values. The graph of the model's marginal stationary density (the right panel), on the other hand, shows that the two regimes capture the two modes in the marginal distribution of the spread. The hump shape in the right tail of the kernel density estimate is not explained by the mixture of the two distributions, but a third regime could be added for the purpose (for brevity, we do not study the three regime model further).
+And the following command creates the stationary density plot:
+%
+<<plot, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
+plot(fit12gs, type="density")
+@
+%
+If the argument \code{type} is not specified, both of the figures will be plotted.
 
 It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean \cite[see][Equation (2.19)]{Virolainen:2020}.
 
