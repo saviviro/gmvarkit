@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  20 OCT 2021 15:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  20 OCT 2021 17:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -706,7 +706,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [17]
-<gmvarkit-vignette-plotseries.pdf, id=402, 722.7pt x 375.4025pt>
+<gmvarkit-vignette-plotseries.pdf, id=425, 722.7pt x 375.4025pt>
 File: gmvarkit-vignette-plotseries.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-plotseries.pdf>
 Package pdftex.def Info: gmvarkit-vignette-plotseries.pdf  used on input line 5
@@ -718,89 +718,65 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [18 <./gmvarkit-vignette-plotseries.pdf>]
-<gmvarkit-vignette-plotdensity.pdf, id=415, 722.7pt x 375.4025pt>
+<gmvarkit-vignette-plotdensity.pdf, id=437, 722.7pt x 375.4025pt>
 File: gmvarkit-vignette-plotdensity.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-plotdensity.pdf>
 Package pdftex.def Info: gmvarkit-vignette-plotdensity.pdf  used on input line 
-582.
+583.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
-
-Overfull \hbox (12.05794pt too wide) in paragraph at lines 582--585
-[] \T1/lmr/m/n/10.95 If the ar-gu-ment \T1/lmtt/m/n/10.95 type
- []
-
-
-LaTeX Warning: File `figures/plotfit42gs.png' not found on input line 590.
-
-
-! Package pdftex.def Error: File `figures/plotfit42gs.png' not found: using dra
-ft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.590   \includegraphics{figures/plotfit42gs.png}
-                                                 
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-LaTeX Warning: File `figures/proflogfit42gs.png' not found on input line 597.
-
-
-! Package pdftex.def Error: File `figures/proflogfit42gs.png' not found: using 
-draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.597 ...cludegraphics{figures/proflogfit42gs.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 19
  []
 
 [19 <./gmvarkit-vignette-plotdensity.pdf>]
+<gmvarkit-vignette-profilelogliks.pdf, id=448, 722.7pt x 375.4025pt>
+File: gmvarkit-vignette-profilelogliks.pdf Graphic file (type pdf)
+<use gmvarkit-vignette-profilelogliks.pdf>
+Package pdftex.def Info: gmvarkit-vignette-profilelogliks.pdf  used on input li
+ne 641.
+(pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 20 []
  []
 
 [20]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 21
  []
 
-[21]
-
-LaTeX Warning: Reference `sec:simuexp' on page 22 undefined on input line 651.
-
-
+[21 <./gmvarkit-vignette-profilelogliks.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 22 []
  []
 
 [22]
-
-Package natbib Warning: Citation `Buse:1982' on page 23 undefined on input line
- 659.
-
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 23
  []
 
 [23]
+! Undefined control sequence.
+l.724 \subsubsubsection
+                       {Restricting AR parameters to be the same for all reg...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-LaTeX Warning: Reference `sec:gstmar' on page 24 undefined on input line 695.
+! Undefined control sequence.
+l.736 \subsubsubsection
+                       {Restricting AR parameters to be the same for all reg...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -809,14 +785,33 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [24]
 
-LaTeX Warning: Reference `eq:defeq' on page 25 undefined on input line 720.
+Package natbib Warning: Citation `Buse:1982' on page 25 undefined on input line
+ 780.
 
 
-LaTeX Warning: Reference `sec:qresexpr' on page 25 undefined on input line 726.
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 25
+ []
+
+[25]
+
+LaTeX Warning: Reference `sec:gstmar' on page 26 undefined on input line 816.
+
+
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+\T1/lmr/m/n/10.95 26 []
+ []
+
+[26]
+
+LaTeX Warning: Reference `eq:defeq' on page 27 undefined on input line 841.
+
+
+LaTeX Warning: Reference `sec:qresexpr' on page 27 undefined on input line 847.
 
 
 
-LaTeX Warning: File `figures/diagplotfit42gsr.png' not found on input line 739.
+LaTeX Warning: File `figures/diagplotfit42gsr.png' not found on input line 860.
 
 
 
@@ -827,43 +822,10 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.739 ...udegraphics{figures/diagplotfit42gsr.png}
+l.860 ...udegraphics{figures/diagplotfit42gsr.png}
                                                   
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 25
- []
-
-[25]
-
-LaTeX Warning: Reference `sec:simuexp' on page 26 undefined on input line 756.
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 26 []
- []
-
-[26]
-
-LaTeX Warning: Reference `sec:simuexp' on page 27 undefined on input line 792.
-
-
-Underfull \hbox (badness 1331) in paragraph at lines 827--828
-[]\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
- []
-
-
-Underfull \hbox (badness 3449) in paragraph at lines 828--829
-\T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
- []
-
-
-Underfull \hbox (badness 1527) in paragraph at lines 840--841
-[]\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
- []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -871,27 +833,52 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [27]
+
+LaTeX Warning: Reference `sec:simuexp' on page 28 undefined on input line 877.
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 28 []
  []
 
 [28]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Warning: Reference `sec:simuexp' on page 29 undefined on input line 913.
+
+
+Underfull \hbox (badness 1331) in paragraph at lines 948--949
+[]\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
+ []
+
+
+Underfull \hbox (badness 3449) in paragraph at lines 949--950
+\T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
+ []
+
+
+Underfull \hbox (badness 1527) in paragraph at lines 961--962
+[]\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
+ []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 29
  []
 
-[29] (./gmvarkit-vignette.bbl
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 119.
-
+[29]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 30 []
  []
 
-[30]
+[30] (./gmvarkit-vignette.bbl
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 119.
+
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 31
+ []
+
+[31]
 
 LaTeX Font Warning: Font shape `T1/lmr/b/it' in size <10.95> not available
 (Font)              Font shape `T1/lmr/b/sl' tried instead on input line 140.
@@ -900,70 +887,71 @@ LaTeX Font Warning: Font shape `T1/lmr/b/it' in size <10.95> not available
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 862.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 983.
 
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 31
- []
-
-[31]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 32 []
  []
 
 [32]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 862.
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 33
+ []
+
+[33]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 983.
  (./gmvarkit-vignette.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 862.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 862.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 983.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 983.
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
-(rerunfilecheck)             Checksum: 1209622AB8050BD69A747C286C480FAC;2730.
+(rerunfilecheck)             Checksum: 87B924B6273C0F244495CC2ED7D1C18E;3645.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 862.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 983.
  ) 
 Here is how much of TeX's memory you used:
- 8799 strings out of 480608
- 134096 string characters out of 5903630
- 401771 words of memory out of 5000000
- 24296 multiletter control sequences out of 15000+600000
- 656768 words of font info for 105 fonts, out of 8000000 for 9000
+ 8791 strings out of 480608
+ 134361 string characters out of 5903630
+ 401822 words of memory out of 5000000
+ 24277 multiletter control sequences out of 15000+600000
+ 661030 words of font info for 106 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,25n,38p,1471b,488s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,25n,38p,1461b,490s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
-texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local/texlive/2020/
-texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2020/texmf-dist
-/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2020/texmf-dist/fonts/enc/dvi
+texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2020/t
+exmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local/texlive/2020/texmf-dist/fon
+ts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2020/texmf-dist/fonts/enc/dvi
 ps/lm/lm-mathsy.enc}{/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-m
 athex.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmb10.pfb><
 /usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmbo10.pfb></usr/local
 /texlive/2020/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2
 020/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2020/texmf-
-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2020/texmf-dist/fonts
-/type1/public/lm/lmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pub
-lic/lm/lmmi12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmm
-i6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></us
-r/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/tex
-live/2020/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2020
-/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2020/texmf-dist
-/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1
-/public/lm/lmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/l
-mr9.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmri10.pfb></
-usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmro10.pfb></usr/local/
-texlive/2020/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/local/texlive/20
-20/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2020/texmf
--dist/fonts/type1/public/lm/lmsso10.pfb></usr/local/texlive/2020/texmf-dist/fon
-ts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/p
-ublic/lm/lmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lm
-tt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtto10.pfb>
-</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.
-pfb>
-Output written on gmvarkit-vignette.pdf (32 pages, 575938 bytes).
+dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2020/texmf-dist/fonts/
+type1/public/lm/lmex10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/publ
+ic/lm/lmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmmi
+12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></us
+r/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/tex
+live/2020/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2020/t
+exmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2020/texmf-dist
+/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type
+1/public/lm/lmr6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/
+lmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmr9.pfb></u
+sr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/t
+exlive/2020/texmf-dist/fonts/type1/public/lm/lmri12.pfb></usr/local/texlive/202
+0/texmf-dist/fonts/type1/public/lm/lmro10.pfb></usr/local/texlive/2020/texmf-di
+st/fonts/type1/public/lm/lmss10.pfb></usr/local/texlive/2020/texmf-dist/fonts/t
+ype1/public/lm/lmssbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pub
+lic/lm/lmsso10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lm
+sy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></
+usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/
+texlive/2020/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></usr/local/texlive/2
+020/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on gmvarkit-vignette.pdf (33 pages, 635136 bytes).
 PDF statistics:
- 698 PDF objects out of 1000 (max. 8388607)
- 624 compressed objects within 7 object streams
- 149 named destinations out of 1000 (max. 500000)
- 187 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 746 PDF objects out of 1000 (max. 8388607)
+ 667 compressed objects within 7 object streams
+ 163 named destinations out of 1000 (max. 500000)
+ 232 words of extra memory for PDF output out of 10000 (max. 10000000)
 

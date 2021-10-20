@@ -50,7 +50,7 @@
 \Shorttitle{A Family of Mixture Autoregressive Models in \proglang{R}}
 
 \Abstract{
-We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics as well as for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to forecast future values of the process using a simulation-based Monte Carlo method, and to estimate generalized impulse response functions as well as generalized forecast error variance decompositions.  We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This brief manuscript is currently intended as a vignette only but it was created with the Journal of Statistical Software style.
+We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics as well as for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to forecast future values of the process using a simulation-based Monte Carlo method, and to estimate generalized impulse response functions as well as generalized forecast error variance decompositions.  We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This brief manuscript is intended as a vignette only but it was created with the Journal of Statistical Software style.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
@@ -76,7 +76,7 @@ We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for es
 
 
 \section{Introduction}
-\textbf{If you came to read this vignette because you have trouble with the estimation, see Section~\ref{sec:example_estim}}.
+\textbf{If you came to read this vignette because you have trouble with the estimation, see Section~\ref{sec:example_estim}. If you have in particular trouble with the estimation of structural models, see also Section~\ref{sec:estim_structural}.}
 
 Linear vector autoregressive (VAR) model is a standard tool in time series econometrics. It can be employed to answer questions about the statistical relationships of different variables or to forecast future values of the process, for example. Structural VAR model allows to trace out the effects of economic shocks that have been identified by the researcher. With an appropriate choice of the autoregressive order $p$, a linear VAR is often able to filter out autocorrelation from the series very well. If the errors are assumed to follow an autoregressive conditional heteroskedasticity (ARCH) process, the model is often able to also filter out conditional heteroskedasticity from the series.
 
@@ -572,6 +572,7 @@ R> plot(fit12gs, type="series")
 \end{Schunk}
 \includegraphics{gmvarkit-vignette-plotseries}
 %
+
 And the following command creates the stationary density plot:
 %
 \begin{Schunk}
@@ -581,77 +582,197 @@ R> plot(fit12gs, type="density")
 \end{Schunk}
 \includegraphics{gmvarkit-vignette-plotdensity}
 %
+
 If the argument \code{type} is not specified, both of the figures will be plotted.
 
-It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean \cite[see][Equation (2.19)]{Virolainen:2020}.
+It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean.
 
-\begin{figure}[p]
-  \centering
-  \includegraphics{figures/plotfit42gs.png}
-  \caption{The figure produced by the command \code{plot(fit42gs)}. On the top left, the monthly spread between the 10-year and 1-year Treasury constant maturity rates, covering the period from 1982 January to 2020 December. On the bottom left, the estimated mixing weights of the G-StMAR model (\code{fit42gs}) fitted to the interest rate spread (blue dashed line for the first regime and red dashed line for the second regime). On the right, the one-dimensional marginal stationary density of the estimated G-StMAR model (grey dashed line) along with a kernel density estimate of the spread (black solid line) and marginal stationary densities of the regimes multiplied by the mixing weight parameter estimates (blue and red dotted lines).}
-\label{fig:fit42gs}
-\end{figure}
-
-\begin{figure}[p]
-  \centering
-  \includegraphics{figures/proflogfit42gs.png}
-  \caption{The figure produced by the command \code{profile\_logliks(fit42gs)}. Graphs of the profile log-likelihood functions of the estimated G-StMAR model \code{fit42gs} with the red vertical lines pointing the estimates.}
-\label{fig:proflogfit42gs}
-\end{figure}
 
 The variable metric algorithm employed in the final estimation does not necessarily stop at a local maximum point. The algorithm might also stop at a saddle point or near a local maximum, when the algorithm is not able to increase the log-likelihood, or at any point, when the maximum number of iterations has been reached. In the latter case, the estimation function throws a warning, but saddle points and inaccurate estimates need to be detected by the researcher.
 
 It is well known that in a local maximum point, the gradient of the log-likelihood function is zero, and the eigenvalues of the Hessian matrix are all negative. In a local minimum, the eigenvalues of the Hessian matrix are all positive, whereas in a saddle point, some of them are positive and some negative. Nearly numerically singular Hessian matrices occur when the surface of the log-likelihood function is very flat about the estimate in some directions. This particularly happens when the model contains overly large degrees of freedom parameter estimates or the mixing weights $\alpha_{m,t}$ are estimated close to zero for all $t=1,...,T$ for some regime $m$.
 
-\pkg{uGMAR} provides several functions for evaluating whether the estimate is a local maximum point. The function \code{get_foc} returns the (numerically approximated) gradient of the log-likelihood function evaluated at the estimate, and the function \code{get_soc} returns eigenvalues of the (numerically approximated) Hessian matrix of the log-likelihood function evaluated at the estimate. The numerical derivatives are calculated using a central difference approximation
+\pkg{gmvarkit} provides several functions for evaluating whether the estimate is a local maximum point. The function \code{get_foc} returns the (numerically approximated) gradient of the log-likelihood function evaluated at the estimate, and the function \code{get_soc} returns eigenvalues of the (numerically approximated) Hessian matrix of the log-likelihood function evaluated at the estimate. The numerical derivatives are calculated using a central difference approximation
 \begin{equation}
 \frac{\partial L(\boldsymbol{\theta})}{\partial \theta_i} \approx \frac{f(\boldsymbol{\theta} + \boldsymbol{h}^{(i)}) - f(\boldsymbol{\theta} - \boldsymbol{h}^{(i)})}{2h}, \ \ h>0,
 \end{equation}
 where $\theta_i$ is the $i$th element of $\boldsymbol{\theta}$ and $\boldsymbol{h}^{(i)}=(0,...,0,h,0,...,0)$
 contains $h$ as its $i$th element. By default, the difference $h=6\cdot 10^{-6}$ is used for all parameters except for overly large degrees of freedom parameters, whose partial derivatives are approximated using larger differences. The difference is increased for large degrees of freedom parameters, because the limited precision of the float point presentation induces artificially rugged surfaces to the their profile log-likelihood functions, and the increased differences diminish the related numerical error. On the other hand, as the surface of the profile log-likelihood function is very flat about a large degrees of freedom parameter estimate, large differences work well for the approximation.
 
-For example, the following code calculates the first order condition for the G-StMAR model \code{fit42gs}:
+For example, the following code calculates the first order condition for the G-StMVAR model \code{fit12gs}:
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> get_foc(fit42gs)
-\end{CodeInput}
-\begin{CodeOutput}
- [1]  0.1122667304  0.0443675437  0.0412785752  0.0423330799  0.0452292663
- [6]  0.3538279050 -0.0812537190 -0.0732948896 -0.0755336131 -0.0767990779
-[11] -0.0825067588 -0.0117666801 -0.0004755852 -0.0003115161
-\end{CodeOutput}
-\end{CodeChunk}
+\begin{Schunk}
+\begin{Sinput}
+R> get_foc(fit12gs)
+\end{Sinput}
+\begin{Soutput}
+ [1] -0.0006134447  0.0137299025  0.0098887109 -0.0011046216
+ [5] -0.0082410002  0.0043358573  0.0227806301  0.0567827575
+ [9] -0.0305398871 -0.0076389005  0.0217023555  0.0085821531
+[13]  0.0139181727 -0.0017298992  0.0010732843  0.0213273026
+[17]  0.0066026165 -0.2656223946  0.0142493946  0.0003786577
+\end{Soutput}
+\end{Schunk}
 %
 and the following code calculates the second order condition:
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> get_soc(fit42gs)
-\end{CodeInput}
-\begin{CodeOutput}
- [1] -5.532989e-02 -1.354613e+01 -4.393581e+01 -6.468623e+01 -1.208288e+02
- [6] -1.672930e+02 -2.618770e+02 -8.870701e+02 -2.044356e+03 -4.862843e+03
-[11] -4.356473e+04 -5.459504e+04 -2.727102e+05 -5.568025e+05
-\end{CodeOutput}
-\end{CodeChunk}
+\begin{Schunk}
+\begin{Sinput}
+R> get_soc(fit12gs)
+\end{Sinput}
+\begin{Soutput}
+ [1]     -0.129339     -1.391451    -12.777210    -18.688706
+ [5]    -20.669182    -50.434083    -81.137635   -107.036071
+ [9]   -171.759280   -212.430510   -277.544528   -337.194107
+[13]   -446.790867  -1103.841017  -1130.123478  -1260.969931
+[17]  -1821.309543  -9262.322334 -13026.702437 -34549.413869
+\end{Soutput}
+\end{Schunk}
 %
-All eigenvalues of the Hessian matrix are negative, which points to a local maximum, but the gradient of the log-likelihood function seems to somewhat deviate from zero. The gradient might be inaccurate, because it is based on a numerical approximation. It is also possible that the estimate is inaccurate, because it is based on approximative numerical estimation, and the estimates are therefore not expected to be exactly accurate. Whether the estimate is a local maximum point with accuracy that is reasonable enough, can be evaluated by plotting the graphs of the profile log-likelihood functions about the estimate. In \pkg{uGMAR}, this can be done conveniently with the function \code{profile_logliks}.
+All eigenvalues of the Hessian matrix are negative, which points to a local maximum, but the gradient of the log-likelihood function seems to somewhat deviate from zero. The gradient might be inaccurate, because it is based on a numerical approximation. It is also possible that the estimate is inaccurate, because it is based on approximative numerical estimation, and the estimates are therefore not expected to be exactly accurate. Whether the estimate is a local maximum point with accuracy that is reasonable enough, can be evaluated by plotting the graphs of the profile log-likelihood functions about the estimate. In \pkg{gmvarkit}, this can be done conveniently with the function \code{profile_logliks}.
 
-The exemplify, the following command plots the graphs of profile log-likelihood functions of the estimated G-StMAR model \code{fit42gs}:
+The exemplify, the following command plots the graphs of profile log-likelihood functions of the estimated G-StMVAR model \code{fit12gs}:
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> profile_logliks(fit42gs, scale = 0.02, precision = 200)
-\end{CodeInput}
-\end{CodeChunk}
+\begin{Schunk}
+\begin{Sinput}
+R> profile_logliks(fit12gs, scale=0.02, precision=50)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{gmvarkit-vignette-profilelogliks}
 %
-The output is displayed in Figure~\ref{fig:proflogfit42gs}, showing that the estimate's accuracy is reasonable, as changing any individual parameter value marginally would not visibly increase the log-likelihood. The argument \code{scale} can be adjusted to shorten or lengthen the interval shown in the horizontal axis. If one zooms in enough by setting \code{scale} to a very small number, it can be seen that the estimate is not exactly at the local maximum, but it is so close that moving there would not increase the log-likelihood notably. The argument \code{precision} can be adjusted to increase the number of points the graph is based on. For faster plotting, it can be decreased, and for more precision, it can be increased.
 
-We have discussed tools that can be utilized to evaluate whether the found estimate is a local maximum with a reasonable accuracy. It is, however, more difficult to establish that the estimate is the global maximum. With \pkg{uGMAR}, the best way to increase the reliability that the found estimate is the global maximum, is to run more estimation rounds by adjusting the argument \code{ncalls} of the estimation function \code{fitGSMAR}. When a large number of estimation rounds is run (and $M>1$), \code{fitGSMAR} often finds peculiar near-the-boundary estimates that have extremely spiky profile log-likelihood functions for some parameters and are thus difficult to find (see Appendix~\ref{sec:simuexp}). Therefore, it seems plausible that \code{fitGSMAR} also finds a reasonable ML estimate with a good reliability.
+The output shows that the estimate's accuracy is reasonable, as changing any individual parameter value marginally would not increase the log-likelihood much. The argument \code{scale} can be adjusted to shorten or lengthen the interval shown in the horizontal axis. If one zooms in enough by setting \code{scale} to a very small number, it can be seen that the estimate is not exactly at the local maximum, but it is so close that moving there would not increase the log-likelihood notably. The argument \code{precision} can be adjusted to increase the number of points the graph is based on. For faster plotting, it can be decreased, and for more precision, it can be increased. The argument \code{which_pars} is used to specify the parameters whose profile log-likelihood functions should be plotted. This argument is particularly useful when creating as many plots as there are parameters in the model to a single figure would cause the individual plots to be very small. In such a case, profile log-likelihood functions for subsets of the parameters can be plotted separately by specifying this argument accordingly.
 
-\subsection{Examples of constrained estimation}\label{sec:examp_const}
-Alternatively to the unconstrained estimation, one may impose linear constraints on the autoregressive (AR) parameters of the model; that is, on $\varphi_{m,1},...,\varphi_{m,p}$, $m=1,...,M$. \pkg{uGMAR} deploys two types of constraints: the AR parameters can be restricted to be the same for all regimes and linear constraints can be applied to each regime separately. In order to impose the former type of constraints, the estimation function simply needs to be supplied with the argument \code{restricted = TRUE}.
+We have discussed tools that can be utilized to evaluate whether the found estimate is a local maximum with a reasonable accuracy. It is, however, more difficult to establish that the estimate is the global maximum. With \pkg{gmvarkit}, the best way to increase the reliability that the found estimate is the global maximum, is to run more estimation rounds by adjusting the argument \code{ncalls} of the estimation function \code{fitGSMVAR}. If the model is very large, a very large number of estimation rounds may be required to find the global maximum. If there are two regimes in the model, $p$ is reasonable, and the dimension of the time series at most four, the required number of estimation rounds typically varies from several hundred to several thousand depending on the model and the data. In the simpler models, less estimation rounds are required. In the larger models, and in particular if $M>2$, a significantly large number of estimation rounds may be required obtain the MLE.
+
+\subsection{Estimation of the structural GSMVAR model}\label{sec:estim_structural}
+The structural GSMVAR models are estimated similarly to the reduced form version, expect that the model is parametrized with $W$ and $\lambda_{mi}$, $m=2,...,M$, $i=1,...,d$ instead of the covariance matrices $\Omega_{m}$, $m=1,...,M$. The estimation is can be done with the function \code{fitGSMVAR} but now the argument \code{structural_pars} needs to be supplied with a list providing the constraints on $W$ (which equally imposes the constraints on the B-matrix) and optionally linear constraints on the $\lambda_{mi}$ parameters.
+
+The list \code{structural_pars} should contain at least the element \code{W} which is a $(dxd)$ matrix matrix with its entries imposing constraints on $W$: \code{NA} indicating that the element is unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict negative sign constraint, and zero indicating that the element is constrained to zero. The element named \code{C_lambda} is optional. If specified it should be a $(d(M-1) \times r)$ constraint matrix that satisfies ($\lambda_{2},...,\lambda_{M}) =C_{\lambda} \gamma$ where $\lambda_{m}=(\lambda_{m1},...,\lambda_{md})$ and $\gamma$ is the new $(r x 1)$ parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda} must be either positive or zero. Ignore (or set to \code{NULL}) if the eigenvalues $\lambda_{mi}$ should not be constrained. Note that other constraints than constraining some of the $\lambda_{mi}$ to be identical are not recommended but if such constraints are imposed, the argument \code{lambda_scale} in the genetic algorithm (see \code{?GAfit}) should be adjusted accordingly.
+
+\textbf{Reliable estimation of structural GSMVAR models typically requires much more estimation rounds than the estimation of the reduced form models. However, when $M=2$, every reduced form model has an implied statistically identified structural model, which can be built without any additional estimation (see the next subsection). We recommend considering this implied model first. Then, if overidentifying constraints are to be imposed on the B-matrix (or equally $W$), we recommend using the unrestricted estimate to create an initial guess for the constrained parameter vector and pass this to the genetic algorithm as an initial population}. See the help page \code{?GAfit} for the arguments that can be passed by \code{fitGSMVAR} to the genetic algorithm. Create the initial guess for the parameter vector by using the form given in documentation of the argument \code{initpop}. If $M\neq 2$, the structural model needs to be estimated in the normal way with \code{fitGSMVAR}, however.
+
+\subsubsection{Building structural model based on a reduced form model}
+If the number of regimes is two ($M=2$), a structural model can be built based on a reduced form model, because the matrix decomposition used in the simultaneous diagonalization of the error term covariance matrices always exists. This can be done with function \code{gsmvar_to_sgsmvar} which should be supplied with the reduced form model, and it then returns a corresponding structural model. After creating the structural model, the columns of $W$ can be reordered with the function \code{reorder_W_columns} which also reorders all $\lambda_{mi}$ accordingly (and hence the resulting model will coincide with the original reduced form model). Also, all signs any column of $W$ can be swapped with the function \code{swap_W_signs} (and structural model is still related to the same reduced form model).
+
+The exemplify, the following code creates statistically identified structural model based on the reduced form model \code{fit12gs} and then prints the estimates.
+%
+\begin{Schunk}
+\begin{Sinput}
+R> fit12gss <- gsmvar_to_sgsmvar(fit12gs)
+R> fit12gss
+\end{Sinput}
+\begin{Soutput}
+Structural G-StMVAR model:
+ p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+
+Regime 1 (GMVAR type)
+Mixing weight: 0.17 
+Regime means: 0.66, 1.67
+
+   Y     phi0          A1                  Omega         1/2     
+1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
+2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
+
+Regime 2 (StMVAR type)
+Mixing weight: 0.83 
+Regime means: 0.78, 0.54
+Df parameter:  7.57
+
+   Y     phi0          A1                            Omega         
+1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )
+2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )
+  1/2     
+1     eps1
+2     eps2
+
+Structural parameters:
+        W             lamb2  
+1 [  0.95 -0.55 ]   [  0.37 ]
+2 [  0.16  0.34 ] , [  0.28 ]
+
+The B-matrix (or equally W) is subject to 0 zero constraints and 2 sign constraints.
+The eigenvalues lambda_{mi} are not subject to linear constraints.
+\end{Soutput}
+\end{Schunk}
+%
+
+Estimates for the structural parameters, $W$ and the eigenvalues, are printed last.
+
+\subsection{Constrained estimation}\label{sec:examp_const}
+
+\subsubsection{Imposing linear constraints and parameter vector}
+Imposing linear constraints on the autoregressive parameters of GMVAR model is straightforward in \pkg{gmvarkit}. The constraints are expressed in a rather general form which allows to impose a wide class of constraints but one needs to take the time to construct the constraint matrix carefully for each particular case.
+
+We consider constraints of form
+\begin{align}
+& (\boldsymbol{\phi_1},...,\boldsymbol{\phi_M}) = \boldsymbol{C}\boldsymbol{\psi},\\
+& \boldsymbol{\phi_m}=(vec(A_{m,1}),...,vec(A_{m,p}))\enspace (pd^2x1), \enspace m=1,...,M,
+\end{align}
+$\boldsymbol{C}$ is known $(Mpd^2xq)$ constraint matrix (of full column rank) and $\boldsymbol{\psi}$ is unknown $(qx1)$ parameter vector.
+
+The parameter vector for constrained model is size $((M(d+d(d+1)/2+1)+q-1)x1)$ and has form
+\begin{equation}
+\boldsymbol{\theta} = (\phi_{1,0},...,\phi_{M,0},\boldsymbol{\psi},\alpha_1,...,\alpha_{M-1}),
+\end{equation}
+where $\boldsymbol{\psi}$ is the $(qx1)$ parameter vector containing constrained autoregressive parameters. As in the case of regular models, instead of the intercept parametrization that takes use of intercept terms $\phi_{m,0}$, one may use the mean parametrization with regimewise means $\mu_m$ instead $(m=1,...,M)$.
+
+\subsubsection{Examples of linear constraints}
+Consider the following two common uses of linear constraints: restricting the autoregressive parameters to be the same for all regimes and constraining some parameters to zero. Of course also some other constraints may be useful, but we chose to show illustrative examples of these two as they occur in the cited article by Kalliovirta et al. (2016).
+
+\subsubsubsection{Restricting AR parameters to be the same for all regimes}
+To restrict the AR parameters to be the same for all regimes, we want $\boldsymbol{\phi_m}$ to be the same for all $m=1,...,M$. The parameter vector $\boldsymbol{\psi}$ $(qx1)$ then corresponds to any $\boldsymbol{\phi_m}=\boldsymbol{\phi}$, and therefore $q=pd^2$. For the constraint matrix we choose
+\begin{equation}
+\boldsymbol{C} = [I_{pd^2}:\cdots:I_{pd^2}]' \enspace (Mpd^2xpd^2),
+\end{equation}
+that is, $M$ pieces of $(pd^2xpd^2)$ diagonal matrices stacked on top of each other, because then
+\begin{equation}
+\boldsymbol{C}\boldsymbol{\psi}=(\boldsymbol{\psi},...,\boldsymbol{\psi})=(\boldsymbol{\phi},...,\boldsymbol{\phi}).
+\end{equation}
+The appropriate constraint matrix then created with \proglang{R} as....GIVE THE EXAMPLE
+
+
+\subsubsubsection{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}
+The previous example shows how to restrict the AR parameters to be the same for all regimes, but say we also want to constrain the non-diagonal elements of coefficient matrices $A_{m,i}$ $(m=1,...,M, i=1,...,p)$ to be zero. We have the constrained parameter $\boldsymbol{\psi}$ $(qx1)$ representing the unconstrained parameters $(\boldsymbol{\phi_1},...,\boldsymbol{\phi_M})$, where by assumption $\boldsymbol{\phi_m}=\boldsymbol{\phi}=(vec(A_1),...,vec(A_p))$ $(pd^2x1)$ and the elements of $vec(A_i)$ $(i=1,...,p)$ corresponding to the diagonal are zero.
+
+For illustrative purposes, let's consider a GMVAR model with autoregressive degree $p=2$, number of mixture components $M=2$ and number of time series in the system $d=2$. Then we have
+$$
+\boldsymbol{\phi}=(A_{1,(1,1)},0,0,A_{1,(2,2)},A_{2,(1,1)},0,0,A_{2,(2,2)}) \enspace (8x1) \enspace \text{and}
+$$
+$$\boldsymbol{\psi}=(A_{1,(1,1)},A_{1,(2,2)},A_{2,(1,1)},A_{2,(2,2)}) \enspace (4x1).\quad\quad\quad\quad\quad\enspace
+$$
+By a direct calculation, we can see that choosing the constraint matrix
+$$
+\boldsymbol{C}=\left[{\begin{array}{c}
+   \boldsymbol{\tilde{c}} \\
+   \boldsymbol{\tilde{c}} \\
+  \end{array}}\right]
+\enspace (Mpd^2x4),
+\enspace \text{where}
+$$
+
+$$
+\boldsymbol{\tilde{c}}=\left[{\begin{array}{cccc}
+   1 & 0 & 0 & 0 \\
+   0 & 0 & 0 & 0 \\
+   0 & 0 & 0 & 0 \\
+   0 & 1 & 0 & 0 \\
+   0 & 0 & 1 & 0 \\
+   0 & 0 & 0 & 0 \\
+   0 & 0 & 0 & 0 \\
+   0 & 0 & 0 & 1 \\
+  \end{array}}\right]
+\enspace (pd^2x4)
+$$
+satisfies $\boldsymbol{C}\boldsymbol{\psi}=(\boldsymbol{\phi},...,\boldsymbol{\phi}).$
+
+\subsubsection{Constraining the unconditional means of some regimes to be the same}
+In addition to constraining the autoregressive parameters, \pkg{gmvarkit} allows to constrain the unconditional means of some regimes to be the same. This feature is, however, only available for models that are parametrized with the unconditional means instead of intercepts (because some of the estimation is always done with mean-parametrization and one cannot generally swap the parametrization when constraints are imposed on means/intercepts). With the mean-parametrization employed (by setting \code{parametrization="mean"}), one may define groups of regimes that have the same mean parameters using the argument \code{same_means}. For instance, with three regime model $(M=3)$ the argument \code{same_means=list(c(1, 3), 2)} sets the unconditional means of the first and third regimes to be the same while allows the second regime to have different mean.
+
+One can also combine linear constraints on the AR parameters with constraining some of the means to be the same. This allows, for instance, to estimate a model in which only the covariance matrix varies in time. Validity of different constraints can be evaluated, for example, with likelihood ratio and Wald tests using the functions \code{LR_test} and \code{Wald_test}.
+
+
 
 
 
