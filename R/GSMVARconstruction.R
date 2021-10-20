@@ -544,17 +544,17 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #' }
 #' @export
 
-stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, max_df=100, maxit=100) {
+stmvar_to_gstmvar <- function(gsmvar, estimate, calc_std_errors=estimate, maxdf=100, maxit=100) {
   check_gsmvar(gsmvar)
   if(missing(estimate)) estimate <- ifelse(is.null(gsmvar$data), FALSE, TRUE)
-  stopifnot(all_pos_ints(c(max_df, maxit)))
+  stopifnot(all_pos_ints(c(maxdf, maxit)))
   M <- gsmvar$model$M
 
   # G-StMVAR model parameter vector with the large df regimes changed to GMVAR type
   new_params <- stmvarpars_to_gstmvar(p=gsmvar$model$p, M=M, d=gsmvar$model$d,
                                       params=gsmvar$params, model=gsmvar$model$model,
                                       constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
-                                      structural_pars=gsmvar$structural_pars, max_df=max_df)
+                                      structural_pars=gsmvar$structural_pars, maxdf=maxdf)
 
   # New constraints, if they we removed
   if(!all(new_params$reg_order == 1:sum(M))) {

@@ -316,11 +316,11 @@ mod12t <- suppressWarnings(GSMVAR(gdpdef, p=1, M=2, params=c(params12, 7, 90000)
 mod12gs <- suppressWarnings(GSMVAR(gdpdef, p=1, M=c(1, 1), params=c(params12, 90), model="G-StMVAR"))
 
 test_that("sgmvar_to_gstmvar works correctly", {
-  new_mod12t_1 <- suppressMessages(stmvar_to_gstmvar(mod12t, max_df=100, maxit=1))
-  new_mod12t_2 <- suppressMessages(stmvar_to_gstmvar(mod12t, max_df=5, maxit=1))
-  new_mod12t_3 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12t, max_df=90001, maxit=1)))
-  new_mod12gs_1 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, max_df=100, maxit=1)))
-  new_mod12gs_2 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, max_df=50, maxit=1)))
+  new_mod12t_1 <- suppressMessages(stmvar_to_gstmvar(mod12t, maxdf=100, maxit=1))
+  new_mod12t_2 <- suppressMessages(stmvar_to_gstmvar(mod12t, maxdf=5, maxit=1))
+  new_mod12t_3 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12t, maxdf=90001, maxit=1)))
+  new_mod12gs_1 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, maxdf=100, maxit=1)))
+  new_mod12gs_2 <- suppressWarnings(suppressMessages(stmvar_to_gstmvar(mod12gs, maxdf=50, maxit=1)))
 
   expect_equal(new_mod12t_1$model$model, "G-StMVAR")
   expect_equal(new_mod12t_1$model$M, c(1, 1))

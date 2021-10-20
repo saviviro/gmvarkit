@@ -246,7 +246,7 @@ u_{M,t}\sim t_d(0,\Omega_{M,t},\nu_m + dp) & \text{if} & s_{M,t}=1 & (\text{with
 \end{matrix}\right.
 \end{equation}
 where the probabilities are expressed conditionally on $\mathcal{F}_{t-1}$ and $e_t$ $(d \times 1)$ in an orthogonal structural error.  For the GMVAR type regimes, $m=1,...,M_1$‚ $\Omega_{m,t}=\Omega_m$.  For the StMVAR type regimes,  $m=M_1+1,...,M$,  $\Omega_{m,t}=\sigma_{m,t}^2\Omega_m$, where
-\begin{equation}
+\begin{equation}\label{eq:sigma_mt}
 \sigma_{m,t}^2 = \frac{\nu_m - 2 + (\boldsymbol{y}_{t-1} - \boldsymbol{1}_p\otimes\mu_m)'\Sigma_{m,p}^{-1}(\boldsymbol{y}_{t-1} - \boldsymbol{1}_p\otimes\mu_m)}{\nu_m - 2 + dp}.
 \end{equation}
 The invertible $(d\times d)$ "B-matrix" $B_t$, which governs the contemporaneous relations of the shocks, is time-varying and a function of $y_{t-1},..., y_{t-p}$. With a particular choice of $B_t$,  the conditional covariance matrix of the structural error can be normalized to an identity matrix. Consequently,  a constant sized structural shock will be amplified according to the conditional variance of the reduced form error, thereby reflecting the specific state of the economy.
@@ -380,7 +380,7 @@ The argument \code{seeds} supplies the seeds that initialize the random number g
 %
 <<data>>=
 data("gdpdef", package = "gmvarkit")
-m1 <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=2, seeds=1:2)
+fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=2, seeds=1:2)
 @
 %
 
@@ -391,7 +391,7 @@ The function throws a warning (does not show up in the above printout) because a
 The following code builds a StMVAR model based on the second-largest local maximum found in the estimation:
 %
 <<alt_gsmvar>>=
-m2 <- alt_gsmvar(m1, which_largest=2)
+fit12t_alt <- alt_gsmvar(fit12t, which_largest=2)
 @
 %
 
@@ -400,189 +400,45 @@ m2 <- alt_gsmvar(m1, which_largest=2)
 The estimates can be examined with the \code{print}.
 %
 <<print>>=
-print(m2)
+print(fit12t_alt)
 @
 %
 The parameter estimates are reported for each mixture component separately so that the estimates can be easily interpreted. Each regime's autoregressive formula is presented in the form
 \begin{equation}
-y_t = \varphi_{m,0} + \varphi_{m,1}y_{t - 1} + ... + \varphi_{m,p}y_{t - p} + \sigma_{m,t}\varepsilon_{m,t}.
+y_t = \varphi_{m,0} + A_{m,1}y_{t - 1} + ... + A_{m,p}y_{t - p} + \Omega_{m,t}^{1/2}\varepsilon_{m,t}.
 \end{equation}
-The other statistics are listed above the formula, including the mixing weight pameter $\alpha_m$, the unconditional mean $\mu_m$, the variance parameter $\sigma_m^2$, and the degrees freedom parameter $\nu_m$. For GMAR type regimes (if any), $\sigma_{m,t}=\sigma_m$ so the estimate of the variance parameter $\sigma_m^2$ is reported directly in the autoregressive formula.
+If $\Omega_{m,t}^{1/2}$ is time varying, it printed in the form $\Omega_{m,t}^{1/2}=(\text{arch\_scalar_{m,t}}\Omega_m)^{1/2}$ where the arch\_scalar is the square root of $\sigma_{m,t}^2$ which is defined in (\ref{eq:sigma_mt}). No numerical value is given to the ARCH scalar, as it is time-varying. The other statistics are listed above the formula, including the mixing weight pameter $\alpha_m$, the unconditional mean $\mu_m$, and the degrees freedom parameter $\nu_m$.
 
-The above printout shows that the second regime's degrees of freedom parameter estimate is very large, which might induce numerical problems. However, since a StMAR model with some degrees of freedom parameters tending to infinity coincides with the G-StMAR model with the corresponding regimes switched to GMAR type, one may avoid the problems by switching to the appropriate G-StMAR model \citep[Section 4]{Virolainen:2020}. Switching to the appropriate G-StMAR model is recommended also because it removes the redundant degrees of freedom parameters from the model, thereby reducing its complexity. The function \code{stmar_to_gstmar} does this switch automatically by first removing the large degrees of freedom parameters and then estimating the G-StMAR model with a variable metric algorithm \citep[algorithm 21]{Nash:1990} using the induced parameter vector as the initial value.
+The above printout shows that the second regime's degrees of freedom parameter estimate is very large, which might induce numerical problems. However, since a StMVAR model with some degrees of freedom parameters tending to infinity coincides with the G-StMVAR model with the corresponding regimes switched to GMVAR type, one may avoid the problems by switching to the appropriate G-StMVAR model \citep[see][]{Virolainen2:2021}. Switching to the appropriate G-StMVAR model is recommended also because it removes the redundant degrees of freedom parameters from the model, thereby reducing its complexity. The function \code{stmvar_to_gstmvar} does this switch automatically by first removing the large degrees of freedom parameters and then estimating the G-StMVAR model with a variable metric algorithm \citep[algorithm 21]{Nash:1990} using the induced parameter vector as the initial value.
 
-To exemplify, the following code switches all the regimes of the StMAR model \code{fit42t} with a degrees of freedom parameter estimate larger than $100$ to GMAR type, and then estimates the corresponding G-StMAR model.
+To exemplify, the following code switches all the regimes of the StMVAR model \code{fit12t_alt} with a degrees of freedom parameter estimate larger than $100$ to GMVAR type, and then estimates the corresponding G-StMVAR model.
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> fit42gs <- stmar_to_gstmar(fit42t, maxdf = 100)
-\end{CodeInput}
-\end{CodeChunk}
+<<stmvar_to_gstmvar>>=
+fit12gs <- stmvar_to_gstmvar(fit12t_alt, maxdf=100)
+@
 %
-We use the \code{summary} method to obtain a more detailed printout of the estimated the G-StMAR model:
+We use the \code{summary} method to obtain a more detailed printout of the estimated the G-StMVAR model:
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> summary(fit42gs, digits = 2)
-\end{CodeInput}
-\begin{CodeOutput}
-Model:
- G-StMAR, p = 4, M1 = 1, M2 = 1, #parameters = 14, #observations = 468,
- conditional, intercept parametrization, not restricted, no constraints.
-
- log-likelihood: 182.35, AIC: -336.71, HQIC: -313.89, BIC: -278.75
-
-Regime 1 (GMAR type)
-Moduli of AR poly roots: 1.16, 1.45, 1.45, 1.16
-Mix weight: 0.19 (0.09)
-Reg mean: 0.55
-Reg var:  0.14
-
-y = [0.04] + [1.34]y.1 + [-0.59]y.2 + [0.54]y.3 + [-0.36]y.4 + sqrt[0.01]eps
-    (0.01)   (0.10)       (0.20)      (0.19)       (0.12)          (0.00)
-
-Regime 2 (StMAR type)
-Moduli of AR poly roots: 1.07, 2.02, 2.02, 1.51
-Mix weight: 0.81
-Reg mean: 1.87
-Var param: 0.04 (0.01)
-Df param: 9.76 (4.25)
-Reg var:  1.01
-
-y = [0.06] + [1.28]y.1 + [-0.36]y.2 + [0.20]y.3 + [-0.15]y.4 + [sigma_mt]eps
-    (0.02)   (0.05)       (0.09)      (0.09)       (0.06)
-
-Process mean: 1.62
-Process var:  1.11
-First p autocors: 0.98 0.96 0.93 0.89
-\end{CodeOutput}
-\end{CodeChunk}
+<<stmvar_to_gstmvar>>=
+summary(fit12gs)
+@
 %
-In the G-StMAR model, estimates for GMAR type regimes are reported before StMAR type regimes, in a decreasing order according to the mixing weight parameter estimates. As shown above, the model \code{fit42gs} incorporates one GMAR type regime and one StMAR type regime. The mixing weight parameter estimate $0.19$ of the GMAR type regime indicates that in the long run, roughly $19\%$ of the observations are generated from this regime. Estimates of the unconditional mean and variance ($0.55$ and $0.14$, respectively) are visibly smaller in the GMAR type regime than in the StMAR type regime ($1.87$ and $1.01$, respectively). Hence, the GMAR type seems to mostly account for the periods when the series takes smaller values and is less volatile, while the StMAR type regime covers the more volatile periods of larger values. Interestingly, the AR parameters are somewhat similar in both regimes, implying that it could be appropriate to restrict them to be identical (this will be tested in Section~\ref{sec:testconst}).
+In the G-StMVAR model, estimates for GMVAR type regimes are reported before StMVAR type regimes, in a decreasing order according to the mixing weight parameter estimates. As shown above, the model \code{fit12gs} incorporates one GMVAR type regime and one StMVAR type regime. Estimates of the first $p$ autocovariances and autocorrelations (including the unconditional covariance) matrix can be obtained from the element \code{$uncond_moments} of the model object. The first two conditional moments calculated using the data are available for the process (\code{$total_cmeans} and \code{$total_ccovs}) as well as for the regimes separately (\code{$regime_cmeans} and \code{$regime_ccovs}). Notably these statistics can be conveniently plotted along the series with the function \code{cond_moment_plot}.
 
-Approximate standard errors are given in parentheses under or next to the related estimates. Note that the last mixing weight parameter estimate does not have an approximate standard error because it is not parametrized. Likewise, there is no standard error for the intercepts if mean parametrization is used (by setting \code{parametrization = "mean"} in \code{fitGSMAR}) and vice versa. In order to obtain standard errors for the regimewise unconditional means or intercepts, one can easily swap between the mean and intercept parametrizations with the function \code{swap_parametrization}.
+Approximate standard errors can be printed with the function \code{print_std_errors}, which prints the standard errors in the same form as the print method prints the estimates. Note that the last mixing weight parameter estimate does not have an approximate standard error because it is not parametrized. Likewise, there is no standard error for the intercepts if mean parametrization is used (by setting \code{parametrization = "mean"} in \code{fitGSMVAR}) and vice versa. In order to obtain standard errors for the regimewise unconditional means or intercepts, one can easily swap between the mean and intercept parametrizations with the function \code{swap_parametrization}.
 
-Missing values are reported when \pkg{uGMAR} is not able to calculate the standard error. This typically happens either because there is an overly large degrees of freedom parameter estimate in the model (as discussed above) or because the estimation algorithm did not stop a local maximum. In the latter case, the observed information matrix is not necessarily positive definite, implying that the diagonal entries of its inverse might not all be positive. Consequently, when extracting the approximate standard errors by taking the square roots of the diagonal entries from the inverse of the observed information matrix, the possibly present negative entries will lead to missing values.
-
-Section~\ref{sec:examestim} discusses how to evaluate with \pkg{uGMAR} whether the estimate is a local maximum (and how to improve the reliability of it being the global maximum). If the estimate is not a local maximum, one may try running more iterations of the variable metric algorithm with the function \code{iterate_more}. However, often when the algorithm does not stop a local maximum, it stopped to an unreasonable point very near the boundary of parameter space. As will be discussed next, in such a case it might be more appropriate to consider an alternative estimate that is clearly in the interior of the parameter space.
-
-Other statistics reported in the summary printout include the log-likelihood and values of the information criteria, the first and second moments of the process, as well as regime specific unconditional means, unconditional variances, and moduli of the roots of the AR polynomials $1-\sum_{i=1}^p\varphi_{m,i}z^i, \ m=1,...,M$. If some of the moduli are very close to one, the related estimates are near the boundary of the stationarity region. We demonstrate in Appendix~\ref{sec:simuexp} that when such solutions are accompanied with a very small variance parameter estimate, they might not be reasonable estimates and maximize the log-likelihood function for a technical reason only. Consequently, the estimate related to the next-largest local maximum could be considered.
-
-This is possible in \pkg{uGMAR}, because the estimation function \code{fitGSMAR} stores the estimates from all the estimation rounds so that a GSMAR model can be built based on any one of them, most conveniently with the function \code{alt_gsmar}. The desired estimation round can be specified either with the argument \code{which_round} or \code{which_largest}. The former specifies the round in the estimation order, whereas the latter specifies it in a decreasing order of the log-likelihoods.
-
-To give an example of a case where the estimates are very close the boundary of the stationarity region, we estimate the G-StMAR model directly with the following code.
+To exemplify, the following code prints approximate standard errors for the model \code{fit12gs}:
 %
-\begin{CodeChunk}
-\begin{CodeInput}
-R> fit42gs2 <- fitGSMAR(M10Y1Y, p = 4, M = c(1, 1), model = "G-StMAR",
-+    conditional = TRUE, ncalls = 12, ncores = 4, seeds = 1:12)
-\end{CodeInput}
-\begin{CodeOutput}
-Using 4 cores for 12 estimation rounds...
-Optimizing with a genetic algorithm...
-  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=30s
-Results from the genetic algorithm:
-The lowest loglik:  133.926
-The mean loglik:    147.787
-The largest loglik: 175.58
-Optimizing with a variable metric algorithm...
-  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=10s
-Results from the variable metric algorithm:
-The lowest loglik:  151.91
-The mean loglik:    172.875
-The largest loglik: 185.558
-Finished!
-Warning message:
-In warn_ar_roots(ret) :
-  Regime 1 has near-unit-roots! Consider building a model from the next-
-  largest local maximum with the function 'alt_gsmar' by adjusting its
-  argument 'which_largest'.
-\end{CodeOutput}
-\end{CodeChunk}
+<<stmvar_to_gstmvar>>=
+print_std_errors(fit12gs)
+@
 %
-The function throws a warning, because the largest found maximum point incorporates a regime that is very close to the boundary of the stationarity region, indicating that the estimate might be inappropriate.
-We examine the estimates with the \code{summary} method:
-%
-\begin{CodeChunk}
-\begin{CodeInput}
-R> summary(fit42gs2, digits = 2)
-\end{CodeInput}
-\begin{CodeOutput}
-Model:
- G-StMAR, p = 4, M1 = 1, M2 = 1, #parameters = 14, #observations = 468,
- conditional, intercept parametrization, not restricted, no constraints.
 
- log-likelihood: 185.56, AIC: -343.12, HQIC: -320.30, BIC: -285.16
+Missing values are reported when \pkg{gmvarkit} is not able to calculate the standard error. This typically happens either because there is an overly large degrees of freedom parameter estimate in the model or because the estimation algorithm did not stop a local maximum. In the former case, switch to the appropariate G-StMVAR with the function \code{stmvar_to_gstmvar}. In the latter case, make sure the estimate in not an unreasonable near-the-boundary point. If it is, it might appropriate the consider the next-best local maximum with the function \code{alt_gsmvar}. It is not a near-the-boundary point, try running more iterations of the variable metric algorithm with the function \code{iterate_more}. Section~\ref{sec:examestim} discusses how to evaluate with \pkg{gmvarkit} whether the estimate is a local maximum (and how to improve the reliability of it being the global maximum).
 
-Regime 1 (GMAR type)
-Moduli of AR poly roots: 1.00, 1.00, 1.00, 1.00
-Mix weight: 0.02 (0.01)
-Reg mean: 0.39
-Reg var:  0.09
+Other statistics reported in the summary printout include the log-likelihood and values of the information criteria, the first and second moments of the process, as well as regime specific unconditional means, moduli of the eigenvalues of the 'bold A' matrix (see (\ref{eq:gausmatrices})) and eigenvalues of the covariance matrix $\Omega_m$. If some of the moduli are very close to one, the related estimates are near the boundary of the stationarity region. If some of the eigenvalues of $\Omega_m$ close to zero, the related estimates are near the boundary of positive-definiteness region. Then also the related error term correlation matrix reported in the summary printout has non-diagonal elements that are close to one. As mentioned already multiple times, this kind of near-the-boundary point might be unreasonable and maximize the log-likelihood function for a technical reason only, so it might be more appropriate to consider the next-best local maximum with the function \code{alt_gsmvar}.
 
-y = [0.63] + [0.21]y.1 + [-0.04]y.2 + [0.21]y.3 + [-1.00]y.4 + sqrt[0.00]eps
-    (0.01)   (0.01)       (0.02)      (0.01)       (0.00)          (0.00)
-
-Regime 2 (StMAR type)
-Moduli of AR poly roots: 1.03, 1.92, 1.92, 1.54
-Mix weight: 0.98
-Reg mean: 0.80
-Var param: 0.03 (0.01)
-Df param: 5.94 (1.97)
-Reg var:  1.65
-
-y = [0.01] + [1.31]y.1 + [-0.40]y.2 + [0.24]y.3 + [-0.17]y.4 + [sigma_mt]eps
-    (0.01)   (0.05)       (0.08)      (0.08)       (0.05)
-
-Process mean: 0.79
-Process var:  1.62
-First p autocors: 0.99 0.97 0.95 0.93
-\end{CodeOutput}
-\end{CodeChunk}
-%
-The summary statistics reveal that there are four near-unit-roots in the GMAR type regime and the variance parameter estimate is very small. Such estimates often occur when there are several regimes in the model and the estimation algorithm is ran a large number of times.
-
-If one suspects that the estimate is inappropriate, it is easy to build a model based on the second-largest maximum point that was found in the estimation procedure. Below, the first line of the code builds the model based on the second-largest maximum point, and the second line calls the \code{summary} method to produce a detailed printout of the model.
-%
-\begin{CodeChunk}
-\begin{CodeInput}
-R> fit42gs3 <- alt_gsmar(fit42gs2, which_largest = 2)
-R> summary(fit42gs3, digits = 2)
-\end{CodeInput}
-\begin{CodeOutput}
-Model:
- G-StMAR, p = 4, M1 = 1, M2 = 1, #parameters = 14, #observations = 468,
- conditional, intercept parametrization, not restricted, no constraints.
-
- log-likelihood: 182.35, AIC: -336.71, HQIC: -313.89, BIC: -278.75
-
-Regime 1 (GMAR type)
-Moduli of AR poly roots: 1.16, 1.45, 1.45, 1.16
-Mix weight: 0.19 (0.09)
-Reg mean: 0.55
-Reg var:  0.14
-
-y = [0.04] + [1.34]y.1 + [-0.59]y.2 + [0.54]y.3 + [-0.36]y.4 + sqrt[0.01]eps
-    (0.01)   (0.10)       (0.20)      (0.19)       (0.12)          (0.00)
-
-Regime 2 (StMAR type)
-Moduli of AR poly roots: 1.07, 2.02, 2.02, 1.51
-Mix weight: 0.81
-Reg mean: 1.87
-Var param: 0.04 (0.01)
-Df param: 9.76 (4.05)
-Reg var:  1.01
-
-y = [0.06] + [1.28]y.1 + [-0.36]y.2 + [0.20]y.3 + [-0.15]y.4 + [sigma_mt]eps
-    (0.02)   (0.05)       (0.09)      (0.09)       (0.06)
-
-Process mean: 1.62
-Process var:  1.11
-First p autocors: 0.98 0.96 0.93 0.89
-\end{CodeOutput}
-\end{CodeChunk}
-%
-The above printout shows that the estimates related to the second-largest local maximum are the same as of the model \code{fit42gs} (which was estimated based on a StMAR model with a very large degrees of freedom parameter estimate) and that they are clearly inside the stationarity region for all regimes. If also the second-largest maximum point seems unreasonable, a GSMAR model can be built based on the next-largest maximum point by adjusting the argument \code{which_largest} in the function \code{alt_gsmar} accordingly.
+This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSMVAR} stores the estimates from all the estimation rounds so that a GSMVAR model can be built based on any one of them, most conveniently with the function \code{alt_gsmvar}. The desired estimation round can be specified either with the argument \code{which_round} or \code{which_largest}. The former specifies the round in the estimation order, whereas the latter specifies it in a decreasing order of the log-likelihoods.
 
 
 \subsection{Further examination of the estimates}\label{sec:examestim}

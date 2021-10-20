@@ -1148,62 +1148,62 @@ theta_332gs_2 <- c(theta_332, 20, 30)
 
 
 test_that("stmvarpar_to_gstmvar works correctly", {
-  expect_equal(suppressWarnings(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", max_df=100)$params), theta_112t_2, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", max_df=9)$params), theta_112, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", max_df=9)$reg_order), 1, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", max_df=9)$M), c(1, 0), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112ts, model="StMVAR", max_df=9)$params), theta_112s, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_2, model="StMVAR", max_df=10)$params), theta_222_sorted, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_2, model="StMVAR", max_df=20)$params), c(theta_222, 20), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_3, model="StMVAR", max_df=10)$params), c(theta_222_sorted, 10), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=c(1, 1), d=2, params=theta_222gs_2, model="G-StMVAR", max_df=20)$params), theta_222_sorted, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", max_df=20)$params),
+  expect_equal(suppressWarnings(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", maxdf=100)$params), theta_112t_2, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", maxdf=9)$params), theta_112, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", maxdf=9)$reg_order), 1, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", maxdf=9)$M), c(1, 0), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112ts, model="StMVAR", maxdf=9)$params), theta_112s, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_2, model="StMVAR", maxdf=10)$params), theta_222_sorted, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_2, model="StMVAR", maxdf=20)$params), c(theta_222, 20), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222t_3, model="StMVAR", maxdf=10)$params), c(theta_222_sorted, 10), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=c(1, 1), d=2, params=theta_222gs_2, model="G-StMVAR", maxdf=20)$params), theta_222_sorted, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", maxdf=20)$params),
                c(upsilon3_332, upsilon1_332, upsilon2_332, 1-alpha1_332-alpha2_332, alpha1_332, 10, 20), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", max_df=20)$M), c(1, 2), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", max_df=20)$reg_order), c(3, 1, 2), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", max_df=10)$params),
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", maxdf=20)$M), c(1, 2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", maxdf=20)$reg_order), c(3, 1, 2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_2, model="StMVAR", maxdf=10)$params),
                c(upsilon2_332, upsilon3_332, upsilon1_332, alpha2_332, 1-alpha1_332-alpha2_332, 10), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", max_df=20)$params),
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", maxdf=20)$params),
                c(upsilon2_332, upsilon1_332, upsilon3_332, alpha2_332, alpha1_332, 10, 20), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", max_df=20)$M), c(1, 2), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", max_df=20)$reg_order), c(2, 1, 3), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", max_df=20)$params),
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", maxdf=20)$M), c(1, 2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332t_3, model="StMVAR", maxdf=20)$reg_order), c(2, 1, 3), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", maxdf=20)$params),
                c(upsilon1_332, upsilon3_332, upsilon2_332, alpha1_332, 1-alpha1_332-alpha2_332, 20), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", max_df=20)$M), c(2, 1), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", max_df=20)$reg_order), c(1, 3, 2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", maxdf=20)$M), c(2, 1), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gs_2, model="G-StMVAR", maxdf=20)$reg_order), c(1, 3, 2), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112tcsWAR, model="StMVAR", constraints=C_112,
-                                                      structural_pars=list(W=W_112), max_df=3)$params), theta_112csWAR, tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=c(1, 1), d=2, params=c(theta_122c, 10), model="G-StMVAR", constraints=C_122, max_df=3)$params),
+                                                      structural_pars=list(W=W_112), maxdf=3)$params), theta_112csWAR, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=c(1, 1), d=2, params=c(theta_122c, 10), model="G-StMVAR", constraints=C_122, maxdf=3)$params),
                c(phi20_122, vec(A11_122), vech(Omega2_122), phi10_122, vec(A11_122), vech(Omega1_122), 1-alpha1_122), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=c(1, 1), d=2, params=c(theta_122csLAR, 10), model="G-StMVAR",
-                                                      constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122), max_df=3)$params),
+                                                      constraints=C_122, structural_pars=list(W=W_122, C_lambda=C_lambda_122), maxdf=3)$params),
                c(phi20_122, phi10_122, vec(A11_122), vec(A11_122), redecompose_Omegas(M=2, d=2, W=W_122, lambdas=c(0.5, 0.5), perm=2:1)[1:4], 2, 2,
                  1-alpha1_122), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c, 20, 10), model="StMVAR", constraints=C_222, max_df=10)$params),
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c, 20, 10), model="StMVAR", constraints=C_222, maxdf=10)$params),
                c(theta_222c, 10), tol=1e-6)
-  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c, 10, 20), model="StMVAR", constraints=C_222, max_df=10)$params),
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c, 10, 20), model="StMVAR", constraints=C_222, maxdf=10)$params),
                c(phi20_222, vec(A11_222), vec(A12_222), vech(Omega2_222), phi10_222, vec(A11_222), vec(A12_222),
                  vech(Omega1_222), 1-alpha1_222, 10), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=c(theta_332csWLAR, 20, 30), model="G-StMVAR",
-                                                      constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), max_df=20)$params),
+                                                      constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), maxdf=20)$params),
                c(phi10_332, phi30_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A11_332), vec(A12_332), vec(A13_332),
                  vec(A11_332), vec(A12_332), vec(A13_332), Wvec(W_332), 2, 2, 1, 1, alpha1_332, 1-alpha1_332-alpha2_332, 20), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c_int, 10, 20), model="StMVAR",
-                                                      constraints=C_222, same_means=list(1:2), max_df=10)$params),
+                                                      constraints=C_222, same_means=list(1:2), maxdf=10)$params),
                c(phi10_222, vec(A11_222), vec(A12_222), vech(Omega2_222), phi10_222, vec(A11_222), vec(A12_222),
                  vech(Omega1_222), 1-alpha1_222, 10), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c_int, 20, 10), model="StMVAR",
-                                                      constraints=C_222, same_means=list(1:2), max_df=10)$params),
+                                                      constraints=C_222, same_means=list(1:2), maxdf=10)$params),
                c(theta_222c_int, 10), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=c(theta_222c_int, 20, 10), model="StMVAR",
-                                                      constraints=C_222, same_means=list(1:2), max_df=10)$same_means),
+                                                      constraints=C_222, same_means=list(1:2), maxdf=10)$same_means),
                list(1:2), tol=1e-6)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=c(theta_332c_int, 30, 20), model="G-StMVAR",
-                                                      constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), max_df=20)$params),
+                                                      constraints=C_332, structural_pars=list(W=W_332, C_lambda=C_lambda_332), maxdf=20)$params),
                c(theta_332c_int, 20), tol=1e-6)
   redecompose_Omegas(M=2, d=3, W=W_123, lambdas=c(1, 1, 2), perm=2:1)
   expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=3, params=c(theta_123csLAR_int, 10, 20), model="StMVAR", constraints=C_123,
-                                                      structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2), max_df=10)$params),
+                                                      structural_pars=list(W=W_123, C_lambda=C_lambda_123), same_means=list(1:2), maxdf=10)$params),
                c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), redecompose_Omegas(M=2, d=3, W=W_123, lambdas=c(1, 1, 2), perm=2:1)[1:9],
                  1, 1, 0.5, 1-alpha1_123, 10), tol=1e-6)
 })

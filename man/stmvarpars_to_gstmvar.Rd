@@ -14,7 +14,7 @@ stmvarpars_to_gstmvar(
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  max_df = 100
+  maxdf = 100
 )
 }
 \arguments{
@@ -133,7 +133,7 @@ the following elements:
 See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
-\item{max_df}{regimes with degrees of freedom parameter value larger than this will be turned into
+\item{maxdf}{regimes with degrees of freedom parameter value larger than this will be turned into
 GMVAR type.}
 }
 \value{
