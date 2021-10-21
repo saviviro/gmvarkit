@@ -137,7 +137,7 @@
 # gmvarkit 2.0.0
 
 * This update should be mostly backward compatible, but some changes made in the argument names are not.
-* gmvarkit now accommodates new models: the StMVAR model and the G-StMVAR model, as well their structural versions (see the vignette or the references in the package description).
+* gmvarkit now accommodates new models: the StMVAR model and the G-StMVAR model, as well their structural versions (see the vignette or the references in the package description). 
 * Changed the model class from 'gmvar' to 'gsmvar' to accommodate also StMVAR and G-StMVAR models.
 * Renamed functions: GMVAR -> GSMVAR; fitGMVAR -> fitGSMVAR; alt_gmvar -> alt_gsmvar; gmvar_to_sgmvar -> gsmvar_to_sgsmvars; also all the class 'gmvar' methods were changed to class 'gsmvar' methods.
 * The old simulation function 'simulateGMVAR' is now deprecated. Now, we use the class 'gsmvar' simulation method 'simulate.gsmvar' instead.

@@ -1,4 +1,4 @@
-\begin{thebibliography}{22}
+\begin{thebibliography}{25}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -8,6 +8,26 @@
   \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 \providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Aomoto and Kita(2011)}]{Aomoto+Kita:2011}
+Aomoto K, Kita M (2011).
+\newblock \emph{Theory of Hypergeometric Functions}.
+\newblock 1st edition. Springer-Verlag, Tokyo.
+\newblock \doi{10.1007/978-4-431-53938-4}.
+
+\bibitem[{Buse(1982)}]{Buse:1982}
+Buse A (1982).
+\newblock \enquote{The Likelihood Ratio, Wald, and Lagrange Multiplier Tests:
+  An Expository Note.}
+\newblock \emph{The American Statistician}, \textbf{36}(3a), 153--157.
+\newblock \doi{10.1080/00031305.1982.10482817}.
+
+\bibitem[{Ding(2016)}]{Ding:2016}
+Ding P (2016).
+\newblock \enquote{On the Conditional Distribution of the Multivariate $t$
+  Distribution.}
+\newblock \emph{The American Statistician}, \textbf{70}(3), 293--295.
+\newblock \doi{10.1080/00031305.2016.1164756}.
 
 \bibitem[{Dorsey and Mayer(1995)}]{Dorsey+Mayer:1995}
 Dorsey R, Mayer W (1995).

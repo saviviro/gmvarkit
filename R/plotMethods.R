@@ -20,10 +20,10 @@ plot.gsmvarpred <- function(x, ..., nt, mix_weights=TRUE, add_grid=TRUE) {
   n_obs <- nrow(data)
   d <- ncol(data)
   q <- gsmvarpred$q
-  M <- gsmvarpred$gsmvar$model$M
+  M <- sum(gsmvarpred$gsmvar$model$M)
   mixing_weights <- gsmvarpred$gsmvar$mixing_weights
   n_mix <- nrow(mixing_weights)
-  mix_weights <- mix_weights & M > 1 # Don't plot mixing weights if M == 1
+  mix_weights <- mix_weights && M > 1 # Don't plot mixing weights if M == 1
   if(missing(nt)) {
     nt <- round(nrow(data)*0.15)
   } else {
