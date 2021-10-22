@@ -126,7 +126,7 @@ print_std_errors <- function(gsmvar, digits=3) {
   cat(paste0("p = ", p, ", M = ", M, ","),
       ifelse(gsmvar$model$conditional, "conditional", "exact"),
       "log-likelihood,",
-      ifelse(parametrization == "mean", "mean parametrization,", "intercept parametrization,\n"),
+      ifelse(parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
       ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
   cat("\n")
   cat("APPROXIMATE STANDARD ERRORS\n\n")

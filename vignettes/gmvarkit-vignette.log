@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  22 OCT 2021 14:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.16)  22 OCT 2021 15:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -684,13 +684,13 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 File: gmvarkit-vignette-plotseries.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-plotseries.pdf>
 Package pdftex.def Info: gmvarkit-vignette-plotseries.pdf  used on input line 5
-36.
+37.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
 <gmvarkit-vignette-plotdensity.pdf, id=451, 722.7pt x 375.4025pt>
 File: gmvarkit-vignette-plotdensity.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-plotdensity.pdf>
 Package pdftex.def Info: gmvarkit-vignette-plotdensity.pdf  used on input line 
-546.
+547.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -708,7 +708,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 File: gmvarkit-vignette-profilelogliks.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-profilelogliks.pdf>
 Package pdftex.def Info: gmvarkit-vignette-profilelogliks.pdf  used on input li
-ne 604.
+ne 605.
 (pdftex.def)             Requested size: 354.12434pt x 183.94882pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -731,7 +731,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [22]
-Overfull \hbox (84.54276pt too wide) detected at line 727
+Overfull \hbox (84.54276pt too wide) detected at line 728
 []
  []
 
@@ -741,7 +741,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [23]
-Overfull \hbox (11.30399pt too wide) in paragraph at lines 784--787
+Overfull \hbox (11.30399pt too wide) in paragraph at lines 785--788
 []\T1/lmr/m/n/10.95 To ex-em-plify, the fol-low-ing code (which is not ex-e-cut
 ed in this vi-gnette) es-ti-mates a GMVAR($\OML/lmm/m/it/10.95 p \OT1/lmr/m/n/1
 0.95 =
@@ -759,7 +759,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [25]
 
-LaTeX Warning: Reference `eq:defeq' on page 26 undefined on input line 820.
+LaTeX Warning: Reference `eq:defeq' on page 26 undefined on input line 821.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -774,7 +774,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [27]
 
 Package natbib Warning: Citation `Lanne+Nyberg:2016' on page 28 undefined on in
-put line 886.
+put line 887.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -785,7 +785,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 ! Undefined control sequence.
 <recently read> \vech 
                       
-l.919 ...A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\vech
+l.920 ...A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\vech
                                                   {\Omega}_2 = (1, 0.1, 1)$,...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -805,26 +805,26 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [30]
 
-LaTeX Warning: Reference `example_est' on page 31 undefined on input line 970.
+LaTeX Warning: Reference `example_est' on page 31 undefined on input line 971.
 
 <gmvarkit-vignette-predict.pdf, id=607, 722.7pt x 505.89pt>
 File: gmvarkit-vignette-predict.pdf Graphic file (type pdf)
 <use gmvarkit-vignette-predict.pdf>
-Package pdftex.def Info: gmvarkit-vignette-predict.pdf  used on input line 979.
+Package pdftex.def Info: gmvarkit-vignette-predict.pdf  used on input line 980.
 
 (pdftex.def)             Requested size: 354.12434pt x 247.88826pt.
 
-Underfull \hbox (badness 1331) in paragraph at lines 997--998
+Underfull \hbox (badness 1331) in paragraph at lines 998--999
 []\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 998--999
+Underfull \hbox (badness 3449) in paragraph at lines 999--1000
 \T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
  []
 
 
-Underfull \hbox (badness 1527) in paragraph at lines 1009--1010
+Underfull \hbox (badness 1527) in paragraph at lines 1010--1011
 []\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
  []
 
@@ -867,14 +867,14 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [35]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1026.
+(hyperref)                removing `math shift' on input line 1027.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 1026.
+(hyperref)                removing `math shift' on input line 1027.
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 1026.
+(Font)              <14.4> on input line 1027.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 36 []
@@ -886,12 +886,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [37]
-Overfull \hbox (16.39037pt too wide) detected at line 1114
+Overfull \hbox (16.39037pt too wide) detected at line 1115
 \OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
 
-Overfull \hbox (16.39037pt too wide) detected at line 1118
+Overfull \hbox (16.39037pt too wide) detected at line 1119
 \OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
@@ -909,7 +909,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1238.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1239.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 40 []
@@ -921,10 +921,10 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [41]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1238.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1239.
  (./gmvarkit-vignette.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1238.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1238.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1239.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1239.
 
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
 (rerunfilecheck)             Checksum: 4DF94DFADE0BF55250C9B7051AFDBEC1;4533.
@@ -935,7 +935,7 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1238.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1239.
  ) 
 Here is how much of TeX's memory you used:
  8876 strings out of 480608
@@ -944,7 +944,7 @@ Here is how much of TeX's memory you used:
  24312 multiletter control sequences out of 15000+600000
  673881 words of font info for 114 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,25n,38p,1640b,488s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,25n,38p,1640b,490s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/lo
 cal/texlive/2020/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/20
 20/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2020/texmf-dist/
@@ -975,7 +975,7 @@ usr/local/texlive/2020/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/t
 exlive/2020/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/202
 0/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></usr/local/texlive/2020/texmf-d
 ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on gmvarkit-vignette.pdf (41 pages, 684320 bytes).
+Output written on gmvarkit-vignette.pdf (41 pages, 684367 bytes).
 PDF statistics:
  939 PDF objects out of 1000 (max. 8388607)
  851 compressed objects within 9 object streams
