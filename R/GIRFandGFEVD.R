@@ -32,8 +32,8 @@
 #'   Provide a length three vector where the shock of interest
 #'   is given in the first element (an integer in \eqn{1,...,d}), the variable of
 #'   interest is given in the second element (an integer in \eqn{1,...,d}), and
-#'   the magnitude of its instantaneous or peak response (a non-zero real number)
-#'   in the third element. If the GIRFs of multiple shocks should be scaled, provide
+#'   the magnitude of its instantaneous or peak response in the third element
+#'   (a non-zero real number). If the GIRFs of multiple shocks should be scaled, provide
 #'   a matrix which has one column for each of the shocks with the columns being
 #'   the length three vectors described above.
 #' @param scale_type If argument \code{scale} is specified, should the GIRFs be

@@ -68,13 +68,13 @@ We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for es
 %%   (in extra lines, separated by \emph{and}\\).
 %% - May contain multiple authors for the same affiliation
 %%   (in the same first line, separated by comma).
-%\Address{
-%  Savi Virolainen\\
-%  Faculty of Social Sciences\\
-%  University of Helsinki\\
-%  P. O. Box 17, FI-0014 University of Helsinki, Finland\\
-%  E-mail: \email{savi.virolainen@helsinki.fi}
-%}
+\Address{
+  Savi Virolainen\\
+  Faculty of Social Sciences\\
+  University of Helsinki\\
+  P. O. Box 17, FI-0014 University of Helsinki, Finland\\
+  E-mail: \email{savi.virolainen@helsinki.fi}
+}
 
 \begin{document}
 
@@ -268,7 +268,7 @@ where the diagonal of $\Lambda_m = \text{diag}(\lambda_{m1},...,\lambda_{md})$, 
 
 \citet[Proposition 1]{Lanne+Lutkepohl+Maciejowska:2010} show that for a given ordering of the eigenvalues, $W$ is unique apart from changing all signs a column, as long as for all $i\neq j\in \lbrace 1,...,d \rbrace$ there exists an $m\in\lbrace 2,...,M \rbrace$ such that $\lambda_{mi}\neq\lambda_{mj}$ (for $m=1$,  $\Lambda_m=I_d$ and $\lambda_{m1}=\cdots = \lambda_{md}=1$).  A locally unique B-matrix that amplifies a constant sized structural shock according to the conditional variance of the reduced form error is therefore obtained as
 \begin{equation}\label{eq:B-matrix}
-B_t = W(\sum_{m=1}^{M_1}\alpha_{m,t}\Lambda_m + \sum_{m=M_1 + 1}^{M}\alpha_{m,t}\omega_{m,t\Lambda_m)^{1/2}.
+B_t = W(\sum_{m=1}^{M_1}\alpha_{m,t}\Lambda_m + \sum_{m=M_1 + 1}^{M}\alpha_{m,t}\omega_{m,t}\Lambda_m)^{1/2}.
 \end{equation}
 Since $B_t^{-1}\Omega_mB_t'^{-1}=\Lambda_m(\sum_{n=1}^{M_1}\alpha_{n,t}\Lambda_n + \sum_{n=M_1+1}^M\alpha_{n,t}\omega_{n,t}\Lambda_n)^{-1}$,  the B-matrix (\ref{eq:B-matrix}) simultaneously diagonalizes $\Omega_{1},...,\Omega_{M}$, and $\Omega_{u,t}$ (and thereby also $\Omega_{1,t},...,\Omega_{M,t}$) for each $t$ so that $\text{Cov}(e_t|\mathcal{F}_{t-1}) = I_d$.
 
@@ -658,7 +658,7 @@ For a correctly specified GSMVAR model employing the ML estimator, the empirical
 \section{Impulse response analysis}\label{sec:impulseresponse}
 
 \subsection{Generalized impulse response function}
-We consider the generalized impulse response function (GIRF) \cite{Koop+Pesaran+Potter:1996} defined as
+We consider the generalized impulse response function (GIRF) \citep{Koop+Pesaran+Potter:1996} defined as
 \begin{equation}\label{eq:girf}
 \text{GIRF}(n,\delta_j,\mathcal{F}_{t-1}) = \text{E}[y_{t+n}|\delta_j,\mathcal{F}_{t-1}] - \text{E}[y_{t+n}|\mathcal{F}_{t-1}],
 \end{equation}
@@ -670,12 +670,14 @@ In practice, the GIRF and its distributional properties can be approximated with
 
 Because the SG-StMVAR model allows to associate specific features or economic interpretations for different regimes, it might be interesting to also examine the effects of a structural shock to the mixing weights $\alpha_{m,t}$, $m=1,...,M$. We then consider the related GIRFs $E[\alpha_{m,t+n}|\delta_j,\boldsymbol{y}_{t-1}] - E[\alpha_{m,t+n}|\boldsymbol{y}_{t-1}]$ for which point estimates and confidence intervals can be constructed similarly to (\ref{eq:girf}).
 
-In \pkg{gmvarkit}, the GIRF can be estimated with the function \code{GIRF} which should be supplied with the estimated SG-StMVAR model or a SG-StMVAR model build with hand specified parameter values using the function \code{GSMVAR}. The size of the structural shock can be set with the argument \code{shock_size}. If not specified, the size of one standard deviation is used; that is, the size one. Among other arguments, the function may also be supplied with the argument \code{init_regimes} which specifies from which regimes' stationary distributions the initial values are generated from. If more than one regime is specified, a mixture distribution with weights given by the mixing weight parameters is used. Alternatively, one may specify fixed initial values with the argument \code{init_values}. Note that the confidence intervals (whose confidence level can be specified with the argument \code{ci}) reflect uncertainty about the initial value only and not about the parameter estimates.
+In \pkg{gmvarkit}, the GIRF can be estimated with the function \code{GIRF} which should be supplied with the estimated SG-StMVAR model or an SG-StMVAR model built with hand-specified parameter values using the function \code{GSMVAR}. The size of the structural shock can be set with the argument \code{shock_size}. If not specified, the size of one standard deviation is used; that is, the size one. Among other arguments, the function may also be supplied with the argument \code{init_regimes} which specifies from which regimes' stationary distributions the initial values are generated from (if more than one regime is specified, the initial values will be generated from a mixture of the stationary distributions with the relative mixing proportions given by the mixing weight parameters). If more than one regime is specified, a mixture distribution with weights given by the mixing weight parameters is used. Alternatively, one may specify fixed initial values with the argument \code{init_values}. Note that the confidence intervals (whose confidence level can be specified with the argument \code{ci}) reflect uncertainty about the initial value only and not about the parameter estimates.
 
-Because estimating the GIRF and confidence intervals for it is computationally demanding, parallel computing is taken use of to shorten the estimation time. The number of CPU cores used can be set with the argument \code{ncores}. The objects returned by the \code{GIRF} function have their own \code{plot} and \code{print} methods. Also, cumulative impulse responses of the specified variables can be obtained directly by specifying the argument \code{which_cumulative}, while scaled GIRFs can be obtained by specifying the argument \code{scale} as desired.
+Due to the nonlinear nature of the model, GIRFs estimated from different starting values, or with different sign or magnitude of the shock, generally move the variables differently. Sometimes it is, however, of interest to scale the impulse responses so that they correspond to movement of some specific sign and magnitude of some specific variable. In \pkg{gmvarkit}, this is most conveniently achieved with the arguments \code{scale} and \code{scale_type}. The argument \code{scale} can be specified in order to scale the GIRFs to some of the shocks so that they correspond to a specific magnitude of instantaneous or peak response of some specific variable. For a single shock, it should a length three vector where the shock of interest is given in the first element (an integer in $1,...,d$), the variable according to which the GIRFs should be scaled in the second element (an integer in $1,...,d$), and the magnitude of the given variable's instantaneous or peak response in the third element (a non-zero real number). If the GIRFs of multiple shocks should be scaled, provide a matrix which has one column for each of the shocks with the columns being the length three vectors described above. The argument \code{scale_type} should be either \code{"instant"} or \code{"peak"} specifying whether you want to scale according to the instantaneous movement of peak response. Note that if you scale the GIRFs, the scaled GIRFs of mixing weights can be outside the interval from zero to one.
+
+Because estimating the GIRF and their confidence intervals is computationally demanding, parallel computing is taken use of to shorten the estimation time. The number of CPU cores used can be set with the argument \code{ncores}. The objects returned by the \code{GIRF} function have their own \code{plot} and \code{print} methods. Also, cumulative impulse responses of the specified variables can be obtained directly by specifying the argument \code{which_cumulative}.
 
 \subsection{Generalized forecast error variance decomposition}
-We consider the generalized forecast error variance decomposition (GFEVD) \cite{Lanne+Nyberg:2016}  that is defined for variable $i$, shock $j$, and horizon $n$ as
+We consider the generalized forecast error variance decomposition (GFEVD) \citep{Lanne+Nyberg:2016}  that is defined for variable $i$, shock $j$, and horizon $n$ as
 \begin{equation}
 \text{GFEVD}(n,y_{it}, \delta_j,\mathcal{F}_{t-1}) = \frac{\sum_{l=0}^n\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i^2}{\sum_{k=1}^d\sum_{l=0}^n\text{GIRF}(l,\delta_k,\mathcal{F}_{t-1})_i^2},
 \end{equation}
@@ -685,7 +687,7 @@ In \pkg{gmvarkit}, the GFEVD can be estimated with the function \code{GFEVD}. As
 \begin{enumerate}
 \item \code{"data"} which estimates the GIRFs for all possible length $p$ histories in the data and then the GIRFs in the GFEVD are obtained as the sample mean over those GIRFs.
 \item \code{"random"} which generates the initial values from the stationary distribution of the process or from the mixture of the stationary distributions of some specific regime(s) with the relative mixing proportions given by the mixing weight parameters. The initial regimes can be set with the argument \code{init_regimes}. The GIRFs in the GFEVD are obtained as the sample mean over the GIRFs estimated for the different random initial values.
-\item \code{"fixed"} which estimates the GIRFs for a single fixed initial value that is set with the argument \code{init_ values}.
+\item \code{"fixed"} which estimates the GIRFs for a single fixed initial value that is set with the argument \code{init_values}.
 \end{enumerate}
 The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument \code{shock_size}. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument \code{which_cumulative}. Finally, note that the GFEVD objects have their own plot and print methods.
 
@@ -694,21 +696,23 @@ The shock size is the same for all scalar components of the structural shock and
 \section{Building a GSMVAR model with specific parameter values}\label{sec:GSMVAR}
 The function \code{GSMVAR} facilitates building GSMVAR models without estimation, for instance, in order to simulate observations from a GSMVAR process with specific parameter values. The parameter vector (of length $M(d + d^2p + d(d+1)/2 + 2) - M_1 - 1$ for unconstrained reduced form models) has the form $\boldsymbol{\theta} = (\boldsymbol{\vartheta}_1,...,\boldsymbol{\vartheta}_M,\alpha_1,...,\alpha_{M-1},\boldsymbol{\nu})$ where
 \begin{align}
-\boldsymbol{\vartheta}_m &= (\varphi_{m,0},\text{vec}({A_{m,1}}),...,\text{vec}(A_{m,p}),\text{vech}(\Omega_m),\ \ m=1,...,M, \ \text{and}  \\
+\boldsymbol{\vartheta}_m &= (\varphi_{m,0},\text{vec}({A_{m,1}}),...,\text{vec}(A_{m,p}),\text{vech}(\Omega_m)),\ \ m=1,...,M, \ \text{and}  \\
 \boldsymbol{\nu} &= (\nu_{M_1+1},...,\nu_M).
 \end{align}
 %
-In the GMVAR model (when $M_1=M$), the vector $\boldsymbol{\nu}$ is omitted, as the GMVAR model does not contain degrees of freedom parameters. For models with constraints on the autoregressive parameters, the parameter vectors are expressed in a different way. They are only presented in the package documentation for brevity, because the hand-specified parameter values can be set to satisfy any constraints as is. In a structural GSMVAR model, the parameter vector has the form
+In the GMVAR model (when $M_1=M$), the vector $\boldsymbol{\nu}$ is omitted, as the GMVAR model does not contain degrees of freedom parameters. For models imposing additional constraints on the paremeters, the parameter vectors are expressed in a different way. They are only presented in the package documentation for brevity, because the hand-specified parameter values can be set to satisfy any constraints as is.
+
+In a structural GSMVAR model, the parameter vector has the form
 \begin{align}
 \boldsymbol{\theta} &= (\varphi_{1,0},...,\varphi_{M,0},\text{vec}(\boldsymbol{A}_1),...,\text{vec}(\boldsymbol{A}_M),\text{vec}(W),\boldsymbol{\lambda}_1,...,\boldsymbol{\lambda}_M, \alpha_1,...,\alpha_{M-1},\boldsymbol{\nu}), \\
 \boldsymbol{A}_m & = (\text{vec}({A_{m,1}}),...,\text{vec}(A_{m,p})) \\
-\boldsymbol{\lambda}_m &= (\lambda_{m1},...,\boldsymbol{\lambda}_{md}).
+\boldsymbol{\lambda}_m &= (\lambda_{m1},...,\lambda_{md}).
 \end{align}
 For constrained structural models (including constraints on the structural parameters), see the documentation of \code{GSMVAR} (or any other relevant function).
 
-In addition to the parameter vector, \code{GSMVAR} should be supplied with arguments \code{p} and \code{M} specifying the order of the model similarly to the estimation function \code{fitGSMVAR} discussed in Sections \ref{sec:example_estim}. If one wishes to parametrize the model with the regimewise unconditional means ($\mu_m$) instead of the intercepts ($\varphi_{m,0}$), the argument \code{parametrization} should be set to \code{"mean"} in which case the intercept parameters $\varphi_{m,0}$ are replaced with $\mu_m$ in the parameter vector. By default, \pkg{gmvarkit} uses intercept parametrization.
+In addition to the parameter vector, \code{GSMVAR} should be supplied with arguments \code{p} and \code{M} specifying the order of the model similarly to the estimation function \code{fitGSMVAR} discussed in Section \ref{sec:example_estim}. If one wishes to parametrize the model with the regimewise unconditional means ($\mu_m$) instead of the intercepts ($\varphi_{m,0}$), the argument \code{parametrization} should be set to \code{"mean"} in which case the intercept parameters $\varphi_{m,0}$ are replaced with $\mu_m$ in the parameter vector. By default, \pkg{gmvarkit} uses intercept parametrization.
 
-To exemplify, we build a reduced form StMVAR $p=1$, $M=1$, $d=2$ model. The model has intercept parametrization and parameter values $\varphi_{1,0}=(0, 1)$ $\text{vec}(A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\vech{\Omega}_2 = (1, 0.1, 1)$, and $\nu_1 = 3$. After building the model, we use the \code{print} method to examine it:
+To exemplify, we build a reduced form StMVAR $p=1$, $M=1$, $d=2$ model. The model has intercept parametrization and parameter values $\varphi_{1,0}=(0, 1)$ $\text{vec}(A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\text{vech}(\Omega_2) = (1, 0.1, 1)$, and $\nu_1 = 3$. After building the model, we use the \code{print} method to examine it:
 %
 <<gsmvar_ex1>>=
 params112 <- c(0, 1, 0.2, 0.2, 0.2, -0.2, 1, 0.1, 1, 3)
@@ -740,7 +744,7 @@ Deriving multiple-steps-ahead point predictions and prediction intervals analyti
 
 Forecasting is most conveniently done with the \code{predict} method (see \code{?predict.gsmvar}). The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsim}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
 
-To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{example_est}. The forecast is $10$ steps (quarters in this case) ahead, based on $100$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
+To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_est}. The forecast is $10$ steps (quarters in this case) ahead, based on $100$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
 %
 <<predict, echo=TRUE, fig=TRUE, height=7, width=10>>=
 mypred <- predict(fit12gs, n_ahead=10, nsim=100, pred_type="mean",
@@ -784,7 +788,7 @@ Other          & \code{add_data}           & Add data to a GSMVAR model \\
 \end{table}
 
 \section{Summary}\label{sec:summary}
-Mixture vector autoregressive models are a valuable tool in modeling multivariate time series in which the data generating dynamics vary in time. We described the \proglang{R} package \pkg{gmvarkit}, which accommodates the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021} - an appealing family of mixture autoregressive models that call the GSMVAR models. We discussed several features provided by \pkg{gmvarkit} for GSMVAR modeling: unconstrained and constrained maximum likelihood estimation of the model parameter, hypothesis testing, quantile residual based model diagnostics, estimation of generalized impulse response function and generalized forecast error variance decomposition, simulation, forecasting, and more. For convenience, we have collected some useful function in \pkg{gmvarkit} to Table~\ref{tab:functions}.
+Mixture vector autoregressive models are a valuable tool in modeling multivariate time series in which the data generating dynamics vary in time. We described the \proglang{R} package \pkg{gmvarkit}, which accommodates the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021} - an appealing family of mixture vector autoregressive models that call the GSMVAR models. We discussed several features provided by \pkg{gmvarkit} for GSMVAR modeling: unconstrained and constrained maximum likelihood estimation of the model parameters, hypothesis testing, quantile residual based model diagnostics, estimation of generalized impulse response function and generalized forecast error variance decomposition, simulation, forecasting, and more. For convenience, we have collected some useful functions in \pkg{gmvarkit} to Table~\ref{tab:functions}. For all the exported functions and their usage, see the reference manual.
 
 
 \pagebreak
@@ -938,8 +942,6 @@ where
 \end{aligned}
 \end{align}
 
-The conditional distribution functions $F_{i_j,j-1,t-1}(y_{i_j,t};\boldsymbol{\theta})$ in the definition of multivariate quantile residuals (\ref{eq:qrdef}) can be expressed as
-
 It then remains to find expressions for the conditional distribution functions $F_{j-1,t-1}(y_{j,t};\boldsymbol{\theta})$, $j=1,...,d$, in (\ref{eq:qrdef}).  For notational convenience, we write
 \begin{align}
 \begin{aligned}
@@ -982,7 +984,7 @@ By applying the third change of variables $x_{m,t,j}=z_{m,t,j}/\tilde{y}_{m,t,j}
 \begin{equation}
 \frac{\tilde{y}_{m,t,j}}{2}\int_0^1 x_{m,t,j}^{-1/2}\left(1 - x_{m,t,j}\left(-\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}}\right)  \right)^{-b_{m,j}}dx_{m,t,j} = \tilde{y}_{m,t,j} \times {}_2\text{F}_1\left(\frac{1}{2}, b_{m,j}, \frac{3}{2}; -\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}} \right),
 \end{equation}
-where the hypergeometric function is defines as \citep[Section 1.3.1]{Aomoto+Kita:2011}
+where the hypergeometric function is defined as \citep[Section 1.3.1]{Aomoto+Kita:2011}
 \begin{equation}
 {}_2F_1(a,b,c;x)=\frac{\Gamma(c)}{\Gamma(a)\Gamma(c-a)}\int_0^1 s^{a-1}(1-s)^{c-a-1}(1-sx)^{-b}ds,
 \end{equation}
@@ -999,7 +1001,7 @@ whenever $\left|-\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}}\right|<1$.  That is,  the
 \begin{equation}
 |y_{j,t} - \mu_{m,t,j|j-1}| < \sqrt{(v_m + dp + j - 3)\Omega_{m,t,j,|j-1}}.
 \end{equation}
-If this condition does not hold,  the quantile residual can be obtained by numerically integrating the conditional density function $t_1(u;\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)$.
+If this condition does not hold, the quantile residual are obtained by numerically integrating the conditional density function $t_1(u;\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)$. For the hypergeometric function, \pkg{gmvarkit} uses the package \pkg{gsl} \citep{gsl}.
 
 
 
