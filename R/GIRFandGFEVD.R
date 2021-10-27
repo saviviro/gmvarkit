@@ -40,6 +40,8 @@
 #'   scaled to match an instantaneous response (\code{"instant"}) or peak response
 #'   (\code{"peak"}). If \code{"peak"}, the scale is based on the largest magnitude
 #'   of peak response in absolute value. Ignored if \code{scale} is not specified.
+#' @param scale_horizon If \code{scale_type == "peak"} what the maximum horizon up
+#'   to which peak response is expected? Scaling won't based on values after this.
 #' @param ci a numeric vector with elements in \eqn{(0, 1)} specifying the
 #'   confidence levels of the confidence intervals.
 #' @param include_mixweights should the generalized impulse response be
@@ -122,7 +124,7 @@
 #' @export
 
 GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:sum(gsmvar$model$M), init_values=NULL,
-                 which_cumulative=numeric(0), scale=NULL, scale_type=c("instant", "peak"),
+                 which_cumulative=numeric(0), scale=NULL, scale_type=c("instant", "peak"), scale_horizon=N,
                  ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2, plot_res=TRUE, seeds=NULL, ...) {
   scale_type <- match.arg(scale_type)
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
@@ -130,6 +132,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
   M <- sum(gsmvar$model$M)
   d <- gsmvar$model$d
 
+  stopifnot(N %% 1 == 0 && N > 0)
+  stopifnot(scale_horizon %in% 1:N)
   if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported")
   if(M == 1) include_mixweights <- FALSE
   if(missing(which_shocks)) {
@@ -224,8 +228,9 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
           # different with different starting values.
           one_scale <- magnitude/res_in_array[1, which_var, i2]
         } else {  # scale_type == "peak", "peak_max" or "peak_min", scale by peak response
-          one_scale <- magnitude/res_in_array[my_comparison_fun(vec1=abs(res_in_array[, which_var, i2]),
-                                                                scalar1=max(abs(res_in_array[, which_var, i2]))), which_var, i2]
+          inds <- 1:(scale_horizon + 1)
+          one_scale <- magnitude/res_in_array[my_comparison_fun(vec1=abs(res_in_array[inds, which_var, i2]),
+                                                                scalar1=max(abs(res_in_array[inds, which_var, i2]))), which_var, i2]
           #one_scale <- magnitude/res_in_array[which(abs(res_in_array[, which_var, i2]) == max(abs(res_in_array[, which_var, i2]))), which_var, i2]
         }
         res_in_array[, , i2] <- one_scale*res_in_array[, , i2]

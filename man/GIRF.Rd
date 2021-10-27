@@ -20,6 +20,7 @@ GIRF(
   which_cumulative = numeric(0),
   scale = NULL,
   scale_type = c("instant", "peak"),
+  scale_horizon = N,
   ci = c(0.95, 0.8),
   include_mixweights = TRUE,
   ncores = 2,
@@ -91,6 +92,9 @@ the length three vectors described above.}
 scaled to match an instantaneous response (\code{"instant"}) or peak response
 (\code{"peak"}). If \code{"peak"}, the scale is based on the largest magnitude
 of peak response in absolute value. Ignored if \code{scale} is not specified.}
+
+\item{scale_horizon}{If \code{scale_type == "peak"} what the maximum horizon up
+to which peak response is expected? Scaling won't based on values after this.}
 
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
 confidence levels of the confidence intervals.}
