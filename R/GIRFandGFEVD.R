@@ -133,7 +133,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
   d <- gsmvar$model$d
 
   stopifnot(N %% 1 == 0 && N > 0)
-  stopifnot(scale_horizon %in% 1:N)
+  stopifnot(scale_horizon %in% 0:N)
   if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported")
   if(M == 1) include_mixweights <- FALSE
   if(missing(which_shocks)) {
@@ -223,12 +223,12 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
       my_comparison_fun <- function(vec1, scalar1) which(abs(vec1 - scalar1) < .Machine$double.eps)[1] # To avoid potential problems with using == to compare numerical values
       for(i2 in 1:R2) { # Go through the MC repetitions
+        # The scaling scalar is different for each MC repetition, because the instantaneous/peak movement is generally
+        # different with different starting values.
         if(scale_type == "instant") {  # Scale by initial response
-          # The scaling scalar is different for each MC repetition, because the instantaneous movement is generally
-          # different with different starting values.
           one_scale <- magnitude/res_in_array[1, which_var, i2]
         } else {  # scale_type == "peak", "peak_max" or "peak_min", scale by peak response
-          inds <- 1:(scale_horizon + 1)
+          inds <- 1:(scale_horizon + 1) # +1 for period 0
           one_scale <- magnitude/res_in_array[my_comparison_fun(vec1=abs(res_in_array[inds, which_var, i2]),
                                                                 scalar1=max(abs(res_in_array[inds, which_var, i2]))), which_var, i2]
           #one_scale <- magnitude/res_in_array[which(abs(res_in_array[, which_var, i2]) == max(abs(res_in_array[, which_var, i2]))), which_var, i2]

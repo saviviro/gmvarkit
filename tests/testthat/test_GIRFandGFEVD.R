@@ -60,9 +60,9 @@ test_that("GIRF works correctly", {
   expect_equal(unname(girf7$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.01271137, -0.15835522, -0.07584107, -0.17535997), tolerance=1e-4)
   expect_equal(unname(girf7$girf_res[[2]]$conf_ints[10, 4, ]), c(1.06440367, 15.01354442, -0.08135584, 10.13226946), tolerance=1e-4)
 
-  expect_equal(unname(girf8$girf_res[[1]]$point_est[11,]), c(0.17977678, -0.03994763, 0.01449259, -0.01449259), tolerance=1e-4)
+  expect_equal(unname(girf8$girf_res[[1]]$point_est[11,]), c(-0.06483972, 0.07817930, -0.15026571, 0.15026571), tolerance=1e-4)
   expect_equal(unname(girf8$girf_res[[2]]$point_est[11,]), c(0.12182618, -0.09861772, 0.09722857, -0.09722857), tolerance=1e-4)
-  expect_equal(unname(girf8$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.008862332, -0.260877400, -0.355479659, -0.269946781), tolerance=1e-4)
+  expect_equal(unname(girf8$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.205108973, -0.066469711, -0.462800685, -0.002246891), tolerance=1e-4)
   expect_equal(unname(girf8$girf_res[[2]]$conf_ints[10, 4, ]), c(0.284564352, -0.006810979, 0.252877297, -0.007056435), tolerance=1e-4)
 })
 
