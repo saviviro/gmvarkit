@@ -88,8 +88,9 @@ a matrix which has one column for each of the shocks with the columns being
 the length three vectors described above.}
 
 \item{scale_type}{If argument \code{scale} is specified, should the GIRFs be
-scaled to match an instantaneous response \code{"instant"} or peak response
-\code{"peak"}? Ignored if \code{scale} is not specified.}
+scaled to match an instantaneous response (\code{"instant"}) or peak response
+(\code{"peak"}). If \code{"peak"}, the scale is based on the largest magnitude
+of peak response in absolute value. Ignored if \code{scale} is not specified.}
 
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
 confidence levels of the confidence intervals.}
@@ -149,7 +150,7 @@ The model needs to be structural in order for this function to be
   about the algorithm.
 
   Note that if the argument \code{scale} is used, the scaled responses of
-  the mixing weights might be more than one in absolute valie.
+  the mixing weights might be more than one in absolute value.
 }
 \section{Methods (by generic)}{
 \itemize{

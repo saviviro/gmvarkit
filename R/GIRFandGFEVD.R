@@ -37,8 +37,9 @@
 #'   a matrix which has one column for each of the shocks with the columns being
 #'   the length three vectors described above.
 #' @param scale_type If argument \code{scale} is specified, should the GIRFs be
-#'   scaled to match an instantaneous response \code{"instant"} or peak response
-#'   \code{"peak"}? Ignored if \code{scale} is not specified.
+#'   scaled to match an instantaneous response (\code{"instant"}) or peak response
+#'   (\code{"peak"}). If \code{"peak"}, the scale is based on the largest magnitude
+#'   of peak response in absolute value. Ignored if \code{scale} is not specified.
 #' @param ci a numeric vector with elements in \eqn{(0, 1)} specifying the
 #'   confidence levels of the confidence intervals.
 #' @param include_mixweights should the generalized impulse response be
@@ -65,7 +66,7 @@
 #'   about the algorithm.
 #'
 #'   Note that if the argument \code{scale} is used, the scaled responses of
-#'   the mixing weights might be more than one in absolute valie.
+#'   the mixing weights might be more than one in absolute value.
 #' @return Returns a class \code{'girf'} list with the GIRFs in the first
 #'   element (\code{$girf_res}) and the used arguments the rest. The first
 #'   element containing the GIRFs is a list with the \eqn{m}th element
@@ -121,9 +122,8 @@
 #' @export
 
 GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_regimes=1:sum(gsmvar$model$M), init_values=NULL,
-                 which_cumulative=numeric(0), scale=NULL, scale_type=c("instant", "peak"), ci=c(0.95, 0.80),
-                 include_mixweights=TRUE, ncores=2,
-                 plot_res=TRUE, seeds=NULL, ...) {
+                 which_cumulative=numeric(0), scale=NULL, scale_type=c("instant", "peak"),
+                 ci=c(0.95, 0.80), include_mixweights=TRUE, ncores=2, plot_res=TRUE, seeds=NULL, ...) {
   scale_type <- match.arg(scale_type)
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   p <- gsmvar$model$p
@@ -217,13 +217,16 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
       which_var <- scale[2, which_col] # According to initial/peak response of which variable the GIRFs should be scaled
       magnitude <- scale[3, which_col] # What should be the magnitude of the initial/peak response of this variable
 
+      my_comparison_fun <- function(vec1, scalar1) which(abs(vec1 - scalar1) < .Machine$double.eps)[1] # To avoid potential problems with using == to compare numerical values
       for(i2 in 1:R2) { # Go through the MC repetitions
         if(scale_type == "instant") {  # Scale by initial response
           # The scaling scalar is different for each MC repetition, because the instantaneous movement is generally
           # different with different starting values.
           one_scale <- magnitude/res_in_array[1, which_var, i2]
-        } else {  # scale_type == "peak", scale by peak response
-          one_scale <- magnitude/res_in_array[which(res_in_array[, which_var, i2] == max(res_in_array[, which_var, i2])), which_var, i2]
+        } else {  # scale_type == "peak", "peak_max" or "peak_min", scale by peak response
+          one_scale <- magnitude/res_in_array[my_comparison_fun(vec1=abs(res_in_array[, which_var, i2]),
+                                                                scalar1=max(abs(res_in_array[, which_var, i2]))), which_var, i2]
+          #one_scale <- magnitude/res_in_array[which(abs(res_in_array[, which_var, i2]) == max(abs(res_in_array[, which_var, i2]))), which_var, i2]
         }
         res_in_array[, , i2] <- one_scale*res_in_array[, , i2]
       }
