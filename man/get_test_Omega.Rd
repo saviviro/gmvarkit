@@ -17,7 +17,7 @@ get_test_Omega(
   structural_pars = NULL,
   g,
   dim_g,
-  ncores = 2,
+  ncores = 1,
   stat_tol = 0.001,
   posdef_tol = 1e-08,
   df_tol = 1e-08
@@ -152,7 +152,8 @@ a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{dim_g}{output dimension of the transformation \code{g}.}
 
-\item{ncores}{the number of CPU cores to be used in numerical differentiation}
+\item{ncores}{the number of CPU cores to be used in numerical differentiation. Multiple cores
+are not supported on Windows, though.}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
 has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the

@@ -4,7 +4,7 @@ Version: 2.0.0
 Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
 Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
     Gaussian mixture vector autoregressive, Student's t mixture vector autoregressive, and Gaussian and Student's t
-    mixture vector autoregresive models, quantile residual tests, graphical diagnostics,
+    mixture vector autoregressive models, quantile residual tests, graphical diagnostics,
     simulations, forecasting, and estimation of generalized impulse response function and generalized 
     forecast error variance decomposition.
     Leena Kalliovirta, Mika Meitz, Pentti Saikkonen (2016) <doi:10.1016/j.jeconom.2016.02.012>,

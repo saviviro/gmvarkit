@@ -16,7 +16,7 @@ quantile_residual_tests(
   lags_ac = c(1, 3, 6, 12),
   lags_ch = lags_ac,
   nsim = 1,
-  ncores = 2,
+  ncores = 1,
   print_res = TRUE,
   stat_tol,
   posdef_tol,
@@ -40,7 +40,8 @@ quantile_residual_tests(
 If smaller than sample size, then the covariance matrix will be evaluated from the sample. Larger number
 of simulations might improve the tests size properties but it increases the computation time.}
 
-\item{ncores}{the number of CPU cores to be used in numerical differentiation}
+\item{ncores}{the number of CPU cores to be used in numerical differentiation. Multiple cores
+are not supported on Windows, though.}
 
 \item{print_res}{should the test results be printed while computing the tests?}
 

@@ -49,7 +49,7 @@
 #' }
 #' @export
 
-quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsim=1, ncores=2, print_res=TRUE,
+quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags_ac, nsim=1, ncores=1, print_res=TRUE,
                                     stat_tol, posdef_tol, df_tol) {
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
@@ -241,13 +241,14 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
 #' @inheritParams loglikelihood
 #' @param g function g specifying the transformation.
 #' @param dim_g output dimension of the transformation \code{g}.
-#' @param ncores the number of CPU cores to be used in numerical differentiation
+#' @param ncores the number of CPU cores to be used in numerical differentiation. Multiple cores
+#'   are not supported on Windows, though.
 #' @return Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen 2010}.
 #' @inherit quantile_residuals references
 #' @keywords internal
 
 get_test_Omega <- function(data, p, M, params, model, conditional, parametrization, constraints, same_means, structural_pars=NULL,
-                           g, dim_g, ncores=2, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                           g, dim_g, ncores=1, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   n_obs <- nrow(data)
   T_obs <- n_obs - p
