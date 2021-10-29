@@ -209,7 +209,7 @@ fitGMVAR <- function(data, p, M, conditional=TRUE, parametrization=c("intercept"
 
 gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
   .Deprecated("gsmvar_to_sgsmvar")
-  gsmvar <- gmvar_to_gsmvar(gsmvar)
+  gsmvar <- gmvar_to_gsmvar(gmvar)
   gsmvar_to_sgsmvar(gsmvar, calc_std_errors=calc_std_errors)
 }
 
