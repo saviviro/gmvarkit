@@ -75,7 +75,7 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
     omega_data <- data
   }
   if(Sys.info()[1] == "Windows" && ncores > 1) {
-    message("Multiple cores are not supported on Windows")
+    message("Multiple cores are not supported on Windows.")
     ncores <- 1
   }
 
