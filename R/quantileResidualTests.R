@@ -55,6 +55,7 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
   check_gsmvar(gsmvar)
   check_null_data(gsmvar)
   if(!all_pos_ints(c(lags_ac, lags_ch))) stop("arguments 'lags_ac' and 'lags_ch' must be strictly positive integer vectors")
+  if(!all_pos_ints(ncores) || length(ncores) > 1) stop("The argument 'ncores' must be a strictly positive integer")
   p <- gsmvar$model$p
   M <- gsmvar$model$M
   d <- gsmvar$model$d
@@ -72,6 +73,10 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
     omega_data <- simulate.gsmvar(gsmvar, nsim=nsim, init_values=NULL, ntimes=1)$sample
   } else {
     omega_data <- data
+  }
+  if(Sys.info()[1] == "Windows" && ncores > 1) {
+    message("Multiple cores are not supported on Windows")
+    ncores <- 1
   }
 
   # Function to calculate covariance matrix omega
