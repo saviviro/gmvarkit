@@ -137,6 +137,10 @@ Returns a class \code{'girf'} list with the GIRFs in the first
   element) and confidence intervals in \code{$conf_ints} (the second
   element). The first row is for the GIRF at impact \eqn{(n=0)}, the second
   for \eqn{n=1}, the third for \eqn{n=2}, and so on.
+
+  The element \code{$all_girfs} is a list containing results from all the individual GIRFs
+  obtained from the MC repetitions. Each element is for one shock and results are in
+  array of the form \code{[horizon, variables, MC-repetitions]}.
 }
 \description{
 \code{GIRF} estimates generalized impulse response function for

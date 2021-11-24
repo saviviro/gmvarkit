@@ -76,6 +76,10 @@
 #'   element) and confidence intervals in \code{$conf_ints} (the second
 #'   element). The first row is for the GIRF at impact \eqn{(n=0)}, the second
 #'   for \eqn{n=1}, the third for \eqn{n=2}, and so on.
+#'
+#'   The element \code{$all_girfs} is a list containing results from all the individual GIRFs
+#'   obtained from the MC repetitions. Each element is for one shock and results are in
+#'   array of the form \code{[horizon, variables, MC-repetitions]}.
 #' @seealso \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
 #'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
 #'   \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}},
@@ -205,6 +209,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
   parallel::stopCluster(cl=cl)
 
   GIRF_results <- vector("list", length=length(which_shocks))
+  all_GIRFS <- vector("list", length=length(which_shocks))
   names(GIRF_results) <- paste0("shock", which_shocks)
 
   for(i1 in 1:length(which_shocks)) { # Go through shocks
@@ -235,7 +240,9 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
         }
         res_in_array[, , i2] <- one_scale*res_in_array[, , i2]
       }
+      all_GIRFS[[i1]] <- res_in_array
     }
+    names(all_GIRFS) <- paste("Shock", which_shocks)
 
     # Point estimates, confidence intervals
     colnames(res_in_array) <- colnames(GIRF_shocks[[1]][[1]])
@@ -253,6 +260,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   cat("Finished!\n")
   ret <- structure(list(girf_res=GIRF_results,
+                        all_girfs=all_GIRFS,
                         shocks=which_shocks,
                         shock_size=shock_size,
                         N=N,

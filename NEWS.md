@@ -151,3 +151,7 @@
 * Fixed a bug in the argument scale of the function GIRF. Fixed also a bug that caused an error in some cases.
 * Now the plot method for class 'gsmvar' objects enables to plot only a single figure: series plot or density plot.
 * Note that this version might produce different results with the same random number generator seed than the previous versions.
+
+# gmvarkit 2.0.1
+
+* Now GIRF also returns all the girfs from each Monte Carlo repetition.
