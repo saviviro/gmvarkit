@@ -210,6 +210,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   GIRF_results <- vector("list", length=length(which_shocks))
   all_GIRFS <- vector("list", length=length(which_shocks))
+  names(all_GIRFS) <- paste0("shock", which_shocks)
   names(GIRF_results) <- paste0("shock", which_shocks)
 
   for(i1 in 1:length(which_shocks)) { # Go through shocks
@@ -240,9 +241,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
         }
         res_in_array[, , i2] <- one_scale*res_in_array[, , i2]
       }
-      all_GIRFS[[i1]] <- res_in_array
     }
-    names(all_GIRFS) <- paste0("shock", which_shocks)
+    all_GIRFS[[i1]] <- res_in_array
 
     # Point estimates, confidence intervals
     colnames(res_in_array) <- colnames(GIRF_shocks[[1]][[1]])
