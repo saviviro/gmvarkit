@@ -97,7 +97,7 @@ a univariate time series. \code{NA} values are not supported.}
   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
   \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
-  error term covariance matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+  error term covariance matrices (see Virolainen, 2021). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
@@ -145,7 +145,7 @@ the following elements:
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
 }
-See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{g}{function g specifying the transformation.}
@@ -180,7 +180,7 @@ Returns the covariance matrix Omega described by \emph{Kalliovirta and Saikkonen
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2109.13648.

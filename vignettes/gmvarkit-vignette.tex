@@ -25,7 +25,7 @@
 \newcommand{\fct}[1]{\code{#1()}}
 \newtheorem{condition}{Condition}
 \newtheorem{proposition}{Proposition}
-
+\newtheorem{assumption}{Assumption}
 
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
@@ -229,11 +229,11 @@ f(\boldsymbol{y}) = \sum_{m=1}^M\alpha_m n_{dp}(\boldsymbol{y};\boldsymbol{1}_p\
 
 \subsection{Structural G-StMVAR model}\label{sec:structural_model}
 We write the structural G-StMVAR model \citep{Virolainen2:2021} as
-\begin{equation}
+\begin{equation}\label{eq:def_sgstmvar1}
 y_t = \sum_{m=1}^Ms_{m,t}(\phi_{m,0}+\sum_{i=1}^pA_{m,i}y_{t-i}) + B_te_t
 \end{equation}
 and
-\begin{equation}
+\begin{equation}\label{eq:def_sgstmvar2}
 u_t\equiv B_te_t =
 \left\lbrace\begin{matrix}
 u_{1,t}\sim n_d(0,\Omega_{1,t}) & \text{if} & s_{1,t}=1 & (\text{with probability } \alpha_{1,t}) \\
@@ -248,38 +248,43 @@ where the probabilities are expressed conditionally on $\mathcal{F}_{t-1}$ and $
 \begin{equation}\label{eq:sigma_mt}
 \omega_{m,t} = \frac{\nu_m - 2 + (\boldsymbol{y}_{t-1} - \boldsymbol{1}_p\otimes\mu_m)'\Sigma_{m,p}^{-1}(\boldsymbol{y}_{t-1} - \boldsymbol{1}_p\otimes\mu_m)}{\nu_m - 2 + dp}.
 \end{equation}
-The invertible $(d\times d)$ "B-matrix" $B_t$, which governs the contemporaneous relations of the shocks, is time-varying and a function of $y_{t-1},..., y_{t-p}$. With a particular choice of $B_t$,  the conditional covariance matrix of the structural error can be normalized to an identity matrix. Consequently,  a constant sized structural shock will be amplified according to the conditional variance of the reduced form error, thereby reflecting the specific state of the economy.
+The invertible $(d\times d)$ "B-matrix" $B_t$,  which governs the contemporaneous relationships of the shocks, is time-varying and a function of $y_{t-1},..., y_{t-p}$.  When the conditional covariance matrix of the structural error is normalized to an identity matrix,  the B-matrix captures the conditional variance of the reduced form error,  thereby reflecting the specific state of the economy.
 
-We have $\Omega_{u,t}\equiv\text{Cov}(u_t|\mathcal{F}_{t-1})=\sum_{m=1}^{M_1}\alpha_{m,t}\Omega_m + \sum_{m=M_1+1}^{M}\alpha_{m,t}\omega_{m,t}\Omega_m$,  while the conditional covariance matrix of the structural error $e_t=B_t^{-1}u_t$ (which are not IID but are martingale differences and therefore uncorrelated) is obtained as
+We have $\Omega_{u,t}\equiv\text{Cov}(u_t|\mathcal{F}_{t-1})=\sum_{m=1}^{M_1}\alpha_{m,t}\Omega_m + \sum_{m=M_1+1}^{M}\alpha_{m,t}\omega_{m,t}\Omega_m$,  while the conditional covariance matrix of the structural error $e_t=B_t^{-1}u_t$ (which are not IID but are martingale differences and thereby uncorrelated) is obtained as
 \begin{equation}
 \text{Cov}(e_t|\mathcal{F}_{t-1})=\sum_{m=1}^{M_1}\alpha_{m,t}B_t^{-1}\Omega_mB_t'^{-1} + \sum_{m=M_1+1}^{M}\alpha_{m,t}\omega_{m,t}B_t^{-1}\Omega_mB_t'^{-1}.
 \end{equation}
-Therefore, we need to choose the B-matrix so that the structural shocks are orthogonal regardless of which regime they come from.
+Therefore,  the B-matrix should be chosen so that the structural shocks are orthogonal regardless of which regime they come from.  \cite{Virolainen:2020} shows that any such B-matrix has (linearly independent) eigenvectors of the matrix $\Omega_m\Omega_1^{-1}$ as its columns.  Moreover,  he shows that under the following assumption and a constant normalization of the structural error's conditional variance,  say $\Omega_{u,t}=I_d$, the B-matrix is unique up to ordering of its columns and changing all signs in a column.\footnote{\cite{Virolainen:2020} shows the uniqueness of the B-matrix for the structural GMVAR model, but the results apply to the more general structural G-StMVAR model as well.}
 
-We employ the following decomposition to simultaneously diagonalize all the error term covariance matrices:
+\begin{assumption}\label{as:eigenvalues}
+Consider $M$ positive definite $(d\times d)$ covariance matrices $\Omega_m$,  $m = 1,...,M$, and denote the strictly positive eigenvalues of the matrices $\Omega_m\Omega_1^{-1}$ as $\lambda_{mi}$, $i=1,...,d$,  $m=2,...,M$.  Suppose that for all $i\neq j\in\lbrace 1,...,d\rbrace$, there exists an $m\in\lbrace 2,...,M\rbrace$ such that $\lambda_{mi}\neq\lambda_{mj}$.
+\end{assumption}
+
+Thus, as long as one is willing to assume a single (time-varying) B-matrix,  its columns generally characterize the estimated impact effects of the economic shocks,  but it is not revealed which column is related to which shock.  Since the B-matrix is also subject to an estimation error,  additional constraints are required for a formal identification of the shocks.
+
+Following \cite{Virolainen:2020} (and \cite{Lanne+Lutkepohl:2010} and \cite{Lanne+Lutkepohl+Maciejowska:2010}), we utilize the following matrix decomposition that is convenient for the specifying the B-matrix and deriving the identification conditions.  We decompose the error term covariance matrices as
 \begin{equation}\label{eq:omega_decomp}
-\Omega_m = W\Lambda_mW',  \ \ m=1,...,M,
+\Omega_1 = WW' \quad \text{and} \quad \Omega_m=W\Lambda_mW', \quad m=2,...,M,
 \end{equation}
-where the diagonal of $\Lambda_m = \text{diag}(\lambda_{m1},...,\lambda_{md})$,  $\lambda_{mi}>0$ $(i=1,...,d)$,  contains the eigenvalues of the matrix $\Omega_m\Omega_1^{-1}$ and the columns of the nonsingular $W$ are the related eigenvectors (that are the same for all $m$ by construction).  When $M=2$,  the decomposition (\ref{eq:omega_decomp}) always exists, but for $M\geq 3$ its existence requires that the matrices share the common eigenvectors in $W$.  This is, however, testable.
+where the diagonal of $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of the matrix $\Omega_m\Omega_1^{-1}$ and the columns of the nonsingular $W$ are the related eigenvectors (that are the same for all $m$ by construction). When $M=2$, the decomposition (\ref{eq:omega_decomp}) always exists \citep[Theorem A9.9]{Muirhead:1982}, but for $M\geq 3$ its existence requires that the matrices $\Omega_m\Omega_1^{-1}$ share the common eigenvectors in $W$.  If this is not the case,  the B-matrix does not exist \citep[see][Section 3.1]{Virolainen:2020}, but its existence is,  however, testable.
 
-\citet[Proposition 1]{Lanne+Lutkepohl+Maciejowska:2010} show that for a given ordering of the eigenvalues, $W$ is unique apart from changing all signs a column, as long as for all $i\neq j\in \lbrace 1,...,d \rbrace$ there exists an $m\in\lbrace 2,...,M \rbrace$ such that $\lambda_{mi}\neq\lambda_{mj}$ (for $m=1$,  $\Lambda_m=I_d$ and $\lambda_{m1}=\cdots = \lambda_{md}=1$).  A locally unique B-matrix that amplifies a constant sized structural shock according to the conditional variance of the reduced form error is therefore obtained as
+Similarly to \cite{Virolainen:2020},  any scalar multiples of $W$'s columns comprise an appropriate B-matrix,  as they are linearly independent eigenvectors of  $\Omega_m\Omega_1^{-1}$.  But only specific scalar multiples comprise the the locally unique B-matrix associated with a given normalization of the structural error's conditional covariance matrix.  Direct calculation shows that a B-matrix that amplifies a constant sized structural shock according to the conditional variance of the reduced form error is obtained as
 \begin{equation}\label{eq:B-matrix}
-B_t = W(\sum_{m=1}^{M_1}\alpha_{m,t}\Lambda_m + \sum_{m=M_1 + 1}^{M}\alpha_{m,t}\omega_{m,t}\Lambda_m)^{1/2}.
+B_t = W(\sum_{m=1}^{M_1}\alpha_{m,t}\Lambda_m + \sum_{m=M_1 + 1}^{M}\alpha_{m,t}\omega_{m,t}\Lambda_m)^{1/2},
 \end{equation}
-Since $B_t^{-1}\Omega_mB_t'^{-1}=\Lambda_m(\sum_{n=1}^{M_1}\alpha_{n,t}\Lambda_n + \sum_{n=M_1+1}^M\alpha_{n,t}\omega_{n,t}\Lambda_n)^{-1}$,  the B-matrix (\ref{eq:B-matrix}) simultaneously diagonalizes $\Omega_{1},...,\Omega_{M}$, and $\Omega_{u,t}$ (and thereby also $\Omega_{1,t},...,\Omega_{M,t}$) for each $t$ so that $\text{Cov}(e_t|\mathcal{F}_{t-1}) = I_d$.
+where $B_tB_t'=\Omega_{u,t}$.  Since $B_t^{-1}\Omega_mB_t'^{-1}=\Lambda_m(\sum_{n=1}^{M_1}\alpha_{n,t}\Lambda_n + \sum_{n=M_1+1}^M\alpha_{n,t}\omega_{n,t}\Lambda_n)^{-1}$,  the B-matrix (\ref{eq:B-matrix}) simultaneously diagonalizes $\Omega_{1},...,\Omega_{M}$, and $\Omega_{u,t}$ (and thereby also $\Omega_{1,t},...,\Omega_{M,t}$) for each $t$ so that $\text{Cov}(e_t|\mathcal{F}_{t-1}) = I_d$.
 
-
-\subsection{Identification of the structural shocks}
-With the decomposition (\ref{eq:omega_decomp}) of $\Omega_1,...,\Omega_M$ and the B-matrix (\ref{eq:B-matrix}),  a statistical identification of the shocks is achieved as long as each pair of the eigenvalues is distinct for some $m$.  In order to identify structural shocks with economic interpretations,  they need to be uniquely related to the economic shocks through the constraints on the B-matrix (or equally $W$) that only the shock of interest satisfies. \citet[Proposition 1]{Virolainen:2020} gives formal conditions for global identification of any subset of the shocks when the relevant pairs eigenvalues are distinct in some regime.  He also derives conditions for globally identifying some of the shocks when one of the relevant pairs of the eigenvalues is identical in all regimes.  For convenience,  we repeat the conditions in the former case below,  but in the latter case,  we refer to \citet[where also the following Proposition is proven]{Virolainen:2020}.
-\begin{proposition}\label{prop:ident1}
-Suppose $\Omega_m = W\Lambda_mW'$,  $m=1,...,M$, where the diagonal of $\Lambda = \text{diag}(\lambda_{m1},...,\lambda_{md})$,  $\lambda_{mi}>0$ $(i=1,...,d)$,  contains the eigenvalues of the matrix $\Omega_m\Omega_1^{-1}$ and the columns of the nonsingular $W$ are the related eigenvectors.  Then,  the last $d_1$ structural shocks are uniquely identified if
-\begin{enumerate}
+\subsection{Identification of the shocks}
+We have established that with the structure (\ref{eq:def_sgstmvar1}) and (\ref{eq:def_sgstmvar1}) of the model and the normalization $\text{Cov}(e_t|\mathcal{F}_{t-1}) = I_d$,  the structural shocks are identified up ordering and sign  under Assumption~\ref{as:eigenvalues}.  It remains to identify which column of the B-matrix is related to which economic shock.  To that end,  the structural shocks need to be uniquely related to the economic shocks through the constraints on the B-matrix (or equally $W$) that only the shock of interest satisfies. \citet[Proposition 2]{Virolainen:2020} gives formal conditions for global identification of any subset of the shocks when the relevant pairs eigenvalues $\lambda_{mi}$ are distinct in some regime.  He also derives conditions for globally identifying some of the shocks when one of the relevant pairs of the eigenvalues is identical in all regimes \citep[Proposition 3]{Virolainen:2020}.  For convenience,  we repeat the conditions in the former case below,  but in the latter case (as well as for the proof of the below proposition),  we refer to \cite{Virolainen:2020}.
+\begin{proposition}\label{prop:ident}
+Suppose $\Omega_1=WW'$ and $\Omega_m=W\Lambda_mW', \ \ m=2,...,M,$ where $\Lambda_m=\text{diag}(\lambda_{m1},...,\lambda_{md})$, $\lambda_{mi}>0$ ($i=1,...,d$), contains the eigenvalues of $\Omega_m\Omega_1^{-1}$ in the diagonal and the columns of the nonsingular $W$ are the related eigenvectors. Then, the last $d_1$ structural shocks are uniquely identified if
+\begin{enumerate}%[label={(\arabic*)}]
 \item for all $j>d-d_1$ and $i \neq j$ there exists an $m\in\lbrace 2,...,M\rbrace$ such that $\lambda_{mi}\neq \lambda_{mj}$,\label{cond:lambdadif}
-\item the columns of $W$ in a way that for all $i\neq j > d - d_1$, the $i$th column cannot satisfy the constraints of the $j$th column as is nor after changing all signs in the $i$th column, and\label{cond:Wconstraints}
+\item the columns of $W$ are constrained in a way that for all $i\neq j > d - d_1$, the $i$th column cannot satisfy the constraints of the $j$th column as is nor after changing all signs in the $i$th column, and\label{cond:Wconstraints}
 \item there is at least one (strict) sign constraint in each of the last $d_1$ columns of $W$. \label{cond:Wsign}
 \end{enumerate}
 \end{proposition}
-Condition \ref{cond:Wsign} fixes the signs in the last $d_1$ columns of $W$,  and therefore the signs of the instantaneous effects of the corresponding shocks.  However,  since changing the signs of the columns is effectively the same as changing the signs of the corresponding shocks, and the structural shock has a distribution that is symmetric about zero,  this condition is not restrictive.  The assumption that the last $d_1$ shocks are identified is not restrictive either,  as one may always reorder the structural shocks accordingly.
+Condition~\ref{cond:Wsign} fixes the signs in the last $d_1$ columns of $W$,  and therefore the signs of the instantaneous effects of the corresponding shocks.  However,  since changing the signs of the columns is effectively the same as changing the signs of the corresponding shocks, and the structural shock has a distribution that is symmetric about zero,  this condition is not restrictive.  The assumption that the last $d_1$ shocks are identified is not restrictive either,  as one may always reorder the structural shocks accordingly.  Finally,  note that Assumption~\ref{as:eigenvalues} is not required for the identification,  when only some of the shocks are to be identified,  for which it is replaced with the weaker condition~\ref{cond:lambdadif}.
 
 For example, if $d=3$, $\lambda_{m1}\neq\lambda_{m3}$ for some $m$, and $\lambda_{m2}\neq\lambda_{m3}$ for some $m$, the third structural shock can be identified with the following constraints:
 \begin{equation}
@@ -301,9 +306,9 @@ B_t=\begin{bmatrix}
 + & * & + \\
 \end{bmatrix}
 \end{equation}
-and so on, where $"*"$ signifies that the element is not constrained, $"+"$ denotes strict positive and $"-"$ a strict negative sign constraint, and $"0"$ means that the element is constrained to zero. Because imposing zero or sign constraints on $W$ equals to placing them on $B_t$, they may be justified economically. Furthermore, besides a single sign constraint in each column, the constraints are over-identifying and can thus be also justified statistically. Sign constraints, however, don't reduce the dimension of the parameter space, making some of the measures such as the conventional likelihood ratio test and information criteria unsuitable for testing them. Quantile residual diagnostics, on the other hand, can be used to evaluate how well the restricted model is able to encapsulate the statistical properties of the data compared to the unrestricted alternative.
+and so on, where $"*"$ signifies that the element is not constrained, $"+"$ denotes strict positive and $"-"$ a strict negative sign constraint, and $"0"$ means that the element is constrained to zero.
 
-If condition~\ref{cond:lambdadif} of Proposition~\ref{prop:ident1} is strengthened to state that for all $i\neq j$ there exists an $m\in\lbrace 2,...,M\rbrace$ such that $\lambda_{mi}\neq \lambda_{mj}$,  the model is statistically identified even though only the last $d_1$ structural shocks have been identified with the proposition.  Consequently,  the constraints imposed in condition \ref{cond:Wconstraints} become testable.  If it cannot be assumed that all the pairs of the eigenvalues are distinct in some regime,  then the testing problem is nonstandard and the conventional asymptotic distributions of likelihood ratio and Wald test statistics become unreliable.  Note,  however, that since placing zero or sign constraints on $W$ equals to placing them on the B-matrix (\ref{eq:B-matrix}),  the constraints imposed in condition \ref{cond:Wconstraints} can be justified economically as usual.
+If condition~\ref{cond:lambdadif} of Proposition~\ref{prop:ident} is strengthened to Assumption~\ref{as:eigenvalues}, the model is statistically identified even though only the last $d_1$ structural shocks have been identified with the proposition.  Consequently,  the constraints imposed in condition \ref{cond:Wconstraints} become testable. If it cannot be assumed that all the pairs of the eigenvalues are distinct in some regime,  then the testing problem is nonstandard and the conventional asymptotic distributions of likelihood ratio and Wald test statistics become unreliable.  Note,  however, that since placing zero or sign constraints on $W$ equals to placing them on the B-matrix (\ref{eq:B-matrix}),  the constraints imposed in condition \ref{cond:Wconstraints} can be justified economically as usual. See \cite{Virolainen:2020} for a more thorough discussion on the identification of the shocks.
 
 
 \section{Estimation and model selection}\label{sec:estimation}
@@ -348,17 +353,17 @@ R> data("gdpdef", package = "gmvarkit")
 R> fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=2, seeds=1:2)
 \end{Sinput}
 \begin{Soutput}
-Using 2 cores for 2 estimations rounds... 
+Using 2 cores for 2 estimations rounds...
 Optimizing with a genetic algorithm...
 Results from the genetic algorithm:
-The lowest loglik:  -254.476 
-The mean loglik:    -254.15 
-The largest loglik: -253.823 
+The lowest loglik:  -254.476
+The mean loglik:    -254.15
+The largest loglik: -253.823
 Optimizing with a variable metric algorithm...
 Results from the variable metric algorithm:
-The lowest loglik:  -247.496 
-The mean loglik:    -245.24 
-The largest loglik: -242.985 
+The lowest loglik:  -247.496
+The mean loglik:    -245.24
+The largest loglik: -242.985
 Calculating approximate standard errors...
 Finished!
 \end{Soutput}
@@ -387,29 +392,29 @@ R> print(fit12t_alt)
 \begin{Soutput}
 Reduced form StMVAR model:
  p = 1, M = 2, d = 2, #parameters = 21, #observations = 244 x 2,
- conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints
 
 Regime 1
-Mixing weight: 0.83 
+Mixing weight: 0.83
 Regime means: 0.78, 0.54
 Df parameter:  7.57
 
-   Y     phi0          A1                            Omega         
+   Y     phi0          A1                            Omega
 1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )
 2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )
-  1/2     
+  1/2
 1     eps1
 2     eps2
 
 Regime 2
-Mixing weight: 0.17 
+Mixing weight: 0.17
 Regime means: 0.66, 1.67
 Df parameter:  58889.20
 
-   Y     phi0          A1                            Omega          
+   Y     phi0          A1                            Omega
 1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + (         [  1.21 -0.04 ] )
 2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   ( ARCH_mt [ -0.04  0.14 ] )
-  1/2     
+  1/2
 1     eps1
 2     eps2
 \end{Soutput}
@@ -440,17 +445,17 @@ R> summary(fit12gs)
 \begin{Soutput}
 Reduced form G-StMVAR model:
  p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
- conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints
 
- log-likelihood: -247.50, AIC: 534.99, HQIC: 563.13, BIC: 604.85 
+ log-likelihood: -247.50, AIC: 534.99, HQIC: 563.13, BIC: 604.85
 
 Regime 1 (GMVAR type)
-Moduli of 'bold A' eigenvalues:  0.75, 0.10 
-Cov. matrix 'Omega' eigenvalues: 1.21, 0.14 
-Mixing weight: 0.17 
+Moduli of 'bold A' eigenvalues:  0.75, 0.10
+Cov. matrix 'Omega' eigenvalues: 1.21, 0.14
+Mixing weight: 0.17
 Regime means: 0.66, 1.67
 
-   Y     phi0          A1                  Omega         1/2     
+   Y     phi0          A1                  Omega         1/2
 1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
 2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
 
@@ -460,16 +465,16 @@ Error term correlation matrix:
 [2,] -0.088  1.000
 
 Regime 2 (StMVAR type)
-Moduli of 'bold A' eigenvalues:  0.70, 0.34 
-Cov. matrix 'Omega' eigenvalues: 0.42, 0.04 
-Mixing weight: 0.83 
+Moduli of 'bold A' eigenvalues:  0.70, 0.34
+Cov. matrix 'Omega' eigenvalues: 0.42, 0.04
+Mixing weight: 0.83
 Regime means: 0.78, 0.54
 Df parameter:  7.57
 
-   Y     phi0          A1                            Omega         
+   Y     phi0          A1                            Omega
 1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )
 2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )
-  1/2     
+  1/2
 1     eps1
 2     eps2
 
@@ -494,24 +499,24 @@ R> print_std_errors(fit12gs)
 \end{Sinput}
 \begin{Soutput}
 Reduced form model:
-p = 1, M = 2, conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+p = 1, M = 2, conditional log-likelihood, intercept parametrization, no AR parameter constraints
 
 APPROXIMATE STANDARD ERRORS
 
 Regime 1 (GMVAR type)
-Mixing weight: 0.124 
+Mixing weight: 0.124
 
-   Y      phi0          A1                  Omega         1/2     
+   Y      phi0          A1                  Omega         1/2
 1 Y1 = [ 0.759 ] + [ 0.149 0.386 ] Y1.1 + [ 0.263 0.061 ]     eps1
 2 Y2   [ 0.234 ]   [ 0.050 0.118 ] Y2.1   [ 0.061 0.029 ]     eps2
 
 Regime 2 (StMVAR type)
-Df parameter:  2.778 
+Df parameter:  2.778
 
-   Y      phi0          A1                            Omega        
+   Y      phi0          A1                            Omega
 1 Y1 = [ 0.127 ] + [ 0.079 0.196 ] Y1.1 + (         [ 0.070 0.011 ]
 2 Y2   [ 0.037 ]   [ 0.024 0.064 ] Y2.1   ( ARCH_mt [ 0.011 0.008 ]
-  1/2     
+  1/2
 1     eps1
 2     eps2
 \end{Soutput}
@@ -630,30 +635,30 @@ R> fit12gss
 \begin{Soutput}
 Structural G-StMVAR model:
  p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
- conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints
 
 Regime 1 (GMVAR type)
-Mixing weight: 0.17 
+Mixing weight: 0.17
 Regime means: 0.66, 1.67
 
-   Y     phi0          A1                  Omega         1/2     
+   Y     phi0          A1                  Omega         1/2
 1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
 2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
 
 Regime 2 (StMVAR type)
-Mixing weight: 0.83 
+Mixing weight: 0.83
 Regime means: 0.78, 0.54
 Df parameter:  7.57
 
-   Y     phi0          A1                            Omega         
+   Y     phi0          A1                            Omega
 1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )
 2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )
-  1/2     
+  1/2
 1     eps1
 2     eps2
 
 Structural parameters:
-        W             lamb2  
+        W             lamb2
 1 [  0.95 -0.55 ]   [  0.37 ]
 2 [  0.16  0.34 ] , [  0.28 ]
 
@@ -930,18 +935,18 @@ R> mod112
 \end{Sinput}
 \begin{Soutput}
 Reduced form StMVAR model:
- p = 1, M = 1, d = 2, #parameters = 10, 
- conditional log-likelihood, intercept parametrization, no AR parameter constraints 
+ p = 1, M = 1, d = 2, #parameters = 10,
+ conditional log-likelihood, intercept parametrization, no AR parameter constraints
 
 Regime 1
-Mixing weight: 1.00 
+Mixing weight: 1.00
 Regime means: 0.22, 0.87
 Df parameter:  3.00
 
-   Y     phi0          A1                            Omega         
+   Y     phi0          A1                            Omega
 1 y1 = [ 0.00 ] + [  0.20  0.20 ] y1.1 + (         [  1.00 0.10 ] )
 2 y2   [ 1.00 ]   [  0.20 -0.20 ] y2.1   ( ARCH_mt [  0.10 1.00 ] )
-  1/2     
+  1/2
 1     eps1
 2     eps2
 \end{Soutput}

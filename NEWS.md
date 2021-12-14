@@ -156,3 +156,5 @@
 
 * Now GIRF also returns all the girfs from each Monte Carlo repetition.
 * Added the data "usamone" that is used in the cited paper by Virolainen introducing the structural GMVAR model.
+* Updated the references.
+* Updated the vignette.

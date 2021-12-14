@@ -35,7 +35,7 @@
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
 #'    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
 #'          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
-#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2109.13648.
@@ -218,7 +218,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2109.13648.
@@ -408,7 +408,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2109.13648.
@@ -526,7 +526,7 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
 #'    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
 #'      paper, available as arXiv:2007.04713.
 #'  }
 #' @examples

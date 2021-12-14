@@ -40,7 +40,7 @@ The switch is made by simultaneously diagonalizing the two error term covariance
    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2109.13648.

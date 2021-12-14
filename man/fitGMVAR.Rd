@@ -66,7 +66,7 @@ the following elements:
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
 }
-See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{ncalls}{the number of estimation rounds that should be performed.}
@@ -162,7 +162,7 @@ If you wish to estimate a structural model without overidentifying constraints t
          \emph{Transactions on Systems, Man and Cybernetics} \strong{24}, 656-667.
    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2109.13648.

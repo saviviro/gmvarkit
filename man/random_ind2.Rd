@@ -52,7 +52,7 @@ the following elements:
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
 }
-See Virolainen (2020) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{mu_scale}{a size \eqn{(dx1)} vector defining \strong{means} of the normal distributions from which each
@@ -135,7 +135,7 @@ The coefficient matrices are generated using the algorithm proposed by Ansley
       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2109.13648.

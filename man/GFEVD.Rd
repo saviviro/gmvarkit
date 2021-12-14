@@ -110,7 +110,7 @@ The model needs to be structural in order for this function to be applicable. A 
 
   The GFEVD is a forecast error variance decomposition calculated with the generalized impulse response function (GIRF).
   Lanne and Nyberg (2016) for details. Note, however, that the related GIRFs are calculated using the algorithm given in
-  Virolainen (2020).
+  Virolainen (2021).
 }
 \section{Methods (by generic)}{
 \itemize{
@@ -170,7 +170,7 @@ The model needs to be structural in order for this function to be applicable. A 
      and Nonlineae Multivariate Models. \emph{Oxford Bulletin of Economics and Statistics}, \strong{78}, 4, 595-603.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2007.04713.
    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
      paper, available as arXiv:2109.13648.
