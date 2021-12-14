@@ -12,7 +12,7 @@ A numeric matrix of class \code{'ts'} with 244 rows and 2 columns with one time 
 }
 }
 \source{
-The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of Atlanta's website
+The Federal Reserve Bank of St. Louis database
 }
 \usage{
 gdpdef
