@@ -162,4 +162,4 @@
 # gmvarkit 2.0.2
 
 * Changed the default ncalls in fitGSMVAR to (M + 1)^5.
-* Fixed a bug that sometimes caused an error in the estimation algorithm because the random degrees of freedom parameters were not "numerically larger enough than 2".
+* Fixed a bug that sometimes caused an error in the estimation algorithm because the random degrees of freedom parameters were too close to their strict lower bound 2.

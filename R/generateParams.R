@@ -476,7 +476,7 @@ random_df <- function(M, model=c("GMVAR", "StMVAR", "G-StMVAR")) {
   } else { # model == "G-StMVAR"
     M2 <- M[2]
   }
-  2 + rgamma(M2, shape=0.3, rate=0.007)
+  2.0001 + rgamma(M2, shape=0.3, rate=0.007)
 }
 
 

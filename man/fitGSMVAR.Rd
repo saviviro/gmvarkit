@@ -14,7 +14,7 @@ fitGSMVAR(
   constraints = NULL,
   same_means = NULL,
   structural_pars = NULL,
-  ncalls = M^6,
+  ncalls = (M + 1)^5,
   ncores = 2,
   maxit = 1000,
   seeds = NULL,
