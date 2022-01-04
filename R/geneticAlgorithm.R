@@ -456,7 +456,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       which_inds_na <- which(is.na(logliks[i1,]))
       logliks[i1, which_inds_na] <- minval
       warning(paste0("Removed NaNs from the logliks of inds ", which_inds_na, " in the GA round ", i1,
-                     " with the seed ", seed, ". To fix the issue, do a bug report (if the seed is not NULL)."))
+                     " with the seed ", seed, "."))
     }
     logliks[i1, which(logliks[i1,] < minval)] <- minval
     redundants[i1, which(logliks[i1,] <= minval)] <- M
