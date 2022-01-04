@@ -545,7 +545,7 @@ check_same_means <- function(parametrization, same_means) {
 #' @return Doesn't return anything.
 #' @keywords internal
 
-warn_eigens <- function(gsmvar, tol=0.002) {
+warn_eigens <- function(gsmvar, stat_tol=0.0015, posdef_tol=0.0002) {
   boldA_eigens <- get_boldA_eigens(gsmvar)
   omega_eigens <- get_omega_eigens(gsmvar)
   near_nonstat <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
