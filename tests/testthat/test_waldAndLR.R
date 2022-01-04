@@ -16,9 +16,9 @@ c1 <- c(0.1, 0)
 wald1 <- Wald_test(mod222s, A1, c1)
 
 test_that("Wald_test works correctly", {
-  expect_equal(unname(wald1$parameter), 2)
-  expect_equal(unname(wald1$statistic), 1.818517, tolerance=1e-1)
-  expect_equal(wald1$p.value, 0.4028229, tolerance=1e-1)
+  expect_equal(unname(wald1$df), 2)
+  expect_equal(unname(wald1$test_stat), 1.818517, tolerance=1e-1)
+  expect_equal(wald1$p_value, 0.4028229, tolerance=1e-1)
 })
 
 
@@ -32,7 +32,7 @@ mod222sc <- GSMVAR(gdpdef, p=2, M=2, params=params222sc, constraints=C_mat, stru
 lr1 <- LR_test(mod222s, mod222sc)
 
 test_that("LR_test works correctly", {
-  expect_equal(unname(lr1$parameter), 8)
-  expect_equal(unname(lr1$statistic), 14.18665, tolerance=1e-4)
-  expect_equal(lr1$p.value, 0.07702821, tolerance=1e-4)
+  expect_equal(unname(lr1$df), 8)
+  expect_equal(unname(lr1$test_stat), 14.18665, tolerance=1e-4)
+  expect_equal(lr1$p_value, 0.07702821, tolerance=1e-4)
 })

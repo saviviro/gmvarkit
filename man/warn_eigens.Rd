@@ -4,10 +4,19 @@
 \alias{warn_eigens}
 \title{Warn about near-unit-roots in some regimes}
 \usage{
-warn_eigens(gsmvar, tol = 0.002)
+warn_eigens(gsmvar, stat_tol = 0.0015, posdef_tol = 2e-04)
 }
 \arguments{
 \item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
+
+\item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
+has eigenvalues larger that \code{1 - stat_tol} the model is classified as non-stationary. Note that if the
+tolerance is too small, numerical evaluation of the log-likelihood might fail and cause error.}
+
+\item{posdef_tol}{numerical tolerance for positive definiteness of the error term covariance matrices: if
+the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
+as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
+evaluation of the log-likelihood might fail and cause error.}
 
 \item{tol}{if eigenvalue is closer than \code{tol} to its bound, a warning is thrown}
 }

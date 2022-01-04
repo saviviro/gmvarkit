@@ -14,15 +14,7 @@ the \strong{freely estimated} model.}
 the \strong{constrained} model.}
 }
 \value{
-A list with class "htest" containing the following components:
-  \item{statistic}{the value of the likelihood ratio statistics.}
-  \item{parameter}{the degrees of freedom of the likelihood ratio statistic.}
-  \item{p.value}{the p-value of the test.}
-  \item{alternative}{a character string describing the alternative hypothesis.}
-  \item{method}{a character string indicating the type of the test (likelihood ratio test).}
-  \item{data.name}{a character string giving the names of the supplied models, gsmar1 and gsmar2.}
-  \item{gsmvar1}{the supplied argument gsmvar1}
-  \item{gsmvar2}{the supplied argument gsmvar2}
+A list with class "hypotest" containing the test results and arguments used to calculate the test.
 }
 \description{
 \code{LR_test} performs a likelihood ratio test for a GMVAR, StMVAR, or G-StMVAR model
@@ -43,13 +35,13 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
  # Structural GMVAR(2, 2), d=2 model with recursive identification
  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
  fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
-                    ncalls=1, seeds=2)
+                     ncalls=1, seeds=2)
 
  # The same model but the AR coefficients restricted to be the same
  # in both regimes:
  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
  fit22sc <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat,
-                     structural_pars=list(W=W22), ncalls=1, seeds=1)
+                      structural_pars=list(W=W22), ncalls=1, seeds=1)
 
  # Test the AR constraints with likelihood ratio test:
  LR_test(fit22s, fit22sc)

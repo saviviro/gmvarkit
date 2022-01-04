@@ -17,17 +17,7 @@
 #'
 #'   Finally, note that this function does \strong{not} check whether the specified constraints are feasible (e.g. whether
 #'   the implied constrained model would be stationary or have positive definite error term covariance matrices).
-#' @return A list with class "htest" containing the following components:
-#'   \item{statistic}{the value of the Wald statistics.}
-#'   \item{parameter}{the degrees of freedom of the Wald statistic.}
-#'   \item{p.value}{the p-value of the test.}
-#'   \item{alternative}{a character string describing the alternative hypothesis.}
-#'   \item{method}{a character string indicating the type of the test (Wald test).}
-#'   \item{data.name}{a character string giving the names of the supplied model, constraint matrix A, and vector c.}
-#'   \item{gsmvar}{the supplied argument gsmvar.}
-#'   \item{A}{the supplied argument A.}
-#'   \item{c}{the supplied argument c.}
-#'   \item{h}{the supplied argument h.}
+#' @return A list with class "hypotest" containing the test results and arguments used to calculate the test.
 #' @seealso \code{\link{LR_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
@@ -102,18 +92,27 @@ Wald_test <- function(gsmvar, A, c, h=6e-6) {
   p_value <- pchisq(test_stat, df=df, lower.tail=FALSE)
 
   # Return
-  dname <- paste0(deparse(substitute(gsmvar)),", ", deparse(substitute(A)), ", ", deparse(substitute(c)))
-  structure(list(statistic=c("W"=test_stat),
-                 parameter=c("df"=df),
-                 p.value=p_value,
-                 alternative="the true parameter theta does not satisfy A%*%theta = c",
-                 data.name=dname,
-                 method="Wald test",
-                 gsmvar=gsmvar,
+  #dname <- paste0(deparse(substitute(gsmvar)),", ", deparse(substitute(A)), ", ", deparse(substitute(c)))
+  #structure(list(statistic=c("W"=test_stat),
+  #               parameter=c("df"=df),
+  #               p.value=p_value,
+  #               alternative="the true parameter theta does not satisfy A%*%theta = c",
+  #               data.name=dname,
+  #               method="Wald test",
+  #               gsmvar=gsmvar,
+  #               A=A,
+  #               c=c,
+  #               h=h),
+  #          class="htest")
+  structure(list(gsmvar=gsmvar,
                  A=A,
                  c=c,
-                 h=h),
-            class="htest")
+                 df=df,
+                 test_stat=test_stat,
+                 df=df,
+                 p_value=p_value,
+                 type="Wald test"),
+            class="hypotest")
 }
 
 
@@ -131,18 +130,10 @@ Wald_test <- function(gsmvar, A, c, h=6e-6) {
 #'   of the unconstrained and constrained parameter spaces.
 #'
 #'   Note that this function does \strong{not} verify that the two models are actually nested.
-#' @return A list with class "htest" containing the following components:
-#'   \item{statistic}{the value of the likelihood ratio statistics.}
-#'   \item{parameter}{the degrees of freedom of the likelihood ratio statistic.}
-#'   \item{p.value}{the p-value of the test.}
-#'   \item{alternative}{a character string describing the alternative hypothesis.}
-#'   \item{method}{a character string indicating the type of the test (likelihood ratio test).}
-#'   \item{data.name}{a character string giving the names of the supplied models, gsmar1 and gsmar2.}
-#'   \item{gsmvar1}{the supplied argument gsmvar1}
-#'   \item{gsmvar2}{the supplied argument gsmvar2}
 #' @seealso \code{\link{Wald_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 #' @inherit in_paramspace_int references
+#' @inherit Wald_test return
 #' @examples
 #' \donttest{
 #'  ## These are long running examples that use parallel computing!
@@ -151,13 +142,13 @@ Wald_test <- function(gsmvar, A, c, h=6e-6) {
 #'  # Structural GMVAR(2, 2), d=2 model with recursive identification
 #'  W22 <- matrix(c(1, NA, 0, 1), nrow=2, byrow=FALSE)
 #'  fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
-#'                     ncalls=1, seeds=2)
+#'                      ncalls=1, seeds=2)
 #'
 #'  # The same model but the AR coefficients restricted to be the same
 #'  # in both regimes:
 #'  C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 #'  fit22sc <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat,
-#'                      structural_pars=list(W=W22), ncalls=1, seeds=1)
+#'                       structural_pars=list(W=W22), ncalls=1, seeds=1)
 #'
 #'  # Test the AR constraints with likelihood ratio test:
 #'  LR_test(fit22s, fit22sc)
@@ -178,16 +169,23 @@ LR_test <- function(gsmvar1, gsmvar2) {
   p_value <- pchisq(test_stat, df=df, lower.tail=FALSE)
 
   # Return
-  dname <- paste(deparse(substitute(gsmvar1)), "and", deparse(substitute(gsmvar2)))
-  structure(list(statistic=c("LR"=test_stat),
-                 parameter=c("df"=df),
-                 p.value=p_value,
-                 alternative=paste("the true parameter does not satisfy the constraints imposed in", deparse(substitute(gsmvar2))),
-                 data.name=dname,
-                 method="Likelihood ratio test",
-                 gsmvar1=gsmvar1,
-                 gsmvar2=gsmvar2),
-            class="htest")
+  #dname <- paste(deparse(substitute(gsmvar1)), "and", deparse(substitute(gsmvar2)))
+  #structure(list(statistic=c("LR"=test_stat),
+  #               parameter=c("df"=df),
+  #               p.value=p_value,
+  #               alternative=paste("the true parameter does not satisfy the constraints imposed in", deparse(substitute(gsmvar2))),
+  #               data.name=dname,
+  #               method="Likelihood ratio test",
+  #               gsmvar1=gsmvar1,
+  #               gsmvar2=gsmvar2),
+  #          class="htest")
+  structure(list(gsmvar1=gsmvar1,
+                 gsmvar2=gsmvar2,
+                 test_stat=test_stat,
+                 df=df,
+                 p_value=p_value,
+                 type="Likelihood ratio test"),
+            class="hypotest")
 }
 
 

@@ -548,8 +548,8 @@ check_same_means <- function(parametrization, same_means) {
 warn_eigens <- function(gsmvar, stat_tol=0.0015, posdef_tol=0.0002) {
   boldA_eigens <- get_boldA_eigens(gsmvar)
   omega_eigens <- get_omega_eigens(gsmvar)
-  near_nonstat <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(boldA_eigens[,i1]) > 1 - tol), logical(1))
-  near_singular <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(omega_eigens[,i1]) < tol), logical(1))
+  near_nonstat <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(boldA_eigens[,i1]) > 1 - stat_tol), logical(1))
+  near_singular <- vapply(1:sum(gsmvar$model$M), function(i1) any(abs(omega_eigens[,i1]) < posdef_tol), logical(1))
   if(any(near_nonstat)) {
     my_string1 <- ifelse(sum(near_nonstat) == 1,
                         paste("Regime", which(near_nonstat),"has near-unit-roots! "),

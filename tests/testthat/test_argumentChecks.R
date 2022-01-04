@@ -770,11 +770,11 @@ params112 <- c(1.03, 2.36, 0.85, 0.06, 0.04, 0.94, 0.93, -0.913, 0.90)
 mod112 <- GSMVAR(p=1, M=1, d=2, params=params112)
 
 test_that("warn_eigens works correctly", {
-  expect_warning(warn_eigens(mod44, tol=0.002))
-  expect_warning(warn_eigens(mod44_2, tol=0.002))
-  expect_warning(warn_eigens(mod44t_2, tol=0.002))
-  expect_warning(warn_eigens(mod44gs_2, tol=0.002))
-  expect_warning(warn_eigens(mod112, tol=0.002))
+  expect_warning(warn_eigens(mod44, stat_tol=0.002, posdef_tol=0.002))
+  expect_warning(warn_eigens(mod44_2, stat_tol=0.002, posdef_tol=0.002))
+  expect_warning(warn_eigens(mod44t_2, stat_tol=0.002, posdef_tol=0.002))
+  expect_warning(warn_eigens(mod44gs_2, stat_tol=0.002, posdef_tol=0.002))
+  expect_warning(warn_eigens(mod112, stat_tol=0.002, posdef_tol=0.002))
 })
 
 test_that("warn_eigens works correctly", {

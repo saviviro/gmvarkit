@@ -18,17 +18,7 @@ See details for more information.}
 \item{h}{difference used to approximate the derivatives.}
 }
 \value{
-A list with class "htest" containing the following components:
-  \item{statistic}{the value of the Wald statistics.}
-  \item{parameter}{the degrees of freedom of the Wald statistic.}
-  \item{p.value}{the p-value of the test.}
-  \item{alternative}{a character string describing the alternative hypothesis.}
-  \item{method}{a character string indicating the type of the test (Wald test).}
-  \item{data.name}{a character string giving the names of the supplied model, constraint matrix A, and vector c.}
-  \item{gsmvar}{the supplied argument gsmvar.}
-  \item{A}{the supplied argument A.}
-  \item{c}{the supplied argument c.}
-  \item{h}{the supplied argument h.}
+A list with class "hypotest" containing the test results and arguments used to calculate the test.
 }
 \description{
 \code{Wald_test} performs a Wald test for a GMVAR, StMVAR, or G-StMVAR model
