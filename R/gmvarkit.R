@@ -1,5 +1,4 @@
-#' @title gmvarkit: Estimate Gaussian Mixture Vector Autoregressive, Student's t Mixture Vector Autoregressive,
-#'   or Gaussian and Student's t Mixture Vector Autoregressive model
+#' @title gmvarkit: Estimate Gaussian and Student's t Mixture Vector Autoregressive Models
 #'
 #' @description \code{gmvarkit} is a package for reduced form and structural Gaussian mixture vector
 #'   autoregressive (GMVAR), Student's t Mixture Vector Autoregressive (StMVAR),
