@@ -9,7 +9,7 @@
 %% tools::texi2pdf("gmvarkit.tex")
 
 %% recommended packages
-\usepackage{orcidlink,thumbpdf,lmodern}
+\usepackage{thumbpdf, lmodern}
 
 %% Packages added by the author
 \usepackage{amsmath} % \align, etc.

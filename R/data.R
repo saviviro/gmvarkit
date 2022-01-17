@@ -33,7 +33,7 @@
 #'   \item{Second column (GDPDEF):}{The log-difference of GDP implicit price deflator, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
 #'   \item{Third column (PPI):}{The log-difference of producer price index (all commodities), \url{https://fred.stlouisfed.org/series/PPIACO}.}
 #'   \item{Third column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
-#'    \url{https://fred.stlouisfed.org/series/FEDFUNDS}, \url{https://www.frbatlanta.org/cqer/research/wu-xia-shadow-federal-funds-rate}.}
+#'    \url{https://fred.stlouisfed.org/series/FEDFUNDS}, \url{https://www.atlantafed.org/cqer/research/wu-xia-shadow-federal-funds-rate}.}
 #' }
 #'
 #' @source The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of Atlanta's website
