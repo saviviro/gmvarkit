@@ -1,19 +1,15 @@
-\documentclass[nojss]{jss} % nojss articlen sijaan
-
-%\VignetteIndexEntry{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
-
-%% HUOM: alla olevat uGMAR paperille
-%% setwd("/Users/savi/Desktop/uGMARartikkeli/jss-article-rnw")
-%% Sweave("uGMARpaper.Rnw")
-%% tools::texi2pdf("uGMARpaper.tex")
+\documentclass[nojss]{jss}
 
 %% -- LaTeX packages and custom commands ---------------------------------------
+%\VignetteIndexEntry{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
+
+%% FOR SWEAVE (if used)
+%% setwd("/Users/savi/Documents/gmvarkit/vignettes")
+%% Sweave("gmvarkit-vignette.Rnw")
+%% tools::texi2pdf("gmvarkit.tex")
 
 %% recommended packages
-\usepackage{thumbpdf,lmodern}
-
-%% another package (only for this demo article)
-\usepackage{framed}
+\usepackage{orcidlink,thumbpdf,lmodern}
 
 %% Packages added by the author
 \usepackage{amsmath} % \align, etc.
@@ -26,19 +22,17 @@
 \newtheorem{condition}{Condition}
 \newtheorem{proposition}{Proposition}
 
-
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
 \SweaveOpts{engine=R, eps=FALSE, keep.source = TRUE}
 <<preliminaries, echo=FALSE, results=hide>>=
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
-library(gmvarkit)
 @
 
 
 %% -- Article metainformation (author, title, ...) -----------------------------
 
-%% - \author{} with primary affiliation
+%% - \author{} with primary affiliation (and optionally ORCID link)
 %% - \Plainauthor{} without affiliations
 %% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
 %% - \AND starts a new line, \And does not.
@@ -48,20 +42,20 @@ library(gmvarkit)
 %% - \title{} in title case
 %% - \Plaintitle{} without LaTeX markup (if any)
 %% - \Shorttitle{} with LaTeX markup (if any), used as running title
-%%\title{A Short Demo Article: Regression Models for Count Data in \proglang{R}}
 \title{gmvarkit: A Family of Mixture Vector Autoregressive Models in \proglang{R}}
 \Plaintitle{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
 \Shorttitle{A Family of Mixture Autoregressive Models in \proglang{R}}
 
+%% - \Abstract{} almost as usual
 \Abstract{
-We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This manuscript is intended as a fancy vignette only but it was created with the Journal of Statistical Software style.
+  We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This manuscript is intended as a fancy vignette only.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
 %% - \Plainkeywords{} without LaTeX markup (if necessary)
 %% - Should be comma-separated and in sentence case.
-\Keywords{mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's $t$ mixture}
-\Plainkeywords{mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's t mixture}
+\Keywords{mixture vector autoregressive model, structural mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's $t$ mixture, mixture VAR, mixture SVAR}
+\Plainkeywords{mixture vector autoregressive model, mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's t mixture, mixture VAR, mixture SVAR}
 
 %% - \Address{} of at least one author
 %% - May contain multiple affiliations for each author
@@ -76,8 +70,8 @@ We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for es
   E-mail: \email{savi.virolainen@helsinki.fi}
 }
 
-\begin{document}
 
+\begin{document}
 
 \section{Introduction}
 \textbf{If you came to read this vignette because you have trouble with the estimation (and don't want to read through the whole thing), see Sections \ref{sec:example_estim} and \ref{sec:examestim}. If you have in particular trouble with the estimation of structural models, see also Section~\ref{sec:estim_structural}.}
@@ -310,7 +304,7 @@ and so on, where $"*"$ signifies that the element is not constrained, $"+"$ deno
 If condition~\ref{cond:lambdadif} of Proposition~\ref{prop:ident1} is strengthened to state that for all $i\neq j$ there exists an $m\in\lbrace 2,...,M\rbrace$ such that $\lambda_{mi}\neq \lambda_{mj}$,  the model is statistically identified even though only the last $d_1$ structural shocks have been identified with the proposition.  Consequently,  the constraints imposed in condition \ref{cond:Wconstraints} become testable.  If it cannot be assumed that all the pairs of the eigenvalues are distinct in some regime,  then the testing problem is nonstandard and the conventional asymptotic distributions of likelihood ratio and Wald test statistics become unreliable.  Note,  however, that since placing zero or sign constraints on $W$ equals to placing them on the B-matrix (\ref{eq:B-matrix}),  the constraints imposed in condition \ref{cond:Wconstraints} can be justified economically as usual.
 
 
-\section{Estimation and model selection}\label{sec:estimation}
+\section{Estimation}\label{sec:estimation}
 
 \subsection{Log-likelihood function}\label{sec:loglik}
 \pkg{gmvarkit} employs the method of maximum likelihood (ML) for estimating the parameters of the G-StMVAR model. Even the exact log-likelihood function is available, as the stationary distribution $p$ consecutive observations in known. Suppose the observed time series is $y_{-p+1},...,y_0,y_1,...,y_T$ and that the initial values are stationary.  Then, the log-likelihood function of the G-StMVAR model takes the form
@@ -342,32 +336,96 @@ Additional arguments may be supplied to \code{fitGSMVAR} in order to specify, fo
 
 \textbf{In general, we recommend being conservative with choice of M due to the identifation problems induced if the number of regimes is chosen too large. Also, estimation of models that contain more than two regimes can be extremely challenging. Another important thing to know about estimation is that the estimation algorithm performs very poorly if some of the AR coefficients very large, signifcantly larger than one. This means that you need scale each component time series so that they vary approximately in the same magnitude. For instance, typically in macroeconomic time series, log-differences should be multiplied by hundred. If the suitable scales are not obvious, you can try out different scales and estimate linear VARs with your favorite package to see whether the AR coeffients are in a reasonable range. When a suitable scale is found, proceed to the GSMVAR models.}
 
-We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) this model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing two estimation rounds with two CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only two estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, almost all the estimation rounds end up in the MLE anyway, though).
+We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) this model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing $16$ estimation rounds with $8$ CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only $16$ estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, majority the estimation rounds end up in the MLE anyway, though).
 
 The argument \code{seeds} supplies the seeds that initialize the random number generator at the beginning of each call to the genetic algorithm, thereby yielding reproducible results.
 %
-<<data>>=
-data("gdpdef", package = "gmvarkit")
-fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=2, seeds=1:2)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library(gmvarkit)
+R> data("gdpdef", package="gmvarkit")
+R> fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=16, ncores=8,
++    seeds=1:16)
+\end{CodeInput}
+\begin{CodeOutput}
+Using 8 cores for 16 estimations rounds...
+Optimizing with a genetic algorithm...
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=26s
+Results from the genetic algorithm:
+The lowest loglik:  -277.038
+The mean loglik:    -258.416
+The largest loglik: -252.168
+Optimizing with a variable metric algorithm...
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=06s
+Results from the variable metric algorithm:
+The lowest loglik:  -276.974
+The mean loglik:    -252.439
+The largest loglik: -243.719
+Calculating approximate standard errors...
+Finished!
+Warning messages:
+1: In warn_df(p = p, M = M, params = params, model = model) :
+  The model contains overly large degrees of freedom parameters. Consider
+  switching to the appropriate G-StMVAR model by setting the corresponding
+  regimes to GMVAR type with the function 'stmvar_to_gstmvar'.
+2: In warn_eigens(ret) :
+  Regime 2 has near-singular error term covariance matrix! Consider
+  building a model from the next-largest local maximum with the function
+  'alt_gsmvar' by adjusting its argument 'which_largest'.
+\end{CodeOutput}
+\end{CodeChunk}
 %
-
 The progression of the estimation process is reported with a progress bar giving an estimate of the remaining estimation time. Also statistics on the spread of the log-likelihoods are printed after each estimation phase. The progress bars are generated during parallel computing with the package \pkg{pbapply} \citep{Solymos+Zawadzki:2020}.
 
-The function throws a warning (does not show up in the above printout) because at least one the regimes contains a near-singular covariance matrix. This kind of unreasonable boundary points can often be disregarded, and the model can be built based on a reasonable estimate found from a local maximum that is clearly in the interior of the parameter space. Models based on the next-best local maximum can be built with the function \code{alt_gsmvar} by adjusting its argument \code{which_largest}.
+The function throws a warning (the second warning) because at least one the regimes contains a near-singular covariance matrix. This kind of unreasonable boundary points can often be disregarded, and the model can be built based on a reasonable estimate found from a local maximum that is clearly in the interior of the parameter space. Models based on the next-best local maximum can be built with the function \code{alt_gsmvar} by adjusting its argument \code{which_largest}.
 
 The following code builds a StMVAR model based on the second-largest local maximum found in the estimation:
 %
-<<alt_gsmvar>>=
-fit12t_alt <- alt_gsmvar(fit12t, which_largest=2)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> fit12t_alt <- alt_gsmvar(fit12t, which_largest=2)
+\end{CodeInput}
+\begin{CodeOutput}
+Warning message:
+In warn_df(p = p, M = M, params = params, model = model) :
+  The model contains overly large degrees of freedom parameters. Consider
+  switching to the appropriate G-StMVAR model by setting the corresponding
+  regimes to GMVAR type with the function 'stmvar_to_gstmvar'.
+\end{CodeOutput}
+\end{CodeChunk}
 %
 
 The estimates can be examined with the \code{print}.
 %
-<<print>>=
-print(fit12t_alt)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> print(fit12t_alt)
+\end{CodeInput}
+\begin{CodeOutput}
+Reduced form StMVAR model:
+ p = 1, M = 2, d = 2, #parameters = 21, #observations = 244 x 2,
+ conditional log-likelihood, intercept parametrization, no AR parameter
+ constraints
+
+Regime 1
+Mixing weight: 0.83
+Regime means: 0.78, 0.54
+Df parameter:  7.57
+
+   Y     phi0          A1                            Omega          1/2
+1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )     eps1
+2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )     eps2
+
+Regime 2
+Mixing weight: 0.17
+Regime means: 0.66, 1.67
+Df parameter:  92497.86
+
+   Y     phi0          A1                            Omega           1/2
+1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + (         [  1.21 -0.04 ] )     eps1
+2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   ( ARCH_mt [ -0.04  0.14 ] )     eps2
+\end{CodeOutput}
+\end{CodeChunk}
 %
 The parameter estimates are reported for each mixture component separately so that the estimates can be easily interpreted. Each regime's autoregressive formula is presented in the form
 \begin{equation}
@@ -379,25 +437,93 @@ The above printout shows that the second regime's degrees of freedom parameter e
 
 To exemplify, the following code switches all the regimes of the StMVAR model \code{fit12t_alt} with a degrees of freedom parameter estimate larger than $100$ to GMVAR type, and then estimates the corresponding G-StMVAR model.
 %
-<<stmvar_to_gstmvar>>=
-fit12gs <- stmvar_to_gstmvar(fit12t_alt, maxdf=100)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> fit12gs <- stmvar_to_gstmvar(fit12t_alt, maxdf=100)
+\end{CodeInput}
+\end{CodeChunk}
 %
 We use the \code{summary} method to obtain a more detailed printout of the estimated the G-StMVAR model:
 %
-<<stmvar_to_gstmvar>>=
-summary(fit12gs)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(fit12gs)
+\end{CodeInput}
+\begin{CodeOutput}
+Reduced form G-StMVAR model:
+ p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
+ conditional log-likelihood, intercept parametrization, no AR parameter
+ constraints
+
+ log-likelihood: -247.50, AIC: 534.99, HQIC: 563.13, BIC: 604.85
+
+Regime 1 (GMVAR type)
+Moduli of 'bold A' eigenvalues:  0.75, 0.10
+Cov. matrix 'Omega' eigenvalues: 1.21, 0.14
+Mixing weight: 0.17
+Regime means: 0.66, 1.67
+
+   Y     phi0          A1                  Omega         1/2
+1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
+2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
+
+Error term correlation matrix:
+       [,1]   [,2]
+[1,]  1.000 -0.087
+[2,] -0.087  1.000
+
+Regime 2 (StMVAR type)
+Moduli of 'bold A' eigenvalues:  0.70, 0.34
+Cov. matrix 'Omega' eigenvalues: 0.42, 0.04
+Mixing weight: 0.83
+Regime means: 0.78, 0.54
+Df parameter:  7.57
+
+   Y     phi0          A1                            Omega          1/2
+1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )     eps1
+2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )     eps2
+
+Error term correlation matrix:
+      [,1]  [,2]
+[1,] 1.000 0.014
+[2,] 0.014 1.000
+
+Print approximate standard errors with the function 'print_std_errors'.
+\end{CodeOutput}
+\end{CodeChunk}
 %
-In the G-StMVAR model, estimates for GMVAR type regimes are reported before StMVAR type regimes, in a decreasing order according to the mixing weight parameter estimates. As shown above, the model \code{fit12gs} incorporates one GMVAR type regime and one StMVAR type regime. Estimates of the unconditional mean, the first $p$ autocovariances and autocorrelations (including the unconditional covariance matrix) can be obtained from the element \code{$uncond_moments} of the model object. The conditional moments calculated using the data are available for the process (\code{$total_cmeans} and \code{$total_ccovs}) as well as for the regimes separately (\code{$regime_cmeans} and \code{$regime_ccovs}). These conditional moments can be conveniently plotted along the series with the function \code{cond_moment_plot}.
+In the G-StMVAR model, estimates for GMVAR type regimes are reported before StMVAR type regimes, in a decreasing order according to the mixing weight parameter estimates. As shown above, the model \code{fit12gs} incorporates one GMVAR type regime and one StMVAR type regime. Estimates of the unconditional mean, the first $p$ autocovariances and autocorrelations (including the unconditional covariance matrix) can be obtained from the element \code{\$uncond_moments} of the model object. The conditional moments calculated using the data are available for the process (\code{\$total_cmeans} and \code{\$total_ccovs}) as well as for the regimes separately (\code{\$regime_cmeans} and \code{\$regime_ccovs}). These conditional moments can be conveniently plotted along the series with the function \code{cond_moment_plot}.
 
 Approximate standard errors can be printed with the function \code{print_std_errors}, which prints the standard errors in the same form as the print method prints the estimates. Note that the last mixing weight parameter estimate does not have an approximate standard error because it is not parametrized. Likewise, there is no standard error for the intercepts if mean parametrization is used (by setting \code{parametrization = "mean"} in \code{fitGSMVAR}) and vice versa. In order to obtain standard errors for the regimewise unconditional means or intercepts, one can easily swap between the mean and intercept parametrizations with the function \code{swap_parametrization}.
 
 To exemplify, the following code prints approximate standard errors for the model \code{fit12gs}:
 %
-<<print_std_errors>>=
-print_std_errors(fit12gs)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> print_std_errors(fit12gs)
+\end{CodeInput}
+\begin{CodeOutput}
+Reduced form model:
+p = 1, M = 2, conditional log-likelihood, intercept parametrization,
+no AR parameter constraints
+
+APPROXIMATE STANDARD ERRORS
+
+Regime 1 (GMVAR type)
+Mixing weight: 0.124
+
+   Y      phi0          A1                  Omega         1/2
+1 Y1 = [ 0.759 ] + [ 0.149 0.386 ] Y1.1 + [ 0.264 0.061 ]     eps1
+2 Y2   [ 0.234 ]   [ 0.050 0.118 ] Y2.1   [ 0.061 0.029 ]     eps2
+
+Regime 2 (StMVAR type)
+Df parameter:  2.740
+
+   Y      phi0          A1                            Omega         1/2
+1 Y1 = [ 0.127 ] + [ 0.079 0.196 ] Y1.1 + (         [ 0.070 0.011 ]     eps1
+2 Y2   [ 0.037 ]   [ 0.024 0.064 ] Y2.1   ( ARCH_mt [ 0.011 0.008 ]     eps2
+\end{CodeOutput}
+\end{CodeChunk}
 %
 
 Missing values are reported when \pkg{gmvarkit} is not able to calculate the standard error. This typically happens either because there is an overly large degrees of freedom parameter estimate in the model or because the estimation algorithm did not stop a local maximum. In the former case, switch to the appropariate G-StMVAR with the function \code{stmvar_to_gstmvar}. In the latter case, make sure the estimate in not an unreasonable near-the-boundary point. If it is, it might appropriate the consider the next-best local maximum with the function \code{alt_gsmvar}. If it is not a near-the-boundary point, try running more iterations of the variable metric algorithm with the function \code{iterate_more}. Section~\ref{sec:examestim} discusses how to evaluate with \pkg{gmvarkit} whether the estimate is a local maximum (and how to improve the reliability that it is the global maximum).
@@ -410,22 +536,39 @@ This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSM
 \subsection{Further examination of the estimates}\label{sec:examestim}
 In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. The following command creates the time series plot along with estimated mixing weights:
 %
-<<plotseries, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
-plot(fit12gs, type="series")
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(fit12gs, type="series")
+\end{CodeInput}
+\end{CodeChunk}
 %
+The resulting plot is presented in Figure~\ref{fig:seriesplot}.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics{figures/seriesplot.png}
+  \caption{The figure produced by the command \code{plot(fit12gs, type="series")}. On the top, a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. On the bottom, the estimated mixing weights of the G-StMVAR model \code{plot(fit12gs)} fitted the series.}
+\label{fig:seriesplot}
+\end{figure}
 
 And the following command creates the stationary density plot:
 %
-<<plotdensity, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
-plot(fit12gs, type="density")
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(fit12gs, type="density")
+\end{CodeInput}
+\end{CodeChunk}
 %
+The resulting plot is presented in Figure~\ref{fig:densityplot}. If the argument \code{type} is not specified, both of the figures will be plotted.
 
-If the argument \code{type} is not specified, both of the figures will be plotted.
+\begin{figure}[p]
+  \centering
+  \includegraphics{figures/densityplot.png}
+  \caption{The figure produced by the command \code{plot(fit12gs, type="density")}. Kernel density estimates of the marginal series of the data the model was fitted to (black solid line), the stationary marginal density of the estimated G-StMVAR model (grey dashed line), and the marginal stationary densities of the component processes multiplied by the mixing weight parameter estimates (blue and red dashed lines).}
+\label{fig:densityplot}
+\end{figure}
 
 It is also sometimes interesting to examine the time series of (one-step) conditional means and variances of the process along with the time series the model was fitted to. This can be done conveniently with the function \code{cond_moment_plot}, where the argument \code{which_moment} should be specified with \code{"mean"} or \code{"variance"} accordingly. In addition to the conditional moment of the process, \code{cond_moment_plot} also displays the conditional means or variances of the regimes multiplied by the mixing weights. Note, however, that the conditional variance of the process is not generally the same as the weighted sum of regimewise conditional variances, as it includes a component that encapsulates heteroskedasticity caused by variation in the conditional mean.
-
 
 The variable metric algorithm employed in the final estimation does not necessarily stop at a local maximum point. The algorithm might also stop at a saddle point or near a local maximum, when the algorithm is not able to increase the log-likelihood, or at any point, when the maximum number of iterations has been reached. In the latter case, the estimation function throws a warning, but saddle points and inaccurate estimates need to be detected by the researcher.
 
@@ -440,30 +583,59 @@ contains $h$ as its $i$th element. By default, the difference $h=6\cdot 10^{-6}$
 
 For example, the following code calculates the first order condition for the G-StMVAR model \code{fit12gs}:
 %
-<<get_foc>>=
-get_foc(fit12gs)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> get_foc(fit12gs)
+\end{CodeInput}
+\begin{CodeOutput}
+ [1]  1.475392e-03  2.520058e-03  1.593868e-03 -4.325443e-03
+ [5]  3.426033e-03  1.272343e-03 -7.762371e-04 -4.553748e-03
+ [9]  3.181280e-03  3.919771e-03 -2.321276e-02  4.170381e-03
+[13] -1.782989e-02  3.166647e-03 -3.229744e-03 -3.738130e-03
+[17] -9.082465e-03  2.232360e-02 -7.895506e-03  9.746278e-06
+\end{CodeOutput}
+\end{CodeChunk}
 %
 and the following code calculates the second order condition:
 %
-<<get_foc>>=
-get_soc(fit12gs)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> get_soc(fit12gs)
+\end{CodeInput}
+\begin{CodeOutput}
+ [1] -1.329154e-01 -1.389172e+00 -1.273009e+01 -1.865806e+01
+ [5] -2.067262e+01 -5.037907e+01 -8.094178e+01 -1.070554e+02
+ [9] -1.715455e+02 -2.124879e+02 -2.769413e+02 -3.371079e+02
+[13] -4.467047e+02 -1.104002e+03 -1.130339e+03 -1.261037e+03
+[17] -1.820865e+03 -9.262083e+03 -1.302900e+04 -3.456585e+04
+\end{CodeOutput}
+\end{CodeChunk}
 %
 All eigenvalues of the Hessian matrix are negative, which points to a local maximum, but the gradient of the log-likelihood function seems to somewhat deviate from zero. The gradient might be inaccurate, because it is based on a numerical approximation. It is also possible that the estimate is inaccurate, because it is based on approximative numerical estimation, and the estimates are therefore not expected to be exactly accurate. Whether the estimate is a local maximum point with accuracy that is reasonable enough, can be evaluated by plotting the graphs of the profile log-likelihood functions about the estimate. In \pkg{gmvarkit}, this can be done conveniently with the function \code{profile_logliks}.
 
 The exemplify, the following command plots the graphs of profile log-likelihood functions of the estimated G-StMVAR model \code{fit12gs}:
 %
-<<profilelogliks, echo=TRUE, fig=TRUE, height=5.2, width=10>>=
-profile_logliks(fit12gs, scale=0.02, precision=50)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> profile_logliks(fit12gs, scale=0.02, precision=200)
+\end{CodeInput}
+\end{CodeChunk}
 %
+The resulting plot is presented in Figure~\ref{fig:proflogliks}.
+
+\begin{figure}%[p]
+  \centering
+  \includegraphics{figures/proflogliks.png}
+  \caption{The figure produced by the command \code{profile\_logliks(fit12gs, scale=0.02, precision=200)}. The graphs of the profile log-likelihood functions of the G-StMVAR model drawn about the estimate. The red vertical lines denote the estimate.}
+\label{fig:proflogliks}
+\end{figure}
 
 The output shows that the estimate's accuracy is reasonable, as changing any individual parameter value marginally would not increase the log-likelihood much. The argument \code{scale} can be adjusted to shorten or lengthen the interval shown in the horizontal axis. If one zooms in enough by setting \code{scale} to a very small number, it can be seen that the estimate is not exactly at the local maximum, but it is so close that moving there would not increase the log-likelihood notably. The argument \code{precision} can be adjusted to increase the number of points the graph is based on. For faster plotting, it can be decreased, and for more precision, it can be increased. The argument \code{which_pars} is used to specify the parameters whose profile log-likelihood functions should be plotted. This argument is particularly useful when creating as many plots as there are parameters in the model to a single figure would cause the individual plots to be very small. In such a case, profile log-likelihood functions for subsets of the parameters can be plotted separately by specifying this argument accordingly.
 
 We have discussed tools that can be utilized to evaluate whether the found estimate is a local maximum with a reasonable accuracy. It is, however, more difficult to establish that the estimate is the global maximum. With \pkg{gmvarkit}, the best way to increase the reliability that the found estimate is the global maximum, is to run more estimation rounds by adjusting the argument \code{ncalls} of the estimation function \code{fitGSMVAR}.
 
 If the model is very large, a very large number of estimation rounds may be required to find the global maximum. If there are two regimes in the model, $p$ is reasonable, and the dimension of the time series at most four, the required number of estimation rounds typically varies from several hundred to several thousand depending on the model and the data. In the simpler models, less estimation rounds are required. In the larger models, and in particular if $M>2$ or $d>4$, a significantly large number of estimation rounds may be required obtain the MLE. Another thing that makes the estimation more challenging, are exotic parameter constraints that do not reduce the dimension of the parameter much. Constraints that greatly reduce complexity of the parameter space (such as constraining the autoregressive matrices to be identical in all regimes\footnote{Models constrained in this way can often be reliably estimated with a reasonable number of estimation rounds even when $M>2$}), on the other hand, make the estimation easier and reliable estimation of such models thereby require less estimation rounds.
+
 
 \subsection{Estimation of the structural GSMVAR model}\label{sec:estim_structural}
 The structural GSMVAR models are estimated similarly to the reduced form version, expect that the model is parametrized with $W$ and $\lambda_{mi}$, $m=2,...,M$, $i=1,...,d$ instead of the covariance matrices $\Omega_{m}$, $m=1,...,M$. The estimation is can be done with the function \code{fitGSMVAR} but now the argument \code{structural_pars} needs to be supplied with a list providing the constraints on $W$ (which equally imposes the constraints on the B-matrix) and optionally linear constraints on the $\lambda_{mi}$ parameters.
@@ -477,12 +649,44 @@ If the number of regimes is two ($M=2$), a structural model can be built based o
 
 The exemplify, the following code creates statistically identified structural model based on the reduced form model \code{fit12gs} and then prints the estimates.
 %
-<<gsmvar_sgsmvar>>=
-fit12gss <- gsmvar_to_sgsmvar(fit12gs)
-fit12gss
-@
-%
+\begin{CodeChunk}
+\begin{CodeInput}
+R> fit12gss <- gsmvar_to_sgsmvar(fit12gs)
+R> fit12gss
+\end{CodeInput}
+\begin{CodeOutput}
+Structural G-StMVAR model:
+ p = 1, M1 = 1, M2 = 1, d = 2, #parameters = 20, #observations = 244 x 2,
+ conditional log-likelihood, intercept parametrization, no AR parameter
+ constraints
 
+Regime 1 (GMVAR type)
+Mixing weight: 0.17
+Regime means: 0.66, 1.67
+
+   Y     phi0          A1                  Omega         1/2
+1 y1 = [ 1.60 ] + [  0.13 -0.61 ] y1.1 + [  1.21 -0.04 ]     eps1
+2 y2   [ 0.48 ]   [ -0.03  0.72 ] y2.1   [ -0.04  0.14 ]     eps2
+
+Regime 2 (StMVAR type)
+Mixing weight: 0.83
+Regime means: 0.78, 0.54
+Df parameter:  7.57
+
+   Y     phi0          A1                            Omega          1/2
+1 y1 = [ 0.55 ] + [  0.33 -0.04 ] y1.1 + (         [  0.42 0.00 ] )     eps1
+2 y2   [ 0.12 ]   [  0.05  0.71 ] y2.1   ( ARCH_mt [  0.00 0.04 ] )     eps2
+
+Structural parameters:
+        W             lamb2
+1 [  0.95 -0.55 ]   [  0.36 ]
+2 [  0.16  0.34 ] , [  0.28 ]
+
+The B-matrix (or equally W) is subject to 0 zero constraints and 2 sign
+constraints. The eigenvalues lambda_{mi} are not subject to linear constraints.
+\end{CodeOutput}
+\end{CodeChunk}
+%
 Estimates for the structural parameters, $W$ and the eigenvalues, are printed last.
 
 \subsection{Constrained estimation}\label{sec:examp_const}
@@ -517,14 +721,27 @@ that is, $M$ pieces of $(pd^2xpd^2)$ diagonal matrices stacked on top of each ot
 \end{equation}
 For instance, if there are two regimes in the model, the appropriate constraint matrix then created with \proglang{R} as
 %
-<<constraint_ex1>>=
-p <- 1 # Any autoregressive order
-d <- 2 # Whatever the dimension of the time series is
-I_pd2 <- diag(p*d^2) # The appropriate diagonal matrix
-(C1 <- rbind(I_pd2, I_pd2)) # Stack them on top of each other
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> p <- 1 # Any autoregressive order
+R> d <- 2 # Whatever the dimension of the time series is
+R> I_pd2 <- diag(p*d^2) # The appropriate diagonal matrix
+R> (C1 <- rbind(I_pd2, I_pd2)) # Stack them on top of each other
+\end{CodeInput}
+\begin{CodeOutput}
+     [,1] [,2] [,3] [,4]
+[1,]    1    0    0    0
+[2,]    0    1    0    0
+[3,]    0    0    1    0
+[4,]    0    0    0    1
+[5,]    1    0    0    0
+[6,]    0    1    0    0
+[7,]    0    0    1    0
+[8,]    0    0    0    1
+\end{CodeOutput}
+\end{CodeChunk}
 %
-The command \code{fitGSMVAR(gdpdef, p=1, M=2, model="GMVAR", constraints=C1)} would then estimate a GMVAR($1,2$) model with the AR matrices constrained to be the same in both regimes. In practice, you might want to adjust the number of estimation rounds and set seeds. Notably, with the dimension of the time series being only two and $p=1$ with two regimes, almost all of the estimation rounds end up in the MLE. Also, because model has the AR matrices constrained to be the same for all regimes, the estimation is much easier than with freely estimated models.
+The command \code{fitGSMVAR(gdpdef, p=1, M=2, model="GMVAR", constraints=C1)} would then estimate a GMVAR($1,2$) model with the AR matrices constrained to be the same in both regimes. In practice, you might want to adjust the number of CPU cores used, the of estimation rounds, and set seeds. Notably, with the dimension of the time series being only two and $p=1$ with two regimes, almost all of the estimation rounds end up in the MLE. Also, because model has the AR matrices constrained to be the same for all regimes, the estimation is much easier than with freely estimated models.
 
 \subsubsection{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}
 The previous example shows how to restrict the AR parameters to be the same for all regimes, but say we also want to constrain the non-diagonal elements of coefficient matrices $A_{m,i}$ $(m=1,...,M, i=1,...,p)$ to be zero. We have the constrained parameter $\boldsymbol{\psi}$ $(qx1)$ representing the unconstrained parameters $(\boldsymbol{\phi_1},...,\boldsymbol{\phi}_M)$, where by assumption $\boldsymbol{\phi}_m=\boldsymbol{\phi}=(vec(A_1),...,vec(A_p))$ $(pd^2x1)$ and the elements of $vec(A_i)$ $(i=1,...,p)$ corresponding to the diagonal are zero.
@@ -561,14 +778,36 @@ satisfies $\boldsymbol{C}\boldsymbol{\psi}=(\boldsymbol{\phi},...,\boldsymbol{\p
 
 The above constraint matrix can be created with \proglang{R} as
 %
-<<constraint_ex2>>=
-c_tilde <- matrix(0, nrow=2*2^2, ncol=4)
-c_tilde[c(1, 12, 21, 32)] <- 1
-c_tilde
-C2 <- rbind(c_tilde, c_tilde)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> c_tilde <- matrix(0, nrow=2*2^2, ncol=4)
+R> c_tilde[c(1, 12, 21, 32)] <- 1
+R> C2 <- rbind(c_tilde, c_tilde)
+R> C2
+\end{CodeInput}
+\begin{CodeOutput}
+      [,1] [,2] [,3] [,4]
+ [1,]    1    0    0    0
+ [2,]    0    0    0    0
+ [3,]    0    0    0    0
+ [4,]    0    1    0    0
+ [5,]    0    0    1    0
+ [6,]    0    0    0    0
+ [7,]    0    0    0    0
+ [8,]    0    0    0    1
+ [9,]    1    0    0    0
+[10,]    0    0    0    0
+[11,]    0    0    0    0
+[12,]    0    1    0    0
+[13,]    0    0    1    0
+[14,]    0    0    0    0
+[15,]    0    0    0    0
+[16,]    0    0    0    1
+\end{CodeOutput}
+\end{CodeChunk}
 %
-The command \code{fitGSMVAR(gdpdef, p=2, M=2, model="GMVAR", constraints=C2)} would then estimate a GMVAR($2,2$) model with the AR matrices constrained to be the same in both regimes and the off-diagonal elements constrained to zero (again, you may want to adjust the argument \code{ncalls}).
+The command \code{fitGSMVAR(gdpdef, p=2, M=2, model="GMVAR", constraints=C2)} would then estimate a GMVAR($2,2$) model with the AR matrices constrained to be the same in both regimes and the off-diagonal elements constrained to zero (again, you may want to adjust the arguments \code{ncalls}, \code{ncored}, and \code{seeds}).
+
 
 \subsubsection{Constraining the unconditional means of some regimes to be the same}
 In addition to constraining the autoregressive parameters, \pkg{gmvarkit} allows to constrain the unconditional means of some regimes to be the same. This feature is, however, only available for models that are parametrized with the unconditional means instead of intercepts (because some of the estimation is always done with mean-parametrization and one cannot generally swap the parametrization when constraints are imposed on means/intercepts). With the mean-parametrization employed (by setting \code{parametrization="mean"}), one may define groups of regimes that have the same mean parameters using the argument \code{same_means}. For instance, with three regime model $(M=3)$ the argument \code{same_means=list(c(1, 3), 2)} sets the unconditional means of the first and third regimes to be the same while allows the second regime to have different mean.
@@ -580,11 +819,27 @@ One can also combine linear constraints on the AR parameters with constraining s
 R> I_pd2 <- diag(4*2^2) # The appropriate diagonal matrix for the constraint matrix
 R> C3 <- rbind(I_pd2, I_pd2) # Stack them on top of each other
 R> fit42cm <- fitGSMVAR(gdpdef, p=4, M=2, model="GMVAR", parametrization="mean",
-+               same_means=list(1:2), constraints=C3, ncalls=20, seeds=1:20)
++    same_means=list(1:2), constraints=C3, ncalls=16, ncores=8, seeds=1:16)
 \end{CodeInput}
+\begin{CodeOutput}
+Using 8 cores for 16 estimations rounds...
+Optimizing with a genetic algorithm...
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=31s
+Results from the genetic algorithm:
+The lowest loglik:  -227.251
+The mean loglik:    -225.743
+The largest loglik: -224.648
+Optimizing with a variable metric algorithm...
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=03s
+Results from the variable metric algorithm:
+The lowest loglik:  -223.311
+The mean loglik:    -223.311
+The largest loglik: -223.311
+Calculating approximate standard errors...
+Finished!
+\end{CodeOutput}
 \end{CodeChunk}
 %
-
 
 \subsection{Testing parameter constraints}\label{sec:testconst}
 One way to asses the validity of the imposed constraints is to compare the values of information criteria of the constrained and unconstrained models. \pkg{gmvarkit}, however, also provides functions for testing the constraints with the likelihood ratio test and Wald test, which are applicable as the ML estimator of a GSMVAR model has the conventional asymptotic distribution \cite[as long as the model is correctly specified and one is willing to assume the validity of the required unverified assumptions; see][Theorem 3, and \cite{Kalliovirta+Meitz+Saikkonen:2016}, Theorem 3]{Virolainen2:2021}. For a discussion on the likelihood ratio and Wald tests, see \citet{Buse:1982} and the references therein, for example.
@@ -606,6 +861,7 @@ W = (A\hat{\boldsymbol{\theta}} - c)' [A\mathcal{J}(\hat{\boldsymbol{\theta}})^{
 where $\mathcal{J}(\hat{\boldsymbol{\theta}})$ is the observed information matrix evaluated at the ML estimate $\hat{\boldsymbol{\theta}}$. Under the null, the test statistic is asymptotically $\chi^2$-distributed with $k$ degrees of freedom (which is the difference in dimensions of the constrained and unconstrained parameter spaces). With \pkg{gmvarkit}, the Wald test can be calculated with function \code{Wald_test}, which takes the estimated unconstrained model (as a class \code{gsmvar} object) as the first argument, the matrix $A$ as the second argument, and the vector $c$ as the third argument.
 
 Note that the standard tests are not applicable if the number of GMVAR or StMVAR type regimes is chosen too large, as then some of the parameters are not identified, causing the result of the asymptotic normality of the ML estimator to break down. This particularly happens when one tests for the number of regimes in the model, as the under the null some of the regimes are reduced from the model\footnote{\cite{Meitz+Saikkonen:2021} have, however, recently developed such tests for mixture models with Gaussian conditional densities} \citep[see the related discussion in][]{Virolainen2:2021}. Similar caution applies for testing whether a regime is of the GMVAR type against the alternative that it is of the StMVAR type: then $\nu_m = \infty$ under the null for the regime $m$ to be tested, which violates the assumption that the parameter value is in the interior of a compact subset of the parameter space \citep[see][Theorem 3 and Assumption 1]{Virolainen2:2021}.
+
 
 
 \section{Quantile residual based model diagnostics}\label{sec:qres}
@@ -653,8 +909,6 @@ For a correctly specified GSMVAR model employing the ML estimator, the empirical
 \cite{Kalliovirta+Saikkonen:2010} also propose three diagnostic tests for testing normality, autocorrelation, and conditional heteroskedasticity of the quantile residuals. The tests can be based either on the data or on a simulation procedure. If the sample is short, tests based on the data can be too forgiving, so to obtain more reliable test results the simulation procedure is recommended (with sample size of at least several thousand). The tests can be calculated with \pkg{gmvarkit} by using the function \code{quantile_residual_tests}. The simulation procedure is employed if the argument \code{nsim} is set larger the number of observations (in each component time series). In this case, \code{nsim} sets the length of the sample path used in the simulation procedure. If one is concerned about autocorrelation or conditional heteroskedasticity in a specigic lag, the (standardized) individual statistics discussed in \cite{Kalliovirta+Saikkonen:2010} can be examined. The function \code{quantile_residual_tests} returns them automatically for the specified lags.
 
 
-
-
 \section{Impulse response analysis}\label{sec:impulseresponse}
 
 \subsection{Generalized impulse response function}
@@ -692,7 +946,6 @@ In \pkg{gmvarkit}, the GFEVD can be estimated with the function \code{GFEVD}. As
 The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument \code{shock_size}. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument \code{which_cumulative}. Finally, note that the GFEVD objects have their own plot and print methods.
 
 
-
 \section{Building a GSMVAR model with specific parameter values}\label{sec:GSMVAR}
 The function \code{GSMVAR} facilitates building GSMVAR models without estimation, for instance, in order to simulate observations from a GSMVAR process with specific parameter values. The parameter vector (of length $M(d + d^2p + d(d+1)/2 + 2) - M_1 - 1$ for unconstrained reduced form models) has the form $\boldsymbol{\theta} = (\boldsymbol{\vartheta}_1,...,\boldsymbol{\vartheta}_M,\alpha_1,...,\alpha_{M-1},\boldsymbol{\nu})$ where
 \begin{align}
@@ -714,22 +967,38 @@ In addition to the parameter vector, \code{GSMVAR} should be supplied with argum
 
 To exemplify, we build a reduced form StMVAR $p=1$, $M=1$, $d=2$ model. The model has intercept parametrization and parameter values $\varphi_{1,0}=(0, 1)$ $\text{vec}(A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\text{vech}(\Omega_2) = (1, 0.1, 1)$, and $\nu_1 = 3$. After building the model, we use the \code{print} method to examine it:
 %
-<<gsmvar_ex1>>=
-params112 <- c(0, 1, 0.2, 0.2, 0.2, -0.2, 1, 0.1, 1, 3)
-mod112 <- GSMVAR(p=1, M=1, d=2, params=params112, model="StMVAR")
-mod112
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> params112 <- c(0, 1, 0.2, 0.2, 0.2, -0.2, 1, 0.1, 1, 3)
+R> mod112 <- GSMVAR(p=1, M=1, d=2, params=params112, model="StMVAR")
+R> mod112
+\end{CodeInput}
+\begin{CodeOutput}
+Reduced form StMVAR model:
+ p = 1, M = 1, d = 2, #parameters = 10,
+ conditional log-likelihood, intercept parametrization, no AR parameter
+ constraints
+
+Regime 1
+Mixing weight: 1.00
+Regime means: 0.22, 0.87
+Df parameter:  3.00
+
+   Y     phi0          A1                            Omega          1/2
+1 y1 = [ 0.00 ] + [  0.20  0.20 ] y1.1 + (         [  1.00 0.10 ] )     eps1
+2 y2   [ 1.00 ]   [  0.20 -0.20 ] y2.1   ( ARCH_mt [  0.10 1.00 ] )     eps2
+\end{CodeOutput}
+\end{CodeChunk}
 %
 
 It is possible to include data in the models built with \code{GSMVAR} by either providing the data in the argument \code{data} when creating the model or by adding the data afterwards with the function \code{add_data}. When the model is supplied with data, the mixing weights, one-step conditional means and variances, and quantile residuals can be calculated and included in the model. The function \code{add_data} can also be used to update data to an estimated GSMVAR model without re-estimating the model.
-
 
 \section{Simulation and forecasting}\label{sec:simufore}
 
 \subsection{Simulation}\label{sec:simu}
 \pkg{gmvarkit} implements the S3 method \code{simulate} for simulating observations from GSMVAR processes (see \code{?simulate.gsmvar}). The method requires the process to be given as a class \code{gsmvar} object, which are typically created either by estimating a model with the function \code{fitGSMVAR} or by specifying the parameter values by hand and building the model with the constructor function \code{GSMVAR}. The initial values required to simulate the first $p$ observations can be either set by hand (with the argument \code{init_values}) or drawn from the stationary distribution of the process (by default) or from a (mixture of) stationary distribution(s) of given regime(s). The argument \code{nsim} sets the length of the sample path to be simulated.
 
-To give an example, the following code sets the random number generator seed to one and simulates 500 observations long sample from the StMVAR process built in Section~\ref{sec:GSMVAR}:
+To give an example, the following code sets the random number generator seed to one and simulates $500$ observations long sample from the StMVAR process built in Section~\ref{sec:GSMVAR}:
 %
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -737,24 +1006,32 @@ R> mysim <- simulate(mod112, nsim=500, seed=1)
 \end{CodeInput}
 \end{CodeChunk}
 %
-Our implementation of \code{simulate} returns a list containing the simulated sample path in \code{$sample}, the mixture component that generated each observation in \code{$component}, and the mixing weights in \code{$mixing_weights}.
+Our implementation of \code{simulate} returns a list containing the simulated sample path in \code{\$sample}, the mixture component that generated each observation in \code{\$component}, and the mixing weights in \code{\$mixing_weights}.
 
 \subsection{Simulation based forecasting}
 Deriving multiple-steps-ahead point predictions and prediction intervals analytically for the GSMVAR models is very complicated, so \pkg{gmvarkit} employs the following simulation-based method. By using the last $p$ observations of the data up to the date of forecasting as initial values, a large number of sample paths for the future values of the process are simulated. Then, sample quantiles from the simulated sample paths are calculated to obtain prediction intervals, and the median or mean is used for point predictions. A similar procedure is also applied to forecast future values of the mixing weights, which might be of interest because the researcher can often associate specific characteristics to different regimes.
 
 Forecasting is most conveniently done with the \code{predict} method (see \code{?predict.gsmvar}). The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsim}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
 
-To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_est}. The forecast is $10$ steps (quarters in this case) ahead, based on $100$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
+To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_estim}. The forecast is $10$ steps (quarters in this case) ahead, based on $10000$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
 %
-<<predict, echo=TRUE, fig=TRUE, height=7, width=10>>=
-mypred <- predict(fit12gs, n_ahead=10, nsim=100, pred_type="mean",
-                  pi_type="two-sided", pi=c(0.95, 0.90),
-                  mix_weights=TRUE)
-@
+\begin{CodeChunk}
+\begin{CodeInput}
+R> mypred <- predict(fit12gs, n_ahead=10, nsim=10000, pred_type="mean",
++                    pi_type="two-sided", pi=c(0.95, 0.90),
++                    mix_weights=TRUE)
+\end{CodeInput}
+\end{CodeChunk}
 %
+The resulting plot is presented in Figure~\ref{fig:predplot}.
 
 
-
+\begin{figure}%[p]
+  \centering
+  \includegraphics{figures/predplot.png}
+  \caption{The figure produced by the predict method applied to the model \code{fit12gs}. The first top figures show the point and interval predictions $10$ steps ahaed for the time series, and the bottom figure for the mixing weights. Two-sided prediction intervals with confidence levels $95\%$ and $90\%$, point forecast based on mean. Prediction based on $10000$ Monte Carlo repetitions.}
+\label{fig:predplot}
+\end{figure}
 
 
 \begin{table}
@@ -790,6 +1067,11 @@ Other          & \code{add_data}           & Add data to a GSMVAR model \\
 \section{Summary}\label{sec:summary}
 Mixture vector autoregressive models are a valuable tool in modeling multivariate time series in which the data generating dynamics vary in time. We described the \proglang{R} package \pkg{gmvarkit}, which accommodates the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021} - an appealing family of mixture vector autoregressive models that call the GSMVAR models. We discussed several features provided by \pkg{gmvarkit} for GSMVAR modeling: unconstrained and constrained maximum likelihood estimation of the model parameters, hypothesis testing, quantile residual based model diagnostics, estimation of generalized impulse response function and generalized forecast error variance decomposition, simulation, forecasting, and more. For convenience, we have collected some useful functions in \pkg{gmvarkit} to Table~\ref{tab:functions}. For all the exported functions and their usage, see the reference manual.
 
+
+\section*{Computational details}
+The results in this paper were obtained using \proglang{R}~4.1.2 and \pkg{uGMAR}~3.4.1 package running on MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system.
+
+Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
 
 \pagebreak
 \bibliography{refs}
@@ -1002,8 +1284,6 @@ whenever $\left|-\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}}\right|<1$.  That is,  the
 |y_{j,t} - \mu_{m,t,j|j-1}| < \sqrt{(v_m + dp + j - 3)\Omega_{m,t,j,|j-1}}.
 \end{equation}
 If this condition does not hold, the quantile residual are obtained by numerically integrating the conditional density function $t_1(u;\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)$. For the hypergeometric function, \pkg{gmvarkit} uses the package \pkg{gsl} \citep{gsl}.
-
-
 
 \end{appendix}
 

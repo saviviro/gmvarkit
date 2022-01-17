@@ -165,3 +165,4 @@
 * Changed the default ncalls in fitGSMVAR to (M + 1)^5.
 * Fixed a bug that sometimes caused an error in the estimation algorithm because the random degrees of freedom parameters were too close to their strict lower bound 2. This change may have an effect on the estimation results of StMVAR and G-StMVAR models with specific seed.
 * Adjusted the tolerance when the estimation functions warns about near-non-stationary estimates or near-singular error term covariance matrices.
+* Updated the vignette.
