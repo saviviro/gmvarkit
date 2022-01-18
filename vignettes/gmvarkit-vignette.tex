@@ -1,15 +1,22 @@
-\documentclass[nojss]{jss}
+\documentclass[nojss]{jss} % nojss articlen sijaan
 
-%% -- LaTeX packages and custom commands ---------------------------------------
+%% For R.rsp (does not seem to work)
+%VignetteIndexEntry{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
+%VignetteEngine{R.rsp::tex}
+
+%% FOR SWEAVE (not used):
 %\VignetteIndexEntry{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
 
-%% FOR SWEAVE (if used)
 %% setwd("/Users/savi/Documents/gmvarkit/vignettes")
 %% Sweave("gmvarkit-vignette.Rnw")
 %% tools::texi2pdf("gmvarkit.tex")
+%% -- LaTeX packages and custom commands ---------------------------------------
 
 %% recommended packages
-\usepackage{thumbpdf, lmodern}
+\usepackage{orcidlink,thumbpdf,lmodern}
+
+%% another package (only for this demo article)
+\usepackage{framed}
 
 %% Packages added by the author
 \usepackage{amsmath} % \align, etc.
@@ -22,6 +29,7 @@
 \newtheorem{condition}{Condition}
 \newtheorem{proposition}{Proposition}
 
+
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
 
@@ -29,7 +37,7 @@
 
 %% -- Article metainformation (author, title, ...) -----------------------------
 
-%% - \author{} with primary affiliation (and optionally ORCID link)
+%% - \author{} with primary affiliation
 %% - \Plainauthor{} without affiliations
 %% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
 %% - \AND starts a new line, \And does not.
@@ -39,20 +47,20 @@
 %% - \title{} in title case
 %% - \Plaintitle{} without LaTeX markup (if any)
 %% - \Shorttitle{} with LaTeX markup (if any), used as running title
+%%\title{A Short Demo Article: Regression Models for Count Data in \proglang{R}}
 \title{gmvarkit: A Family of Mixture Vector Autoregressive Models in \proglang{R}}
 \Plaintitle{gmvarkit: A Family of Mixture Vector Autoregressive Models in R}
 \Shorttitle{A Family of Mixture Autoregressive Models in \proglang{R}}
 
-%% - \Abstract{} almost as usual
 \Abstract{
-  We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This manuscript is intended as a fancy vignette only.
+We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This manuscript is intended as a fancy vignette only but it was created with the Journal of Statistical Software style.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
 %% - \Plainkeywords{} without LaTeX markup (if necessary)
 %% - Should be comma-separated and in sentence case.
-\Keywords{mixture vector autoregressive model, structural mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's $t$ mixture, mixture VAR, mixture SVAR}
-\Plainkeywords{mixture vector autoregressive model, mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's t mixture, mixture VAR, mixture SVAR}
+\Keywords{mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's $t$ mixture}
+\Plainkeywords{mixture vector autoregressive model, regime-switching, Gaussian mixture, Student's t mixture}
 
 %% - \Address{} of at least one author
 %% - May contain multiple affiliations for each author
@@ -67,8 +75,9 @@
   E-mail: \email{savi.virolainen@helsinki.fi}
 }
 
-
 \begin{document}
+%\input{gmvarkit-vignette-concordance}
+
 
 \section{Introduction}
 \textbf{If you came to read this vignette because you have trouble with the estimation (and don't want to read through the whole thing), see Sections \ref{sec:example_estim} and \ref{sec:examestim}. If you have in particular trouble with the estimation of structural models, see also Section~\ref{sec:estim_structural}.}
@@ -1010,7 +1019,7 @@ Deriving multiple-steps-ahead point predictions and prediction intervals analyti
 
 Forecasting is most conveniently done with the \code{predict} method (see \code{?predict.gsmvar}). The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsim}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
 
-To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_estim}. The forecast is $10$ steps (quarters in this case) ahead, based on $10000$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
+To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_est}. The forecast is $10$ steps (quarters in this case) ahead, based on $10000$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
 %
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -1066,7 +1075,7 @@ Mixture vector autoregressive models are a valuable tool in modeling multivariat
 
 
 \section*{Computational details}
-The results in this paper were obtained using \proglang{R}~4.1.2 and \pkg{uGMAR}~3.4.1 package running on MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system.
+The results in this paper were obtained using \proglang{R}~4.1.2 and \pkg{gmvqrkit}~2.0.2 package running on MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system.
 
 Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
 
@@ -1281,6 +1290,8 @@ whenever $\left|-\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}}\right|<1$.  That is,  the
 |y_{j,t} - \mu_{m,t,j|j-1}| < \sqrt{(v_m + dp + j - 3)\Omega_{m,t,j,|j-1}}.
 \end{equation}
 If this condition does not hold, the quantile residual are obtained by numerically integrating the conditional density function $t_1(u;\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)$. For the hypergeometric function, \pkg{gmvarkit} uses the package \pkg{gsl} \citep{gsl}.
+
+
 
 \end{appendix}
 
