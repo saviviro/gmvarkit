@@ -386,6 +386,164 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
 }
 
 
+#' @title Maximum likelihood estimation of a structural GMVAR, StMVAR, or G-StMVAR model
+#'  with preliminary estimates
+#'
+#' @description \code{estimate_gsmvar} uses a genetic algorithm and variable metric algorithm to estimate the parameters
+#'  of a structural GMVAR, StMVAR, or G-StMVAR model with the method of maximum likelihood and preliminary
+#'  estimates from (typically identified) reduced form or structural GSMVAR model.
+#'
+#' @inheritParams quantile_residual_tests
+#' @inheritParams fitGSMVAR
+#' @inheritParams GSMVAR
+#' @inheritParams standard_errors
+#' @param new_W What should be the constraints on the W-matrix (or equally B-matrix)? Provide a \eqn{(d x d)} matrix
+#'  (where \code{d} is the number of time series in the system) expressing the constraints such that \code{NA} signifies
+#'  that the element is not constrained, strictly positive real number signifies strict positive sign constraint,
+#'  strictly negative real number signified strict negative sign constraints, and zero signifies a zero constraints.
+#' @details The purpose of \code{estimate_gsmvar} is to provide a convenient tool to estimate (typically over)identified
+#'   structural GSMVAR models when preliminary estimates are available from a fitted reduced form or structural GMVAR
+#'   model. Often one estimates a two-regime reduced form model and then uses the function \code{gsmvar_to_sgsmvar} to
+#'   obtain the corresponding, statistically identified structural model. After obtaining the statistically identified
+#'   structural model, overidentifying constraints may be placed the W-matrix (or equally B-matrix). This function makes
+#'   imposing the overidentifying constraints and estimating the overidentified structural model convenient.
+#'
+#'   \strong{Note that the surface of the log-likelihood function is extremely multimodal, and this function is designed
+#'   to only explore the neighbourhood of the preliminary estimates, so it finds its way reliably to the correct MLE
+#'   only the preliminary estimates are close it in the first place. Use the function directly fitGSMVAR for a more thorough
+#'   search of the parameter space, if necessary.} This function calls \code{fitGSMVAR} by construction an initial population to
+#'   the genetic algorithm from a preliminary guess of the new estimates. The smart mutations are set to begin from the
+#'   first generation.
+#'
+#'   In order to the impose the constraints you wish, it might be useful to first run the model through the functioons
+#'   \code{reorder_W_columns} and \code{swap_W_signs}. \strong{Particularly check that the sign constraints are readily
+#'   satisfied. If not, the estimated solution might not be correct MLE.}
+#'
+#'   \code{estimate_sgsmvar} can also be used to estimate models that are not identified, i.e., one regime models. If it
+#'   supplied with a reduced form model, it will first apply the function \code{gsmvar_to_sgsmvar}, then impose the
+#'   constraints and finally estimate the model.
+#' @return Returns an object of class \code{'gsmvar'} defining the estimated GMVAR, StMVAR, or G-StMVAR model.
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link[stats]{optim}},
+#'  \code{\link{profile_logliks}}, \code{\link{iterate_more}} \code{\link{gsmvar_to_sgmvar}}
+#' @inherit GSMVAR references
+#' @examples
+#' \donttest{
+#' ## These are long running examples that use parallel computing!
+#' ## Running the below examples takes 30 seconds
+#'
+#' # GMVAR(1,2) model
+#' fit12 <- fitGSMVAR(gdpdef, p=1, M=2, ncalls=2, seeds=1:2) # Reduced form
+#' fit12s <- gsmvar_to_sgsmvar(fit12) # Structural
+#' fit12s
+#' # Constrain the lower right element of W (or B-matrix) to zero, and for
+#' # global identification the first elements of each column to strictly positive.
+#' (new_W <- matrix(c(1, NA, 1, 0), nrow=2))
+#' new_fit12s <- estimate_sgsmvar(fit12s, new_W, ncalls=2, ncores=2, seeds=1:2)
+#' new_fit12s # Overidentified model
+#'
+#' # Cholesky VAR(1)
+#' fit11 <- fitGSMVAR(gdpdef, p=1, M=1, ncalls=2, seeds=1:2) # Reduced form
+#' (new_W <- matrix(c(1, NA, 0, 1), nrow=2))
+#' new_fit11s <- estimate_sgsmvar(fit11, new_W, ncalls=2, ncores=2, seeds=1:2)
+#' print(new_fit11s, digits=4)
+#' # Also: gsmvar_to_sgsmvar(fit11, cholesky=TRUE) gives Cholesky VAR
+#' }
+#' @export
+
+estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, seeds=NULL) {
+  check_gsmvar(gsmvar)
+  d <- ncol(gsmvar$data)
+  M <- gsmvar$model$M
+  p <- gsmvar$model$p
+  data <- check_data(gsmvar$data, p=p)
+  stopifnot(dim(new_W) == c(d, d))
+  check_constraints(p=p, M=M, d=d, structural_pars=list(W=new_W))
+  if(is.null(gsmvar$model$structural_pars)) { # Reduced form model was supplied
+  gsmvar <- gsmvar_to_sgsmvar(gsmvar, calc_std_errors=FALSE, cholesky=FALSE) # Turn it to a structural model
+  }
+  pars <- gsmvar$params
+  n_alphas <- sum(M) - 1
+  if(is.null(gsmvar$model$structural_pars$C_lambda)) { # Structural model without lambda constraints
+    n_lambdas <- (sum(M) - 1)*d
+  } else { # Structural model with lambda constraints
+    n_lambdas <- ncol(gsmvar$model$structural_pars$C_lambda) # The number of constraint params
+  }
+  model <- gsmvar$model$model
+  if(model == "GMVAR") {
+    n_df <- 0
+  } else if(model == "StMVAR") {
+    n_df <- M
+  } else { # model == "G-StMVAR"
+    n_df <- M[2]
+  }
+  n_total <- n_alphas + n_lambdas + n_df
+  n_oldWpars <- length(Wvec(gsmvar$model$structural_pars$W))
+  oldWpars <- pars[(length(pars) - n_oldWpars - n_total + 1):(length(pars) - n_total)]
+  old_W <- gsmvar$model$structural_pars$W
+  n_sign_changes <- 0
+
+  oldWpars_inW <- matrix(0, nrow=d, ncol=d)
+  oldWpars_inW[old_W != 0 | is.na(old_W)] <- oldWpars # Fill in the parameters including non-parametrized zeros
+
+  # Go through the matrices old_W, new_W, and changes the oldWpars accordingly
+  newWpars <- matrix(NA, nrow=d, ncol=d)
+  for(i1 in 1:d) { # i1 marks the row
+    for(i2 in 1:d) { # i2 marks the column
+      so <- sign(old_W[i1, i2])
+      sn <- sign(new_W[i1, i2])
+      if(is.na(so)) { # If no constraint, just handle it as if there was sign constraint of the estimate's sign
+        so <- sign(oldWpars_inW[i1, i2])
+      }
+      if(is.na(sn) && so != 0) { # No new constraint, old constraint is not zero
+        newWpars[i1, i2] <- oldWpars_inW[i1, i2] # Insert old param
+      } else if(is.na(sn) && so == 0) { # No new constraints, old constraint is zero
+        newWpars[i1, i2] <- 1e+6  # Insert close to zero value: not exactly zero to avoid the parameter disappearing in Wvec
+      } else if(so == sn) { # Same constraint in new and old W
+        newWpars[i1, i2] <- oldWpars_inW[i1, i2] # Insert old param
+      } else if(sn == 0) { # Zero constraint in new W
+        newWpars[i1, i2] <- 0 # Insert zero (which will be removed as it is not parametrized)
+      } else if(so > sn) { # sn must be negative, so could be zero or positive
+        newWpars[i1, i2] <- -0.01 # Insert small negative number
+        n_sign_changes <- n_sign_changes + 1
+      } else { # It must be that so < sn, which implies sn > 0, while so could be zero or negative
+        newWpars[i1, i2] <- 0.01 # Insert s mall positive number
+        n_sign_changes <- n_sign_changes + 1
+      }
+    }
+  }
+  newWpars <- Wvec(newWpars)
+  pars1 <- pars[1:(length(pars) - n_oldWpars - n_total)]
+  if(n_total == 0) {
+    pars2 <- numeric(0)
+  } else {
+    pars2 <- pars[(length(pars) - n_total + 1):length(pars)]
+  }
+  new_pars <- c(pars1, newWpars, pars2)
+  if(n_sign_changes > 0) {
+    cat(paste0("There was ", n_sign_changes, "sign changes when creating preliminary estimates for the new model.
+                The sign changes make the results more unrealiable. To obtain more reliable results, consider using
+                the function 'swap_W_signs' to create a model that has the sign constraints readily satisfied and
+                then applying this function.\n"))
+  }
+
+
+  new_loglik <- loglikelihood_int(data=gsmvar$data, p=p, M=M, params=new_pars, model=model,
+                                  conditional=gsmvar$model$conditional,
+                                  structural_pars=list(W=new_W, C_lambda=gsmvar$model$structural_pars$C_lambda),
+                                  constraints=gsmvar$model$constraints, parametrization=gsmvar$model$parametrization,
+                                  same_means=gsmvar$model$same_means)
+
+  cat("The log-likelihood of the supplied model:   ", round(c(gsmvar$loglik), 3),
+      "\nConstrained log-likelihood prior estimation:", round(new_loglik, 3), "\n\n")
+
+  fitGSMVAR(data=gsmvar$data, p=p, M=M, model=model, conditional=gsmvar$model$conditional,
+            parametrization=gsmvar$model$parametrization,
+            structural_pars=list(W=new_W, C_lambda=gsmvar$model$structural_pars$C_lambda),
+            constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+            ncalls=ncalls, ncores=ncores, seeds=seeds, maxit=maxit, smart_mu=1, initpop=list(new_pars))
+}
+
+
 #' @title Returns the default smallest allowed log-likelihood for given data.
 #'
 #' @description \code{get_minval} returns the default smallest allowed log-likelihood for given data.

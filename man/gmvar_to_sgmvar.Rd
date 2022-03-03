@@ -28,7 +28,8 @@ The switch is made by simultaneously diagonalizing the two error term covariance
   diagonal of the matrix W positive (which implies positive diagonal of the B-matrix). Models with
   more that two regimes are not supported because the matrix decomposition does not generally
   exists for more than two covariance matrices. If the model has only one regime (= regular SVAR model),
-  a symmetric and pos. def. square root matrix of the error term covariance matrix is used.
+  a symmetric and pos. def. square root matrix of the error term covariance matrix is used \strong{unless}
+  \code{cholesky = TRUE} is set in the arguments, in which case Cholesky identification is employed.
 
   The columns of \eqn{W} as well as the lambda parameters can be re-ordered (without changing the implied
   reduced form model) afterwards with the function \code{reorder_W_columns}. Also all signs in any column

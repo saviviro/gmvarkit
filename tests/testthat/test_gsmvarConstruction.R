@@ -201,12 +201,14 @@ mod222cs <- gsmvar_to_sgsmvar(mod222c)
 mod222gsc <- GSMVAR(p=2, M=c(1, 1), d=2, params=c(params222c, 10), model="G-StMVAR", constraints=C_mat)
 mod222gscs <- gsmvar_to_sgsmvar(mod222gsc)
 
-
 # p=2, M=2, d=2, constraints=C_222, same_means=list(1:2)
 mod222c_int <- GSMVAR(gdpdef, p=2, M=2, params=theta_222c_int, parametrization="mean", constraints=C_222, same_means=list(1:2))
 mod222cs_int <- gsmvar_to_sgsmvar(mod222c_int)
 
-
+# p=1, M=1, d=2, Cholesky
+params112chol <- c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103, 0.601791, -0.002944, 0.067224)
+mod112chol <- GSMVAR(gdpdef, p=1, M=1, params=params112chol)
+mod112chols <- gsmvar_to_sgsmvar(mod112chol, cholesky=TRUE)
 
 test_that("gsmvar_to_sgsmvar works correctly", {
   expect_equal(mod122s$params, c(0.623, -0.129, 3.245, 7.913, 0.959, 0.089, -0.006, 1.006, 0.952, -0.037, -0.019, 0.943,
@@ -220,6 +222,9 @@ test_that("gsmvar_to_sgsmvar works correctly", {
   expect_equal(mod222cs_int$params,
                c(-5.0000000, 123.0000000, 1.2500000, 0.0600000, 0.0400000, 1.3400000, -0.2900000, -0.0800000, -0.0500000,
                  -0.3600000, 0.8924620, 0.7180539, -0.3653923, 2.1643472, 7.1638990, 1.3035363, 0.3700000), tolerance=1e-6)
+  expect_equal(mod112chols$params, c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103, 0.775752,
+                                     -0.003795, 0.259248), tolerance=1e-4)
+  expect_equal(mod112chols$model$structural_pars$W, matrix(c(1, NA, 0, 1), nrow=2))
 })
 
 

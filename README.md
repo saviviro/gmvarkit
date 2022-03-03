@@ -4,7 +4,6 @@
 # gmvarkit
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of gmvarkit is to provide tools to analyse structural and
@@ -120,6 +119,9 @@ all.equal(fit22s$loglik, fit22s_2$loglik)
 all.equal(fit22s$loglik, fit22s_3$loglik)
 all.equal(fit22s$loglik, fit22s_4$loglik)
 
+# Check out also the function: estimate_sgsmvar
+# for estimating overidentified structural models.
+
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
 girf1 <- GIRF(fit22s, N=20, ci=c(0.95, 0.8), R1=200, R2=200, ncores=4)
@@ -187,14 +189,14 @@ fit22gss
 
 ## References
 
-  - Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture
+-   Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture
     vector autoregression. *Journal of Econometrics*, **192**, 485-498.
-  - Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
+-   Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
     Multivariate Nonlinear Time Series Models. *Unpublished Revision of
     HECER Discussion Paper No. 247*.
-  - Virolainen S. 2020. Structural Gaussian mixture vector
+-   Virolainen S. 2020. Structural Gaussian mixture vector
     autoregressive model. Unpublished working paper, available as
     arXiv:2007.04713.
-  - Virolainen S. 2021. Gaussian and Student’s t mixture vector
+-   Virolainen S. 2021. Gaussian and Student’s t mixture vector
     autoregressive model. Unpublished working paper, available as
     arXiv:2109.13648.

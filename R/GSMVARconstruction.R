@@ -387,12 +387,14 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #'
 #' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
+#' @param cholesky if \code{M == 1}, should the lower triangular Cholesky identification be employed?
 #' @details The switch is made by simultaneously diagonalizing the two error term covariance matrices
 #'   with a well known matrix decomposition (Muirhead, 1982, Theorem A9.9) and then normalizing the
 #'   diagonal of the matrix W positive (which implies positive diagonal of the B-matrix). Models with
 #'   more that two regimes are not supported because the matrix decomposition does not generally
 #'   exists for more than two covariance matrices. If the model has only one regime (= regular SVAR model),
-#'   a symmetric and pos. def. square root matrix of the error term covariance matrix is used.
+#'   a symmetric and pos. def. square root matrix of the error term covariance matrix is used \strong{unless}
+#'   \code{cholesky = TRUE} is set in the arguments, in which case Cholesky identification is employed.
 #'
 #'   The columns of \eqn{W} as well as the lambda parameters can be re-ordered (without changing the implied
 #'   reduced form model) afterwards with the function \code{reorder_W_columns}. Also all signs in any column
@@ -431,11 +433,10 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' # Form a structural model based on the reduced form model:
 #' mod12ts <- gsmvar_to_sgsmvar(mod12t)
 #' mod12ts
-
 #' }
 #' @export
 
-gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
+gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE, cholesky=FALSE) {
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   check_gsmvar(gsmvar)
   if(is.null(gsmvar$data)) calc_std_errors <- FALSE
@@ -451,12 +452,19 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
                                     constraints=constraints, same_means=same_means)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=NULL)
   if(sum(M) == 1) {
-    W <- matrix(diag_Omegas(Omega1=all_Omega[, , 1]), nrow=d, ncol=d, byrow=FALSE)
     lambdas <- numeric(0)
+    if(cholesky) {
+      W <- t(chol(all_Omega[, , 1]))
+    } else {
+      W <- matrix(diag_Omegas(Omega1=all_Omega[, , 1]), nrow=d, ncol=d, byrow=FALSE)
+    }
   } else { # M == 2
     tmp <- diag_Omegas(Omega1=all_Omega[, , 1], Omega2=all_Omega[, , 2])
     W <- matrix(tmp[1:(d^2)], nrow=d, ncol=d, byrow=FALSE)
     lambdas <- tmp[(d^2 + 1):(d^2 + d)]
+    if(cholesky) {
+      warning("The argument 'cholesky=TRUE' is ignored for models with more than one mixture component")
+    }
   }
 
   # Normalize the main diagonal of W to be positive
@@ -478,9 +486,12 @@ gsmvar_to_sgsmvar <- function(gsmvar, calc_std_errors=TRUE) {
   } else {
     all_A <- gsmvar$params[(d*g + 1):(d*g + ncol(constraints))] # \psi
   }
-  new_params <- c(all_phi0, all_A, vec(W), lambdas, alphas[-sum(M)], all_df)
+  new_params <- c(all_phi0, all_A, Wvec(W), lambdas, alphas[-sum(M)], all_df)
   new_W <- matrix(NA, nrow=d, ncol=d)
   diag(new_W) <- rep(1, times=d)
+  if(sum(M) == 1 && cholesky) {
+    new_W[W == 0] <- 0 # Relevant for one regime Cholesky identification only
+  }
 
   # Construct the SGSMVAR model based on the obtained structural parameters
   GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=new_params, model=model, conditional=gsmvar$model$conditional,

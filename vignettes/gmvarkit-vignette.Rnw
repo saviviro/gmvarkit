@@ -689,6 +689,17 @@ constraints. The eigenvalues lambda_{mi} are not subject to linear constraints.
 %
 Estimates for the structural parameters, $W$ and the eigenvalues, are printed last.
 
+If there is only one mixture component, i.e., \code{M == 1}, \code{gsmvar_to_sgsmvar} returns a symmetric and pos. def. square root matrix of the error term covariance matrix by default. But one may also employ lower triangular Cholesky identification by setting \code{cholesky = TRUE} in the arguments.
+
+\subsubsection{Estimating overidentified structural GSMVAR models}
+Sometimes is appropriate to impose overidentifying constraints on $W$ (or equally the B-matrix). With preliminary estimates from the just-identified model in the case $M>1$ or any model in the case $M=1$, it is convenient to use the function \code{estimate_sgsmvar}. It takes in a reduced form or structural GSMVAR model as a class 'gsmvar' object and new constraints in the argument \code{new_W} as a matrix expressing the sign or zero constraints. Strictly positive or negative elements signify strict sign constraints, zeros zero constraints, and \code{NA} values that the element is unconstrained.
+
+\code{estimate_sgsmvar} then creates preliminary estimate based on the supplied model and the constraints, and then runs the two-phase estimation with settings of the genetic algorithm such that the search is focused on the neighbourhood of the preliminary estimate. Thus, it will lead to the correct ML estimate only if the unconstrained estimate is close to the constrained one in the first place. It is therefore useful for imposing zero constraints for elements that are close to zero in the unrestricted estimate, for instance.
+
+\textbf{It is important to make sure that supplied model readily satisfies the sign constraints that are imposed. To achieve this, you can swap the signs in each column of the W matrix with the function \code{swap\_W\_signs}. If the sign constraints are not not readily satisfie, the preliminary estimate switches the signs and will probably lead to incorrect estimate.}
+
+\code{estimate_sgsmvar} can also be used to estimate models that are not identified, i.e., one regime models. If it supplied with a reduced form model, it will first apply the function \code{gsmvar_to_sgsmvar}, then impose the constraints and finally estimate the model.
+
 \subsection{Constrained estimation}\label{sec:examp_const}
 
 \subsubsection{Linear constraints on the autoregressive parameters}

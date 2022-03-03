@@ -117,6 +117,9 @@ all.equal(fit22s$loglik, fit22s_2$loglik)
 all.equal(fit22s$loglik, fit22s_3$loglik)
 all.equal(fit22s$loglik, fit22s_4$loglik)
 
+# Check out also the function: estimate_sgsmvar
+# for estimating overidentified structural models.
+
 # Estimate generalized impulse response function (GIRF) with starting values
 # generated from the stationary distribution of the process:
 girf1 <- GIRF(fit22s, N=20, ci=c(0.95, 0.8), R1=200, R2=200, ncores=4)

@@ -348,10 +348,10 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
     for(i1 in 1:length(initpop)) {
       ind <- initpop[[i1]]
       tryCatch(check_parameters(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
-                                same_means=same_means, structural_pars=structural_pars),
+                                parametrization=parametrization, same_means=same_means, structural_pars=structural_pars),
                error=function(e) stop(paste("Problem with individual", i1, "in the initial population: "), e))
       if(parametrization == "intercept") { # This is never the case when !is.null(same_means)
-        ind <- change_parametrization(p=p, M=M, d=d, params=ind, model=model, constraints=constraints,
+        ind <- change_parametrization(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
                                       structural_pars=structural_pars, change_to="mean")
       }
       if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {

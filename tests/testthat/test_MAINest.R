@@ -38,3 +38,27 @@ test_that("iterate_more works correctly", {
                                     -0.03837, 0.00851, -0.31741, 2.05107, 0.50571, 8.24552, 5.3192, 3.53919, 11.71521,
                                     0.55438), tolerance=1e-4)
 })
+
+# G-StMVAR(1, 1, 1)
+sg_stmvar12_pars <- c(1.59756, 0.48318, 0.54543, 0.11584, 0.12584, -0.03109, -0.61263, 0.7226, 0.33097, 0.05368, -0.04244,
+                      0.70867, 0.9545, 0.15627, -0.54858, 0.33714, 0.36483, 0.28422, 0.1666, 7.56742)
+sg_stmvar12 <- GSMVAR(gdpdef, p=1, M=c(1, 1), d=2, params=sg_stmvar12_pars, model="G-StMVAR",
+                      structural_pars=list(W=matrix(nrow=2, ncol=2)))
+new_W1 <- matrix(c(1, 0, -1, NA), nrow=2)
+
+# Cholesky VAR(1)
+var1pars <- c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103, 0.601791, -0.002944, 0.067224)
+var1 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=var1pars, model="GMVAR")
+new_W2 <- matrix(c(1, NA, 0, 1), nrow=2)
+
+test_that("estimate_ works correctly", {
+  new_fit12gss <- estimate_sgsmvar(sg_stmvar12, new_W=new_W1, ncalls=1, ncores=1, seeds=1)
+  expect_equal(new_fit12gss$params, c(1.68044468, 0.50581789, 0.53848797, 0.11334361, 0.11786532,
+                                      -0.03078259, -0.65462904, 0.71336338, 0.33229816, 0.05399712,
+                                      -0.03006147, 0.71400402, 1.10621116, -0.01436285, 0.37288158,
+                                      0.34530781, 0.30271439, 0.14914748, 7.46245286), tolerance=1e-3)
+
+  new_fit11s <- estimate_sgsmvar(fit11, new_W=new_W2, ncalls=1, ncores=1, seeds=1)
+  expect_equal(new_fit11s$params, c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103,
+                                    0.775748, -0.003775, 0.259252), tolerance=1e-3)
+})
