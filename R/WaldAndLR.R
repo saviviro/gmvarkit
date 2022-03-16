@@ -9,6 +9,10 @@
 #'   where \eqn{n_params} is the number of parameters in the (unconstrained) model.
 #'   See details for more information.
 #' @param c a length \eqn{k} vector specifying part of the null hypothesis. See details for more information.
+#' @param custom_h a numeric vector with the same length as \code{x} specifying the difference \code{h}
+#'  for each dimension separately. If \code{NULL} (default), then the difference \code{1e-6} used for
+#'   all but overly large degrees of freedom parameters. For them, the difference is adjusted to avoid
+#'   numerical problems.
 #' @details Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothesis \eqn{A\theta_{0}=c}.
 #'   Under the null, the test statistic is asymptotically \eqn{\chi^2}-distributed with \eqn{k}
 #'   (\code{=nrow(A)}) degrees of freedom. The parameter \eqn{\theta_{0}} is assumed to have the same form as in
@@ -48,7 +52,7 @@
 #' }
 #' @export
 
-Wald_test <- function(gsmvar, A, c, h=6e-6) {
+Wald_test <- function(gsmvar, A, c, custom_h=NULL) {
   gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
   params <- gsmvar$params
   stopifnot(is.matrix(A) && ncol(A) == length(params) && nrow(A) <= ncol(A))
@@ -57,25 +61,10 @@ Wald_test <- function(gsmvar, A, c, h=6e-6) {
   if(qr(A)$rank != nrow(A)) stop("The constraint matrix 'A' should have full row rank")
 
   # Calculate Hessian matrix at the estimate
-  minval <- get_minval(gsmvar$data)
-  loglik_fn <- function(pars) {
-    tryCatch(loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=pars,
-                               conditional=gsmvar$model$conditional,
-                               parametrization=gsmvar$model$parametrization,
-                               constraints=gsmvar$model$constraints,
-                               same_means=gsmvar$model$same_means,
-                               structural_pars=gsmvar$model$structural_pars,
-                               check_params=TRUE,
-                               to_return="loglik", minval=minval,
-                               stat_tol=gsmvar$num_tols$stat_tol,
-                               posdef_tol=gsmvar$num_tols$posdef_tol),
-             error=function(e) {
-               print(paste("Failed to evualuate log-likelihood function in the approximation of Hessian matrix:", e))
-               return(NA)
-               })
-  }
-  Hess <- calc_hessian(x=params, fn=loglik_fn, h=h)
-  if(anyNA(Hess)) stop("Unable to fully calculate Hessian matrix of the log-likelihood function using central difference numerical approximation. Check whether there is something funny in the estimates or maybe try another difference 'h'?")
+  Hess <- tryCatch(get_hessian(gsmvar, custom_h=custom_h),
+                   error=function(e) {
+                     print(paste("Failed to calculate Hessian matrix:", e))
+                     return(NA)})
 
   # Invert the Hessian matrix
   inv_Hess <- tryCatch(solve(Hess), error=function(e) {

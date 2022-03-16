@@ -58,7 +58,7 @@ test_that("estimate_ works correctly", {
                                       -0.03006147, 0.71400402, 1.10621116, -0.01436285, 0.37288158,
                                       0.34530781, 0.30271439, 0.14914748, 7.46245286), tolerance=1e-3)
 
-  new_fit11s <- estimate_sgsmvar(fit11, new_W=new_W2, ncalls=1, ncores=1, seeds=1)
+  new_fit11s <- estimate_sgsmvar(var1, new_W=new_W2, ncalls=1, ncores=1, seeds=1)
   expect_equal(new_fit11s$params, c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103,
                                     0.775748, -0.003775, 0.259252), tolerance=1e-3)
 })

@@ -14,9 +14,9 @@
 #' @param varying_h a numeric vector with the same length as \code{x} specifying the difference \code{h}
 #'  for each dimension separately. If \code{NULL} (default), then the difference given as parameter \code{h}
 #'  will be used for all dimensions.
-#' @param custom_h same as \code{varying_h} but if \code{NULL} (default), then the difference \code{h} used
+#' @param custom_h same as \code{varying_h} except thaqt if \code{NULL} (default), then the difference used
 #'   for differentiating overly large degrees of freedom parameters is adjusted to avoid numerical problems,
-#'   and the difference is \code{6e-6} for the other parameters.
+#'   and the difference \code{6e-6} is used for the other parameters.
 #' @param ... other arguments passed to \code{fn}
 #' @details In particular, the functions \code{get_foc} and \code{get_soc} can be used to check whether
 #'   the found estimates denote a (local) maximum point, a saddle point, or something else. Note that
@@ -102,12 +102,14 @@ get_gradient <- function(gsmvar, custom_h=NULL) {
   foo <- function(x) {
     loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-                      structural_pars=gsmvar$structural_pars, constraints=gsmvar$model$constraints,
+                      structural_pars=gsmvar$model$structural_pars, constraints=gsmvar$model$constraints,
                       to_return="loglik", check_params=TRUE, minval=NA, stat_tol=gsmvar$num_tols$stat_tol,
                       posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
   }
   calc_gradient(x=gsmvar$params, fn=foo, varying_h=varying_h)
 }
+
+
 
 #' @rdname calc_gradient
 #' @export
@@ -123,7 +125,7 @@ get_hessian <- function(gsmvar, custom_h=NULL) {
   foo <- function(x) {
     loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-                      constraints=gsmvar$model$constraints, structural_pars=gsmvar$structural_pars,
+                      constraints=gsmvar$model$constraints, structural_pars=gsmvar$model$structural_pars,
                       to_return="loglik", check_params=TRUE, minval=NA, stat_tol=gsmvar$num_tols$stat_tol,
                       posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
   }

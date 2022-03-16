@@ -170,6 +170,7 @@
 # gmvarkit 2.0.3
 
 * Fixed a bug that caused an error when trying to estimate model a with restrictions on the mean parameters or a G-StMVAR model by setting up initial population in the genetic algorithm.
+* Fixed bug that made some of the functions unable to calculate first and second differences for structural models
 * Added new functionality to the function gsmvar_to_sgsmvar: now it is possible to employ Cholesky identification if M=1.
 * Added new function: estimate_sgsmvar which can be used to conveniently estimate overidentified structural models.
 * Updated the data 'usamone' to contain the observations until the end of 2021.
