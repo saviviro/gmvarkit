@@ -3,13 +3,14 @@
 \docType{data}
 \name{usamone}
 \alias{usamone}
-\title{A quarterly U.S. data covering the period from 1954Q3 to 2021Q1 (267 observations) and consisting four variables:
+\title{A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
 cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-diffence of producer
-price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds (FF)
+price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
-bound and also quantifies unconventional monetary policy measures. This data is the one that was used in Virolainen (2021).}
+bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP deflator and producer price
+index are multiplied by hundred. This data is the one that was used in Virolainen (2021).}
 \format{
-A numeric matrix of class \code{'ts'} with 267 rows and 4 columns with one time series in each column:
+A numeric matrix of class \code{'ts'} with 270 rows and 4 columns with one time series in each column:
 \describe{
   \item{First column (GDP):}{The cyclical component of the log of real GDP, \url{https://fred.stlouisfed.org/series/GDPC1}.}
   \item{Second column (GDPDEF):}{The log-difference of GDP implicit price deflator, \url{https://fred.stlouisfed.org/series/GDPDEF}.}

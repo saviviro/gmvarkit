@@ -36,9 +36,9 @@ will be used for all dimensions.}
 
 \item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 
-\item{custom_h}{same as \code{varying_h} but if \code{NULL} (default), then the difference \code{h} used
+\item{custom_h}{same as \code{varying_h} except thaqt if \code{NULL} (default), then the difference used
 for differentiating overly large degrees of freedom parameters is adjusted to avoid numerical problems,
-and the difference is \code{6e-6} for the other parameters.}
+and the difference \code{6e-6} is used for the other parameters.}
 }
 \value{
 Gradient functions return numerical approximation of the gradient and Hessian functions return

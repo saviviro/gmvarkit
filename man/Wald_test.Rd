@@ -4,7 +4,7 @@
 \alias{Wald_test}
 \title{Perform Wald test for a GMVAR, StMVAR, or G-StMVAR model}
 \usage{
-Wald_test(gsmvar, A, c, h = 6e-06)
+Wald_test(gsmvar, A, c, custom_h = NULL)
 }
 \arguments{
 \item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
@@ -15,7 +15,10 @@ See details for more information.}
 
 \item{c}{a length \eqn{k} vector specifying part of the null hypothesis. See details for more information.}
 
-\item{h}{difference used to approximate the derivatives.}
+\item{custom_h}{a numeric vector with the same length as \code{x} specifying the difference \code{h}
+for each dimension separately. If \code{NULL} (default), then the difference \code{1e-6} used for
+ all but overly large degrees of freedom parameters. For them, the difference is adjusted to avoid
+ numerical problems.}
 }
 \value{
 A list with class "hypotest" containing the test results and arguments used to calculate the test.
