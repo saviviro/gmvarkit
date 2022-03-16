@@ -100,5 +100,5 @@ print(new_fit11s, digits=4)
 }
 \seealso{
 \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link[stats]{optim}},
- \code{\link{profile_logliks}}, \code{\link{iterate_more}} \code{\link{gsmvar_to_sgmvar}}
+ \code{\link{profile_logliks}}, \code{\link{iterate_more}} \code{\link{gsmvar_to_sgsmvar}}
 }

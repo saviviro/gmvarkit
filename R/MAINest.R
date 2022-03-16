@@ -424,7 +424,7 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
 #'   constraints and finally estimate the model.
 #' @return Returns an object of class \code{'gsmvar'} defining the estimated GMVAR, StMVAR, or G-StMVAR model.
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link[stats]{optim}},
-#'  \code{\link{profile_logliks}}, \code{\link{iterate_more}} \code{\link{gsmvar_to_sgmvar}}
+#'  \code{\link{profile_logliks}}, \code{\link{iterate_more}} \code{\link{gsmvar_to_sgsmvar}}
 #' @inherit GSMVAR references
 #' @examples
 #' \donttest{
