@@ -3,14 +3,14 @@
 \docType{data}
 \name{euromone}
 \alias{euromone}
-\title{A monthly Euro area data covering the period from February 1997 to December (299 observations) and consisting four variables:
+\title{A monthly Euro area data covering the period from January 1999 to December (276 observations) and consisting four variables:
 cyclical component of log industrial production index, the log-difference of harmonized consumer price index, the log-difference
 of Brent crude oil prices (Europe), and an interest rate variable. The interest rate variable is the Euro overnight index average
-rate (EONIA) from February 1997 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
+rate (EONIA) from January 1999 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-difference of the harmonized consumer price index is
 multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (2021).}
 \format{
-A numeric matrix of class \code{'ts'} with 299 rows and 4 columns with one time series in each column:
+A numeric matrix of class \code{'ts'} with 276 rows and 4 columns with one time series in each column:
 \describe{
   \item{First column (IPI):}{The cyclical component of the log of industrial production index,
     \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=132.STS.M.I8.Y.PROD.NS0010.4.000}.}
@@ -18,7 +18,7 @@ A numeric matrix of class \code{'ts'} with 299 rows and 4 columns with one time 
     \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=122.ICP.M.U2.Y.000000.3.INX}.}
   \item{Third column (OIL):}{The log-difference of Brent crude oil price (Europe),
     \url{https://fred.stlouisfed.org/series/MCOILBRENTEU}.}
-  \item{Third column (RATE):}{The EONIA from February 1997 to October 2008 and after that the Wu and Xia (2016) shadow rate,
+  \item{Third column (RATE):}{The EONIA from January 1999 to October 2008 and after that the Wu and Xia (2016) shadow rate,
     \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=143.FM.M.U2.EUR.4F.MM.EONIA.HSTA},
     \url{https://sites.google.com/view/jingcynthiawu/shadow-rates}.}
 }
