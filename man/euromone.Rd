@@ -13,13 +13,13 @@ multiplied by hundred and the log-difference of oil price by ten. This data is t
 A numeric matrix of class \code{'ts'} with 276 rows and 4 columns with one time series in each column:
 \describe{
   \item{First column (IPI):}{The cyclical component of the log of industrial production index,
-    \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=132.STS.M.I8.Y.PROD.NS0010.4.000}.}
+    url is https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=132.STS.M.I8.Y.PROD.NS0010.4.000.}
   \item{Second column (HCPI):}{The log-difference of harmonized consumer price index,
-    \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=122.ICP.M.U2.Y.000000.3.INX}.}
+    url is https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=122.ICP.M.U2.Y.000000.3.INX.}
   \item{Third column (OIL):}{The log-difference of Brent crude oil price (Europe),
-    \url{https://fred.stlouisfed.org/series/MCOILBRENTEU}.}
+    \url{https://fred.stlouisfed.org/series/MCOILBRENTEU.}}
   \item{Third column (RATE):}{The EONIA from January 1999 to October 2008 and after that the Wu and Xia (2016) shadow rate,
-    \url{https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=143.FM.M.U2.EUR.4F.MM.EONIA.HSTA},
+    urls are https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=143.FM.M.U2.EUR.4F.MM.EONIA.HSTA and
     \url{https://sites.google.com/view/jingcynthiawu/shadow-rates}.}
 }
 }
@@ -33,7 +33,7 @@ euromone
 The cyclical component of the log of industrial production index was obtained by applying the linear projection filter proposed
 by Hamilton (2018) using the parameter values h=24 and p=12. In order to obtain as accurate estimates as possible, we applied the
 filter to the full available sample from January 1991 to December 2021 before extracting our sample period from it.
-package lpirfs (Adämmer, 2021)
+package lpirfs (Adämmer, 2021).
 }
 \references{
 \itemize{
