@@ -175,3 +175,4 @@
 * Added new function: estimate_sgsmvar which can be used to conveniently estimate overidentified structural models.
 * Updated the data 'usamone' to contain the observations until the end of 2021.
 * Added the data 'euromone' that is used in the (G-)StMVAR paper of Virolainen.
+* Fixed CRAN issues.
