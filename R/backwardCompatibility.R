@@ -14,7 +14,7 @@
 #' @export
 
 gmvar_to_gsmvar <- function(gsmvar) {
-  stopifnot(is(gsmvar) %in% c("gsmvar", "gmvar"))
+  stopifnot(methods::is(gsmvar) %in% c("gsmvar", "gmvar"))
   if(inherits(gsmvar, what="gmvar")) {
     class(gsmvar) <- "gsmvar"
     gsmvar$model$model <- "GMVAR"

@@ -69,7 +69,7 @@
 #'   \item{Second column (HCPI):}{The log-difference of harmonized consumer price index,
 #'     url is https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=122.ICP.M.U2.Y.000000.3.INX.}
 #'   \item{Third column (OIL):}{The log-difference of Brent crude oil price (Europe),
-#'     \url{https://fred.stlouisfed.org/series/MCOILBRENTEU.}}
+#'     \url{https://fred.stlouisfed.org/series/MCOILBRENTEU}.}
 #'   \item{Third column (RATE):}{The EONIA from January 1999 to October 2008 and after that the Wu and Xia (2016) shadow rate,
 #'     urls are https://sdw.ecb.europa.eu/quickview.do?SERIES_KEY=143.FM.M.U2.EUR.4F.MM.EONIA.HSTA and
 #'     \url{https://sites.google.com/view/jingcynthiawu/shadow-rates}.}
