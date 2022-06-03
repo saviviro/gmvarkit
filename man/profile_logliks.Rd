@@ -118,9 +118,10 @@ profile_logliks(mod22gs, which_pars=c(1, 3, 28))
          \emph{Springer}.
    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
-   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-         paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
 }

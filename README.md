@@ -195,9 +195,11 @@ fit22gss
 -   Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
     Multivariate Nonlinear Time Series Models. *Unpublished Revision of
     HECER Discussion Paper No. 247*.
--   Virolainen S. 2020. Structural Gaussian mixture vector
-    autoregressive model. Unpublished working paper, available as
+-   Virolainen S. 2022. Structural Gaussian mixture vector
+    autoregressive model with application to the asymmetric effects of
+    monetary policy shocks. Unpublished working paper, available as
     arXiv:2007.04713.
--   Virolainen S. 2021. Gaussian and Student’s t mixture vector
-    autoregressive model. Unpublished working paper, available as
-    arXiv:2109.13648.
+-   Virolainen S. 2022. Gaussian and Student’s t mixture vector
+    autoregressive model with application to the assymetric effects of
+    monetary policy shocks in the Euro area. Unpublished working paper,
+    available as arXiv:2109.13648.

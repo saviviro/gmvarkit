@@ -145,7 +145,7 @@ quantile_residuals <- function(gsmvar) {
     }
   }
 
-  # Calculate beta_{m,t,j} for j=2,...,d (Virolainen 2021, eq. (2.6),(2.7) unpublished work paper)
+  # Calculate beta_{m,t,j} for j=2,...,d (Virolainen 2022, eq. (2.6),(2.7) unpublished work paper)
   beta_mtj <- array(dim=c(T_obs, M, d)) # [t, m, j] j=1,...,d
   beta_mtj[, , 1] <- alpha_mt
   for(j in 2:d) {

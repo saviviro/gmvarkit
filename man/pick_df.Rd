@@ -39,7 +39,7 @@ pick_df(M, params, model = c("GMVAR", "StMVAR", "G-StMVAR"))
   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
   \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
-  error term covariance matrices (see Virolainen, 2021). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+  error term covariance matrices (see Virolainen, 2022). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
@@ -71,9 +71,10 @@ Constrained models are supported, but obtaining the degrees of freedom does not 
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
  @keywords internal

@@ -56,7 +56,7 @@ the following elements:
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
 }
-See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
@@ -75,9 +75,10 @@ Returns the number of parameters in the parameter vector of the specified
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
  @keywords internal

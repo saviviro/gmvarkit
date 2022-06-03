@@ -75,7 +75,7 @@
 #'   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
 #'   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
 #'   \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
-#'   error term covariance matrices (see Virolainen, 2021). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+#'   error term covariance matrices (see Virolainen, 2022). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
 #'   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
@@ -117,7 +117,7 @@
 #'       must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
 #'       should not be constrained.
 #'   }
-#'   See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+#'   See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 #'   a time-varying diagonal matrix with positive diagonal entries).
 #' @param check_params should it be checked that the parameter vector satisfies the model assumptions? Can be skipped to save
 #'   computation time if it does for sure.
@@ -157,9 +157,10 @@
 #'          \emph{Springer}.
 #'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
 #'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
-#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-#'          paper, available as arXiv:2007.04713.
-#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+#'    \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+#'      effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+#'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
 #'      paper, available as arXiv:2109.13648.
 #'  }
 #' @keywords internal
@@ -241,7 +242,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     }
   }
 
-  # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)) or log Students t densities (Virolainen 2021, eq. (3.4)):
+  # Calculate the dp-dimensional multinormal densities (KMS 2016, eq.(6)) or log Students t densities (Virolainen 2022, eq. (3.4)):
   # i:th row for index i-1 etc, m:th column for m:th component.
   # We calculate in logarithm because the non-log values may be too close to zero for machine accuracy (if they are too close to zero
   # for all regimes and computer handles them as zero, we would divide by zero when calculating the mixing weights)
@@ -310,7 +311,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
     return(first_term + second_term)
   }
 
-  # Calculate the second term of the log-likelihood (KMS 2016 eq.(10)), also see Virolainen (2021) for the StMVAR type regimes
+  # Calculate the second term of the log-likelihood (KMS 2016 eq.(10)), also see Virolainen (2022) for the StMVAR type regimes
   dat <- data[(p + 1):n_obs,] # Initial values are not used here (conditional means and variances are already calculated)
   mvd_vals <- matrix(nrow=T_obs, ncol=M)
   if(M1 > 0) { # GMVAR type regimes

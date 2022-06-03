@@ -64,7 +64,7 @@
 #'   The confidence bounds reflect uncertainty about the initial state (but
 #'   currently not about the parameter estimates) if initial values are not
 #'   specified. If initial values are specified, there won't currently be
-#'   confidence intervals. See the cited paper by Virolainen (2021) for details
+#'   confidence intervals. See the cited paper by Virolainen (2022) for details
 #'   about the algorithm.
 #'
 #'   Note that if the argument \code{scale} is used, the scaled responses of
@@ -315,23 +315,22 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #'
 #'   The GFEVD is a forecast error variance decomposition calculated with the generalized impulse response function (GIRF).
 #'   Lanne and Nyberg (2016) for details. Note, however, that the related GIRFs are calculated using the algorithm given in
-#'   Virolainen (2021).
+#'   Virolainen (2022).
 #' @return Returns and object of class 'gfevd' containing the GFEVD for all the variables and if
 #'   \code{include_mixweights=TRUE} also to the mixing weights. Note that the decomposition does not
 #'   exist at horizon zero for mixing weights because the related GIRFs are always zero at impact.
 #' @seealso \code{\link{GIRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{gsmvar_to_sgsmvar}},
 #'  \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
 #' @references
-#' @references
 #'  \itemize{
 #'    \item Lanne M. and Nyberg H. 2016. Generalized Forecast Error Variance Decomposition for Linear
 #'      and Nonlineae Multivariate Models. \emph{Oxford Bulletin of Economics and Statistics}, \strong{78}, 4, 595-603.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-#'      paper, available as arXiv:2007.04713.
-#'    \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
-#'      paper, available as arXiv:2109.13648.
+#'    \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+#'      effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+#'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working paper, available as arXiv:2109.13648.
 #'  }
 #' @examples
 #'  \donttest{

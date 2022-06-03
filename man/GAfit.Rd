@@ -82,7 +82,7 @@ the following elements:
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
 }
-See Virolainen (2021) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{ngen}{a positive integer specifying the number of generations to be ran through in
@@ -159,7 +159,7 @@ mixing weights practically at zero) so far.}
   Above, \eqn{\phi_{m,0}} is the intercept parameter, \eqn{A_{m,i}} denotes the \eqn{i}th coefficient matrix of the \eqn{m}th
   mixture component, \eqn{\Omega_{m}} denotes the error term covariance matrix of the \eqn{m}:th mixture component, and
   \eqn{\alpha_{m}} is the mixing weight parameter. The \eqn{W} and \eqn{\lambda_{mi}} are structural parameters replacing the
-  error term covariance matrices (see Virolainen, 2020). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
+  error term covariance matrices (see Virolainen, 2022). If \eqn{M=1}, \eqn{\alpha_{m}} and \eqn{\lambda_{mi}} are dropped.
   If \code{parametrization=="mean"}, just replace each \eqn{\phi_{m,0}} with regimewise mean \eqn{\mu_{m}}.
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
@@ -300,9 +300,10 @@ The core of the genetic algorithm is mostly based on the description by \emph{Do
          \emph{Transactions on Systems, Man and Cybernetics} \strong{24}, 656-667.
    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
-   \item Virolainen S. 2020. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
 }

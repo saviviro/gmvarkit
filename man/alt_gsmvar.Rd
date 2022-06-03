@@ -56,9 +56,10 @@ fit12_2
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
    \item Kalliovirta L. and Saikkonen P. 2010. Reliable Residuals for Multivariate Nonlinear
          Time Series Models. \emph{Unpublished Revision of HECER Discussion Paper No. 247}.
-   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
 }

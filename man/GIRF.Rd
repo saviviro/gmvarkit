@@ -154,7 +154,7 @@ The model needs to be structural in order for this function to be
   The confidence bounds reflect uncertainty about the initial state (but
   currently not about the parameter estimates) if initial values are not
   specified. If initial values are specified, there won't currently be
-  confidence intervals. See the cited paper by Virolainen (2021) for details
+  confidence intervals. See the cited paper by Virolainen (2022) for details
   about the algorithm.
 
   Note that if the argument \code{scale} is used, the scaled responses of
@@ -210,9 +210,10 @@ The model needs to be structural in order for this function to be
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2021. Structural Gaussian mixture vector autoregressive model. Unpublished working
-     paper, available as arXiv:2007.04713.
-   \item Virolainen S. 2021. Gaussian and Student's t mixture vector autoregressive model. Unpublished working
+   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
+     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
+     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
  }
  @keywords internal
