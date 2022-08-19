@@ -180,3 +180,7 @@
 # gvmarkit 2.0.4
 
 * Updated the references
+
+# gmvarkit 2.0.5
+
+* Fixed a CRAN issue
