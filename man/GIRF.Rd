@@ -160,13 +160,13 @@ The model needs to be structural in order for this function to be
   Note that if the argument \code{scale} is used, the scaled responses of
   the mixing weights might be more than one in absolute value.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{plot}: plot method
+\item \code{plot(girf)}: plot method
 
-\item \code{print}: print method
+\item \code{print(girf)}: print method
+
 }}
-
 \examples{
  \donttest{
  # These are long-running examples that use parallel computing.

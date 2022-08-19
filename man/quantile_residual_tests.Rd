@@ -76,14 +76,14 @@ If the function fails to calculate the tests because of numerical problems and t
   can be changed with the function \code{update_numtols} or you can set it directly with the arguments
   \code{stat_tol} and \code{posdef_tol}.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{plot}: Plot p-values of the autocorrelation and conditional
+\item \code{plot(qrtest)}: Plot p-values of the autocorrelation and conditional
 heteroskedasticity tests.
 
-\item \code{print}: Print method for class 'qrtest'
-}}
+\item \code{print(qrtest)}: Print method for class 'qrtest'
 
+}}
 \examples{
 \donttest{
 # GMVAR(3,2) model

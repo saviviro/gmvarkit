@@ -112,13 +112,13 @@ The model needs to be structural in order for this function to be applicable. A 
   Lanne and Nyberg (2016) for details. Note, however, that the related GIRFs are calculated using the algorithm given in
   Virolainen (2022).
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{plot}: plot method
+\item \code{plot(gfevd)}: plot method
 
-\item \code{print}: print method
+\item \code{print(gfevd)}: print method
+
 }}
-
 \examples{
  \donttest{
  # These are long-running examples that use parallel computing.

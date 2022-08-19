@@ -221,19 +221,19 @@ The first plot displays the time series together with estimated mixing weights.
   together with the marginal stationary density implied by the model. The colored regimewise
   stationary densities are multiplied with the mixing weight parameter estimates.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{logLik}: Log-likelihood method
+\item \code{logLik(gsmvar)}: Log-likelihood method
 
-\item \code{residuals}: residuals method to extract multivariate quantile residuals
+\item \code{residuals(gsmvar)}: residuals method to extract multivariate quantile residuals
 
-\item \code{summary}: summary method
+\item \code{summary(gsmvar)}: summary method
 
-\item \code{plot}: plot method for class 'gsmvar'
+\item \code{plot(gsmvar)}: plot method for class 'gsmvar'
 
-\item \code{print}: print method
+\item \code{print(gsmvar)}: print method
+
 }}
-
 \section{About S3 methods}{
 
   If data is not provided, only the \code{print} and \code{simulate} methods are available.
