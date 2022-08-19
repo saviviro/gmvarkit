@@ -466,7 +466,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 
 #' @title Compute conditional moments of a GMVAR, StMVAR, or G-StMVAR model
 #'
-#' @description \code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices
+#' @description \code{cond_moments} compute conditional regimewise means, conditional means, and conditional covariance matrices
 #'  of a GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams loglikelihood_int

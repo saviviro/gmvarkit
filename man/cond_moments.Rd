@@ -177,7 +177,7 @@ freedom parameters are not larger than \code{2 + df_tol}.}
    are all ones (the first p values are used as the initial values).}
 }
 \description{
-\code{loglikelihood} compute conditional regimewise means, conditional means, and conditional covariance matrices
+\code{cond_moments} compute conditional regimewise means, conditional means, and conditional covariance matrices
  of a GMVAR, StMVAR, or G-StMVAR model.
 }
 \details{
