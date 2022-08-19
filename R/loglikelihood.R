@@ -127,6 +127,7 @@
 #'  See the section "Return" for all the options.
 #' @details \code{loglikelihood_int} takes use of the function \code{dmvn} from the package \code{mvnfast}.
 #' @return
+#'  \describe{
 #'   \item{By default:}{log-likelihood value of the specified GMVAR, StMVAR, or G-StMVAR model,}
 #'   \item{If \code{to_return=="mw"}:}{a size ((n_obs-p)xM) matrix containing the mixing weights: for m:th component in m:th column.}
 #'   \item{If \code{to_return=="mw_tplus1"}:}{a size ((n_obs-p+1)xM) matrix containing the mixing weights: for m:th component in m:th column.
@@ -134,21 +135,22 @@
 #'   \item{If \code{to_return=="terms"}:}{a size ((n_obs-p)x1) numeric vector containing the terms \eqn{l_{t}}.}
 #'   \item{if \code{to_return=="loglik_and_mw"}:}{a list of two elements. The first element contains the log-likelihood value and the
 #'     second element contains the mixing weights.}
-#'   \item{If \code{to_return=="regime_cmeans"}:}{an [T-p, d, M] array containing the regimewise conditional means
+#'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
 #'    (the first p values are used as the initial values).}
-#'    \item{If \code{to_return=="regime_ccovs"}:}{an [d, d, T-p, M] array containing the regimewise conditional
-#'    covariance matrices (the first p values are used as the initial values). The index [ , , t, m] gives the time
+#'    \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+#'    covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
 #'    \code{t} conditional covariance matrix for the regime \code{m}.}
-#'   \item{If \code{to_return=="total_cmeans"}:}{a [T-p, d] matrix containing the conditional means of the process
+#'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
 #'    (the first p values are used as the initial values).}
-#'   \item{If \code{to_return=="total_ccov"}:}{an [d, d, T-p] array containing the conditional covariance matrices of the process
+#'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
 #'    (the first p values are used as the initial values).}
-#'   \item{If \code{to_return=="arch_scalars"}:}{a [T-p, M] matrix containing the regimewise arch scalars
+#'   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
 #'    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
 #'    are all ones (the first p values are used as the initial values).}
 #'   \item{if \code{to_return=="loglik_mw_archscalars"}:}{a list of three elements. The first element contains the log-likelihood value, the
 #'     second element contains the mixing weights, the third element contains the arch scalars
 #'     (this is used in \code{quantile_residuals_int}).}
+#'  }
 #' @references
 #'  \itemize{
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
@@ -475,18 +477,20 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @details The first p values are used as the initial values, and by conditional we mean conditioning on the past. Formulas
 #'   for the conditional means and covariance matrices are given in equations (3) and (4) of KMS (2016).
 #' @return
-#'   \item{If \code{to_return=="regime_cmeans"}:}{an [T-p, d, M] array containing the regimewise conditional means
+#'  \describe{
+#'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means
 #'     (the first p values are used as the initial values).}
-#'   \item{If \code{to_return=="regime_ccovs"}:}{an [d, d, T-p, M] array containing the regimewise conditional
-#'     covariance matrices (the first p values are used as the initial values). The index [ , , t, m] gives the time
+#'   \item{If \code{to_return=="regime_ccovs"}:}{an \code{[d, d, T-p, M]} array containing the regimewise conditional
+#'     covariance matrices (the first p values are used as the initial values). The index \code{[ , , t, m]} gives the time
 #'     \code{t} conditional covariance matrix for the regime \code{m}.}
-#'   \item{If \code{to_return=="total_cmeans"}:}{a [T-p, d] matrix containing the conditional means of the process
+#'   \item{If \code{to_return=="total_cmeans"}:}{a \code{[T-p, d]} matrix containing the conditional means of the process
 #'     (the first p values are used as the initial values).}
-#'   \item{If \code{to_return=="total_ccov"}:}{an [d, d, T-p] array containing the conditional covariance matrices of the process
+#'   \item{If \code{to_return=="total_ccov"}:}{an \code{[d, d, T-p]} array containing the conditional covariance matrices of the process
 #'     (the first p values are used as the initial values).}
-#'   \item{If \code{to_return=="arch_scalars"}:}{a [T-p, M] matrix containing the regimewise arch scalars
+#'   \item{If \code{to_return=="arch_scalars"}:}{a \code{[T-p, M]} matrix containing the regimewise arch scalars
 #'    multiplying error term covariance matrix in the conditional covariance matrix of the regime. For GMVAR type regimes, these
 #'    are all ones (the first p values are used as the initial values).}
+#'  }
 #' @inherit loglikelihood_int references
 #' @family moment functions
 #' @examples
