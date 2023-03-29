@@ -260,8 +260,9 @@ print.gsmvarpred <- function(x, ..., digits=2) {
     pred_ints <- gsmvarpred$pred_ints
     pred <- gsmvarpred$pred
     pred_type <- gsmvarpred$pred_type
+    series_names <- colnames(gsmvarpred$pred)
     for(i1 in seq_len(gsmvarpred$gsmvar$model$d)) {
-      cat(paste0("Component ", i1, ":"), "\n")
+      cat(paste0(series_names[i1], ":"), "\n")
       df <- as.data.frame(lapply(1:length(gsmvarpred$q), function(i2) format_value(pred_ints[, i2, i1])))
       names(df) <- q
       df[, pred_type] <- format_value(pred[,i1])

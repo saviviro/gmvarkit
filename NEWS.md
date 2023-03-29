@@ -191,4 +191,4 @@
 
 # gmvarkit 2.0.7
 
-* Fixed a minor bug in the predictions print method
+* Updated the print method of gsmvarpred objects
