@@ -247,13 +247,13 @@ print.gsmvarpred <- function(x, ..., digits=2) {
 
   } else if(gsmvarpred$pi_type == "none") {
     cat(paste0("Point forecast by ", gsmvarpred$pred_type, ", no prediction intervals."), "\n")
-    cat(paste0("Forecast ", gsmvarpred$n_ahead, " steps ahead, based on ", gsmvarpred$n_simu, " simulations.\n"))
+    cat(paste0("Forecast ", gsmvarpred$n_ahead, " steps ahead, based on ", gsmvarpred$nsim, " Monte Carlo repetitions.\n"))
     print(gsmvarpred$pred)
 
   } else {
     cat(paste0("Point forecast by ", gsmvarpred$pred_type, ", ", gsmvarpred$pi_type,
                " prediction intervals with levels ", paste(gsmvarpred$pi, collapse=", "), "."), "\n")
-    cat(paste0("Forecast ", gsmvarpred$n_ahead, " steps ahead, based on ", gsmvarpred$n_simu, " simulations.\n"))
+    cat(paste0("Forecast ", gsmvarpred$n_ahead, " steps ahead, based on ", gsmvarpred$nsim, " Monte Carlo repetitions.\n"))
 
     cat("\n")
     q <- gsmvarpred$q

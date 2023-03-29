@@ -188,3 +188,7 @@
 # gmvarkit 2.0.6
 
 * Fixed a CRAN issue
+
+# gmvarkit 2.0.7
+
+* Fixed a minor bug in the predictions print method
