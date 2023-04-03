@@ -316,7 +316,6 @@ check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @inheritParams is_stationary
 #' @return Checks the constraint matrix \strong{C} and throws an error
 #'   if something is wrong.
-#' @details If \code{is.null(constraints)}, then this function doesn't do anything.
 #' @keywords internal
 
 check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {

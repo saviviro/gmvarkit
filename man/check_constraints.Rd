@@ -62,7 +62,4 @@ Checks the constraint matrix \strong{C} and throws an error
 \description{
 \code{check_constraints} checks that the constraints are correctly set.
 }
-\details{
-If \code{is.null(constraints)}, then this function doesn't do anything.
-}
 \keyword{internal}
