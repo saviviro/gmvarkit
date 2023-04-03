@@ -56,7 +56,7 @@ See Virolainen (2022) for the conditions required to identify the shocks and for
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Checks the constraint matrix \strong{C} and throws an error
+Checks the constraints and throws an error
   if something is wrong.
 }
 \description{

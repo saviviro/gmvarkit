@@ -314,7 +314,7 @@ check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMV
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
-#' @return Checks the constraint matrix \strong{C} and throws an error
+#' @return Checks the constraints and throws an error
 #'   if something is wrong.
 #' @keywords internal
 
