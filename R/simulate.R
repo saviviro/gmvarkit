@@ -185,7 +185,8 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
   # Set/generate initial values
   if(is.null(init_values)) {
     # Generate initial values from the stationary distribution of the process or of the given regime
-    m <- ifelse(length(init_regimes) == 1, init_regimes, sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs))  # From which mixture component the initial values are drawn from?
+    m <- ifelse(length(init_regimes) == 1, init_regimes, sample(x=init_regimes, size=1, replace=TRUE, prob=reg_probs))
+    # ^^From which mixture component the initial values are drawn from?
     mu <- rep(all_mu[, m], p)
     if(m <= M1) { # Draw initial values from a GMVAR type regime
       L <- t(chol_Sigmas[, , m]) # Lower triangle
@@ -264,6 +265,10 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
         df_to_use <- all_df[m - M1] + d*p
         Z <- sqrt(arch_scalars[m - M1]*(df_to_use - 2)/df_to_use)*all_Bm[, , m]%*%eps_t # Sample from N(0, arch_scalar*(df - 2)/df*Omega_m))
         sample[i1, , j1] <- mu_mt + Z*sqrt(df_to_use/all_chisq_rv[m - M1]) # Sample from t_d(mu_mt, arch_scalar*Omega_m, all_df[m - M1] + d*p)
+        # Below is equal but with student t epsilon explicitly
+        #Z <- sqrt((df_to_use - 2)/df_to_use)*eps_t # Sample from N(0, (df-2)/df*I_d)
+        #Student_eps_t <- Z*sqrt(df_to_use/all_chisq_rv[m - M1]) # Sample from t_d(0, I_d, all_df[m - M1] + d*p)
+        #sample[i1, , j1] <- mu_mt + sqrt(arch_scalars[m - M1])*all_Bm[, , m]%*%Student_eps_t
       }
 
       # Update storage matrix Y (overwrites when ntimes > 1)
