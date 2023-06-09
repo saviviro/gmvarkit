@@ -86,9 +86,9 @@ test_that("predict works correctly", {
    expect_equal(predict.gsmvar(mod_112, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(0.7231782, 0.4431300), tolerance=1e-5)
    expect_equal(predict.gsmvar(mod_222c, n_ahead=1, pred_type="cond_mean", plot_res=FALSE)$pred, c(0.7250053, 0.4209626), tolerance=1e-5)
 
-   expect_equal(unname(pred112t$pred[2, ]), c(0.8970004, 0.4217662), tolerance=1e-3)
-   expect_equal(pred112t$pred_ints[, 2, 2], c(0.5729150, 0.5105862), tolerance=1e-3)
-   expect_equal(pred112t$pred_ints[, 1, 1], c(0.4116595, 0.3756889), tolerance=1e-3)
+   expect_equal(unname(pred112t$pred[2, ]), c(0.9204917, 0.4015286), tolerance=1e-3)
+   expect_equal(pred112t$pred_ints[, 2, 2], c(0.6106817, 0.5217523), tolerance=1e-3)
+   expect_equal(pred112t$pred_ints[, 1, 1], c(0.3210093, 0.2488382), tolerance=1e-3)
    expect_equal(pred112t$mix_pred_ints[, 1, 1], c(1, 1), tolerance=1e-3)
 
    expect_equal(tmp222, c(0.6709308, 0.4618839), tolerance=1e-5)
@@ -100,9 +100,9 @@ test_that("predict works correctly", {
    expect_equal(pred222s$pred_ints[, 1, 2], c(0.09878082, 0.18761453), tolerance=1e-3)
    expect_equal(pred222s$mix_pred_ints[, 2, 2], c(0.06477058, 0.05950152), tolerance=1e-3)
 
-   expect_equal(unname(pred222gs$pred[2, ]), c(0.7176830, 0.4060806), tolerance=1e-3)
+   expect_equal(unname(pred222gs$pred[2, ]), c(0.7199919, 0.4058923), tolerance=1e-3)
    expect_equal(pred222gs$pred_ints[, 4, 2], c(0.7705175, 0.5784606), tolerance=1e-3)
-   expect_equal(pred222gs$pred_ints[, 2, 2], c(0.1779556, 0.3322382), tolerance=1e-3)
+   expect_equal(pred222gs$pred_ints[, 2, 2], c(0.1779556, 0.3315794), tolerance=1e-3)
    expect_equal(pred222gs$mix_pred_ints[, 2, 1], c(0.9260951, 0.7668288), tolerance=1e-3)
 
    expect_equal(unname(pred123$pred[1,]), c(-8.4121641, -0.3787007, 2.3372331), tolerance=1e-5)
@@ -110,10 +110,10 @@ test_that("predict works correctly", {
    expect_equal(unname(pred123$mix_pred[1 ,]), c(7.987841e-21, 1.000000e+00), tolerance=1e-5)
    expect_equal(unname(pred123$mix_pred_ints[1 , 1, ]), c(7.987841e-21, 1.000000e+00), tolerance=1e-5)
 
-   expect_equal(unname(pred123t$pred[2,]), c(-7.782932, 1.377770, 2.024874), tolerance=1e-5)
-   expect_equal(pred123t$pred_ints[2 , 1, ], c(-7.9877016, 0.7730701, 0.2280571), tolerance=1e-5)
-   expect_equal(unname(pred123t$mix_pred[2,]), c(3.535557e-07, 9.999996e-01), tolerance=1e-5)
-   expect_equal(unname(pred123t$mix_pred_ints[2 , 1, ]), c(1.487353e-07, 9.999948e-01), tolerance=1e-5)
+   expect_equal(unname(pred123t$pred[2,]), c(-7.789771, 1.380211, 2.016605), tolerance=1e-5)
+   expect_equal(pred123t$pred_ints[2 , 1, ], c(-8.0015443, 0.7553734, 0.1624137), tolerance=1e-5)
+   expect_equal(unname(pred123t$mix_pred[2,]), c(3.563723e-07, 9.999996e-01), tolerance=1e-5)
+   expect_equal(unname(pred123t$mix_pred_ints[2 , 1, ]), c(1.457362e-07, 9.999943e-01), tolerance=1e-5)
 
    expect_equal(unname(pred222cm$pred[2,]), c(0.7434035, 0.4107316), tolerance=1e-5)
    expect_equal(unname(pred222cm$pred_ints[2, 2, ]), c(1.6821331, 0.7858234), tolerance=1e-5)

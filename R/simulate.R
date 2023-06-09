@@ -262,7 +262,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
       } else { # StMVAR type regime
         # Here, we obtain a (reduced form) multivariate Student's t shock with time-varying conditional variance
         df_to_use <- all_df[m - M1] + d*p
-        Z <- sqrt(arch_scalars[m - M1])*(df_to_use - 2)/df_to_use*all_Bm[, , m]%*%eps_t # Sample from N(0, arch_scalar*(df - 2)/df*Omega_m))
+        Z <- sqrt(arch_scalars[m - M1]*(df_to_use - 2)/df_to_use)*all_Bm[, , m]%*%eps_t # Sample from N(0, arch_scalar*(df - 2)/df*Omega_m))
         sample[i1, , j1] <- mu_mt + Z*sqrt(df_to_use/all_chisq_rv[m - M1]) # Sample from t_d(mu_mt, arch_scalar*Omega_m, all_df[m - M1] + d*p)
       }
 
@@ -298,7 +298,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
           u_t <- all_Bm[, , m2]%*%eps_t
         } else {# StMVAR type regime
           df_to_use <- all_df[m2 - M1] + d*p
-          Z <- sqrt(arch_scalars[m2 - M1])*(df_to_use - 2)/df_to_use*all_Bm[, , m2]%*%eps_t # Sample from N(0, arch_scalar*(v - 2)/v*Omega_m))
+          Z <- sqrt(arch_scalars[m2 - M1]*(df_to_use - 2))/df_to_use*all_Bm[, , m2]%*%eps_t # Sample from N(0, arch_scalar*(v - 2)/v*Omega_m))
           u_t <- Z*sqrt(df_to_use/all_chisq_rv[m2 - M1]) # Sample from t_d(0, arch_scalar*Omega_m, all_df[m - M1] + d*p)
         }
 
