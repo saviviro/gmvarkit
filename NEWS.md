@@ -193,3 +193,7 @@
 
 * Fixed a bug in simulations from Student's t regimes
 * Updated the print method of gsmvarpred objects
+
+# gmvarkit 2.0.8
+
+* Fixed a bug in simulations from Student's t regimes
