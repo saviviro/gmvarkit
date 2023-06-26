@@ -60,6 +60,6 @@ Performs a likelihood ratio test, testing the null hypothesis that the true para
  @keywords internal
 }
 \seealso{
-\code{\link{Wald_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
+\code{\link{Wald_test}}, \code{\link{Rao_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 }

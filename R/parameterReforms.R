@@ -174,10 +174,10 @@ reform_structural_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "
 #'  (except possibly sign constraints).
 #'
 #' @inheritParams loglikelihood_int
-#' @return Returns a list with \code{$W} being \eqn{(d x d)} matrix of ones and \code{$C_lambda} being \code{NULL}. If the
+#' @return Returns a list with \code{$W} being \eqn{(d x d)} matrix of NAs and \code{$C_lambda} being \code{NULL}. If the
 #'   supplied argument is \code{NULL}, returns \code{NULL}.
 #' @details Intended to be called after calling the function \code{reform_constrained_pars} to avoid remove the constraints
-#'   again in any further function calls as this will create bugs. Sign constraints are irrelevant in this context.
+#'   again in any further function calls as this will create bugs.
 #' @section Warning:
 #'  No argument checks!
 #' @keywords internal
@@ -187,7 +187,7 @@ get_unconstrained_structural_pars <- function(structural_pars=NULL) {
     return(NULL)
   } else {
     d <- nrow(structural_pars$W)
-    new_W <- matrix(rep(1, d^2), nrow=d)
+    new_W <- matrix(NA, nrow=d, ncol=d)
     return(list(W=new_W))
   }
 }

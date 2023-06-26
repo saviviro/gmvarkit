@@ -23,7 +23,7 @@ See Virolainen (2022) for the conditions required to identify the shocks and for
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
-Returns a list with \code{$W} being \eqn{(d x d)} matrix of ones and \code{$C_lambda} being \code{NULL}. If the
+Returns a list with \code{$W} being \eqn{(d x d)} matrix of NAs and \code{$C_lambda} being \code{NULL}. If the
   supplied argument is \code{NULL}, returns \code{NULL}.
 }
 \description{
@@ -32,7 +32,7 @@ Returns a list with \code{$W} being \eqn{(d x d)} matrix of ones and \code{$C_la
 }
 \details{
 Intended to be called after calling the function \code{reform_constrained_pars} to avoid remove the constraints
-  again in any further function calls as this will create bugs. Sign constraints are irrelevant in this context.
+  again in any further function calls as this will create bugs.
 }
 \section{Warning}{
 

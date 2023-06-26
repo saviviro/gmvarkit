@@ -197,3 +197,7 @@
 # gmvarkit 2.0.8
 
 * Fixed a bug in simulations from Student's t regimes
+
+# gmvarkit 2.0.9
+
+* Added the function 'Rao_test' implementing the Rao's score test.

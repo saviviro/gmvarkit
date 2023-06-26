@@ -77,6 +77,6 @@ diagnostic_plot(mod22gs, wait_time=0)
 }
 \seealso{
 \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
- \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
+ \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{Rao_test}}, \code{\link{cond_moment_plot}}, \code{\link[stats]{acf}},
   \code{\link[stats]{density}}, \code{\link{predict.gsmvar}}
 }

@@ -75,6 +75,6 @@ Denoting the true parameter value by \eqn{\theta_{0}}, we test the null hypothes
  @keywords internal
 }
 \seealso{
-\code{\link{LR_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
+\code{\link{LR_test}}, \code{\link{Rao_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
 }
