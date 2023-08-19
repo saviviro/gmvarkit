@@ -9,5 +9,5 @@
 #'   forecasting, and more.
 #'
 #'   The readme file is a good place to start and the vignette might be useful too.
-#' @name gmvarkit
-NULL
+#' @name gmvarkit-package
+"_PACKAGE"

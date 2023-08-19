@@ -539,9 +539,8 @@ check_same_means <- function(parametrization, same_means) {
 #' @description \code{warn_ar_roots} warns if the model contains near-unit-roots in some regimes
 #'
 #' @inheritParams quantile_residual_tests
-#' @param tol if eigenvalue is closer than \code{tol} to its bound, a warning is thrown
-#' @details Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
-#'  some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
+#' @details Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - stat_tol} or
+#'  some eigenvalue of the error term covariance matrix is smaller than \code{podef_tol}.
 #' @return Doesn't return anything.
 #' @keywords internal
 

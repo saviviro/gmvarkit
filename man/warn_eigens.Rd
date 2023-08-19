@@ -17,8 +17,6 @@ tolerance is too small, numerical evaluation of the log-likelihood might fail an
 the error term covariance matrix of any regime has eigenvalues smaller than this, the model is classified
 as not satisfying positive definiteness assumption. Note that if the tolerance is too small, numerical
 evaluation of the log-likelihood might fail and cause error.}
-
-\item{tol}{if eigenvalue is closer than \code{tol} to its bound, a warning is thrown}
 }
 \value{
 Doesn't return anything.
@@ -27,7 +25,7 @@ Doesn't return anything.
 \code{warn_ar_roots} warns if the model contains near-unit-roots in some regimes
 }
 \details{
-Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - tol} or
- some eigenvalue of the error term covariance matrix is smaller than \code{tol}.
+Warns if, for some regime, some moduli of "bold A" eigenvalues are larger than \code{1 - stat_tol} or
+ some eigenvalue of the error term covariance matrix is smaller than \code{podef_tol}.
 }
 \keyword{internal}

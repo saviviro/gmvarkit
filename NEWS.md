@@ -201,3 +201,7 @@
 # gmvarkit 2.0.9
 
 * Added the function 'Rao_test' implementing the Rao's score test.
+
+# gmvarkit 2.0.10
+
+* Fixed the package overview help file and removed reduntant argument from the documentation of warn_eigens. 
