@@ -205,3 +205,7 @@
 # gmvarkit 2.0.10
 
 * Fixed the package overview help file and removed reduntant argument from the documentation of warn_eigens. 
+
+# gmvarkit 2.1.0
+
+* Fixed the .Rd files for random_df and smart_df.

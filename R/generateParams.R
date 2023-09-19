@@ -463,9 +463,11 @@ smart_covmat <- function(d, M, Omega, W_and_lambdas, accuracy, structural_pars=N
 #'
 #' @inheritParams loglikelihood_int
 #' @return
-#'   \item{\strong{GMVAR models}}{a numeric vector of length zero.}
-#'   \item{\strong{StMVAR models}}{a numeric vector of length \code{M} with random entries strictly larger than two.}
-#'   \item{\strong{G-StMVAR models}}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
+#'   \describe{
+#'     \item{\strong{GMVAR models}:}{a numeric vector of length zero.}
+#'     \item{\strong{StMVAR models}:}{a numeric vector of length \code{M} with random entries strictly larger than two.}
+#'     \item{\strong{G-StMVAR models}:}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
+#'   }
 #' @keywords internal
 
 random_df <- function(M, model=c("GMVAR", "StMVAR", "G-StMVAR")) {

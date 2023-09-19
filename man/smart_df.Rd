@@ -31,9 +31,11 @@ close to the given degrees of freedom.}
 are GMVAR type and the rest \code{M2} components are StMVAR type.}
 }
 \value{
-\item{\strong{GMVAR models}}{a numeric vector of length zero.}
-  \item{\strong{StMVAR models}}{a numeric vector of length \code{M} with random entries strictly larger than two.}
-  \item{\strong{G-StMVAR models}}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
+\describe{
+    \item{\strong{GMVAR models}:}{a numeric vector of length zero.}
+    \item{\strong{StMVAR models}:}{a numeric vector of length \code{M} with random entries strictly larger than two.}
+    \item{\strong{G-StMVAR models}:}{a numeric vector of length \code{M2} with random entries strictly larger than two.}
+  }
 }
 \description{
 \code{random_df} generates random \code{M2} degrees of freedom parameter values
