@@ -390,6 +390,7 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #' @inheritParams quantile_residual_tests
 #' @inheritParams GSMVAR
 #' @param cholesky if \code{M == 1}, should the lower triangular Cholesky identification be employed?
+#'    See details for using Cholesky identification with \code{M > 1}.
 #' @details The switch is made by simultaneously diagonalizing the two error term covariance matrices
 #'   with a well known matrix decomposition (Muirhead, 1982, Theorem A9.9) and then normalizing the
 #'   diagonal of the matrix W positive (which implies positive diagonal of the B-matrix). Models with
@@ -397,6 +398,9 @@ alt_gsmvar <- function(gsmvar, which_round=1, which_largest, calc_cond_moments=T
 #'   exists for more than two covariance matrices. If the model has only one regime (= regular SVAR model),
 #'   a symmetric and pos. def. square root matrix of the error term covariance matrix is used \strong{unless}
 #'   \code{cholesky = TRUE} is set in the arguments, in which case Cholesky identification is employed.
+#'
+#'   In order to employ a structural model with Cholesky identification and multiple regimes (\code{M > 1}),
+#'   use the function \code{GIRF} directly with a reduced form model (see \code{?GIRF}).
 #'
 #'   The columns of \eqn{W} as well as the lambda parameters can be re-ordered (without changing the implied
 #'   reduced form model) afterwards with the function \code{reorder_W_columns}. Also all signs in any column
@@ -695,7 +699,8 @@ reorder_W_columns <- function(gsmvar, perm) {
     lambdas <- vec(lambdas[perm,])
   }
   new_params <- gsmvar$params
-  new_params[(length(new_params) - (sum(M) - 1 + length(W) + length(lambdas) + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + length(all_df)))] <- c(W, lambdas)
+  new_params[(length(new_params) - (sum(M) - 1 + length(W) + length(lambdas)
+                                    + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + length(all_df)))] <- c(W, lambdas)
   new_W <- structural_pars$W[, perm]
 
   # Construct the SGSMVAR model based on the obtained structural parameters
@@ -777,7 +782,8 @@ swap_W_signs <- function(gsmvar, which_to_swap) {
   r <- ifelse(is.null(structural_pars$C_lambda), d*(sum(M) - 1), r <- ncol(structural_pars$C_lambda))
 
   new_params <- gsmvar$params
-  new_params[(length(new_params) - (sum(M) - 1 + length(W) + r + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + r + length(all_df)))] <- W
+  new_params[(length(new_params) - (sum(M) - 1 + length(W) + r
+                                    + length(all_df)) + 1):(length(new_params) - (sum(M) - 1 + r + length(all_df)))] <- W
   new_W <- structural_pars$W
   new_W[, which_to_swap] <- -new_W[, which_to_swap]
 

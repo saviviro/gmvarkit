@@ -31,6 +31,9 @@ The switch is made by simultaneously diagonalizing the two error term covariance
   a symmetric and pos. def. square root matrix of the error term covariance matrix is used \strong{unless}
   \code{cholesky = TRUE} is set in the arguments, in which case Cholesky identification is employed.
 
+  In order to employ a structural model with Cholesky identification and multiple regimes (\code{M > 1}),
+  use the function \code{GIRF} directly with a reduced form model (see \code{?GIRF}).
+
   The columns of \eqn{W} as well as the lambda parameters can be re-ordered (without changing the implied
   reduced form model) afterwards with the function \code{reorder_W_columns}. Also all signs in any column
   of \eqn{W} can be swapped (without changing the implied reduced form model) afterwards with the function
