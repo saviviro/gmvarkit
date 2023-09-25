@@ -80,7 +80,7 @@
 #'   The element \code{$all_girfs} is a list containing results from all the individual GIRFs
 #'   obtained from the MC repetitions. Each element is for one shock and results are in
 #'   array of the form \code{[horizon, variables, MC-repetitions]}.
-#' @seealso \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+#' @seealso \code{\link{GFEVD}}, \code{\link{linear_IRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
 #'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
 #'   \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}},
 #'   \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},
@@ -319,8 +319,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #' @return Returns and object of class 'gfevd' containing the GFEVD for all the variables and if
 #'   \code{include_mixweights=TRUE} also to the mixing weights. Note that the decomposition does not
 #'   exist at horizon zero for mixing weights because the related GIRFs are always zero at impact.
-#' @seealso \code{\link{GIRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{gsmvar_to_sgsmvar}},
-#'  \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
+#' @seealso \code{\link{GIRF}}, \code{\link{linear_IRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+#'  \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
 #' @references
 #'  \itemize{
 #'    \item Lanne M. and Nyberg H. 2016. Generalized Forecast Error Variance Decomposition for Linear

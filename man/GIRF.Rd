@@ -219,7 +219,7 @@ The model needs to be structural in order for this function to be
  @keywords internal
 }
 \seealso{
-\code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+\code{\link{GFEVD}}, \code{\link{linear_IRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}},
   \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}},
   \code{\link{predict.gsmvar}}, \code{\link{profile_logliks}},

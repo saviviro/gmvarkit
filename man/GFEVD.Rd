@@ -175,6 +175,6 @@ The model needs to be structural in order for this function to be applicable. A 
  }
 }
 \seealso{
-\code{\link{GIRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{gsmvar_to_sgsmvar}},
- \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
+\code{\link{GIRF}}, \code{\link{linear_IRF}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+ \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}, \code{\link{simulate.gsmvar}}
 }
