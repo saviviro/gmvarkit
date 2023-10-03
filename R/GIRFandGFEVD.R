@@ -138,7 +138,13 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   stopifnot(N %% 1 == 0 && N > 0)
   stopifnot(scale_horizon %in% 0:N)
-  if(is.null(gsmvar$model$structural_pars)) stop("Only structural models are supported")
+  if(is.null(gsmvar$model$structural_pars)) { # Reduced form model
+    B_constrs <- matrix(NA, nrow=d, ncol=d)
+    B_constrs[upper.tri(B_constrs)] <- 0
+    diag(B_constrs) <- 1 # Lower triangular Cholesky constraints
+  } else {
+    B_constrs <- gsmvar$model$structural_pars$W
+  }
   if(M == 1) include_mixweights <- FALSE
   if(missing(which_shocks)) {
     which_shocks <- 1:d
@@ -164,8 +170,13 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
     # For the considered shocks, check that there are not zero-constraints for the variable whose initial response is scaled.
     for(i1 in 1:ncol(scale)) {
-      if(!is.na(gsmvar$model$structural_pars$W[scale[2, i1], scale[1, i1]]) && gsmvar$model$structural_pars$W[scale[2, i1], scale[1, i1]] == 0) {
-        stop(paste("Instantaneous response of the variable that has a zero constraint for the considered shock cannot be scaled"))
+      if(!is.na(B_constrs[scale[2, i1], scale[1, i1]]) && B_constrs[scale[2, i1], scale[1, i1]] == 0) {
+        if(is.null(is.null(gsmvar$model$structural_pars))) {
+          stop(paste("Instantaneous response of the variable that has a zero constraint for the considered shock cannot be scaled"))
+        } else { # Reduced form
+          stop(paste("Instantaneous response of the variable that has a zero constraint for the considered shock cannot be scaled",
+                      "(lower triangular recursive identification is assumed for reduced form models)"))
+        }
       }
     }
   }
@@ -188,9 +199,11 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
     message("ncores was set to be larger than the number of cores detected")
   }
   if(is.null(init_values)) {
-    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", length(which_shocks), "structural shocks,", "each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", length(which_shocks), "structural shocks,",
+              "each based on", R1, "Monte Carlo repetitions."), "\n")
   } else {
-    cat(paste("Using", ncores, "cores to estimate one GIRF for", length(which_shocks), "structural shocks, each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate one GIRF for", length(which_shocks), "structural shocks, each based on",
+              R1, "Monte Carlo repetitions."), "\n")
   }
 
   ### Calculate the GIRFs ###
@@ -203,7 +216,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   for(i1 in 1:length(which_shocks)) {
     cat(paste0("Estimating GIRFs for structural shock ", which_shocks[i1], "..."), "\n")
-    GIRF_shocks[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(shock_numb=which_shocks[i1], shock_size=shock_size, seed=seeds[i2]), cl=cl)
+    GIRF_shocks[[i1]] <- pbapply::pblapply(1:R2, function(i2) get_one_girf(shock_numb=which_shocks[i1],
+                                                                           shock_size=shock_size, seed=seeds[i2]), cl=cl)
   }
 
   parallel::stopCluster(cl=cl)
@@ -214,7 +228,7 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
   names(GIRF_results) <- paste0("shock", which_shocks)
 
   for(i1 in 1:length(which_shocks)) { # Go through shocks
-    res_in_array <- array(unlist(GIRF_shocks[[i1]]), dim=c(N + 1, d + ifelse(include_mixweights, M, 0), R2)) # [horizon, variables, MC-repetitions]
+    res_in_array <- array(unlist(GIRF_shocks[[i1]]), dim=c(N + 1, d + ifelse(include_mixweights, M, 0), R2)) # [horz, vars, MCreps]
     if(length(which_cumulative) > 0) {
       for(i2 in which_cumulative) {
         res_in_array[, i2, ] <- apply(res_in_array[, i2, , drop=FALSE], MARGIN=3, FUN=cumsum) # Replace GIRF with cumulative GIRF
@@ -227,7 +241,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
       which_var <- scale[2, which_col] # According to initial/peak response of which variable the GIRFs should be scaled
       magnitude <- scale[3, which_col] # What should be the magnitude of the initial/peak response of this variable
 
-      my_comparison_fun <- function(vec1, scalar1) which(abs(vec1 - scalar1) < .Machine$double.eps)[1] # To avoid potential problems with using == to compare numerical values
+      # To avoid potential problems with using == to compare numerical values
+      my_comparison_fun <- function(vec1, scalar1) which(abs(vec1 - scalar1) < .Machine$double.eps)[1]
       for(i2 in 1:R2) { # Go through the MC repetitions
         # The scaling scalar is different for each MC repetition, because the instantaneous/peak movement is generally
         # different with different starting values.
@@ -237,7 +252,8 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
           inds <- 1:(scale_horizon + 1) # +1 for period 0
           one_scale <- magnitude/res_in_array[my_comparison_fun(vec1=abs(res_in_array[inds, which_var, i2]),
                                                                 scalar1=max(abs(res_in_array[inds, which_var, i2]))), which_var, i2]
-          #one_scale <- magnitude/res_in_array[which(abs(res_in_array[, which_var, i2]) == max(abs(res_in_array[, which_var, i2]))), which_var, i2]
+          #one_scale <- magnitude/res_in_array[which(abs(res_in_array[, which_var, i2]) ==
+          #             max(abs(res_in_array[, which_var, i2]))), which_var, i2]
         }
         res_in_array[, , i2] <- one_scale*res_in_array[, , i2]
       }
@@ -390,7 +406,7 @@ GFEVD <- function(gsmvar, shock_size=1, N=30, initval_type=c("data", "random", "
     if(is.null(gsmvar$data)) stop("The model does not contain data! Add data with the function 'add_data' or select another 'initval_type'.")
     stopifnot(nrow(gsmvar$data) >= p)
     R2 <- nrow(gsmvar$data) - p + 1 # The number of length p histories in the data
-    all_initvals <- array(vapply(1:R2, function(i1) gsmvar$data[i1:(i1 + p - 1),], numeric(p*d)), dim=c(p, d, R2)) # [, , i1] for i1:th initval
+    all_initvals <- array(vapply(1:R2, function(i1) gsmvar$data[i1:(i1 + p - 1),], numeric(p*d)), dim=c(p, d, R2)) # [, , i1] for i1 initval
   } else if(initval_type == "random") {
     if(is.null(init_regimes)) {
       message("Initial regimes were not specified, so the initial values are generated from the stationary distribution of the process.")
@@ -402,7 +418,8 @@ GFEVD <- function(gsmvar, shock_size=1, N=30, initval_type=c("data", "random", "
     all_initvals <- array(dim=c(1, 1, R2)) # This won't be used. NULL init_values will be used.
   } else if(initval_type == "fixed") {
     R2 <- 1
-    if(is.null(init_values)) stop("Initial values were not specified! Specify the initial values with the argument 'init_values' or choose another 'initval_type'.")
+    if(is.null(init_values)) stop(paste0("Initial values were not specified! Specify the initial values with the argument",
+                                         "'init_values' or choose another 'initval_type'."))
     if(!is.matrix(init_values)) stop("init_values must be a numeric matrix")
     if(anyNA(init_values)) stop("init_values contains NA values")
     if(ncol(init_values) != d | nrow(init_values) < p) stop("init_values must contain d columns and at least p rows")
@@ -430,9 +447,11 @@ GFEVD <- function(gsmvar, shock_size=1, N=30, initval_type=c("data", "random", "
     message("ncores was set to be larger than the number of cores detected")
   }
   if(initval_type != "fixed") {
-    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", d, "structural shocks,", "each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate", R2,"GIRFs for", d, "structural shocks,", "each based on",
+              R1, "Monte Carlo repetitions."), "\n")
   } else {
-    cat(paste("Using", ncores, "cores to estimate one GIRF for", d, "structural shocks, each based on", R1, "Monte Carlo repetitions."), "\n")
+    cat(paste("Using", ncores, "cores to estimate one GIRF for", d, "structural shocks, each based on",
+              R1, "Monte Carlo repetitions."), "\n")
   }
 
   ### Calculate the GIRFs ###

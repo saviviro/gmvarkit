@@ -24,21 +24,21 @@
 #' @param ntimes how many sets of simulations should be performed?
 #' @param drop if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 #'   \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.
-#' @param girf_pars This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
-#'   should ignore it.
-#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating its possible future values.
-#'  One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
-#'  intervals (see the forecasting example).
+#' @param girf_pars This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}).
+#'   You should ignore it (specifying something else than null to it will change how the function behaves).
+#' @details The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating
+#'  its possible future values. One can easily perform a large number simulations and calculate the sample quantiles from the simulated
+#'  values to obtain prediction intervals (see the forecasting example).
 #' @return If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
 #'   Otherwise, returns a list with...
 #'   \describe{
 #'     \item{\code{$sample}}{a size (\code{nsim}\eqn{ x d x }\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
 #'      the time index, the dimension \code{[, d, ]} indicates the marginal time series, and the dimension \code{[, , i]} indicates
 #'      the i:th set of simulations.}
-#'     \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component each
-#'      value was generated from.}
-#'     \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to the
-#'      sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
+#'     \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component
+#'      each value was generated from.}
+#'     \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to
+#'      the sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
 #'      \code{[, , i]} indicates the i:th set of simulations.}
 #'   }
 #' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}}, \code{\link{predict.gsmvar}},
@@ -155,7 +155,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
   } else { # Reduced form model
     for(m in 1:M) { # t(chol(all_Omega[, , m]))
       eig <- eigen(all_Omega[, , m], symmetric=TRUE) # Orthogonal eigenvalue decomposition of the error term covariance matrix
-      all_Bm[, , m] <- eig$vectors%*%tcrossprod(diag(sqrt(eig$values)), eig$vectors) # Symmetric square root matrix of the error term covariance matrix
+      all_Bm[, , m] <- eig$vectors%*%tcrossprod(diag(sqrt(eig$values)), eig$vectors) # Symmetric sqr root matx of the error cov matrix
     }
   }
 
@@ -174,9 +174,16 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
     all_logC <- lgamma(0.5*(d*p + all_df)) - 0.5*d*p*log(base::pi) - 0.5*d*p*log(all_df - 2) - lgamma(0.5*all_df)
   }
 
-
+  # GIRF stuff, particularly for reduced form models, which assume Cholesky identification
   if(!is.null(girf_pars)) {
     R1 <- girf_pars$R1
+    reduced_form_girf <- is.null(gsmvar$model$structural_pars) # reduced form model GIRF -> Cholesky identification
+    all_Omegas_as_matrix <- t(matrix(all_Omega, nrow=d^2, ncol=M)) # Used for reduced form model GIRF
+    calculate_B_matrix <- function(alphas_t) { # alphas_t = vector with alpha_mt for time period t
+      t(chol(matrix(colSums(alphas_t*all_Omegas_as_matrix), ncol=d, nrow=d)))
+    } # Returns lower-triangular Cholesky decomposition of the conditional covariance matrix
+  } else {
+    reduced_form_girf <- FALSE # No GIRF to be estimated
   }
 
   # Relative mixing probabilities of the initial regimes
@@ -219,7 +226,8 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
   }
 
   # Some functions to be used
-  get_matprods <- function(Y) vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p), inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
+  get_matprods <- function(Y) vapply(1:M, function(m) crossprod(Y[i1,] - rep(all_mu[, m], p),
+                                                                inv_Sigmas[, , m])%*%(Y[i1,] - rep(all_mu[, m], p)), numeric(1))
   get_logmvdvalues <- function(matprods, arch_scalars) vapply(1:M, function(m) {
     if(m <= M1) { # GMVAR type regime
       return(-0.5*d*p*log(2*pi) - 0.5*log(det_Sigmas[m]) - 0.5*matprods[m]) # Log multivariate normal density
@@ -252,9 +260,11 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
       mu_mt <- all_phi0[, m] + A2%*%Y[i1,]
 
       # Draw the sample and store it
-      eps_t <- rnorm(d) # We use the same std normal shocks to create the Student't variables as well to control random variation across the sample paths
+      # We use the same std normal shocks to create the Student't variables as well to control random variation across the sample paths
+      eps_t <- rnorm(d)
       if(M1 < M) { # StMVAR and G-StMVAR models
-        # We generate a chi^2 variable with df nu + dp for all StMVAR type regimes and when computing GIRF use the same ones in both sample paths
+        # We generate a chi^2 variable with df nu + dp for all StMVAR type regimes and when computing GIRF use the same ones in
+        # both sample paths
         all_chisq_rv <- vapply(all_df + d*p, function(i1) rchisq(n=1, df=i1), numeric(1)) # [m - M1] indexed
       }
 
