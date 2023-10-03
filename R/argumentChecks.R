@@ -21,7 +21,8 @@
 #'     \item{\strong{For structural model:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)},
+#'       where
 #'       \itemize{
 #'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
 #'       }
@@ -35,9 +36,10 @@
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 #'
-#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
-#'   In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
-#'   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model,
+#'   \eqn{M1=0}. In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are
+#'   \emph{StMVAR type}. In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}}
+#'   # should be strictly larger than two.
 #'
 #'   The notation is similar to the cited literature.
 #' @param all_boldA 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
@@ -191,12 +193,13 @@ in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"
   model <- match.arg(model)
   check_pMd(p=p, M=M, d=d, model=model)
   check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
+                                structural_pars=structural_pars)) {
     stop("The parameter vector has wrong length!")
   }
   W_constraints <- structural_pars$W
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
-                                    structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
+                                    same_means=same_means, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   in_paramspace_int(p=p, M=M, d=d, params=params, model=model, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
@@ -268,7 +271,8 @@ check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMV
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
   check_constraints(p=p, M=M_orig, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M_orig, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  if(length(params) != n_params(p=p, M=M_orig, d=d, model=model, constraints=constraints, same_means=same_means,
+                                structural_pars=structural_pars)) {
     stop("The parameter vector has wrong dimension!")
   }
   params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model, constraints=constraints,
@@ -559,12 +563,14 @@ warn_eigens <- function(gsmvar, stat_tol=0.0015, posdef_tol=0.0002) {
   if(any(near_singular)) {
     my_string2 <- ifelse(sum(near_singular) == 1,
                          paste("Regime", which(near_singular),"has near-singular error term covariance matrix! "),
-                         paste("Regimes", paste(which(near_singular), collapse=" and ") ,"have near-singular error term covariance matrices! "))
+                         paste("Regimes", paste(which(near_singular), collapse=" and "),
+                               "have near-singular error term covariance matrices! "))
   } else {
     my_string2 <- NULL
   }
   if(any(near_nonstat) || any(near_singular)) {
-    warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest local maximum with the function 'alt_gsmvar' by adjusting its argument 'which_largest'."))
+    warning(paste0(my_string1, my_string2, "Consider building a model from the next-largest",
+                   " local maximum with the function 'alt_gsmvar' by adjusting its argument 'which_largest'."))
   }
 }
 
@@ -590,7 +596,9 @@ warn_df <- function(gsmvar, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR")
   if(model == "StMVAR" || model == "G-StMVAR") { # Check whether there is large df parameter value in some regime
     all_df <- pick_df(M=M, params=params, model=model)
     if(any(all_df > 100)) {
-      warning("The model contains overly large degrees of freedom parameters. Consider switching to the appropriate G-StMVAR model by setting the corresponding regimes to GMVAR type with the function 'stmvar_to_gstmvar'.")
+      warning(paste0("The model contains overly large degrees of freedom parameters.",
+                     "Consider switching to the appropriate G-StMVAR model by setting",
+                     "the corresponding regimes to GMVAR type with the function 'stmvar_to_gstmvar'."))
     }
   }
 }
