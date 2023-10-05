@@ -5,8 +5,8 @@
 \alias{GFEVD}
 \alias{plot.gfevd}
 \alias{print.gfevd}
-\title{Estimate generalized forecast error variance decomposition for a structural
-  GMVAR, StMVAR, or G-StMVAR model.}
+\title{Estimate generalized forecast error variance decomposition for structural
+ (and reduced form) GMVAR, StMVAR, and G-StMVAR models.}
 \usage{
 GFEVD(
   gsmvar,
@@ -101,12 +101,15 @@ Returns and object of class 'gfevd' containing the GFEVD for all the variables a
   exist at horizon zero for mixing weights because the related GIRFs are always zero at impact.
 }
 \description{
-\code{GFEVD} estimates generalized generalized forecast error variance decomposition for
- a structural GMVAR, StMVAR, or G-StMVAR model.
+\code{GFEVD} estimates generalized forecast error variance decomposition for structural
+ (and reduced form) GMVAR, StMVAR, and G-StMVAR models.
 }
 \details{
-The model needs to be structural in order for this function to be applicable. A structural
-  GMVAR, StMVAR, or G-StMVAR model can be estimated by specifying the argument \code{structural_pars} in the function \code{fitGSMVAR}.
+The model DOES NOT need to be structural in order for this function to be
+  applicable. When an identified structural GMVAR, StMVAR, or G-StMVAR model is
+  provided in the argument \code{gsmvar}, the identification imposed by the model
+  is used. When a reduced form model is provided in the argument \code{gsmvar},
+  lower triangular Cholesky identification is used to identify the shocks.
 
   The GFEVD is a forecast error variance decomposition calculated with the generalized impulse response function (GIRF).
   Lanne and Nyberg (2016) for details. Note, however, that the related GIRFs are calculated using the algorithm given in

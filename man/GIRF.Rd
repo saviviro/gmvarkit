@@ -5,8 +5,8 @@
 \alias{GIRF}
 \alias{plot.girf}
 \alias{print.girf}
-\title{Estimate generalized impulse response function for reduced form and
- structural GMVAR, StMVAR, or G-StMVAR models.}
+\title{Estimate generalized impulse response function for
+ structural (and reduced form) GMVAR, StMVAR, and G-StMVAR models.}
 \usage{
 GIRF(
   gsmvar,
@@ -144,7 +144,7 @@ Returns a class \code{'girf'} list with the GIRFs in the first
 }
 \description{
 \code{GIRF} estimates generalized impulse response function for
- reduced form and structural GMVAR, StMVAR, or G-StMVAR models.
+ structural (and reduced form) GMVAR, StMVAR, and G-StMVAR models.
 }
 \details{
 The model DOES NOT need to be structural in order for this function to be

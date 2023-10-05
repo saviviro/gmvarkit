@@ -135,6 +135,19 @@ gfevd6 <- GFEVD(mod22s_2, N=2, R1=2, initval_type="fixed",
                 init_values=matrix(c(1, 1, 2, 2), nrow=2),
                 include_mixweights=TRUE, seeds=1)
 
+mod11t_2 <- add_data(mod11t$data[1:50,], mod11t)
+mod12_2 <- add_data(mod12$data[1:50,], mod12)
+mod12t_2 <- add_data(mod12t$data[1:50,], mod12t)
+mod12gs_2 <- add_data(mod12gs$data[1:50,], mod12gs)
+
+gfevd7 <- GFEVD(mod11t_2, N=3, R1=1, initval_type="data", seeds=1:50)
+gfevd8 <- GFEVD(mod12_2, N=2, R1=5, R2=8, initval_type="random", init_regimes=1:2, seeds=1:8)
+gfevd9 <- GFEVD(mod12t_2, N=4, R1=6, initval_type="fixed",
+                init_values=matrix(c(1, 1, 2, 2), nrow=2),
+                include_mixweights=TRUE, seeds=1)
+gfevd10 <- GFEVD(mod12gs_2, N=2, R1=2, initval_type="data", seeds=1:50)
+
+
 test_that("GFEVD works correctly", {
   expect_equal(unname(gfevd1$gfevd_res[3, , 1]), c(0.01382024, 0.98617976), tolerance=1e-3)
   expect_equal(unname(gfevd1$gfevd_res[1, , 2]), c(0.98893981, 0.01106019), tolerance=1e-3)
@@ -152,4 +165,15 @@ test_that("GFEVD works correctly", {
   expect_equal(c(unname(gfevd6$gfevd_res[1, , 1:2])), c(0.092954461, 0.907045539, 0.998705168, 0.001294832), tolerance=1e-3)
   expect_equal(c(unname(gfevd6$gfevd_res[3, , ])), c(0.0894120535, 0.9105879465, 0.9990029740, 0.0009970260, 0.0007465000,
                                                      0.9992535000, 0.0007464997, 0.9992535003), tolerance=1e-3)
+
+  expect_equal(unname(gfevd7$gfevd_res[3, , 1]), c(0.996256034, 0.003743966), tolerance=1e-3)
+  expect_equal(unname(gfevd7$gfevd_res[1, , 2]), c(0.004839729, 0.995160271), tolerance=1e-3)
+  expect_equal(unname(gfevd8$gfevd_res[3, , 1]), c(0.996935931, 0.003064069), tolerance=1e-3)
+  expect_equal(unname(gfevd8$gfevd_res[2, , 2]), c(0.0005259957, 0.9994740043), tolerance=1e-3)
+  expect_equal(unname(gfevd9$gfevd_res[2, , 1]), c(9.999490e-01, 5.104191e-05), tolerance=1e-3)
+  expect_equal(unname(gfevd9$gfevd_res[1, , 2]), c(0.0007162443, 0.9992837557), tolerance=1e-3)
+  expect_equal(unname(gfevd9$gfevd_res[5, , 3]), c(0.5799644, 0.4200356), tolerance=1e-3)
+  expect_equal(unname(gfevd9$gfevd_res[4, , 4]), c(0.7555897, 0.2444103), tolerance=1e-3)
+  expect_equal(c(unname(gfevd10$gfevd_res[3, , ])), c(0.990785908, 0.009214092, 0.001832945, 0.998167055), tolerance=1e-3)
+  expect_equal(c(unname(gfevd10$gfevd_res[2, , ])), c(0.991911836, 0.008088164, 0.002087102, 0.997912898), tolerance=1e-3)
 })
