@@ -208,5 +208,7 @@
 
 # gmvarkit 2.1.0
 
+* Added support for recursively identified structural GSMVAR models.
 * Fixed the .Rd files for random_df and smart_df.
 * Fixed a bug in the estimation of GIRF and GFEVD for StMVAR and G-StMVAR models 
+
