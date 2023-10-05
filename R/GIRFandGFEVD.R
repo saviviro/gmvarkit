@@ -94,7 +94,22 @@
 #'  # These are long-running examples that use parallel computing.
 #'  # It takes approximately 30 seconds to run all the below examples.
 #'
-#'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#'  ## StMVAR(1, 2), d=2 model identified recursively by lower-triangular
+#'  ## Cholesky decomposition (i.e., reduced form model is specified):
+#'  params12t <- c(0.55, 0.11, 0.34, 0.05, -0.01, 0.72, 0.58, 0.01, 0.06, 0.17,
+#'    0.25, 0.34, 0.05, -0.01, 0.72, 0.50, -0.01, 0.20, 0.60, 3.00, 12.00)
+#'  mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
+#'
+#'. # Estimating the GIRFs of both structural shocks with initial values
+#'  # drawn from the stationary distribution of the process,
+#'  # 12 periods ahead, confidence levels 0.95 and 0.8:
+#'  girf0 <- GIRF(mod12t, N=12, R1=100, R2=100)
+#'  girf0
+#'  plot(girf0)
+#'  ## NOTE: Small R1 and R2 is used here to shorten the estimation time.
+#'  ## Larger R1 and R2 should be considered in empirical applications!
+#'
+#'  ## Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 #'  params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
 #'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
@@ -358,7 +373,21 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #'  # These are long-running examples that use parallel computing.
 #'  # It takes approximately 30 seconds to run all the below examples.
 #'
-#'  # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#'  ## StMVAR(1, 2), d=2 model identified recursively by lower-triangular
+#'  ## Cholesky decomposition (i.e., reduced form model is specified):
+#'  params12t <- c(0.55, 0.11, 0.34, 0.05, -0.01, 0.72, 0.58, 0.01, 0.06, 0.17,
+#'    0.25, 0.34, 0.05, -0.01, 0.72, 0.50, -0.01, 0.20, 0.60, 3.00, 12.00)
+#'  mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
+#'
+#'  # Estimating the GFEVD using all possible histories in the data as the
+#'  # initial values:
+#'  gfevd0 <- GFEVD(mod12t, N=24, R1=10, initval_type="data")
+#'  gfevd0
+#'  plot(gfevd0)
+#'  ## NOTE: Use larger R1 is empirical applications! Small R1 is used
+#'  ## here only to fasten the execution time of the examples.
+#'
+#'  ## Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 #'  params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
 #'   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
 #'   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
@@ -371,18 +400,15 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 #'  #                   ncalls=20, seeds=1:20)
 #'  # To obtain an estimated version of the same model.
 #'
-#'  ## NOTE: Use larger R1 is empirical applications! Small R1 is used
-#'  ## Below only to fasten the execution time of the examples.
-#'
 #'  # Estimating the GFEVD using all possible histories in the data as the
 #'  # initial values:
-#'  gfevd1 <- GFEVD(mod22s, N=24, R1=20, initval_type="data")
+#'  gfevd1 <- GFEVD(mod22s, N=24, R1=10, initval_type="data")
 #'  gfevd1
 #'  plot(gfevd1)
 #'
 #'  # Estimate GFEVD with the initial values generated from the stationary
 #'  # distribution of the process:
-#'  gfevd2 <- GFEVD(mod22s, N=24, R1=20, R2=100, initval_type="random")
+#'  gfevd2 <- GFEVD(mod22s, N=24, R1=10, R2=100, initval_type="random")
 #'  gfevd2
 #'  plot(gfevd2)
 #'

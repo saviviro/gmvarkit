@@ -174,7 +174,22 @@ The model DOES NOT need to be structural in order for this function to be
  # These are long-running examples that use parallel computing.
  # It takes approximately 30 seconds to run all the below examples.
 
- # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+ ## StMVAR(1, 2), d=2 model identified recursively by lower-triangular
+ ## Cholesky decomposition (i.e., reduced form model is specified):
+ params12t <- c(0.55, 0.11, 0.34, 0.05, -0.01, 0.72, 0.58, 0.01, 0.06, 0.17,
+   0.25, 0.34, 0.05, -0.01, 0.72, 0.50, -0.01, 0.20, 0.60, 3.00, 12.00)
+ mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
+
+. # Estimating the GIRFs of both structural shocks with initial values
+ # drawn from the stationary distribution of the process,
+ # 12 periods ahead, confidence levels 0.95 and 0.8:
+ girf0 <- GIRF(mod12t, N=12, R1=100, R2=100)
+ girf0
+ plot(girf0)
+ ## NOTE: Small R1 and R2 is used here to shorten the estimation time.
+ ## Larger R1 and R2 should be considered in empirical applications!
+
+ ## Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
  params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
   0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
    0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
