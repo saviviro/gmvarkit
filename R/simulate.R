@@ -179,9 +179,6 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
     R1 <- girf_pars$R1
     reduced_form_girf <- is.null(gsmvar$model$structural_pars) # reduced form model GIRF -> Cholesky identification
     all_Omegas_as_matrix <- t(matrix(all_Omega, nrow=d^2, ncol=M)) # Used for reduced form model GIRF
-    calculate_B_matrix <- function(alphas_t) { # alphas_t = vector with alpha_mt for time period t
-      t(chol(matrix(colSums(alphas_t*all_Omegas_as_matrix), ncol=d, nrow=d)))
-    } # Returns lower-triangular Cholesky decomposition of the conditional covariance matrix
   } else {
     reduced_form_girf <- FALSE # No GIRF to be estimated
   }
@@ -319,28 +316,43 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
 
         if(i1 == 1) { # At impact, obtain reduced form shock from the specific structural shock
 
-          # Calculate the time-varying B-matrix
-          if(M == 1) {
-            B_t <- W
-          } else {
-            tmp <- array(dim=c(d, d, M))
-            if(model == "StMVAR") { # The first regime is StMVAR type
-              multiplier <- arch_scalars[1]*alpha_mt2[1]
+          # Calculate the time-varying B-matrix B_t
+          if(reduced_form_girf) {
+            # Reduced form model: identification by lower triangular Cholesky decomposition
+            if(M == 1) {
+              B_t <- t(chol(all_Omega[, , 1]))
             } else {
-              multiplier <-  alpha_mt2[1]
-            }
-            tmp[, , 1] <- multiplier*diag(d)
 
-            for(m in 2:M) {
-              if(m <= M1) { # GMVAR type regime
-                multiplier <- alpha_mt2[m]
-              } else { # StMVAR type regime
-                multiplier <- arch_scalars[m - M1]*alpha_mt2[m]
-              }
-              tmp[, , m] <- multiplier*diag(lambdas[, m - 1])
             }
-            B_t <- W%*%sqrt(apply(tmp, MARGIN=1:2, FUN=sum))
+
+            #calculate_B_matrix <- function(alphas_t) { # alphas_t = vector with alpha_mt for time period t
+            #  t(chol(matrix(colSums(alphas_t*all_Omegas_as_matrix), ncol=d, nrow=d)))
+            #} # Returns lower-triangular Cholesky decomposition of the conditional covariance matrix
+          } else {
+            # Structural model: identification by heteroskedasticity
+            if(M == 1) {
+              B_t <- W
+            } else {
+              tmp <- array(dim=c(d, d, M))
+              if(model == "StMVAR") { # The first regime is StMVAR type
+                multiplier <- arch_scalars[1]*alpha_mt2[1]
+              } else {
+                multiplier <-  alpha_mt2[1]
+              }
+              tmp[, , 1] <- multiplier*diag(d)
+              for(m in 2:M) {
+                if(m <= M1) { # GMVAR type regime
+                  multiplier <- alpha_mt2[m]
+                } else { # StMVAR type regime
+                  multiplier <- arch_scalars[m - M1]*alpha_mt2[m]
+                }
+                tmp[, , m] <- multiplier*diag(lambdas[, m - 1])
+              }
+              B_t <- W%*%sqrt(apply(tmp, MARGIN=1:2, FUN=sum))
+            }
           }
+
+          # Calculate the structural shock e_t and impose the specific structural shock
           e_t <- solve(B_t, u_t) # Structural shock
           e_t[girf_pars$shock_numb] <- girf_pars$shock_size # Impose the size of a shock
           u_t <- B_t%*%e_t # The reduced form shock corresponding to the specific sized structural shock in the j:th element
