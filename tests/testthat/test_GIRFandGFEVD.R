@@ -5,6 +5,34 @@ library(gmvarkit)
 
 ## A(M)(p)_(p)(M)(d)
 
+# Reduced form linear p=1, M=1, d=2
+phi10_112 <- c(0.65, 0.7)
+A11_112 <- matrix(c(0.29, 0.02, -0.14, 0.9), nrow=2, byrow=FALSE)
+Omega1_112 <- matrix(c(0.60, 0.01, 0.01, 0.07), nrow=2, byrow=FALSE)
+
+theta_112t <- c(phi10_112, vec(A11_112), vech(Omega1_112), 3)
+mod11t <- GSMVAR(gdpdef, p=1, M=1, params=theta_112t, model="StMVAR")
+
+
+# Reduced form p=1, M=2, d=2 model identified by Cholesky
+phi10_122 <- c(0.55, 0.11)
+A11_122 <- matrix(c(0.34, 0.05, -0.01, 0.72), nrow=2, byrow=FALSE)
+Omega1_122 <- matrix(c(0.58, 0.01, 0.01, 0.06), nrow=2, byrow=FALSE)
+
+phi20_122 <- c(0.17, 0.25)
+A21_122 <- A11_122
+Omega2_122 <- matrix(c(0.50, -0.01, -0.01, 0.20), nrow=2, byrow=FALSE)
+
+alpha1_122 <- 0.60
+upsilon1_122 <- c(phi10_122, vec(A11_122), vech(Omega1_122))
+upsilon2_122 <- c(phi20_122, vec(A21_122), vech(Omega2_122))
+theta_122 <- c(upsilon1_122, upsilon2_122, alpha1_122)
+
+mod12 <- GSMVAR(gdpdef, p=1, M=2, params=theta_122)
+mod12t <- GSMVAR(gdpdef, p=1, M=2, params=c(theta_122, 3, 12), model="StMVAR")
+mod12gs <- GSMVAR(gdpdef, p=1, M=c(1, 1), params=c(theta_122, 3), model="G-StMVAR")
+
+
 # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
 params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395, 0.406,
                -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
@@ -26,6 +54,12 @@ girf6 <- GIRF(mod22ts, which_shocks=1, shock_size=1, N=1, R2=1, R1=1, seeds=1, w
 girf7 <- GIRF(mod22gss, N=10, R2=6, R1=2, scale=c(2, 2, -1), seeds=1:6, plot_res=FALSE)
 girf8 <- GIRF(mod22gss, N=10, R2=5, R1=2, scale=c(1, 2, 0.3), scale_type="peak", seeds=1:5, plot_res=FALSE)
 
+# Reduced form mod
+girf9 <- GIRF(mod12, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
+girf10 <- GIRF(mod12t, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
+              include_mixweights=FALSE, init_values=mod12$data, ci=0.2, plot_res=FALSE)
+girf11 <- GIRF(mod12gs, N=2, R2=3, R1=4, which_cumulative=1:2, seeds=11:13, plot_res=FALSE)
+girf12 <- GIRF(mod11t, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=5, plot_res=FALSE)
 
 
 test_that("GIRF works correctly", {
@@ -64,6 +98,22 @@ test_that("GIRF works correctly", {
   expect_equal(unname(girf8$girf_res[[2]]$point_est[11,]), c(0.03162255, -0.09872999, 0.09132550, -0.09132550), tolerance=1e-4)
   expect_equal(unname(girf8$girf_res[[1]]$conf_ints[10, 2, ]), c(-0.3827951, -0.2052065, -0.4112630, -0.1960736), tolerance=1e-4)
   expect_equal(unname(girf8$girf_res[[2]]$conf_ints[10, 4, ]), c(0.276011894, -0.016043945, 0.162048134, -0.007608629), tolerance=1e-4)
+
+  expect_equal(unname(girf9$girf_res[[1]]$point_est[2,]), c(0.47129726, 0.03285889, 0.17361305, -0.17361305), tolerance=1e-4)
+  expect_equal(unname(girf9$girf_res[[2]]$point_est[3,]), c(-0.01661809, 0.13433957, -0.20154580, 0.20154580), tolerance=1e-4)
+  expect_equal(unname(girf9$girf_res[[1]]$conf_ints[1, 1, ]), c(0.6019734824, 0.0008577321, 0.0000000000, 0.0000000000), tolerance=1e-4)
+  expect_equal(unname(girf9$girf_res[[2]]$conf_ints[3, 4, ]), c(0.0239029, 0.2047201, -0.1177271, 0.2853645), tolerance=1e-4)
+
+  expect_equal(unname(girf10$girf_res[[1]]$point_est[1,]), c(0.00000000, 0.09606795), tolerance=1e-4)
+  expect_equal(unname(girf10$girf_res[[1]]$conf_ints[2, 2, ]), c(-0.01311336, 0.07134762), tolerance=1e-4)
+
+  expect_equal(unname(girf11$girf_res[[1]]$point_est[1,]), c(1.09778453, -0.02195569, 0.00000000, 0.00000000), tolerance=1e-4)
+  expect_equal(unname(girf11$girf_res[[2]]$point_est[2,]), c(0.08784187, 0.50221556, -0.01577926, 0.01577926), tolerance=1e-4)
+  expect_equal(unname(girf11$girf_res[[1]]$conf_ints[2, 3, ]), c(3.502104325, 0.006528326, 0.345689728, 0.001160202), tolerance=1e-4)
+  expect_equal(unname(girf11$girf_res[[2]]$conf_ints[3, 2, ]), c(-0.3986564, 0.1166099, -0.1710915, -0.1577015), tolerance=1e-4)
+
+  expect_equal(unname(girf12$girf_res[[1]]$point_est[3,]), c(0.01806770, 0.03962662), tolerance=1e-4)
+  expect_equal(unname(girf12$girf_res[[1]]$conf_ints[2, 2, ]), c(0.24309474, 0.04184041), tolerance=1e-4)
 })
 
 

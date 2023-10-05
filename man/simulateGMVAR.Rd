@@ -31,8 +31,8 @@ mixture distribution specifed by the argument \code{init_regimes}.}
 
 \item{seed}{set seed for the random number generator?}
 
-\item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}). You
-should ignore it.}
+\item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}).
+You should ignore it (specifying something else than null to it will change how the function behaves).}
 }
 \value{
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
@@ -41,10 +41,10 @@ If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$comp
     \item{\code{$sample}}{a size (\code{nsim}\eqn{ x d x }\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
      the time index, the dimension \code{[, d, ]} indicates the marginal time series, and the dimension \code{[, , i]} indicates
      the i:th set of simulations.}
-    \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component each
-     value was generated from.}
-    \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to the
-     sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
+    \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component
+     each value was generated from.}
+    \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to
+     the sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
      \code{[, , i]} indicates the i:th set of simulations.}
   }
 }
@@ -53,9 +53,9 @@ DEPRECATED! USE THE FUNCTION simulate.gsmvar INSTEAD!
   \code{simulateGMVAR} simulates observations from a GMVAR
 }
 \details{
-The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating its possible future values.
- One can easily perform a large number simulations and calculate the sample quantiles from the simulated values to obtain prediction
- intervals (see the forecasting example).
+The argument \code{ntimes} is intended for forecasting: a GMVAR, StMVAR, or G-StMVAR process can be forecasted by simulating
+ its possible future values. One can easily perform a large number simulations and calculate the sample quantiles from the simulated
+ values to obtain prediction intervals (see the forecasting example).
 }
 \references{
 \itemize{

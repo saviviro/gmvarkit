@@ -1,8 +1,8 @@
-#' @title Estimate generalized impulse response function for a structural GMVAR,
-#'   StMVAR, or G-StMVAR model.
+#' @title Estimate generalized impulse response function for reduced form and
+#'  structural GMVAR, StMVAR, or G-StMVAR models.
 #'
 #' @description \code{GIRF} estimates generalized impulse response function for
-#'   a structural GMVAR, StMVAR, or G-StMVAR model.
+#'  reduced form and structural GMVAR, StMVAR, or G-StMVAR models.
 #'
 #' @inheritParams quantile_residual_tests
 #' @inheritParams simulate.gsmvar
@@ -57,9 +57,11 @@
 #'   creating reproducible results.
 #' @param ... parameters passed to the plot method \code{plot.girf} that plots
 #'   the results.
-#' @details The model needs to be structural in order for this function to be
-#'   applicable. A structural GMVAR, StMVAR, or G-StMVAR model can be estimated
-#'   by specifying the argument \code{structural_pars} in the function \code{fitGSMVAR}.
+#' @details The model DOES NOT need to be structural in order for this function to be
+#'   applicable. When an identified structural GMVAR, StMVAR, or G-StMVAR model is
+#'   provided in the argument \code{gsmvar}, the identification imposed by the model
+#'   is used. When a reduced form model is provided in the argument \code{gsmvar},
+#'   lower triangular Cholesky identification is used to identify the shocks.
 #'
 #'   The confidence bounds reflect uncertainty about the initial state (but
 #'   currently not about the parameter estimates) if initial values are not

@@ -322,12 +322,15 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
             if(M == 1) {
               B_t <- t(chol(all_Omega[, , 1]))
             } else {
-
+              if(M1 < M) { # Contains t-regimes
+                tmp_ascalars <- c(rep(0, times=M1), arch_scalars2)
+                multipliers <- alpha_mt2*tmp_ascalars
+              } else { # Only Gaussian regimes
+                multipliers <- alpha_mt2
+              }
+              # Lower triangular Cholesky decomposition of the reduced form error conditional cov mat
+              B_t <- t(chol(matrix(colSums(as.vector(multipliers)*all_Omegas_as_matrix), ncol=d, nrow=d)))
             }
-
-            #calculate_B_matrix <- function(alphas_t) { # alphas_t = vector with alpha_mt for time period t
-            #  t(chol(matrix(colSums(alphas_t*all_Omegas_as_matrix), ncol=d, nrow=d)))
-            #} # Returns lower-triangular Cholesky decomposition of the conditional covariance matrix
           } else {
             # Structural model: identification by heteroskedasticity
             if(M == 1) {
