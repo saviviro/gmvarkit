@@ -100,7 +100,7 @@
 #'    0.25, 0.34, 0.05, -0.01, 0.72, 0.50, -0.01, 0.20, 0.60, 3.00, 12.00)
 #'  mod12t <- GSMVAR(gdpdef, p=1, M=2, params=params12t, model="StMVAR")
 #'
-#'. # Estimating the GIRFs of both structural shocks with initial values
+#'  # Estimating the GIRFs of both structural shocks with initial values
 #'  # drawn from the stationary distribution of the process,
 #'  # 12 periods ahead, confidence levels 0.95 and 0.8:
 #'  girf0 <- GIRF(mod12t, N=12, R1=100, R2=100)
