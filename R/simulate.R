@@ -310,7 +310,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
           u_t <- all_Bm[, , m2]%*%eps_t
         } else {# StMVAR type regime
           df_to_use <- all_df[m2 - M1] + d*p
-          Z <- sqrt(arch_scalars[m2 - M1]*(df_to_use - 2)/df_to_use)*all_Bm[, , m2]%*%eps_t # Sample from N(0, arch_scalar*(v - 2)/v*Omega_m))
+          Z <- sqrt(arch_scalars2[m2 - M1]*(df_to_use - 2)/df_to_use)*all_Bm[, , m2]%*%eps_t # Sample from N(0, arch_scalar*(v - 2)/v*Omega_m))
           u_t <- Z*sqrt(df_to_use/all_chisq_rv[m2 - M1]) # Sample from t_d(0, arch_scalar*Omega_m, all_df[m - M1] + d*p)
         }
 
@@ -335,7 +335,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
             } else {
               tmp <- array(dim=c(d, d, M))
               if(model == "StMVAR") { # The first regime is StMVAR type
-                multiplier <- arch_scalars[1]*alpha_mt2[1]
+                multiplier <- arch_scalars2[1]*alpha_mt2[1]
               } else {
                 multiplier <-  alpha_mt2[1]
               }
@@ -344,7 +344,7 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
                 if(m <= M1) { # GMVAR type regime
                   multiplier <- alpha_mt2[m]
                 } else { # StMVAR type regime
-                  multiplier <- arch_scalars[m - M1]*alpha_mt2[m]
+                  multiplier <- arch_scalars2[m - M1]*alpha_mt2[m]
                 }
                 tmp[, , m] <- multiplier*diag(lambdas[, m - 1])
               }
