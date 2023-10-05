@@ -14,6 +14,8 @@
 #'   components of the structural shock.
 #' @param N a positive integer specifying the horizon how far ahead should the
 #'   linear impulse responses be calculated.
+#' @param regime Based on which regime the linear IRF should be calculated?
+#'   An integer in \eqn{1,...,M}.
 #' @param which_cumulative a numeric vector with values in \eqn{1,...,d}
 #'   (\code{d=ncol(data)}) specifying which the variables for which the linear impulse
 #'   responses should be cumulative. Default is none.
@@ -51,9 +53,13 @@
 #' @return Returns a class \code{'irf'} list with the linear IRFs in ... FILL IN!
 #' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
 #'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}
-#' @references FILL IN
+#' @references
+#'  \itemize{
+#'    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
+#'          \emph{Cambridge University Press}, Cambridge.
+#'  }
 #' @examples
-#'  FILL IN
+#'  # FILL IN
 #' @export
 
 linear_IRF <- function(gsmvar, which_shocks, shock_size=1, N=30, regime=1, which_cumulative=numeric(0),

@@ -36,6 +36,9 @@ components of the structural shock.}
 \item{N}{a positive integer specifying the horizon how far ahead should the
 linear impulse responses be calculated.}
 
+\item{regime}{Based on which regime the linear IRF should be calculated?
+An integer in \eqn{1,...,M}.}
+
 \item{which_cumulative}{a numeric vector with values in \eqn{1,...,d}
 (\code{d=ncol(data)}) specifying which the variables for which the linear impulse
 responses should be cumulative. Default is none.}
@@ -88,10 +91,13 @@ The model DOES NOT need to be structural in order for this function to be
   FILL IN DETAILS ABOUT CONFIDENCE INTERVALS
 }
 \examples{
- FILL IN
+ # FILL IN
 }
 \references{
-FILL IN
+\itemize{
+   \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
+         \emph{Cambridge University Press}, Cambridge.
+ }
 }
 \seealso{
 \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
