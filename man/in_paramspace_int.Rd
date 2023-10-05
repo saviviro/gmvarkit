@@ -68,7 +68,8 @@ in_paramspace_int(
       }
     }
     \item{\strong{For structural models:}}{
-      Should have the form
+      Reduced form models can be directly used as recursively identified structural models. If the structural model is
+      identified by conditional heteroskedasticity, the parameter vector should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
       \itemize{

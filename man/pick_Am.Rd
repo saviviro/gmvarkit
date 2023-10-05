@@ -55,7 +55,8 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
       }
     }
     \item{\strong{For structural models:}}{
-      Should have the form
+      Reduced form models can be directly used as recursively identified structural models. If the structural model is
+      identified by conditional heteroskedasticity, the parameter vector should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
       \itemize{
@@ -92,7 +93,8 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
 
 \item{m}{which component?}
 
-\item{structural_pars}{If \code{NULL} a reduced form model is considered. For structural model, should be a list containing
+\item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
+identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
 the following elements:
 \itemize{
   \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
