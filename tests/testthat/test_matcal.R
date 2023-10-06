@@ -216,3 +216,51 @@ test_that("mat_power works correctly", {
   expect_equal(mat_power(W4, 20), mat_power_test(W4, 20), tol=1e-10)
 
 })
+
+test_that("create_J_matrix works", {
+
+  # Test with d = 2, p = 3
+  J <- create_J_matrix(2, 3)
+
+  # Check dimensions
+  expect_equal(dim(J), c(2, 6))
+
+  # Check the first d x d block is identity matrix
+  expect_equal(J[ , 1:2], diag(2))
+
+  # Check remaining blocks are zeros
+  expect_equal(J[ , 3:6], matrix(0, nrow = 2, ncol = 4))
+
+  # Test with d = 3, p = 1 (edge case where p = 1)
+  J <- create_J_matrix(3, 1)
+
+  # Check dimensions
+  expect_equal(dim(J), c(3, 3))
+
+  # Check it's an identity matrix
+  expect_equal(J, diag(3))
+
+  # Test with d = 100, p = 50 (large case)
+  J <- create_J_matrix(100, 50)
+
+  # Check dimensions
+  expect_equal(dim(J), c(100, 5000))
+
+  # Check the first d x d block is identity matrix
+  expect_equal(J[ , 1:100], diag(100))
+
+  # Check remaining blocks are zeros
+  expect_equal(J[ , 101:5000], matrix(0, nrow = 100, ncol = 4900))
+
+  # Test with d = 5, p = 9 (moderate size case)
+  J <- create_J_matrix(5, 9)
+
+  # Check dimensions
+  expect_equal(dim(J), c(5, 45))
+
+  # Check the first K x K block is identity matrix
+  expect_equal(J[ , 1:5], diag(5))
+
+  # Check remaining blocks are zeros
+  expect_equal(J[ , 6:45], matrix(0, nrow = 5, ncol = 40))
+})

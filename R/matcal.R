@@ -234,7 +234,7 @@ redecompose_Omegas <- function(M, d, W, lambdas, perm=1:sum(M)) {
 
 #' @title Compute the j:th power of a square matrix A
 #'
-#' @description \code{ma_power} computes the j:th power of a square matrix A using
+#' @description \code{mat_power} computes the j:th power of a square matrix A using
 #' exponentiation by squaring.
 #'
 #' @param A A square numeric matrix.
@@ -257,4 +257,23 @@ mat_power <- function(A, j) {
     j <- j%/%2
   }
   res
+}
+
+
+#' @title Create a special matrix J
+#'
+#' @description \code{create_J_matrix} generates a d x dp matrix J, where the first d x d block is the identity matrix I_d,
+#' and the rest is filled with zeros.
+#'
+#' @param d An integer representing the dimension of the identity matrix.
+#' @param p An integer representing the factor by which to extend the matrix with zeros.
+#'
+#' @return A \eqn{d x dp} matrix \eqn{J} where the first \eqn{d x d} block is the identity matrix \eqn{I_d},
+#'   and the rest is filled with zeros.
+#' @keywords internal
+
+create_J_matrix <- function(d, p) {
+  J <- matrix(0, nrow=d, ncol=d*p) # Initialize a matrix with zeros
+  diag(J[ , 1:d]) <- 1 # Fill the first d x d block with the identity matrix
+  J
 }

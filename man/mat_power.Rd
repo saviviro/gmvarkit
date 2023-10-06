@@ -15,7 +15,7 @@ mat_power(A, j)
 A matrix which is A raised to the power j.
 }
 \description{
-\code{ma_power} computes the j:th power of a square matrix A using
+\code{mat_power} computes the j:th power of a square matrix A using
 exponentiation by squaring.
 }
 \keyword{internal}
