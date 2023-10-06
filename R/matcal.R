@@ -1,4 +1,3 @@
-
 #' @title Vectorization operator
 #'
 #' @description \code{vec} stacks columns of the given matrix to form a vector.
@@ -231,3 +230,31 @@ redecompose_Omegas <- function(M, d, W, lambdas, perm=1:sum(M)) {
   c(vec(new_W), vec(new_lambdas))
 }
 
+
+
+#' @title Compute the j:th power of a square matrix A
+#'
+#' @description \code{ma_power} computes the j:th power of a square matrix A using
+#' exponentiation by squaring.
+#'
+#' @param A A square numeric matrix.
+#' @param j A natural number representing the power to which the matrix will be raised.
+#'
+#' @return A matrix which is A raised to the power j.
+#' @keywords internal
+
+mat_power <- function(A, j) {
+  if(j == 0) {
+    return(diag(nrow(A)))
+  }
+  res <- diag(nrow(A))
+  tmp <- A
+  while(j > 0) {
+    if(j%%2 == 1) {
+      res <- res%*%tmp
+    }
+    tmp <- tmp%*%tmp
+    j <- j%/%2
+  }
+  res
+}

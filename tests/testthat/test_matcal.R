@@ -161,3 +161,58 @@ test_that("redecompose_Omegas works correctly", {
   expect_equal(get_Omega(M=3, d=3, W_and_lambdas=decomp33_4, which=3), Omega33_3, tolerance=1e-6)
 })
 
+
+mat_power_test <- function(A, j) {
+  if(j == 0) return(diag(nrow(A)))
+  Reduce('%*%', replicate(j, A, simplify=FALSE))
+}
+
+B4 <- cbind(rbind(B3, Omega1_3), rbind(Omega23_1, Omega1_3))
+
+test_that("mat_power works correctly", {
+  expect_equal(mat_power(A1, 0), A1, tol=1e-10)
+  expect_equal(mat_power(A1, 1), A1, tol=1e-10)
+  expect_equal(mat_power(A1, 2), A1%*%A1, tol=1e-10)
+
+  expect_equal(mat_power(A2, 0), diag(nrow(A2)), tol=1e-10)
+  expect_equal(mat_power(A2, 1), A2, tol=1e-10)
+  expect_equal(mat_power(A2, 2), A2%*%A2, tol=1e-10)
+  expect_equal(mat_power(A2, 3), A2%*%A2%*%A2, tol=1e-10)
+  expect_equal(mat_power(A2, 13), mat_power_test(A2, 13), tol=1e-10)
+  expect_equal(mat_power(A2, 51), mat_power_test(A2, 51), tol=1e-10)
+
+  expect_equal(mat_power(A3, 0), diag(nrow(A3)), tol=1e-10)
+  expect_equal(mat_power(A3, 1), A3, tol=1e-10)
+  expect_equal(mat_power(A3, 2), A3%*%A3, tol=1e-10)
+  expect_equal(mat_power(A3, 3), A3%*%A3%*%A3, tol=1e-10)
+  expect_equal(mat_power(A3, 8), mat_power_test(A3, 8), tol=1e-10)
+  expect_equal(mat_power(A3, 27), mat_power_test(A3, 27), tol=1e-10)
+
+  expect_equal(mat_power(B3, 3), B3%*%B3%*%B3, tol=1e-10)
+  expect_equal(mat_power(B3, 4), mat_power_test(B3, 4), tol=1e-10)
+  expect_equal(mat_power(B3, 43), mat_power_test(B3, 43), tol=1e-10)
+
+  expect_equal(mat_power(B4, 0), diag(nrow(B4)), tol=1e-10)
+  expect_equal(mat_power(B4, 1), B4, tol=1e-10)
+  expect_equal(mat_power(B4, 2), B4%*%B4, tol=1e-10)
+  expect_equal(mat_power(B4, 3), B4%*%B4%*%B4, tol=1e-10)
+  expect_equal(mat_power(B4, 4), B4%*%B4%*%B4%*%B4, tol=1e-10)
+  expect_equal(mat_power(B4, 10), mat_power_test(B4, 10), tol=1e-10)
+  expect_equal(mat_power(B4, 21), mat_power_test(B4, 21), tol=1e-10)
+
+  expect_equal(mat_power(W3, 0), diag(nrow(W3)), tol=1e-10)
+  expect_equal(mat_power(W3, 1), W3, tol=1e-10)
+  expect_equal(mat_power(W3, 2), W3%*%W3, tol=1e-10)
+  expect_equal(mat_power(W3, 3), W3%*%W3%*%W3, tol=1e-10)
+  expect_equal(mat_power(W3, 5), mat_power_test(W3, 5), tol=1e-10)
+  expect_equal(mat_power(W3, 24), mat_power_test(W3, 24), tol=1e-10)
+
+  expect_equal(mat_power(W4, 0), diag(nrow(W4)), tol=1e-10)
+  expect_equal(mat_power(W4, 1), W4, tol=1e-10)
+  expect_equal(mat_power(W4, 2), W4%*%W4, tol=1e-10)
+  expect_equal(mat_power(W4, 3), W4%*%W4%*%W4, tol=1e-10)
+  expect_equal(mat_power(W4, 4), W4%*%W4%*%W4%*%W4, tol=1e-10)
+  expect_equal(mat_power(W4, 11), mat_power_test(W4, 11), tol=1e-10)
+  expect_equal(mat_power(W4, 20), mat_power_test(W4, 20), tol=1e-10)
+
+})
