@@ -60,7 +60,7 @@
 
 linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=numeric(0),
                        scale=NULL, scale_type=c("instant", "peak"), scale_horizon=N,
-                       ci=c(0.95, 0.80),  seed, ...) {
+                       ci=c(0.95, 0.80), seed=NULL, ...) {
   # Get the parameter values etc
   stopifnot(all_pos_ints(c(N, regime)))
   p <- gsmvar$model$p
@@ -116,8 +116,8 @@ linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=nu
     } else {
       all_boldA_powers[, , i1] <- all_boldA_powers[, , i1 - 1]%*%boldA # boldA^{i1-1} because i1=1 is for the zero period
     }
-    all_phi_i[, , i1] <- J%*%all_boldA_powers[, , i1]%*%t(J)
-    all_Phi_i[, , i1] <- all_phi_i[, , i1]%*%impact_matrix
+    all_phi_i[, , i1] <- J_matrix%*%all_boldA_powers[, , i1]%*%t(J_matrix)
+    all_Phi_i[, , i1] <- all_phi_i[, , i1]%*%B_matrix
   }
   # all_Phi_i[variable, shock, horizon] -> all_Phi_i[variable, shock, ] subsets the IRF!
 
