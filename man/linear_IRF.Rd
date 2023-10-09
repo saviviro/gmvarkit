@@ -8,7 +8,6 @@
 linear_IRF(
   gsmvar,
   which_shocks,
-  shock_size = 1,
   N = 30,
   regime = 1,
   which_cumulative = numeric(0),
@@ -16,7 +15,6 @@ linear_IRF(
   scale_type = c("instant", "peak"),
   scale_horizon = N,
   ci = c(0.95, 0.8),
-  plot_res = TRUE,
   seed,
   ...
 )
@@ -29,9 +27,6 @@ the lower triangular Cholesky decomposition.}
 \item{which_shocks}{a numeric vector of length at most \eqn{d}
 (\code{=ncol(data)}) and elements in \eqn{1,...,d} specifying the
 structural shocks for which the IRF should be estimated.}
-
-\item{shock_size}{a non-zero scalar value specifying the common size for all scalar
-components of the structural shock.}
 
 \item{N}{a positive integer specifying the horizon how far ahead should the
 linear impulse responses be calculated.}
@@ -65,9 +60,6 @@ to which peak response is expected? Scaling won't based on values after this.}
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
 confidence levels of the confidence intervals calculated via a bootstrap
 method, see the details section.}
-
-\item{plot_res}{\code{TRUE} if the results should be plotted, \code{FALSE} if
-not.}
 
 \item{seed}{a length one numeric vector initializing the seed for the random generator.}
 
