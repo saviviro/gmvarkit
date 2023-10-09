@@ -14,8 +14,8 @@ linear_IRF(
   scale = NULL,
   scale_type = c("instant", "peak"),
   scale_horizon = N,
-  ci = c(0.95, 0.8),
-  seed,
+  ci = NULL,
+  seed = NULL,
   ...
 )
 }
@@ -59,7 +59,8 @@ to which peak response is expected? Scaling won't based on values after this.}
 
 \item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
 confidence levels of the confidence intervals calculated via a bootstrap
-method, see the details section.}
+method, see the details section. Available only for models that impose linear
+autoregressive dynamics (excluding changes in the volatility regime).}
 
 \item{seed}{a length one numeric vector initializing the seed for the random generator.}
 

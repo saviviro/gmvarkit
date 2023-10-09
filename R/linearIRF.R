@@ -35,7 +35,8 @@
 #'   to which peak response is expected? Scaling won't based on values after this.
 #' @param ci a numeric vector with elements in \eqn{(0, 1)} specifying the
 #'   confidence levels of the confidence intervals calculated via a bootstrap
-#'   method, see the details section.
+#'   method, see the details section. Available only for models that impose linear
+#'   autoregressive dynamics (excluding changes in the volatility regime).
 #' @param seed a length one numeric vector initializing the seed for the random generator.
 #' @param ... parameters passed to the plot method \code{plot.irf} that plots
 #'   the results.
@@ -60,7 +61,7 @@
 
 linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=numeric(0),
                        scale=NULL, scale_type=c("instant", "peak"), scale_horizon=N,
-                       ci=c(0.95, 0.80), seed=NULL, ...) {
+                       ci=NULL, seed=NULL, ...) {
   # Get the parameter values etc
   stopifnot(all_pos_ints(c(N, regime)))
   p <- gsmvar$model$p
@@ -127,6 +128,32 @@ linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=nu
   # Maybe also remove "which_shocks"? IRF calculated for all anyway - are there implications to the ci?
   # All the IRFs are calculate for UNIT SHOCKS i.e., one standard error struct shocks
   # -> responses can be scaled without loss of generality as the IRFs are symmetric w.r.t the size of the shock
+
+  # Tuleeko CI samaan funktioon? Sitä varten olisi varmaan syytä ensin tarkistaa, että onko AR-parametrit rajoitettu lineaarisiksi!
+
+  # HUOM wild bootstrapissa käytetään forecast erroreita eikä virhetermien empiirisiä vastineita.
+  # IDEA (omaan paperiinsa??): arvo eta_i:n sijasta s_{m,t} uudestaan ja sen perusteella virhe käyttäen sekoitussuhteita
+  # (ehkä tyhmä idea mutta tuli mieleen)
+
+  # HUOM! Entä sokkien järjestys ja merkki bootstrapatessa? Herwards and Lutkepohl (2014) käyttää samoja Lambda-parametreja kuin
+  # alkuperäisessä estimoinnissa! Eli pitää ehkä implentoida rajoite, jossa lambda-parametrit on rajoitettu tietyiksi luvuiksi?
+  # Senhän voi määritellä kokonaan erikseen C_lambda rajoitteesta, jolloin vanhoja yksikkötestejä jne ei tarvitse muuttaa.
+  # Samoin ne käyttää alkuperäisiä transition-probabiliteja! alpha-parametrit asettamalla tietyiksi luvuiksi päästään vähän
+  # saman tyyppiseen.
+  # Lutkepohl and Netsunajev (2014) käytti samaa kuin Herwards and Lutkepohl (2014). Meillähän tuo nyt eroaa niin, että koska
+  # transition probabilityt riippuu AR-matriiseista ja kov.matriiseista, niin ihan samoihin transition probiliteihin ei voida
+  # ehdollistaa by construction.
+  # Netsunajev (2013) ei ehdollista samoihin Lambdoihin, mutta taitaa näyttää yli-identifoivia rajoitteita siten ettei
+  # sokkien järjestys muutu.
+  # Simukokeessahan sokin vain uudelleenjärjesteltiin niin että ne oli mahdollisimman lähellä todellisia parametriarvoja
+  # HUOM! Merkkien kääntyminen pitää huomioida bootstrappauksessa jotenkin; joko rajoittamalla merkit alunperinkin tietynlaisiksi
+  # estimointia tehdessä tai kääntämällä merkit sitten että joku etäisyys alkuperäisistä estimaateista olisi mahdollisimman pieni tms?
+  # Netsunajev (2013) tekee jotain tämän tyyppistä; mieti miten implementoit yleiseen tapaukseen bootstrappauksessa! Kiinnostuksen kohteena
+  # olevan sokin merkki nyt ainakin pitää olla tietty, joten sehän käytännössä määrää sen miten päin ne merkit tulee. Esim rajoittamalla
+  # diagonaalit W:ssä positiivisiksi jos muuta merkkirajoitetta ei kyseisellä sarakkeella jo valmiiksi ole (ja jos on niin sitä saraketta
+  # ei muuteta merkin suhteen).
+
+  # Rekursiivisella identifoinnilla tietysti sokkien järjestys on aina oikein.
 
   # Return the results
   structure(list(all_irfs=all_Phi_i,
