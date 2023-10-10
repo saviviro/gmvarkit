@@ -11,8 +11,9 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
-   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+   in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
+   is \code{M=M1+M2}.}
 }}
 
 \item{d}{number of time series in the system, i.e. the dimension.}
@@ -58,7 +59,8 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
       Reduced form models can be directly used as recursively identified structural models. If the structural model is
       identified by conditional heteroskedasticity, the parameter vector should have the form
       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-      vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+      vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)},
+       where
       \itemize{
         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
       }
@@ -70,10 +72,12 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
           as above.}
         \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
          the sign constraints.}
-        \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
-         with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-        \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is a \eqn{(d(M-1) x r)}
-         constraint matrix.}
+        \item{\strong{If \eqn{\lambda_{mi}} are constrained via \code{C_lambda}:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}
+        \strong{\eqn{\lambda}}\eqn{_{M}} with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}
+        \eqn{,...,} \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is
+         a \eqn{(d(M-1) x r)} constraint matrix.}
+        \item{\strong{If \eqn{\lambda_{mi}} are constrained via \code{fixed_lambdas}:}}{Drop \strong{\eqn{\lambda}}\eqn{_{2},...,}
+        \strong{\eqn{\lambda}}\eqn{_{M}} from the parameter vector.}
       }
     }
   }
@@ -85,9 +89,10 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 
-  In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
-  In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
-  In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+  In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model,
+  \eqn{M1=0}. In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are
+  \emph{StMVAR type}. In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should
+  be strictly larger than two.
 
   The notation is similar to the cited literature.}
 
@@ -95,7 +100,7 @@ pick_Am(p, M, d, params, m, structural_pars = NULL)
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
-the following elements:
+at least the first one of the following elements:
 \itemize{
   \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
     unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
@@ -105,6 +110,10 @@ the following elements:
     parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
+  \item \code{fixed_lambdas} - a length \eqn{d(M-1)} numeric vector (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M})} with elements strictly larger than zero specifying the fixed parameter values for the
+    parameters \eqn{\lambda_{mi}} should be constrained to. This constraint is alternative \code{C_lambda}.
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
 }
 See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}

@@ -10,8 +10,9 @@
 #' @param p a positive integer specifying the autoregressive order of the model.
 #' @param M \describe{
 #'   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-#'   \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
-#'    first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+#'   \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+#'    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
+#'    is \code{M=M1+M2}.}
 #' }
 #' @param params a real valued vector specifying the parameter values.
 #'   \describe{
@@ -54,7 +55,8 @@
 #'       Reduced form models can be directly used as recursively identified structural models. If the structural model is
 #'       identified by conditional heteroskedasticity, the parameter vector should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)},
+#'        where
 #'       \itemize{
 #'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
 #'       }
@@ -66,10 +68,12 @@
 #'           as above.}
 #'         \item{\strong{If \eqn{W} is constrained:}}{Remove the zeros from \eqn{vec(W)} and make sure the other entries satisfy
 #'          the sign constraints.}
-#'         \item{\strong{If \eqn{\lambda_{mi}} are constrained:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M}}
-#'          with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-#'         \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is a \eqn{(d(M-1) x r)}
-#'          constraint matrix.}
+#'         \item{\strong{If \eqn{\lambda_{mi}} are constrained via \code{C_lambda}:}}{Replace \strong{\eqn{\lambda}}\eqn{_{2},...,}
+#'         \strong{\eqn{\lambda}}\eqn{_{M}} with \strong{\eqn{\gamma}} \eqn{(rx1)} that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}
+#'         \eqn{,...,} \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \eqn{C_{\lambda}} is
+#'          a \eqn{(d(M-1) x r)} constraint matrix.}
+#'         \item{\strong{If \eqn{\lambda_{mi}} are constrained via \code{fixed_lambdas}:}}{Drop \strong{\eqn{\lambda}}\eqn{_{2},...,}
+#'         \strong{\eqn{\lambda}}\eqn{_{M}} from the parameter vector.}
 #'       }
 #'     }
 #'   }
@@ -81,9 +85,10 @@
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 #'
-#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
-#'   In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
-#'   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model,
+#'   \eqn{M1=0}. In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are
+#'   \emph{StMVAR type}. In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should
+#'   be strictly larger than two.
 #'
 #'   The notation is similar to the cited literature.
 #' @param model is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
@@ -108,7 +113,7 @@
 #'   that is, when \code{parametrization="mean"}.}
 #' @param structural_pars If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 #'   identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
-#'   the following elements:
+#'   at least the first one of the following elements:
 #'   \itemize{
 #'     \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
 #'       unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
@@ -118,6 +123,10 @@
 #'       parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
 #'       must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
 #'       should not be constrained.
+#'     \item \code{fixed_lambdas} - a length \eqn{d(M-1)} numeric vector (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+#'       \strong{\eqn{\lambda}}\eqn{_{M})} with elements strictly larger than zero specifying the fixed parameter values for the
+#'       parameters \eqn{\lambda_{mi}} should be constrained to. This constraint is alternative \code{C_lambda}.
+#'       Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
 #'   }
 #'   See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 #'   a time-varying diagonal matrix with positive diagonal entries).
@@ -169,8 +178,8 @@
 #'  }
 #' @keywords internal
 
-loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                              constraints=NULL, same_means=NULL, structural_pars=NULL,
+loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE,
+                              parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
                                           "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
                                           "arch_scalars", "loglik_mw_archscalars"),
@@ -188,7 +197,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars) # All constraints are expanded and removed from the parameter vector
+                                    same_means=same_means,
+                                    structural_pars=structural_pars) # All constraints are expanded and removed from the parameter vector
   W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
@@ -240,7 +250,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   inv_Sigmas <- array(dim=c(d*p, d*p, M)) # Only used for StMVAR type regimes
   chol_Sigmas <- array(dim=c(d*p, d*p, M))
   for(m in 1:M) {
-    chol_Sigmas[, , m] <- chol(Sigmas[, , m]) # Take Cholesky here to avoid unnecessary warnings from mvnfast::dmvn, also used in inverting for m > M1
+    # Take Cholesky here to avoid unnecessary warnings from mvnfast::dmvn, also used in inverting for m > M1:
+    chol_Sigmas[, , m] <- chol(Sigmas[, , m])
     if(m > M1) {
       inv_Sigmas[, , m] <- chol2inv(chol_Sigmas[, , m])
     }
@@ -285,10 +296,12 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   mu_mt <- array(vapply(1:M, function(m) t(all_phi0[, m] + tcrossprod(all_A2[, , m], Y2)), numeric(d*T_obs)), dim=c(T_obs, d, M)) # [, , m]
 
   # For the StMVAR type regimes, calculate the time-varying ARC-type scalar that multiplies the conditional covariance matrix:
-  # i:th row calculated from y_{i-1} observation when the indexing is y_{-p+1},..,y_0,y_1,...,y_T - note that the last row of arch_scalars is for time T+1
+  # i:th row calculated from y_{i-1} observation when the indexing is y_{-p+1},..,y_0,y_1,...,y_T - note that the last row of
+  # arch_scalars is for time T+1
   arch_scalars <- matrix(1, nrow=nrow(matprods) - 1, ncol=M) # The arch-scalars are all 1 for the GMVAR type regimes
   if(M2 > 0) {
-    matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M]) # The last row is not needed because for the time t, we use the previous value y_{t-1}
+    # The last row is not needed because for the time t, we use the previous value y_{t-1}:
+    matprods0 <- as.matrix(matprods[1:(nrow(matprods) - 1), (M1 + 1):M])
     tmp_mat <- matrix(all_df, nrow=nrow(matprods0), ncol=ncol(matprods0), byrow=TRUE)
     arch_scalars[,(M1 + 1):M] <- (tmp_mat - 2 + matprods0)/(tmp_mat - 2 + d*p)
   }
@@ -309,9 +322,10 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
                                        numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     sum_alpha_mu <- matrix(rowSums(vapply(1:M, function(m) alpha_mt[, m]*mu_mt[, , m],
                                           numeric(d*T_obs))), nrow=T_obs, ncol=d, byrow=FALSE)
-    second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m], each=d*d)*as.vector(vapply(1:nrow(alpha_mt),
-                                                                                                       function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
-                                                                                                       numeric(d*d))), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
+    second_term <- array(rowSums(vapply(1:M, function(m) rep(alpha_mt[, m],
+                                                             each=d*d)*as.vector(vapply(1:nrow(alpha_mt),
+                                                                                        function(i1) tcrossprod((mu_mt[, , m] - sum_alpha_mu)[i1,]),
+                                                                                        numeric(d*d))), numeric(d*d*T_obs))), dim=c(d, d, T_obs))
     return(first_term + second_term)
   }
 
@@ -319,7 +333,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   dat <- data[(p + 1):n_obs,] # Initial values are not used here (conditional means and variances are already calculated)
   mvd_vals <- matrix(nrow=T_obs, ncol=M)
   if(M1 > 0) { # GMVAR type regimes
-    mvd_vals[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m], log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
+    mvd_vals[,1:M1] <- vapply(1:M1, function(m) mvnfast::dmvn(X=dat - mu_mt[, , m], mu=rep(0, times=d), sigma=all_Omega[, , m],
+                                                              log=FALSE, ncores=1, isChol=FALSE), numeric(T_obs))
   }
   if(M2 > 0) { # StMVAR type regimes
     for(m in (M1 + 1):M) {
@@ -329,7 +344,8 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
       inv_Omega_m <- chol2inv(chol_Omega_m)
       # Below, we calculate the d-dimensional conditional t-densities for the regime m, for t=1,...,T.
       tmp_mat <- dat - mu_mt[, , m]
-      mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
+      mvd_vals[, m] <- exp(lgamma(0.5*(d + df_m)) - 0.5*d*log(base::pi) - 0.5*d*log(df_m - 2) - lgamma(0.5*df_m))*
+        arch_scalars[, m]^(-d/2)*1/sqrt(det_Omega_m)*(1 + rowSums(tmp_mat%*%inv_Omega_m*tmp_mat)/(arch_scalars[, m]*(df_m - 2)))^(-0.5*(d + df_m))
     }
   }
 
@@ -505,9 +521,10 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' cond_moments(data=gdpdef, p=2, M=2, params=params22, to_return="total_ccovs")
 #' @export
 
-cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
-                         structural_pars=NULL, to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars"), minval=NA,
-                         stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
+                         constraints=NULL, same_means=NULL, structural_pars=NULL,
+                         to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars"),
+                         minval=NA, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
   to_return <- match.arg(to_return)

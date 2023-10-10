@@ -11,8 +11,9 @@ pick_lambdas(p, M, d, params, structural_pars = NULL)
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
-   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+   in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
+   is \code{M=M1+M2}.}
 }}
 
 \item{d}{the number of time series in the system.}
@@ -58,7 +59,7 @@ pick_lambdas(p, M, d, params, structural_pars = NULL)
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
-the following elements:
+at least the first one of the following elements:
 \itemize{
   \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
     unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
@@ -68,6 +69,10 @@ the following elements:
     parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
+  \item \code{fixed_lambdas} - a length \eqn{d(M-1)} numeric vector (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M})} with elements strictly larger than zero specifying the fixed parameter values for the
+    parameters \eqn{\lambda_{mi}} should be constrained to. This constraint is alternative \code{C_lambda}.
+    Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
 }
 See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}

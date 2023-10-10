@@ -11,8 +11,9 @@ check_pMd(p, M, d, model = c("GMVAR", "StMVAR", "G-StMVAR"))
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1} in the
-   first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components is \code{M=M1+M2}.}
+  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+   in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
+   is \code{M=M1+M2}.}
 }}
 
 \item{d}{the number of time series in the system.}
