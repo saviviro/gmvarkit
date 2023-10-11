@@ -14,6 +14,7 @@ loglikelihood_int(
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   to_return = c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms", "regime_cmeans",
     "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars",
@@ -143,6 +144,10 @@ the same but the first regime has freely estimated (unconditional) mean. Ignore 
 should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
 that is, when \code{parametrization="mean"}.}}
 
+\item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
+\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+be strictly less than one.}
+
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
 at least the first one of the following elements:
@@ -183,10 +188,6 @@ evaluation of the log-likelihood might fail and cause error.}
 
 \item{df_tol}{the parameter vector is considered to be outside the parameter space if all degrees of
 freedom parameters are not larger than \code{2 + df_tol}.}
-
-\item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
-\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
-be strictly less than one.}
 }
 \value{
 \describe{

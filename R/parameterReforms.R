@@ -15,7 +15,8 @@ reform_data <- function(data, p) {
   d <- ncol(data)
   n_obs <- nrow(data)
   T_obs <- n_obs - p
-  matrix(vapply(1:p, function(i1) as.vector(data[(p - i1 + 1):(T_obs + p - i1 + 1),]), numeric((n_obs - p + 1)*d)), nrow=n_obs - p + 1, byrow=FALSE)
+  matrix(vapply(1:p, function(i1) as.vector(data[(p - i1 + 1):(T_obs + p - i1 + 1),]), numeric((n_obs - p + 1)*d)),
+         nrow=n_obs - p + 1, byrow=FALSE)
 }
 
 
@@ -34,16 +35,18 @@ reform_data <- function(data, p) {
 #' @keywords internal
 
 reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"),
-                                    constraints=NULL, same_means=NULL, structural_pars=NULL,
-                                    change_na=FALSE) {
+                                    constraints=NULL, same_means=NULL, weight_constraints=NULL,
+                                    structural_pars=NULL, change_na=FALSE) {
   model <- match.arg(model)
   if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
     return(params)
-  } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) && !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda)) {
+  } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) &&
+            !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda) &&
+            is.null(structural_pars$fixed_lambdas)) {
     return(params)
   }
   all_df <- pick_df(M=M, params=params, model=model)
-  M2 <- length(all_df)
+  M2 <- length(all_df) # M[2]
   M <- sum(M)
 
   if(is.null(same_means)) {
@@ -87,8 +90,9 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
   }
 
   if(is.null(structural_pars)) { # Reduced form model
-    pars <- as.vector(vapply(1:M, function(m) c(all_phi0[,m], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
-                                                params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1 - less_pars):(M*d + q + m*d*(d + 1)/2 - less_pars)]),
+    pars <- as.vector(vapply(1:M,
+                             function(m) c(all_phi0[,m], psi_expanded[((m - 1)*p*d^2 + 1):(m*p*d^2)],
+                                           params[(M*d + q + (m - 1)*d*(d + 1)/2 + 1 - less_pars):(M*d + q + m*d*(d + 1)/2 - less_pars)]),
                              numeric(p*d^2 + d + d*(d + 1)/2)))
   } else { # Structural model
     W <- structural_pars$W # Obtain the indices with zero constraints (the zeros don't exist in params)
@@ -98,7 +102,9 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
     new_W[W != 0 | is.na(W)] <- W_pars
 
     if(M > 1) {
-      if(!is.null(structural_pars$C_lambda)) {
+      if(!is.null(structural_pars$fixed_lambdas)) {
+        lambdas <- structural_pars$fixed_lambdas
+      } else if(!is.null(structural_pars$C_lambda)) {
         r <- ncol(structural_pars$C_lambda)
         gamma <- params[(d*M + q + d^2 - n_zeros + 1 - less_pars):(d*M + q + d^2 - n_zeros + r - less_pars)]
         if(change_na) {
@@ -118,10 +124,16 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
       pars <- c(as.vector(all_phi0), psi_expanded, vec(new_W), lambdas)
     }
   }
+
   if(M == 1) {
     return(c(pars, all_df))
-  } else {
-    return(c(pars, params[(length(params) - M - M2 + 2):length(params)]))
+  } else { # M > 1 -> alpha params in the param vector
+    if(is.null(weight_constraints)) {
+      alphas <- params[(length(params) - M - M2 + 2):(length(params) - M2)]
+    } else {
+      alphas <- weight_constraints
+    }
+    return(c(pars, alphas, all_df))
   }
 }
 
@@ -211,7 +223,8 @@ form_boldA <- function(p, M, d, all_A) {
   M <- sum(M)
   I_all <- diag(nrow=d*(p - 1))
   ZER_all <- matrix(0, nrow=d*(p - 1), ncol=d)
-  array(vapply(1:M, function(m) rbind(matrix(all_A[, , 1:p, m], nrow=d, byrow=FALSE), cbind(I_all, ZER_all)), numeric((d*p)^2)), dim=c(d*p, d*p, M))
+  array(vapply(1:M, function(m) rbind(matrix(all_A[, , 1:p, m], nrow=d, byrow=FALSE),
+                                      cbind(I_all, ZER_all)), numeric((d*p)^2)), dim=c(d*p, d*p, M))
 }
 
 
@@ -274,7 +287,8 @@ sort_components <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVA
     old_W[W_const != 0] <- params[(d*M + d^2*p*M + 1):(d*M + d^2*p*M + d^2 - n_zeros)] # Zeros where there are zero constaints
     return(c(phi0[, ord], # sorted phi0/mu parameters
              A[, ord], # sorted AR parameters
-             Wvec(redecompose_Omegas(M=M, d=d, W=old_W, lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
+             Wvec(redecompose_Omegas(M=M, d=d, W=old_W,
+                                     lambdas=lambdas, perm=ord)), # Sorted and possibly recomposed the covariance matrices
              alphas, all_df)) # sorted alphas, excluding the M:th one.
   }
 }
@@ -546,7 +560,8 @@ stmvarpars_to_gstmvar <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G
 
   # Which regimes will be GMVAR type in the new model
   regs_to_change <- which(all_df > maxdf) + M1 # Which regimes to change to GMVAR type
-  if(length(regs_to_change) == M2) message("All regimes are changed to GMVAR type. The result is therefore a GMVAR model and not a G-StMVAR model.")
+  if(length(regs_to_change) == M2) message(paste("All regimes are changed to GMVAR type.",
+                                                 "The result is therefore a GMVAR model and not a G-StMVAR model."))
   if(model == "StMVAR") {
     gmvar_regs <- regs_to_change
   } else { # model == "G-StMVAR"
@@ -594,7 +609,8 @@ stmvarpars_to_gstmvar <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G
       if(is.null(structural_pars)) {
         message("All constraints were removed from the model when switching to the G-StMVAR model")
       } else {
-        message("All constraints were removed from the model, except the ones imposed on the W-matrix, when switching to the G-StMVAR model")
+        message(paste("All constraints were removed from the model, except the ones imposed on the W-matrix,",
+                      "when switching to the G-StMVAR model"))
       }
     } else if(!is.null(same_means)) {
       # If only mean parameters are constrained, the regimes can be sorted as long as the mean-parameter
@@ -643,10 +659,13 @@ stmvarpars_to_gstmvar <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G
       lambdas <- pick_lambdas(p=p, M=M_orig, d=d, params=params_std, structural_pars=structural_pars)
       new_W_and_lambdas <- redecompose_Omegas(M=M_orig, d=d, W=W_pars, lambdas=lambdas, perm=reg_order)
       new_W <- new_W_and_lambdas[1:(d^2)]
-      new_W <- new_W[!structural_pars$W == 0] # Remove zeros when the corresponding elements of W are constrained to zero and hence not parametrized (note: the new W has zeros in the same entries as the old W)
+      # Remove zeros when the corresponding elements of W are constrained to zero and hence not parametrized
+      # (note: the new W has zeros in the same entries as the old W)
+      new_W <- new_W[!structural_pars$W == 0]
       new_lambdas <- new_W_and_lambdas[(d^2 + 1):length(new_W_and_lambdas)]
       if(!is.null(same_means)) {
-        new_mean_params <- params[1:(d*length(same_means))] # The old mean params are also the new mean params (see the reduced form case)
+        # The old mean params are also the new mean params (see the reduced form case)
+        new_mean_params <- params[1:(d*length(same_means))]
       } else {
         new_mean_params <- new_all_phi0
       }

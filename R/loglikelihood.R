@@ -184,7 +184,8 @@
 #' @keywords internal
 
 loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE,
-                              parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL, structural_pars=NULL,
+                              parametrization=c("intercept", "mean"), constraints=NULL, same_means=NULL,
+                              weight_constraints=NULL, structural_pars=NULL,
                               to_return=c("loglik", "mw", "mw_tplus1", "loglik_and_mw", "terms",
                                           "regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs",
                                           "arch_scalars", "loglik_mw_archscalars"),
