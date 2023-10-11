@@ -38,9 +38,9 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
                                     constraints=NULL, same_means=NULL, weight_constraints=NULL,
                                     structural_pars=NULL, change_na=FALSE) {
   model <- match.arg(model)
-  if(is.null(constraints) && is.null(structural_pars) && is.null(same_means)) {
+  if(is.null(constraints) && is.null(structural_pars) && is.null(same_means) && is.null(weight_constraints)) {
     return(params)
-  } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) &&
+  } else if(is.null(constraints) && is.null(same_means) && !is.null(structural_pars) && is.null(weight_constraints) &&
             !any(structural_pars$W == 0, na.rm=TRUE) && is.null(structural_pars$C_lambda) &&
             is.null(structural_pars$fixed_lambdas)) {
     return(params)
@@ -48,6 +48,13 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
   all_df <- pick_df(M=M, params=params, model=model)
   M2 <- length(all_df) # M[2]
   M <- sum(M)
+  if(is.null(constraints) && is.null(structural_pars) && is.null(same_means) && !is.null(weight_constraints)) {
+    # Not structural models, only weight constraints (different form of structural parameter vector,
+    # alphas are just dropped)
+    return(c(params[1:(length(params) - M2)], # all but alphas and df
+             weight_constraints, all_df))
+  }
+
 
   if(is.null(same_means)) {
     less_pars <- 0 # Number of parameters less compared to models without same mean constraints
@@ -57,7 +64,7 @@ reform_constrained_pars <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
   }
 
   # Obtain the AR coefficients from the constraints
-  if(is.null(constraints)) { # For structural model with constrained structural parameters but no AR constraints
+  if(is.null(constraints)) {
     q <- M*p*d^2
     psi_expanded <- params[(d*M + 1 - less_pars):(d*M + d^2*p*M - less_pars)] # AR coefficients (without constraints)
     psiNA <- FALSE
