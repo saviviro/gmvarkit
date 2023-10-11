@@ -51,6 +51,8 @@ get_varying_h(M, params, model = c("GMVAR", "StMVAR", "G-StMVAR"))
           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
       }
     }
+     \item{\strong{For models with weight_constraints:}}{Drop \eqn{\alpha_1,...,\alpha_{M-1}} from
+      the parameter vector.}
     \item{\strong{For structural models:}}{
       Reduced form models can be directly used as recursively identified structural models. If the structural model is
       identified by conditional heteroskedasticity, the parameter vector should have the form

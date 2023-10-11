@@ -51,6 +51,8 @@
 #'           (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M})}.
 #'       }
 #'     }
+#'      \item{\strong{For models with weight_constraints:}}{Drop \eqn{\alpha_1,...,\alpha_{M-1}} from
+#'       the parameter vector.}
 #'     \item{\strong{For structural models:}}{
 #'       Reduced form models can be directly used as recursively identified structural models. If the structural model is
 #'       identified by conditional heteroskedasticity, the parameter vector should have the form
@@ -111,6 +113,9 @@
 #'   the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
 #'   should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
 #'   that is, when \code{parametrization="mean"}.}
+#' @param weight_constraints a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
+#'   \eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+#'   be strictly less than one.
 #' @param structural_pars If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 #'   identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
 #'   at least the first one of the following elements:
