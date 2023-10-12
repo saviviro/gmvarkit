@@ -148,7 +148,7 @@ Returns parameter vector with \code{m}:th regime changed to \code{regime_pars}.
   of the pointed regime to the new given parameters.
 }
 \details{
-Does not currently support models with AR, mean, or lambda parameter constraints.
+Does not currently support models with AR, mean, alpha, or lambda parameter constraints.
 }
 \section{Warning}{
 

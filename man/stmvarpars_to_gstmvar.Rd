@@ -13,6 +13,7 @@ stmvarpars_to_gstmvar(
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   maxdf = 100
 )
@@ -126,6 +127,10 @@ the same but the first regime has freely estimated (unconditional) mean. Ignore 
 should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
 that is, when \code{parametrization="mean"}.}}
 
+\item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
+\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+be strictly less than one.}
+
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
 at least the first one of the following elements:
@@ -150,12 +155,13 @@ a time-varying diagonal matrix with positive diagonal entries).}
 GMVAR type.}
 }
 \value{
-Returns a list with four elements: \code{$params} contains the corresponding G-StMVAR model
+Returns a list with six elements: \code{$params} contains the corresponding G-StMVAR model
  parameter vector, \code{$reg_order} contains the permutation that was applied to the regimes
  (GMVAR type regimes first, and decreasing ordering by mixing weight parameters),
  \code{$M} a vector of length two containing the number of GMVAR type regimes in the first element
- and the number of StMVAR type regimes in the second, \code{$same_means} constains the \code{same_mean}
- constraints of the new model.
+ and the number of StMVAR type regimes in the second, \code{$same_means} contains the \code{same_mean}
+ constraints of the new model. Finally \code{$weight_constraints} contains the \code{weight_constraints} and
+\code{$fixed_lambdas} the \code{structural_pars$fixed_lambdas}  of the new model
 }
 \description{
 \code{stmvarpars_to_gstmvar} transforms a StMVAR (or G-StMVAR) model parameter vector to the corresponding
