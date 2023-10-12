@@ -375,13 +375,13 @@ sort_W_and_lambdas <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-St
 #' @keywords internal
 
 change_parametrization <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
-                                   structural_pars=NULL, change_to=c("intercept", "mean")) {
+                                   weight_constraints=NULL, structural_pars=NULL, change_to=c("intercept", "mean")) {
   stopifnot(is.null(same_means))
   model <- match.arg(model)
   change_to <- match.arg(change_to)
   re_params <- params
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
-                                    structural_pars=structural_pars) # Parameters in "regular" form
+                                    weight_constraints=weight_constraints, structural_pars=structural_pars) # Parameters in "regular" form
   Id <- diag(nrow=d)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)

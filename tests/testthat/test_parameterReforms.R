@@ -957,7 +957,6 @@ test_that("sort_components works correctly", {
 
 
   # p=1, M=3, d=3
-
   expect_equal(sort_components(p=1, M=3, d=3, params=theta_133s_1, structural_pars=list(W=W_133)), # # perm=c(1, 3, 2)
                c(phi10_133, phi30_133, phi20_133, A11_133, A31_133, A21_133,
                  Wvec(redecompose_Omegas(M=3, d=3, W=W_133pars_with0, lambdas=c(lambdas2_133, lambdas3_133), perm=c(1, 3, 2))),
@@ -997,10 +996,11 @@ test_that("sort_components works correctly", {
 })
 
 
-calc_mu <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, structural_pars=NULL) {
+calc_mu <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, weight_constraints=NULL,
+                    structural_pars=NULL) {
   model <- match.arg(model)
   params <- reform_constrained_pars(p, M, d, params, model=model, constraints=constraints, same_means=NULL,
-                                    structural_pars=structural_pars)
+                                    weight_constraints=weight_constraints, structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   M <- sum(M)
@@ -1047,6 +1047,18 @@ theta_112tcsWAR_mu <- change_parametrization(p=1, M=1, d=2, params=theta_112tcsW
                                              structural_pars=list(W=W_112), constraints=C_112, change_to="mean")
 theta_123tcsLAR_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123tcsLAR, model="StMVAR", structural_pars=list(W=W_123),
                                              constraints=C_123, change_to="mean")
+
+# Weight and lambda constraints
+theta_122w_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122w, model="GMVAR", weight_constraints=0.7, change_to="mean")
+theta_122wsF_mu <- change_parametrization(p=1, M=2, d=2, params=theta_122wsF, model="GMVAR",  weight_constraints=0.7,
+                                          structural_pars=list(W=W_122, fixed_lambdas=c(7, 1)), change_to="mean")
+theta_332gswsWF_mu <- change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR", weight_constraints=c(0.5, 0.3),
+                                          structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)), change_to="mean")
+theta_222tcwsL_mu <- change_parametrization(p=2, M=2, d=2, params=theta_222tcwsL, model="StMVAR", constraints=C_222, weight_constraints=0.7,
+                                          structural_pars=list(W=W_222, C_lambda=C_lambda_222), change_to="mean")
+theta_123twsF_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR", weight_constraints=0.6,
+                                          structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1)), change_to="mean")
+theta_123w_mu <- change_parametrization(p=1, M=2, d=3, params=theta_123w, model="GMVAR", weight_constraints=0.6, change_to="mean")
 
 
 test_that("change_parametrization works correctly", {
@@ -1145,6 +1157,38 @@ test_that("change_parametrization works correctly", {
   expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123tcsLAR_mu, constraints=C_123, model="StMVAR",
                                       structural_pars=list(W=W_123, C_lambda=C_lambda_123), change_to="intercept"),
                theta_123tcsLAR)
+
+  # Fixed lambdas or alphas
+  expect_equal(pick_phi0(p=1, M=2, d=2, params=theta_122w_mu), calc_mu(p=1, M=2, d=2, params=theta_122w, model="GMVAR", weight_constraints=0.7))
+  expect_equal(change_parametrization(p=1, M=2, d=2, params=theta_122w_mu, model="GMVAR", weight_constraints=0.7, change_to="intercept"),
+               theta_122w)
+  expect_equal(pick_phi0(p=1, M=2, d=2, params=theta_122wsF_mu, structural_pars=list(W=W_122, fixed_lambdas=c(7, 1))),
+               calc_mu(p=1, M=2, d=2, params=theta_122wsF, model="GMVAR", weight_constraints=0.7,
+                       structural_pars=list(W=W_122, fixed_lambdas=c(7, 1))))
+  expect_equal(change_parametrization(p=1, M=2, d=2, params=theta_122wsF_mu, model="GMVAR", weight_constraints=0.7,
+                                      structural_pars=list(W=W_122, fixed_lambdas=c(7, 1)), change_to="intercept"), theta_122wsF)
+  expect_equal(pick_phi0(p=3, M=c(1, 2), d=2, params=theta_332gswsWF_mu, structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1))),
+               calc_mu(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR", weight_constraints=c(0.5, 0.3),
+                       structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1))))
+  expect_equal(change_parametrization(p=3, M=c(1, 2), d=2, params=theta_332gswsWF_mu, model="G-StMVAR", weight_constraints=c(0.5, 0.3),
+                                      structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)), change_to="intercept"), theta_332gswsWF)
+
+  expect_equal(pick_phi0(p=2, M=2, d=2, params=theta_222tcwsL_mu, structural_pars=list(W=W_222, C_lambda=C_lambda_222)),
+               calc_mu(p=2, M=2, d=2, params=theta_222tcwsL, model="StMVAR", constraints=C_222, weight_constraints=0.7,
+                       structural_pars=list(W=W_222, C_lambda=C_lambda_222)))
+  expect_equal(change_parametrization(p=2, M=2, d=2, params=theta_222tcwsL_mu, model="StMVAR", constraints=C_222, weight_constraints=0.7,
+                                      structural_pars=list(W=W_222, C_lambda=C_lambda_222), change_to="intercept"), theta_222tcwsL)
+
+  expect_equal(pick_phi0(p=1, M=2, d=3, params=theta_123twsF_mu, structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1))),
+               calc_mu(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR", weight_constraints=0.6,
+                       structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1))))
+  expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123twsF_mu, model="StMVAR", weight_constraints=0.6,
+                                      structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1)), change_to="intercept"), theta_123twsF)
+  expect_equal(pick_phi0(p=1, M=2, d=3, params=theta_123w_mu),
+               calc_mu(p=1, M=2, d=3, params=theta_123w, model="GMVAR", weight_constraints=0.6))
+  expect_equal(change_parametrization(p=1, M=2, d=3, params=theta_123w_mu, model="StMVAR", weight_constraints=0.6,
+                                      change_to="intercept"), theta_123w)
+
 })
 
 
