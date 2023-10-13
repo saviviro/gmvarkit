@@ -1406,6 +1406,8 @@ theta_332t_3 <- c(theta_332, 10, 30, 20)
 theta_332gs_2 <- c(theta_332, 20, 30)
 
 
+
+
 test_that("stmvarpar_to_gstmvar works correctly", {
   expect_equal(suppressWarnings(stmvarpars_to_gstmvar(p=1, M=1, d=2, params=theta_112t_2, model="StMVAR", maxdf=100)$params),
                theta_112t_2, tol=1e-6)
@@ -1478,6 +1480,86 @@ test_that("stmvarpar_to_gstmvar works correctly", {
                                                       maxdf=10)$params),
                c(phi10_123, phi10_123, vec(A11_123), vec(A11_123), redecompose_Omegas(M=2, d=3, W=W_123, lambdas=c(1, 1, 2), perm=2:1)[1:9],
                  1, 1, 0.5, 1-alpha1_123, 10), tol=1e-6)
+
+
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=theta_122tw, model="StMVAR", weight_constraints=0.7,
+                                                      maxdf=11.5)$params),
+               c(upsilon2_122, upsilon1_122, 11), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=theta_122tw, model="StMVAR", weight_constraints=0.7,
+                                                      maxdf=11.5)$weight_constraints), 0.3, tol=1e-6)
+  expect_equal(suppressWarnings(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=theta_122tw, model="StMVAR", weight_constraints=0.7,
+                                                      maxdf=13)$params), theta_122tw, tol=1e-6)
+  expect_equal(suppressWarnings(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=theta_122tw, model="StMVAR", weight_constraints=0.7,
+                                                      maxdf=13)$weight_constraints), 0.7, tol=1e-6)
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=c(1, 1), d=2, params=theta_122gsws, model="G-StMVAR", weight_constraints=0.7,
+                                                      structural_pars=list(W=W_122), maxdf=10)$params),
+               c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec(W_122), lambdas_122), tol=1e-6)
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR",
+                                                      weight_constraints=c(0.5, 0.3),
+                                                      structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)), maxdf=11.5)$params),
+               c(phi10_332, phi30_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vec(A31_332),
+                 vec(A32_332), vec(A33_332), vec(A21_332), vec(A22_332), vec(A23_332), Wvec(W_332), 11), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR",
+                                                      weight_constraints=c(0.5, 0.3),
+                                                      structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                                      maxdf=11.5)$weight_constraints), c(0.5, 0.2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR",
+                                                      weight_constraints=c(0.5, 0.3),
+                                                      structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                                      maxdf=11.5)$fixed_lambdas),
+               c(6, 1, 7, 2), tol=1e-6)
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=2, M=2, d=2, params=theta_222tcwsL, model="StMVAR",
+                                                      constraints=C_222, weight_constraints=0.7,
+                                                      structural_pars=list(W=W_222, C_lambda=C_lambda_222),
+                                                      maxdf=10)$params),
+               c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 0.2), tol=1e-6)
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR",
+                                                      weight_constraints=0.6, structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1)),
+                                                      maxdf=11.5)$params),
+               c(phi20_123, phi10_123, vec(A21_123), vec(A11_123),
+                 redecompose_Omegas(M=2, d=3, W=W_123, lambdas=c(3, 2, 1), perm=2:1)[1:9], 11), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR",
+                                                      weight_constraints=0.6, structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1)),
+                                                      maxdf=11.5)$weight_constraints), 0.4, tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR",
+                                                      weight_constraints=0.6, structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1)),
+                                                      maxdf=11.5)$fixed_lambdas),
+               redecompose_Omegas(M=2, d=3, W=W_123, lambdas=c(3, 2, 1), perm=2:1)[10:12], tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(2, 1), d=2, params=theta_332gscmw, model="G-StMVAR",
+                                                      constraints=C_332, same_means=list(1, 2:3), weight_constraints=c(0.5, 0.3),
+                                                      maxdf=10)$params),
+               c(phi10_332, phi20_332, vec(A11_332), vec(A12_332), vec(A13_332), vech(Omega1_332), vech(Omega2_332),
+                   vech(Omega3_332)), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(2, 1), d=2, params=theta_332gscmw, model="G-StMVAR",
+                                                      constraints=C_332, same_means=list(1, 2:3), weight_constraints=c(0.5, 0.3),
+                                                      maxdf=10)$weight_constraints), c(0.5, 0.3), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(2, 1), d=2, params=theta_332gscmw, model="G-StMVAR",
+                                                      constraints=C_332, same_means=list(1, 2:3), weight_constraints=c(0.5, 0.3),
+                                                      maxdf=10)$same_means), list(1, 2:3), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=c(2, 1), d=2, params=theta_332gscmw, model="G-StMVAR",
+                                                      constraints=C_332, same_means=list(1, 2:3), weight_constraints=c(0.5, 0.3),
+                                                      maxdf=10)$fixed_lambdas), NULL, tol=1e-6)
+
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332tmsWF, model="StMVAR",
+                                                      same_means=list(1:2, 3), structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                                      maxdf=11.5)$params),
+               c(phi10_332, phi30_332, vec(A21_332), vec(A22_332), vec(A23_332), vec(A31_332), vec(A32_332), vec(A33_332),
+                 vec(A11_332), vec(A12_332), vec(A13_332),
+                 Wvec(redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(7, 2, 6, 1), perm=c(2, 3, 1))[1:4]),
+                 alpha2_332, 1-alpha1_332-alpha2_332, 11),
+               tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332tmsWF, model="StMVAR",
+                                                      same_means=list(1:2, 3), structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                                      maxdf=11.5)$same_means), list(c(1, 3), 2), tol=1e-6)
+  expect_equal(suppressMessages(stmvarpars_to_gstmvar(p=3, M=3, d=2, params=theta_332tmsWF, model="StMVAR",
+                                                      same_means=list(1:2, 3), structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                                      maxdf=11.5)$fixed_lambdas),
+               redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(7, 2, 6, 1), perm=c(2, 3, 1))[5:8], tol=1e-6)
 })
 
 

@@ -167,6 +167,9 @@ Returns a list with six elements: \code{$params} contains the corresponding G-St
 \code{stmvarpars_to_gstmvar} transforms a StMVAR (or G-StMVAR) model parameter vector to the corresponding
   G-StMVAR model parameter vector with the large df parameters removed.
 }
+\details{
+If constraints are employed on the autoregressive parameters, the regimes cannot be sorted due to the
+}
 \section{Warning}{
 
  No argument checks!

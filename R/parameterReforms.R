@@ -528,6 +528,9 @@ sort_and_standardize_alphas <- function(alphas, M, model=c("GMVAR", "StMVAR", "G
 #' @inheritParams loglikelihood_int
 #' @param maxdf regimes with degrees of freedom parameter value larger than this will be turned into
 #'  GMVAR type.
+#' @details If constraints are employed on the autoregressive parameters, the regimes cannot be sorted due to the
+#   specific form of the constraints. In this case, all constraints are removed and we then do the switch
+#   with the unconstrained model.
 #' @return Returns a list with six elements: \code{$params} contains the corresponding G-StMVAR model
 #'  parameter vector, \code{$reg_order} contains the permutation that was applied to the regimes
 #'  (GMVAR type regimes first, and decreasing ordering by mixing weight parameters),
@@ -637,9 +640,10 @@ stmvarpars_to_gstmvar <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G
       for(i1 in 1:length(same_means)) { # Go though the same means groups
         new_same_means[[i1]] <- which(reg_order %in% same_means[[i1]]) # Create the new groups according to the new ordering
       }
-      cat("The 'same_means' constraints were reconstructed when reordering the regimes. The new same_means is:\n")
+      message(paste("The 'same_means' constraints were reconstructed when reordering the regimes. The new same_means is: ",
+                    paste0(same_means, collapse=", ")))
       same_means <- new_same_means
-      print(same_means)
+      #print(same_means)
     }
     if(!is.null(structural_pars$C_lambda) && is.null(constraints_orig)) {
       # In this case, removal of the (lambda) constraints has not yet been messaged
