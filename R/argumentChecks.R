@@ -189,17 +189,19 @@ in_paramspace_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StM
 #' @export
 
 in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
-                          structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                          weight_constraints=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   check_pMd(p=p, M=M, d=d, model=model)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars)
   if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
-                                structural_pars=structural_pars)) {
+                                weight_constraints=weight_constraints, structural_pars=structural_pars)) {
     stop("The parameter vector has wrong length!")
   }
   W_constraints <- structural_pars$W
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+                                    same_means=same_means, weight_constraints=weight_constraints,
+                                    structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   in_paramspace_int(p=p, M=M, d=d, params=params, model=model, all_boldA=form_boldA(p=p, M=M, d=d, all_A=all_A),
@@ -255,7 +257,7 @@ in_paramspace <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"
 #' @export
 
 check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                             constraints=NULL, same_means=NULL, structural_pars=NULL,
+                             constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                              stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   check_pMd(p=p, M=M, d=d, model=model)
@@ -270,13 +272,15 @@ check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMV
   M <- sum(M)
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
-  check_constraints(p=p, M=M_orig, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_constraints(p=p, M=M_orig, d=d, constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars)
   if(length(params) != n_params(p=p, M=M_orig, d=d, model=model, constraints=constraints, same_means=same_means,
-                                structural_pars=structural_pars)) {
+                                weight_constraints=weight_constraints, structural_pars=structural_pars)) {
     stop("The parameter vector has wrong dimension!")
   }
   params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+                                    same_means=same_means, weight_constraints=weight_constraints,
+                                    structural_pars=structural_pars)
   W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params, model=model)
@@ -322,7 +326,7 @@ check_parameters <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMV
 #'   if something is wrong.
 #' @keywords internal
 
-check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, structural_pars=NULL) {
+check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL) {
   M <- sum(M)
   if(!is.null(constraints)) {
     if(!is.matrix(constraints) | !is.numeric(constraints)) {
@@ -351,6 +355,17 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
       stop("The argument same_means should contains all regimes in some group exactly once")
     }
   }
+  if(!is.null(weight_constraints)) {
+    if(!is.numeric(weight_constraints)) {
+      stop("The argument weight_constraints should be a numeric vector of length M - 1")
+    } else if(length(weight_constraints) != M - 1) {
+      stop("The argument weight_constraints should be a numeric vector of length M - 1")
+    } else if(any(weight_constraints <= 0)) {
+      stop("Each element of weight_constraints should be strictly larger than zero")
+    } else if(sum(weight_constraints) >= 1) {
+      stop("The elements of weight_constraints should sum to strictly less than one")
+    }
+  }
   if(!is.null(structural_pars)) {
     if(!is.list(structural_pars)) {
       stop("The argument structural_pars should be a list")
@@ -377,6 +392,18 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
         stop("Entries of the structural parameter constraint matrix 'C_lambda' should be positive or zero")
       }
     }
+    if(!is.null(structural_pars$C_lambda) && !is.null(structural_pars$fixed_lambdas)) {
+      stop("The constraints C_lambda and fixed_lambdas cannot be used at the same time, remove one of them from structural_pars")
+    }
+    if(!is.null(structural_pars$fixed_lambdas)) {
+      if(!is.numeric(structural_pars$fixed_lambdas)) {
+        stop("structural_pars$fixed_lambdas should be a numeric vector of length d*(M - 1)")
+      } else if(length(structural_pars$fixed_lambdas) != d*(M - 1)) {
+        stop("structural_pars$fixed_lambdas should be a numeric vector of length d*(M - 1)")
+      } else if(any(structural_pars$fixed_lambdas <= 0)) {
+        stop("Each element of structural_pars$fixed_lambdas should be strictly larger than zero.")
+      }
+    }
   }
 }
 
@@ -393,7 +420,8 @@ check_constraints <- function(p, M, d, constraints=NULL, same_means=NULL, struct
 #' @inherit in_paramspace references
 #' @keywords internal
 
-n_params <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL) {
+n_params <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
+                     weight_constraints=NULL, structural_pars=NULL) {
   model <- match.arg(model)
   if(model == "GMVAR") {
     n_df <- 0
@@ -408,6 +436,12 @@ n_params <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraint
   } else {
     g <- length(same_means) # Number groups with the same mean parameters
     less_pars <- d*(M - g) # Number of parameters less compared to models without same intercept constraints
+  }
+  if(!is.null(weight_constraints)) {
+    less_pars <- less_pars + M - 1
+  }
+  if(!is.null(structural_pars$fixed_lambdas)) {
+    less_pars <- less_pars + d*(M - 1)
   }
   if(is.null(structural_pars)) {
     ret <- ifelse(is.null(constraints), M*(d^2*p + d + d*(d+1)/2 + 1) - 1, M*(d + d*(d + 1)/2 + 1) + ncol(constraints) - 1) - less_pars
