@@ -203,7 +203,7 @@ loglikelihood_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-
   parametrization <- match.arg(parametrization)
   check_same_means(parametrization=parametrization, same_means=same_means)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means,
+                                    same_means=same_means, weight_constraints=weight_constraints,
                                     structural_pars=structural_pars) # All constraints are expanded and removed from the parameter vector
   W_constraints <- structural_pars$W
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
@@ -472,7 +472,7 @@ get_alpha_mt <- function(M, log_mvdvalues, alphas, epsilon, conditional, also_l_
 #' @export
 
 loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                          constraints=NULL, same_means=NULL, structural_pars=NULL, minval=NA,
+                          constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL, minval=NA,
                           stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
@@ -480,13 +480,16 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
   data <- check_data(data, p)
   d <- ncol(data)
   check_pMd(p=p, M=M, d=d, model=model)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
+                                weight_constraints=weight_constraints, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
   loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional, parametrization=parametrization,
-                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return="loglik",
-                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
+                    constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars, to_return="loglik", check_params=TRUE, minval=minval,
+                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
@@ -528,7 +531,7 @@ loglikelihood <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMV
 #' @export
 
 cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                         constraints=NULL, same_means=NULL, structural_pars=NULL,
+                         constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                          to_return=c("regime_cmeans", "regime_ccovs", "total_cmeans", "total_ccovs", "arch_scalars"),
                          minval=NA, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   parametrization <- match.arg(parametrization)
@@ -538,13 +541,16 @@ cond_moments <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVA
   data <- check_data(data, p)
   d <- ncol(data)
   check_pMd(p=p, M=M, d=d, model=model)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)) {
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means,
+                    weight_constraints=weight_constraints, structural_pars=structural_pars)
+  if(length(params) != n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
+                                weight_constraints=weight_constraints, structural_pars=structural_pars)) {
     stop("Parameter vector has wrong dimension")
   }
   loglikelihood_int(data=data, p=p, M=M, params=params, model=model, parametrization=parametrization,
-                    constraints=constraints, same_means=same_means, structural_pars=structural_pars, to_return=to_return,
-                    check_params=TRUE, minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
+                    constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars, to_return=to_return, check_params=TRUE, minval=minval,
+                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 }
 
 
