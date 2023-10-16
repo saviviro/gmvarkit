@@ -21,6 +21,7 @@ GSMVAR(
   parametrization = c("intercept", "mean"),
   constraints = NULL,
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   calc_cond_moments,
   calc_std_errors = FALSE,
@@ -159,6 +160,10 @@ such that each numeric vector contains the regimes that should share the common 
 the same but the first regime has freely estimated (unconditional) mean. Ignore or set to \code{NULL} if mean parameters
 should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
 that is, when \code{parametrization="mean"}.}}
+
+\item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
+\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+be strictly less than one.}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing

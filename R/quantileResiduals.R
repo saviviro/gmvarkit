@@ -261,7 +261,9 @@ quantile_residuals <- function(gsmvar) {
 #' @keywords internal
 
 quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional, parametrization, constraints=NULL,
-                                   same_means=NULL, structural_pars=NULL, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+                                   same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
+                                   stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  # WEIGHT CONSTRAINTS NOT YET IMPLEMENTED HERE
   model <- match.arg(model)
   loglik_mw_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                              parametrization=parametrization, constraints=constraints,

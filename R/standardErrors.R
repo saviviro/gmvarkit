@@ -15,8 +15,9 @@
 #' @keywords internal
 
 standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                            constraints=NULL, same_means=NULL, structural_pars=NULL, minval, custom_h=NULL,
+                            constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL, minval, custom_h=NULL,
                             stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
+  # WEIGHT CONSTRAINTS ARE NOT YET IMPLEMENTED HERE
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
 

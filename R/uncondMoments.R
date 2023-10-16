@@ -12,15 +12,16 @@
 #' @keywords internal
 
 get_regime_means_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                                 constraints=NULL, same_means=NULL, structural_pars=NULL) {
+                                 constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+                                    same_means=same_means, weight_constraints=weight_constraints,
+                                    structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(parametrization == "intercept") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
-                                     structural_pars=structural_pars, change_to="mean")
+                                     weight_constraints=NULL, structural_pars=structural_pars, change_to="mean")
   }
   pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 }
@@ -61,6 +62,7 @@ get_regime_means <- function(gsmvar) {
   get_regime_means_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                        model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,
                        constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                       weight_constraints=gsmvar$model$weight_constraints,
                        structural_pars=gsmvar$model$structural_pars)
 }
 
@@ -78,10 +80,11 @@ get_regime_means <- function(gsmvar) {
 #' @inherit loglikelihood_int references
 #' @keywords internal
 
-get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL) {
+get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
+                                    weight_constraints=NULL, structural_pars=NULL) {
   model <- match.arg(model)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+                                    same_means=same_means, weight_constraints=weight_constraints, structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -90,7 +93,8 @@ get_regime_autocovs_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", 
   I_dp2 <- diag(nrow=(d*p)^2)
   ZER_lower <- matrix(0, nrow=d*(p-1), ncol=d*p)
   ZER_right <- matrix(0, nrow=d, ncol=d*(p - 1))
-  all_Gammas <- array(NA, dim=c(d, d, p + 1, M)) # For each m=1,..,M, store the (dxd) covariance matrices Gamma_{y,m}(0),...,Gamma{y,m}(p-1),,Gamma{y,m}(p)
+  # For each m=1,..,M, store the (dxd) covariance matrices Gamma_{y,m}(0),...,Gamma{y,m}(p-1),,Gamma{y,m}(p):
+  all_Gammas <- array(NA, dim=c(d, d, p + 1, M))
   for(m in 1:M) {
     # Calculate the (dpxdp) Gamma_{Y,m}(0) covariance matrix (Lütkepohl 2005, eq. (2.1.39))
     kronmat <- I_dp2 - kronecker(all_boldA[, , m], all_boldA[, , m])
@@ -139,7 +143,8 @@ get_regime_autocovs <- function(gsmvar) {
   check_gsmvar(gsmvar)
   get_regime_autocovs_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                           model=gsmvar$model$model, constraints=gsmvar$model$constraints,
-                          same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
+                          same_means=gsmvar$model$same_means, weight_constraints=gsmvar$model$weight_constraints,
+                          structural_pars=gsmvar$model$structural_pars)
 }
 
 
@@ -163,15 +168,16 @@ get_regime_autocovs <- function(gsmvar) {
 #' @keywords internal
 
 uncond_moments_int <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                               constraints=NULL, same_means=NULL, structural_pars=NULL) {
+                               constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL) {
   parametrization <- match.arg(parametrization)
   model <- match.arg(model)
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints, same_means=same_means,
-                                    structural_pars=structural_pars) # Remove any constraints
+                                    weight_constraints=weight_constraints, structural_pars=structural_pars) # Remove any constraints
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
   reg_means <- get_regime_means_int(p=p, M=M, d=d, params=params, model=model, parametrization=parametrization,
-                                    constraints=NULL, same_means=NULL, structural_pars=structural_pars)
+                                    constraints=NULL, same_means=NULL, weight_constraints=weight_constraints,
+                                    structural_pars=structural_pars)
   uncond_mean <- colSums(alphas*t(reg_means))
   tmp <- rowSums(vapply(1:sum(M), function(m) alphas[m]*tcrossprod(reg_means[,m] - uncond_mean), numeric(d*d))) # Vectorized matrix
   reg_autocovs <- get_regime_autocovs_int(p=p, M=M, d=d, params=params, model=model, constraints=NULL, structural_pars=structural_pars)
@@ -227,6 +233,7 @@ uncond_moments <- function(gsmvar) {
   uncond_moments_int(p=gsmvar$model$p, M=gsmvar$model$M, d=gsmvar$model$d, params=gsmvar$params,
                      model=gsmvar$model$model, parametrization=gsmvar$model$parametrization,
                      constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                     weight_constraints=gsmvar$model$weight_constraints,
                      structural_pars=gsmvar$model$structural_pars)
 }
 

@@ -184,6 +184,8 @@ rbind_diags <- function(p, M, d) {
 
 # Constraining AR-parameters to be the same for all regimes
 
+C_122 <- rbind_diags(p=1, M=2, d=2)
+
 # p=1, M=1, d=2
 C_112 <- rbind_diags(p=1, M=1, d=2)
 theta_112c <- c(phi10_112, vec(A11_112), vech(Omega1_112))
@@ -288,6 +290,17 @@ theta_222tcsLAR_int_expanded <- c(theta_222csLAR_int_expanded, 10, 20) # SStMVAR
 theta_222gscsLAR_int <- c(theta_222csLAR_int, 20) # SG-StMVAR, M1=1, M2=1
 theta_222gscsLAR_int_expanded <- c(theta_222csLAR_int_expanded, 20) # SG-StMVAR, M1=1, M2=1
 
+## Fixed alphas and lambdas
+
+# p=1, M=2, d=2, model="GMVAR", constraints=C_122, weight_constraints=0.6, structural_pars=list(W=W_122, fixed_lambdas=c(4, 3))
+theta_122cwsF <- c(phi10_122, phi20_122, vec(A11_122), vec(W_122))
+
+# p=2, M=2, d=2, model="StMVAR", constraints=C_222, weight_constraints=0.6, structural_pars=list(W=W_222, fixed_lambdas=c(4, 3))
+theta_222tcwsF <- c(phi10_222, phi20_222, vec(A11_222), vec(A12_222), vec(W_222), 11, 12)
+
+# p=2, M=c(1, 1), d=2, model="G-StMVAR", constraints=C_222, same_means=list(1:2), weight_constraints=0.6,
+# structural_pars=list(W=W_222, fixed_lambdas=c(4, 3))
+theta_222gscmwsF <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222), 11)
 
 test_that("get_regime_means_int works correctly", {
   expect_equal(get_regime_means_int(p=1, M=1, d=2, params=theta_112, parametrization="intercept", constraints=NULL),
@@ -405,6 +418,16 @@ test_that("get_regime_means_int works correctly", {
                                     structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2)),
                unname(cbind(phi10_222, phi10_222)))
 
+  # Fixed alphas and lambdas
+  expect_equal(c(get_regime_means_int(p=1, M=2, d=2, params=theta_122cwsF, model="GMVAR", constraints=C_122, weight_constraints=0.6,
+                                    structural_pars=list(W=W_122, fixed_lambdas=c(4, 3)))),
+               c(1.030956, 2.553492, 1.846211, 3.210253), tolerance=1e-5)
+  expect_equal(c(get_regime_means_int(p=2, M=2, d=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                                      structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))),
+               c(-5.000000, 123.000000, 9.666667, 140.333333), tolerance=1e-5)
+  expect_equal(c(get_regime_means_int(p=2, M=c(1, 1), d=2, params=theta_222gscmwsF, model="G-StMVAR", constraints=C_222, same_means=list(1:2),
+                                      weight_constraints=0.6, structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))),
+               c(-5, 123, -5, 123), tolerance=1e-5)
 })
 
 
@@ -479,6 +502,17 @@ test_that("get_regime_autocovs_int works correctly", {
                                        structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))[, 1, 2, 1],
                c(29.21410, -47.35956), tolerance=1e-5)
 
+  # Fixed lambdas and alphas
+  expect_equal(get_regime_autocovs_int(p=1, M=2, d=2, params=theta_122cwsF, model="GMVAR", constraints=C_122, weight_constraints=0.6,
+                                       structural_pars=list(W=W_122, fixed_lambdas=c(4, 3)))[, 2, 2, 1],
+               c(-0.2282206, 0.5365515), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=2, d=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                                       structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))[, 2, 2, 1],
+               c(-48.59455, 246.67447), tolerance=1e-5)
+  expect_equal(get_regime_autocovs_int(p=2, M=c(1, 1), d=2, params=theta_222gscmwsF, model="G-StMVAR", constraints=C_222,
+                                       same_means=list(1:2), weight_constraints=0.6,
+                                       structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))[, 2, 2, 1],
+               c(-48.59455, 246.67447), tolerance=1e-5)
 })
 
 
@@ -593,10 +627,29 @@ test_that("uncond_moments_int works correctly", {
   expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222tcsLAR_int, model="StMVAR", parametrization="mean", constraints=C_222,
                                   structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2))$autocors[, 2, 1],
                c(-0.6139921, 1.0000000), tolerance=1e-6)
+
+  # Fixed lambdas and alphas
+  expect_equal(uncond_moments_int(p=1, M=2, d=2, params=theta_122cwsF, model="GMVAR", constraints=C_122, weight_constraints=0.6,
+                                  structural_pars=list(W=W_122, fixed_lambdas=c(4, 3)))$autocors[, 2, 1],
+               c(0.01365825, 1.00000000), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=2, d=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                                  structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))$uncond_mean,
+               c(0.8666667, 129.9333333), tolerance=1e-6)
+  expect_equal(uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gscmwsF, model="G-StMVAR", constraints=C_222, same_means=list(1:2),
+                                  weight_constraints=0.6, structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))$autocors[, 2, 1],
+               c(-0.5008924, 1.0000000), tolerance=1e-6)
 })
 
 
 test_that("non_int uncond moment functions work", {
+  mod122cwsF <- GSMVAR(p=1, M=2, d=2, params=theta_122cwsF, model="GMVAR", constraints=C_122, weight_constraints=0.6,
+                       structural_pars=list(W=W_122, fixed_lambdas=c(4, 3)))
+  mod222tcwsF <- GSMVAR(p=2, M=2, d=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                        structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))
+  mod222gscmwsF <- GSMVAR(p=2, M=c(1, 1), d=2, params=theta_222gscmwsF, model="G-StMVAR", constraints=C_222, same_means=list(1:2),
+                          parametrization="mean", weight_constraints=0.6, structural_pars=list(W=W_222, fixed_lambdas=c(4, 3)))
+
+
   mod122 <- GSMVAR(p=1, M=2, d=2, params=theta_122)
   mod112csWAR <- GSMVAR(p=1, M=1, d=2, params=theta_112csWAR, structural_pars=list(W=W_112))
   mod112tcsWAR <- GSMVAR(p=1, M=1, d=2, params=c(theta_112csWAR, 10), model="StMVAR", structural_pars=list(W=W_112))
@@ -616,6 +669,20 @@ test_that("non_int uncond moment functions work", {
   unc222gscsLAR <- uncond_moments(mod222gscsLAR)
   unc222c_int <- uncond_moments(mod222c_int)
   unc222tc_int <- uncond_moments(mod222tc_int)
+
+  unc122cwsF <- uncond_moments(mod122cwsF)
+  unc222tcwsF <- uncond_moments(mod222tcwsF)
+  unc222gscmwsF <- uncond_moments(mod222gscmwsF)
+
+  expect_equal(unc122cwsF, uncond_moments_int(p=1, M=2, d=2, params=theta_122cwsF, model="GMVAR", constraints=C_122,
+                                              weight_constraints=0.6, structural_pars=list(W=W_122, fixed_lambdas=c(4, 3))), tolerance=1e-6)
+  expect_equal(unc222tcwsF, uncond_moments_int(p=2, M=2, d=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                                               structural_pars=list(W=W_222, fixed_lambdas=c(4, 3))), tolerance=1e-6)
+  expect_equal(unc222gscmwsF, uncond_moments_int(p=2, M=c(1, 1), d=2, params=theta_222gscmwsF, model="G-StMVAR", constraints=C_222,
+                                                 same_means=list(1:2), weight_constraints=0.6, parametrization="mean",
+                                                 structural_pars=list(W=W_222, fixed_lambdas=c(4, 3))), tolerance=1e-6)
+
+
 
   expect_equal(unc122, uncond_moments_int(p=1, M=2, d=2, params=theta_122), tolerance=1e-6)
   expect_equal(unc112csWAR, uncond_moments_int(p=1, M=1, d=2, params=theta_112csWAR,

@@ -82,7 +82,7 @@
 #' @export
 
 GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "StMVAR", "G-StMVAR"), parametrization=c("intercept", "mean"),
-                  constraints=NULL, same_means=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
+                  constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL, calc_cond_moments, calc_std_errors=FALSE,
                   stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -100,11 +100,13 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     }
   }
   check_pMd(p=p, M=M, d=d, model=model)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars)
   check_parameters(p=p, M=M, d=d, params=params, model=model, parametrization=parametrization, constraints=constraints,
-                   same_means=same_means, structural_pars=structural_pars,
+                   same_means=same_means, weight_constraints=weight_constraints, structural_pars=structural_pars,
                    stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
-  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                    structural_pars=structural_pars)
 
   if(is.null(data)) {
     lok_and_mw <- list(loglik=NA, mw=NA)
@@ -115,6 +117,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     lok_and_mw <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                     conditional=conditional, parametrization=parametrization,
                                     constraints=constraints, same_means=same_means,
+                                    weight_constraints=weight_constraints,
                                     structural_pars=structural_pars,
                                     to_return="loglik_and_mw",
                                     check_params=FALSE, minval=NA,
@@ -122,6 +125,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=params, model=model,
                                          conditional=conditional, parametrization=parametrization,
                                          constraints=constraints, same_means=same_means,
+                                         weight_constraints=weight_constraints,
                                          structural_pars=structural_pars, stat_tol=stat_tol,
                                          posdef_tol=posdef_tol, df_tol=df_tol)
     IC <- get_IC(loglik=lok_and_mw$loglik, npars=npars, obs=ifelse(conditional, nrow(data) - p, nrow(data)))
@@ -135,7 +139,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
       std_errors <- tryCatch(standard_errors(data=data, p=p, M=M, params=params, model=model,
                                              conditional=conditional, parametrization=parametrization,
                                              constraints=constraints, same_means=same_means,
-                                             structural_pars=structural_pars,
+                                             weight_constraints=weight_constraints, structural_pars=structural_pars,
                                              minval=-(10^(ceiling(log10(nrow(data))) + ncol(data) + 1) - 1),
                                              stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
                              error=function(e) {
@@ -154,7 +158,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
     get_cm <- function(to_return) loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                                     conditional=conditional, parametrization=parametrization,
                                                     constraints=constraints, same_means=same_means,
-                                                    structural_pars=structural_pars,
+                                                    weight_constraints=weight_constraints, structural_pars=structural_pars,
                                                     check_params=TRUE,
                                                     to_return=to_return, minval=NA,
                                                     stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
@@ -174,6 +178,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
                             parametrization=parametrization,
                             constraints=constraints,
                             same_means=same_means,
+                            weight_constraints=weight_constraints,
                             structural_pars=structural_pars),
                  params=params,
                  std_errors=std_errors,
@@ -192,6 +197,7 @@ GSMVAR <- function(data, p, M, d, params, conditional=TRUE, model=c("GMVAR", "St
                                                    parametrization=parametrization,
                                                    constraints=constraints,
                                                    same_means=same_means,
+                                                   weight_constraints=weight_constraints,
                                                    structural_pars=structural_pars),
                  all_estimates=NULL,
                  all_logliks=NULL,
