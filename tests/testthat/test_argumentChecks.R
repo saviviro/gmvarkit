@@ -706,6 +706,38 @@ test_that("check_parameters works correctly", {
   expect_error(check_parameters(p=1, M=2, d=3, params=theta_123csL_int, same_means=list(1:2),
                                 structural_pars=list(W=W_123, C_lambda=C_lambda_123), parametrization="mean"))
 
+  # Fixed alphas and lambdas
+  expect_error(check_parameters(p=1, M=2, d=3, params=theta_123w, weight_constraints=0.6))
+  expect_error(check_parameters(p=1, M=2, d=3, params=theta_123twsF, model="StMVAR", weight_constraints=0.6,
+                                structural_pars=list(W=W_123, fixed_lambdas=c(3, 2, 1))))
+  expect_error(check_parameters(p=3, M=3, d=2, params=theta_332w, weight_constraints=c(0.5, 0.3)))
+  expect_error(check_parameters(p=3, M=c(1, 2), d=2, params=theta_332gswsWF, model="G-StMVAR", weight_constraints=c(0.5, 0.3),
+                                structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1))))
+  expect_silent(check_parameters(p=2, M=2, d=2, params=theta_222tcw, model="StMVAR", constraints=C_222, weight_constraints=0.7))
+  expect_silent(check_parameters(p=2, M=2, d=2, params=theta_222tcwsL, model="StMVAR", constraints=C_222, weight_constraints=0.7,
+                                 structural_pars=list(W=W_222, C_lambda=C_lambda_222), parametrization="mean"))
+  expect_silent(check_parameters(p=1, M=c(1, 1), d=2, params=theta_122gsmw, model="G-StMVAR", same_means=list(1:2),
+                                 weight_constraints=0.7, parametrization="mean"))
+  expect_silent(check_parameters(p=1, M=2, d=2, params=theta_122cmwsF, model="GMVAR", constraints=C_122, same_means=list(1:2),
+                                 weight_constraints=0.7, structural_pars=list(W=W_122, fixed_lambdas=c(4, 3)), parametrization="mean"))
+  expect_silent(check_parameters(p=2, M=2, d=2, params=theta_222tcmw, model="StMVAR", constraints=C_222, same_means=list(1:2),
+                                 weight_constraints=0.7, parametrization="mean"))
+  expect_silent(check_parameters(p=2, M=2, d=2, params=theta_222cmwsF, model="GMVAR", constraints=C_222, same_means=list(1:2),
+                                 weight_constraints=0.7, structural_pars=list(W=W_222, fixed_lambdas=c(6, 1)), parametrization="mean"))
+  expect_error(check_parameters(p=3, M=c(2, 1), d=2, params=theta_332gscmw, model="G-StMVAR", constraints=C_332, same_means=list(1, 2:3),
+                                weight_constraints=c(0.5, 0.3), parametrization="mean"))
+  expect_error(check_parameters(p=3, M=3, d=2, params=theta_332tmsWF, model="StMVAR", same_means=list(1:2, 3),
+                                structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)), parametrization="mean"))
+  expect_error(check_parameters(p=3, M=3, d=2, params=theta_332cmwsWF, model="GMVAR", constraints=C_332, same_means=list(1:3),
+                                weight_constraints=c(0.5, 0.3), structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
+                                parametrization="mean"))
+  expect_silent(check_parameters(p=1, M=c(1, 1), d=3, params=theta_123gscmw, model="G-StMVAR", constraints=C_123, same_means=list(1:2),
+                                 weight_constraints=0.7, parametrization="mean"))
+  expect_silent(check_parameters(p=1, M=2, d=3, model="GMVAR", params=theta_123cmwsL, constraints=C_123, same_means=list(1:2),
+                                 weight_constraints=0.7, structural_pars=list(W=W_123, C_lambda=C_lambda_123), parametrization="mean"))
+  expect_silent(check_parameters(p=1, M=2, d=3, params=theta_123tcmwsF, model="StMVAR", constraints=C_123, same_means=list(1:2),
+                                 weight_constraints=0.7, structural_pars=list(W=W_123, fixed_lambdas=c(4, 3, 2)), parametrization="mean"))
+
   # Check df
   expect_error(check_parameters(p=1, M=2, d=2, params=theta_122t_df, model="StMVAR"))
   expect_error(check_parameters(p=1, M=c(1, 1), d=2, params=theta_122gs_df, model="G-StMVAR"))
