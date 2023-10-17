@@ -1405,7 +1405,8 @@ theta_332t_2 <- c(theta_332, 10, 20, 30)
 theta_332t_3 <- c(theta_332, 10, 30, 20)
 theta_332gs_2 <- c(theta_332, 20, 30)
 
-
+# p=1, M=2, d=2, model="StMVAR", weight_constraints=0.83, structural_pars=list(W=W_122, fixed_lambdas=c(7, 3))
+params12twsF <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), vec(W_122), 10, 1000)
 
 
 test_that("stmvarpar_to_gstmvar works correctly", {
@@ -1560,6 +1561,17 @@ test_that("stmvarpar_to_gstmvar works correctly", {
                                                       same_means=list(1:2, 3), structural_pars=list(W=W_332, fixed_lambdas=c(7, 2, 6, 1)),
                                                       maxdf=11.5)$fixed_lambdas),
                redecompose_Omegas(M=3, d=2, W=W_332, lambdas=c(7, 2, 6, 1), perm=c(2, 3, 1))[5:8], tol=1e-6)
+
+  expect_equal(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=params12twsF, model="StMVAR", weight_constraints=0.83,
+                                     structural_pars=list(W=W_122, fixed_lambdas=c(7, 3)), maxdf=100)$params,
+               c(phi20_122, phi10_122, vec(A21_122), vec(A11_122),
+                 redecompose_Omegas(M=2, d=2, W=W_122, lambdas=c(7, 3), perm=2:1)[1:4], 10), tolerance=1e-6)
+  expect_equal(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=params12twsF, model="StMVAR", weight_constraints=0.83,
+                                     structural_pars=list(W=W_122, fixed_lambdas=c(7, 3)), maxdf=100)$weight_constraints,
+               1 - 0.83, tolerance=1e-6)
+  expect_equal(stmvarpars_to_gstmvar(p=1, M=2, d=2, params=params12twsF, model="StMVAR", weight_constraints=0.83,
+                                     structural_pars=list(W=W_122, fixed_lambdas=c(7, 3)), maxdf=100)$fixed_lambdas,
+               c(0.1428571, 0.3333333), tolerance=1e-5)
 })
 
 

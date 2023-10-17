@@ -267,6 +267,7 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
   model <- match.arg(model)
   loglik_mw_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                              parametrization=parametrization, constraints=constraints,
+                                             weight_constraints=weight_constraints,
                                              same_means=same_means, structural_pars=structural_pars,
                                              to_return="loglik_mw_archscalars", check_params=TRUE, minval=NA,
                                              stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
