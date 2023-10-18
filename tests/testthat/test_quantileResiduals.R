@@ -131,6 +131,24 @@ mod_222tcsLAR_int <- GSMVAR(gdpdef, p=2, M=2, params=c(theta_222csLAR_int, 20, 2
                           constraints=C_222, structural_pars=list(W=W_222, C_lambda=C_lambda_222), same_means=list(1:2),
                           calc_std_errors=FALSE)
 
+# p=2, M=2, d=2, model="GMVAR", constraints=C_222, same_means=list(1:2), weight_constraints=0.6,
+# structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)), parametrizarion="mean"
+theta_222cmwsF <- c(phi10_222, vec(A11_222), vec(A12_222), vec(W_222))
+mod_222cmwsF <- GSMVAR(gdpdef,  p=2, M=2, params=theta_222cmwsF, model="GMVAR", constraints=C_222, same_means=list(1:2),
+                       weight_constraints=0.6, parametrization="mean", structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)))
+
+# p=2, M=2, d=2, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+# structural_pars=list(W=W_222, fixed_lambdas=c(7, 3))
+theta_222tcwsF <- c(phi10_222, c(1.79, 3.00), vec(A11_222), vec(A12_222), vec(W_222), 11, 12)
+mod_222tcwsF <- GSMVAR(gdpdef,  p=2, M=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                       structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)))
+
+# p=2, M=c(1, 1), d=2, model="G-StMVAR", constraints=C_222, structural_pars=list(W=W_222, fixed_lambdas=c(7, 3))
+theta_222gscsF <- c(phi10_222, c(1.79, 3.00), vec(A11_222), vec(A12_222), vec(W_222), 0.6, 11)
+mod_222gscsF <- GSMVAR(gdpdef,  p=2, M=c(1, 1), params=theta_222gscsF, model="G-StMVAR", constraints=C_222,
+                       structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)))
+
+
 
 # Calculate quantile residuals
 res_112 <- quantile_residuals(mod_112)
@@ -163,6 +181,10 @@ res_222gscsLAR <- quantile_residuals(mod_222gscsLAR) # G-StMVAR
 
 res222csLAR_int <- quantile_residuals(mod_222csLAR_int)
 res222tcsLAR_int <- quantile_residuals(mod_222tcsLAR_int) # StMVAR
+
+res_222cmwsF <- quantile_residuals(mod_222cmwsF)
+res_222tcwsF <- quantile_residuals(mod_222tcwsF)
+res_222gscsF <- quantile_residuals(mod_222gscsF)
 
 
 test_that("quantile_residuals works correctly", {
@@ -231,6 +253,10 @@ test_that("quantile_residuals works correctly", {
   expect_equal(res222csLAR_int[c(1, 5, 100, 200)], c(-2.6082444, -0.9789409, 0.8552812, 1.5705630), tolerance=1e-6)
   expect_equal(res222tcsLAR_int[c(3, 7, 14, 201)], c(3.538059, 1.003902, -1.036117, 1.318223), tolerance=1e-6)
 
+  # Fixed alphas and lambdas
+  expect_equal(c(res_222cmwsF[c(1, 13),]), c(-1.1627924, 0.1856571, 0.3064827, -0.3428420), tolerance=1e-6)
+  expect_equal(c(res_222tcwsF[c(1, 242),]), c(-2.4532966, -0.9148971, 0.3486117, -0.1578582), tolerance=1e-6)
+  expect_equal(c(res_222gscsF[c(1, 2, 242),]), c(-3.4222887, -2.1161398, -0.7937896, 0.5470228, 0.8390555, -0.1438871), tolerance=1e-6)
 })
 
 test_that("quantile_residuals_int works correctly", {
@@ -245,11 +271,17 @@ test_that("quantile_residuals_int works correctly", {
   qr222gs <- quantile_residuals_int(gdpdef, p=2, M=c(1, 1), params=c(theta_222, 4), model="G-StMVAR", conditional=TRUE,
                                     parametrization="mean")
 
+  qr222tcwsF <- quantile_residuals_int(gdpdef, p=2, M=2, params=theta_222tcwsF, model="StMVAR", constraints=C_222, weight_constraints=0.6,
+                                       structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)), parametrization="intercept", conditional=TRUE)
+
   expect_equal(qr112, res_112, tolerance=1e-6)
   expect_equal(qr222csLAR, res_222csLAR, tolerance=1e-6)
   expect_equal(qr222csLAR_int[1:3], c(-2.608244, -1.453003, 4.221412), tolerance=1e-6)
   expect_equal(qr222t[c(1, 13, 6, 206)], c(-1.0250704, 0.5404009, -2.1362256, -0.2425385), tolerance=1e-6)
   expect_equal(qr222gs[c(1, 14, 7, 208)], c(-1.0049791, -0.7887779, 0.7620531, 0.6624912), tolerance=1e-6)
+  expect_equal(qr222tcwsF, res_222tcwsF, tolerance=1e-6)
+  expect_equal(qr222tcwsF[c(1, 2, 300)], c(-2.453297, -1.499268, 1.705310), tolerance=1e-6)
+
 })
 
 

@@ -51,12 +51,12 @@ quantile_residuals <- function(gsmvar) {
   T_obs <- n_obs - p
 
   # Collect parameter values
-  params <- gsmvar$params
-  params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=gsmvar$model$constraints,
-                                    same_means=gsmvar$model$same_means, structural_pars=structural_pars)
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model, constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means, weight_constraints=gsmvar$model$weight_constraints,
+                                    structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(gsmvar$model$parametrization == "mean") {
-    params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
+    params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL, weight_constraints=NULL,
                                      structural_pars=structural_pars, change_to="intercept")
   }
   all_mu <- get_regime_means(gsmvar)
@@ -263,7 +263,6 @@ quantile_residuals <- function(gsmvar) {
 quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional, parametrization, constraints=NULL,
                                    same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                                    stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
-  # WEIGHT CONSTRAINTS NOT YET IMPLEMENTED HERE
   model <- match.arg(model)
   loglik_mw_archscalars <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                              parametrization=parametrization, constraints=constraints,
@@ -283,6 +282,7 @@ quantile_residuals_int <- function(data, p, M, params, model=c("GMVAR", "StMVAR"
                                    parametrization=parametrization,
                                    constraints=constraints,
                                    same_means=same_means,
+                                   weight_constraints=weight_constraints,
                                    structural_pars=structural_pars),
                         params=params,
                         std_errors=rep(NA, npars),
