@@ -213,3 +213,4 @@
 * Fixed a bug in the estimation of GIRF and GFEVD for StMVAR and G-StMVAR models 
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
 * Fixed a bug that occurred when using swap_W_signs with C_lambda constraints.
+* Fixed a bug in Rao test when using G-StMVAR model

@@ -225,11 +225,13 @@ Rao_test <- function(gsmvar) {
   parametrization <- gsmvar$model$parametrization
   structural_pars <- gsmvar$model$structural_pars
   conditional <- gsmvar$model$conditional
+  weight_constraints <- gsmvar$model$weight_constraints
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model, constraints=constraints,
-                                    same_means=same_means, structural_pars=structural_pars)
+                                    same_means=same_means, weight_constraints=weight_constraints,
+                                    structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
-  new_gsmvar <- GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=params, conditional=conditional,
-                       parametrization=parametrization, constraints=NULL, same_means=NULL,
+  new_gsmvar <- GSMVAR(data=gsmvar$data, p=p, M=M, d=d, params=params, model=model, conditional=conditional,
+                       parametrization=parametrization, constraints=NULL, same_means=NULL, weight_constraints=NULL,
                        structural_pars=structural_pars, calc_std_errors=FALSE, stat_tol=gsmvar$num_tols$stat_tol,
                        posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
 
@@ -247,9 +249,9 @@ Rao_test <- function(gsmvar) {
     # Log-likelihood function as a function of the parameter
     loglikelihood_int(data=new_gsmvar$data, p=p, M=M, params=x, conditional=conditional,
                       parametrization=parametrization, constraints=NULL, same_means=NULL,
-                      structural_pars=structural_pars, stat_tol=gsmvar$num_tols$stat_tol,
-                      posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol,
-                      to_return="terms", minval=NA)[which_obs]
+                      weight_constraints=NULL, structural_pars=structural_pars,
+                      stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol,
+                      df_tol=gsmvar$num_tols$df_tol, to_return="terms", minval=NA)[which_obs]
   }
   T_obs <- nrow(new_gsmvar$data) - new_gsmvar$model$p
   outer_prods <- array(dim=c(length(Grad), length(Grad), T_obs))
