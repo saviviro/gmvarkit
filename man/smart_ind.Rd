@@ -13,6 +13,7 @@ smart_ind(
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   accuracy = 1,
   which_random = numeric(0),

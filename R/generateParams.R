@@ -76,15 +76,16 @@ random_ind <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constrai
 #' @inherit random_ind return references
 #' @keywords internal
 
-smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL, structural_pars=NULL,
-                      accuracy=1, which_random=numeric(0), mu_scale, mu_scale2, omega_scale, ar_scale=1, ar_scale2=1,
-                      W_scale, lambda_scale) {
+smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL, same_means=NULL,
+                      weight_constraints=NULL, structural_pars=NULL, accuracy=1, which_random=numeric(0),
+                      mu_scale, mu_scale2, omega_scale, ar_scale=1, ar_scale2=1, W_scale, lambda_scale) {
   model <- match.arg(model)
   M_orig <- M
   M <- sum(M)
   scale_A <- ar_scale2*(1 + log(2*mean(c((p - 0.2)^(1.25), d))))
   params_std <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model,
                                         constraints=constraints, same_means=same_means,
+                                        weight_constraints=weight_constraints,
                                         structural_pars=structural_pars)
   unc_structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   alphas <- pick_alphas(p=p, M=M_orig, d=d, params=params_std, model=model)
@@ -166,15 +167,15 @@ smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), c
         covmat_pars <- random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars)
       } else { # First regime is smart
         W_pars <- Wvec(pick_W(p=p, M=M, d=d, params=params_std, structural_pars=unc_structural_pars))
-        if(M > 1) {
+        if(M > 1 && is.null(structural_pars$fixed_lambdas)) {
           n_lambs <- ifelse(is.null(structural_pars$C_lambda), d*(M - 1), ncol(structural_pars$C_lambda))
           W_and_lambdas <- c(W_pars, params[(length(params) - (M - 1) - n_lambs + 1):(length(params) - (M - 1))])
         } else {
-          W_and_lambdas <- W_pars # No lambdas when M == 1
+          W_and_lambdas <- W_pars # No lambdas when M == 1 or fixed_lambdas are used
         }
         covmat_pars <- smart_covmat(d=d, M=M, W_and_lambdas=W_and_lambdas, accuracy=accuracy, structural_pars=structural_pars)
       }
-      if(is.null(structural_pars$C_lambda) && M > 1) {
+      if(is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) && M > 1) {
         # If lambdas are not constrained, we can replace smart lambdas of some regimes with random lambdas
         for(m in 2:M) {
           if(any(which_random == m)) {
@@ -186,10 +187,10 @@ smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), c
     }
     pars <- c(phi0_pars, AR_pars, covmat_pars)
   }
-  if(M > 1) {
+  if(M > 1 && is.null(weight_constraints)) {
     alphas <- abs(rnorm(M, mean=alphas, sd=0.1))
     ret <- c(pars, (alphas/sum(alphas))[-M])
-  } else {
+  } else { # No alpha params
     ret <- pars
   }
   c(ret, smart_df(M=M_orig, df=all_df, accuracy=accuracy, which_random=which_random, model=model))
