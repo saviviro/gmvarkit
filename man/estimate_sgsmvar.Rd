@@ -47,6 +47,8 @@ The purpose of \code{estimate_gsmvar} is to provide a convenient tool to estimat
   obtain the corresponding, statistically identified structural model. After obtaining the statistically identified
   structural model, overidentifying constraints may be placed the W-matrix (or equally B-matrix). This function makes
   imposing the overidentifying constraints and estimating the overidentified structural model convenient.
+  \strong{Reduced form models can be directly used as lower-triangular Cholesky identified SVARs without having
+  to estimate a structural model separately.}
 
   \strong{Note that the surface of the log-likelihood function is extremely multimodal, and this function is designed
   to only explore the neighbourhood of the preliminary estimates, so it finds its way reliably to the correct MLE

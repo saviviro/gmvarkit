@@ -419,6 +419,8 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
 #'   obtain the corresponding, statistically identified structural model. After obtaining the statistically identified
 #'   structural model, overidentifying constraints may be placed the W-matrix (or equally B-matrix). This function makes
 #'   imposing the overidentifying constraints and estimating the overidentified structural model convenient.
+#'   \strong{Reduced form models can be directly used as lower-triangular Cholesky identified SVARs without having
+#'   to estimate a structural model separately.}
 #'
 #'   \strong{Note that the surface of the log-likelihood function is extremely multimodal, and this function is designed
 #'   to only explore the neighbourhood of the preliminary estimates, so it finds its way reliably to the correct MLE
@@ -474,11 +476,14 @@ estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, see
   gsmvar <- gsmvar_to_sgsmvar(gsmvar, calc_std_errors=FALSE, cholesky=FALSE) # Turn it to a structural model
   }
   pars <- gsmvar$params
-  n_alphas <- sum(M) - 1
-  if(is.null(gsmvar$model$structural_pars$C_lambda)) { # Structural model without lambda constraints
+  n_alphas <- ifelse(is.null(gsmvar$model$weight_constraints), sum(M) - 1, 0)
+  if(is.null(gsmvar$model$structural_pars$C_lambda) && is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
+    # Structural model without lambda constraints
     n_lambdas <- (sum(M) - 1)*d
-  } else { # Structural model with lambda constraints
+  } else if(!is.null(gsmvar$model$structural_pars$C_lambda)) { # Structural model with C_lambda constraints
     n_lambdas <- ncol(gsmvar$model$structural_pars$C_lambda) # The number of constraint params
+  } else { # Structural model with fixed_lambdas
+    n_lambdas <- 0
   }
   model <- gsmvar$model$model
   if(model == "GMVAR") {
@@ -541,18 +546,28 @@ estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, see
 
   new_loglik <- loglikelihood_int(data=gsmvar$data, p=p, M=M, params=new_pars, model=model,
                                   conditional=gsmvar$model$conditional,
-                                  structural_pars=list(W=new_W, C_lambda=gsmvar$model$structural_pars$C_lambda),
-                                  constraints=gsmvar$model$constraints, parametrization=gsmvar$model$parametrization,
-                                  same_means=gsmvar$model$same_means)
+                                  parametrization=gsmvar$model$parametrization,
+                                  constraints=gsmvar$model$constraints,
+                                  same_means=gsmvar$model$same_means,
+                                  weight_constraints=gsmvar$model$weight_constraints,
+                                  structural_pars=list(W=new_W,
+                                                       C_lambda=gsmvar$model$structural_pars$C_lambda,
+                                                       fixed_lambdas=gsmvar$model$structural_pars$fixed_lambdas))
 
   cat("The log-likelihood of the supplied model:   ", round(c(gsmvar$loglik), 3),
       "\nConstrained log-likelihood prior estimation:", round(new_loglik, 3), "\n\n")
 
-  fitGSMVAR(data=gsmvar$data, p=p, M=M, model=model, conditional=gsmvar$model$conditional,
+  fitGSMVAR(data=gsmvar$data, p=p, M=M, model=model,
+            conditional=gsmvar$model$conditional,
             parametrization=gsmvar$model$parametrization,
-            structural_pars=list(W=new_W, C_lambda=gsmvar$model$structural_pars$C_lambda),
-            constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
-            ncalls=ncalls, ncores=ncores, seeds=seeds, maxit=maxit, smart_mu=1, initpop=list(new_pars))
+            structural_pars=list(W=new_W,
+                                 C_lambda=gsmvar$model$structural_pars$C_lambda,
+                                 fixed_lambdas=gsmvar$model$structural_pars$fixed_lambdas),
+            constraints=gsmvar$model$constraints,
+            same_means=gsmvar$model$same_means,
+            weight_constraints=gsmvar$model$weight_constraints,
+            ncalls=ncalls, ncores=ncores, seeds=seeds, maxit=maxit,
+            smart_mu=1, initpop=list(new_pars))
 }
 
 
