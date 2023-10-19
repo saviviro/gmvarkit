@@ -96,6 +96,7 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
                                    parametrization=gsmvar$model$parametrization,
                                    constraints=gsmvar$model$constraints,
                                    same_means=gsmvar$model$same_means,
+                                   weight_constraints=gsmvar$model$weight_constraints,
                                    structural_pars=gsmvar$model$structural_pars,
                                    g=g, dim_g=dim_g, ncores=ncores, stat_tol=stat_tol,
                                    posdef_tol=posdef_tol, df_tol=df_tol),
@@ -252,7 +253,8 @@ quantile_residual_tests <- function(gsmvar, lags_ac=c(1, 3, 6, 12), lags_ch=lags
 #' @inherit quantile_residuals references
 #' @keywords internal
 
-get_test_Omega <- function(data, p, M, params, model, conditional, parametrization, constraints, same_means, structural_pars=NULL,
+get_test_Omega <- function(data, p, M, params, model, conditional, parametrization, constraints, same_means,
+                           weight_constraints, structural_pars=NULL,
                            g, dim_g, ncores=1, stat_tol=1e-3, posdef_tol=1e-8, df_tol=1e-8) {
 
   n_obs <- nrow(data)
@@ -264,16 +266,17 @@ get_test_Omega <- function(data, p, M, params, model, conditional, parametrizati
   g_fn <- function(pars) {
     qresiduals <- quantile_residuals_int(data=data, p=p, M=M, params=pars, model=model, conditional=conditional,
                                          parametrization=parametrization, constraints=constraints,
-                                         same_means=same_means, structural_pars=structural_pars,
-                                         stat_tol=stat_tol, posdef_tol=posdef_tol)
+                                         same_means=same_means, weight_constraints=weight_constraints,
+                                         structural_pars=structural_pars, stat_tol=stat_tol, posdef_tol=posdef_tol)
     g(qresiduals) # a row for each t=1,...,T and column for each output of g
   }
 
   # Function used to calculate gradient for log-likelihood
   loglik_fn <- function(pars) {
     loglikelihood_int(data, p, M, params=pars, model=model, conditional=conditional, parametrization=parametrization,
-                      constraints=constraints, same_means=same_means, structural_pars=structural_pars,
-                      check_params=TRUE, to_return="terms", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol)
+                      constraints=constraints, same_means=same_means, weight_constraints=weight_constraints,
+                      structural_pars=structural_pars, check_params=TRUE, to_return="terms", minval=minval,
+                      stat_tol=stat_tol, posdef_tol=posdef_tol)
   }
 
   npars <- length(params)

@@ -72,6 +72,14 @@ params_222cm <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
                   0.114109, 0.229542, 0.003092, 0.027266, 0.424341)
 mod_222cm <- GSMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
 
+
+# p=2, M=c(1, 1), d=2, model="G-StMVAR", constraints=C_222, weight_constraints=0.6,
+# structural_pars=list(W=W_222, fixed_lambdas=c(7, 3))
+theta_222gscwsF <- c(phi10_222, c(1.79, 3.00), vec(A11_222), vec(A12_222), vec(W_222), 11)
+mod_222gscwsF <- GSMVAR(gdpdef,  p=2, M=c(1, 1), params=theta_222gscwsF, model="G-StMVAR", constraints=C_mat,
+                        weight_constraints=0.6, structural_pars=list(W=W_222, fixed_lambdas=c(7, 3)))
+
+
 set.seed(1)
 res_112 <- quantile_residual_tests(mod_112, lags_ac=1:2, lags_ch=1:2, nsim=300, print_res=FALSE)
 res_222 <- quantile_residual_tests(mod_222, lags_ac=3, lags_ch=1, nsim=1, print_res=FALSE)
@@ -84,6 +92,8 @@ set.seed(1); res_112s <- quantile_residual_tests(mod_112s, lags_ac=1:2, lags_ch=
 set.seed(1); res_222s <- quantile_residual_tests(mod_222s, lags_ac=1, lags_ch=2, nsim=300, print_res=FALSE)
 
 set.seed(1); res_222cm <- quantile_residual_tests(mod_222cm, lags_ac=2, lags_ch=1, nsim=1, print_res=FALSE)
+set.seed(1); res_222gscwsF <- quantile_residual_tests(mod_222gscwsF, lags_ac=2, lags_ch=1, nsim=1, print_res=FALSE)
+
 
 test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_112$norm_res$test_stat, 154.3486, tolerance=1)
@@ -119,9 +129,17 @@ test_that("quantile_residual_tests - test_results - works correctly", {
   expect_equal(res_222cm$norm_res$p_val, 0.2152119, tolerance=1e-4)
   expect_equal(res_222cm$ac_res$test_results$p_val, 0.05002536, tolerance=1e-4)
   expect_equal(res_222cm$ch_res$test_results$p_val, 0.270333, tolerance=1e-4)
+
+  # Fixed alphas and lambdas
+  expect_equal(res_222gscwsF$norm_res$p_val, 1.796328e-08, tolerance=1e-4)
+  expect_equal(res_222gscwsF$ac_res$test_results$p_val, 3.302052e-05, tolerance=1e-4)
+  expect_equal(res_222gscwsF$ch_res$test_results$p_val, 0.01474343, tolerance=1e-4)
 })
 
 test_that("quantile_residual_tests - ind_stats - works correctly", {
+  expect_equal(res_222gscwsF$ac_res$ind_stats$lag2, c(-1.8117884, 2.1669619, -0.2465156, -0.9021953), tolerance=1e-4)
+  expect_equal(res_222gscwsF$ch_res$ind_stats$lag1, c(2.765834, 2.596170, 2.395135, 2.545312), tolerance=1e-4)
+
   expect_equal(res_112$ac_res$ind_stats$lag2, c(2.5963913, 0.1874684, 0.7390084, -0.9374877), tolerance=1e-4)
   expect_equal(res_112$ch_res$ind_stats$lag1, c(2.3595939, -0.1535945, 3.6163184, 5.7548554), tolerance=1e-4)
 
