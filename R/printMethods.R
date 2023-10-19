@@ -31,6 +31,7 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   IC <- gsmvar$IC
   constraints <- gsmvar$model$constraints
   same_means <- gsmvar$model$same_means
+  weight_constraints <- gsmvar$model$weight_constraints
   structural_pars <- gsmvar$model$structural_pars
   all_mu <- round(get_regime_means(gsmvar), digits)
   params <- gsmvar$params
@@ -38,6 +39,7 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   T_obs <- ifelse(is.null(gsmvar$data), NA, nrow(gsmvar$data))
   params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model,
                                     constraints=constraints, same_means=same_means,
+                                    weight_constraints=weight_constraints,
                                     structural_pars=structural_pars)
   if(gsmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, model=model,
@@ -59,13 +61,11 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
   }
   cat(paste0("d = ", d, ", #parameters = " , npars, ","),
       ifelse(is.na(T_obs), "\n", paste0("#observations = ", T_obs, " x ", d, ",\n")),
-      ifelse(gsmvar$model$conditional, "conditional", "exact"),
-      "log-likelihood,",
-      ifelse(gsmvar$model$parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(same_means),
-             ifelse(is.null(constraints), "no AR parameter constraints", "AR parameters constrained"),
-             ifelse(is.null(constraints), "mean paremeters constrained, no AR parameter constraints",
-                                          "mean parameters constrained, AR parameters constrained")), "\n")
+      ifelse(gsmvar$model$conditional, "conditional", "exact"), "log-likelihood,",
+      paste0(ifelse(gsmvar$model$parametrization == "mean", "mean parametrization", "intercept parametrization"),
+             ifelse(is.null(same_means), "", ", mean parameters constrained"),
+             ifelse(is.null(constraints), "", ", AR matrices constrained"),
+             ifelse(is.null(weight_constraints), "", ", alphas constrained")), "\n")
   cat("\n")
 
   if(summary_print) {
@@ -179,8 +179,11 @@ print.gsmvar <- function(x, ..., digits=2, summary_print=FALSE) {
     n_free <- sum(is.na(W_orig))
     n_sign <- d^2 - n_zero - n_free
     cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
-    cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gsmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
-                                                  "subject to linear constraints."))
+    cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gsmvar$model$structural_pars$C_lambda),
+                                                  ifelse(is.null(gsmvar$model$structural_pars$fixed_lambdas),
+                                                         "not subject to linear constraints.",
+                                                         "subject to fixed lambda constraints.")
+                                                  , "subject to linear constraints."))
     cat("\n")
   }
 
