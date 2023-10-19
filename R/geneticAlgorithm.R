@@ -54,7 +54,8 @@
 #'     \item{\strong{For structural models:}}{
 #'       Should have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\phi}}\eqn{_{1},...,}\strong{\eqn{\phi}}\eqn{_{M},
-#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
+#'       vec(W),}\strong{\eqn{\lambda}}\eqn{_{2},...,}\strong{\eqn{\lambda}}\eqn{_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)},
+#'       where
 #'       \itemize{
 #'         \item\strong{\eqn{\lambda}}\eqn{_{m}=(\lambda_{m1},...,\lambda_{md})} contains the eigenvalues of the \eqn{m}th mixture component.
 #'       }
@@ -81,9 +82,10 @@
 #'   \eqn{vec()} is vectorization operator that stacks columns of a given matrix into a vector. \eqn{vech()} stacks columns
 #'   of a given matrix from the principal diagonal downwards (including elements on the diagonal) into a vector.
 #'
-#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model, \eqn{M1=0}.
-#'   In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are \emph{StMVAR type}.
-#'   In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should be strictly larger than two.
+#'   In the \strong{GMVAR model}, \eqn{M1=M} and \strong{\eqn{\nu}} is dropped from the parameter vector. In the \strong{StMVAR} model,
+#'   \eqn{M1=0}. In the \strong{G-StMVAR} model, the first \code{M1} regimes are \emph{GMVAR type} and the rest \code{M2} regimes are
+#'   \emph{StMVAR type}. In \strong{StMVAR} and \strong{G-StMVAR} models, the degrees of freedom parameters in \strong{\eqn{\nu}} should
+#'   be strictly larger than two.
 #'
 #'   The notation is similar to the cited literature.
 #' @param conditional a logical argument specifying whether the conditional or exact log-likelihood function
@@ -163,7 +165,8 @@
 #'   Values smaller than this will be treated as they were \code{minval} and the corresponding individuals will
 #'   never survive. The default is \code{-(10^(ceiling(log10(n_obs)) + d) - 1)}.
 #' @param seed a single value, interpreted as an integer, or NULL, that sets seed for the random number generator in the beginning of
-#'   the function call. If calling \code{GAfit} from \code{fitGSMVAR}, use the argument \code{seeds} instead of passing the argument \code{seed}.
+#'   the function call. If calling \code{GAfit} from \code{fitGSMVAR}, use the argument \code{seeds} instead of passing the argument
+#'   \code{seed}.
 #' @details
 #'  The core of the genetic algorithm is mostly based on the description by \emph{Dorsey and Mayer (1995)}.
 #'  It utilizes a slightly modified version of the individually adaptive crossover and mutation rates described
@@ -204,11 +207,12 @@
 #' @export
 
 GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                  constraints=NULL, same_means=NULL, structural_pars=NULL,
+                  constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                   ngen=200, popsize, smart_mu=min(100, ceiling(0.5*ngen)), initpop=NULL,
                   mu_scale, mu_scale2, omega_scale, W_scale, lambda_scale,
                   ar_scale=0.2, upper_ar_scale=1, ar_scale2=1, regime_force_scale=1,
-                  red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0, to_return=c("alt_ind", "best_ind"), minval, seed=NULL) {
+                  red_criteria=c(0.05, 0.01), pre_smart_mu_prob=0, to_return=c("alt_ind", "best_ind"),
+                  minval, seed=NULL) {
 
   # Required values and preliminary checks
   set.seed(seed)
@@ -220,13 +224,15 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
   d <- ncol(data)
   n_obs <- nrow(data)
   check_same_means(parametrization=parametrization, same_means=same_means)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means,
+                    weight_constraints=weight_constraints, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
+                    weight_constraints=weight_constraints, structural_pars=structural_pars)
   M_orig <- M
   M <- sum(M)
 
   # For structural models, determine whether W constraints such that W and lambdas can be sorted for better estimation
-  if(is.null(structural_pars) || !is.null(structural_pars$C_lambda)) {
+  if(is.null(structural_pars) || !is.null(structural_pars$C_lambda) || !is.null(structural_pars$fixed_lambdas)) {
     sort_structural_pars <- FALSE
   } else {
     W <- structural_pars$W
@@ -307,6 +313,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       if(is.null(constraints)) {
         inds <- replicate(popsize, random_ind2(p=p, M=M_orig, d=d, model=model,
                                                same_means=same_means,
+                                               weigth_constraints=weight_constraints,
                                                structural_pars=structural_pars,
                                                mu_scale=mu_scale,
                                                mu_scale2=mu_scale2,
@@ -318,6 +325,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         inds <- replicate(popsize, random_ind(p=p, M=M_orig, d=d, model=model,
                                               constraints=constraints,
                                               same_means=same_means,
+                                              weigth_constraints=weight_constraints,
                                               structural_pars=structural_pars,
                                               mu_scale=mu_scale,
                                               mu_scale2=mu_scale2,
@@ -329,6 +337,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M_orig, params=inds[,i2], model=model,
                                                                    conditional=conditional, parametrization="mean",
                                                                    constraints=constraints, same_means=same_means,
+                                                                   weigth_constraints=weight_constraints,
                                                                    structural_pars=structural_pars,
                                                                    check_params=TRUE, to_return="loglik",
                                                                    minval=minval), numeric(1))
@@ -338,7 +347,11 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         break
       } else if(i1 == nattempts) {
         if(length(G) == 0) {
-          stop("Failed to create initial population with good enough individuals. Scaling the individual series so that the AR coefficients (of a VAR model) will not be very large (preferably less than one) may solve the problem. If needed, another package may be used to fit linear VARs so see which scalings produce relatively small AR coefficient estimates.")
+          stop(paste("Failed to create initial population with good enough individuals.",
+                     "Scaling the individual series so that the AR coefficients (of a VAR model)",
+                     "will not be very large (preferably less than one) may solve the problem.",
+                     "If needed, another package may be used to fit linear VARs so see which",
+                     "scalings produce relatively small AR coefficient estimates."))
         } else {
           G <- G[, sample.int(ncol(G), size=popsize, replace=TRUE)]
         }
@@ -349,13 +362,16 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
     for(i1 in 1:length(initpop)) {
       ind <- initpop[[i1]]
       tryCatch(check_parameters(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
-                                parametrization=parametrization, same_means=same_means, structural_pars=structural_pars),
+                                parametrization=parametrization, same_means=same_means,
+                                weigth_constraints=weight_constraints, structural_pars=structural_pars),
                error=function(e) stop(paste("Problem with individual", i1, "in the initial population: "), e))
       if(parametrization == "intercept") { # This is never the case when !is.null(same_means)
         ind <- change_parametrization(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
-                                      structural_pars=structural_pars, change_to="mean")
+                                      weigth_constraints=weight_constraints, structural_pars=structural_pars,
+                                      change_to="mean")
       }
-      if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
+      if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
+         is.null(same_means) && is.null(weight_constraints)) {
         initpop[[i1]] <- sort_components(p=p, M=M_orig, d=d, params=ind, model=model, structural_pars=structural_pars)
       } else {
         initpop[[i1]] <- ind
@@ -395,6 +411,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         loks_and_mw <- loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                          conditional=conditional, parametrization="mean",
                                          constraints=constraints, same_means=same_means,
+                                         weigth_constraints=weight_constraints,
                                          structural_pars=structural_pars,
                                          to_return="loglik_and_mw",
                                          check_params=TRUE, minval=minval)
@@ -434,6 +451,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
               loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                                         conditional=conditional, parametrization="mean",
                                                         constraints=constraints, same_means=same_means,
+                                                        weigth_constraints=weight_constraints,
                                                         structural_pars=structural_pars,
                                                         to_return="loglik_and_mw",
                                                         check_params=FALSE, minval=minval),
@@ -442,6 +460,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
               loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                                         conditional=conditional, parametrization="mean",
                                                         constraints=constraints, same_means=same_means,
+                                                        weigth_constraints=weight_constraints,
                                                         structural_pars=structural_pars,
                                                         to_return="loglik_and_mw",
                                                         check_params=TRUE, minval=minval),
@@ -504,15 +523,18 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
 
     # Get the best individual so far and check for reduntant regimes
     best_index0 <- which(logliks == max(logliks), arr.ind=TRUE)
-    best_index <- best_index0[order(best_index0[,1], decreasing=FALSE)[1],] # First generation when the best loglik occurred (because of fitness inheritance)
+    # First gen when the best loglik occurred (because of fitness inheritance):
+    best_index <- best_index0[order(best_index0[,1], decreasing=FALSE)[1],]
     best_ind <- generations[, best_index[2], best_index[1]]
     best_mw <- loglikelihood_int(data=data, p=p, M=M_orig, params=best_ind, model=model,
                                  conditional=conditional, parametrization="mean",
                                  constraints=constraints, same_means=same_means,
+                                 weigth_constraints=weight_constraints,
                                  structural_pars=structural_pars,
                                  to_return="mw",
                                  check_params=FALSE, minval=minval)
-    which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1))) # Which regimes are wasted
+    # Which regimes are wasted:
+    which_redundant <- which(vapply(1:M, function(i2) sum(best_mw[,i2] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))
 
     # Keep track of "the alternative best individual" that has (weakly) less reduntant regimes than the current best one.
     if(length(which_redundant) <= length(which_redundant_alt)) {
@@ -541,6 +563,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M_orig, d=d, model=model,
                                                                                    constraints=constraints,
                                                                                    same_means=same_means,
+                                                                                   weigth_constraints=weight_constraints,
                                                                                    structural_pars=structural_pars,
                                                                                    mu_scale=mu_scale,
                                                                                    mu_scale2=mu_scale2,
@@ -552,6 +575,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         stat_mu <- TRUE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M_orig, d=d, model=model,
                                                                                     same_means=same_means,
+                                                                                    weigth_constraints=weight_constraints,
                                                                                     structural_pars=structural_pars,
                                                                                     mu_scale=mu_scale,
                                                                                     mu_scale2=mu_scale2,
@@ -579,7 +603,8 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
 
       ## 'Smart mutation': mutate close to a well fitting individual. We obviously don't mutate close to
       # redundant regimes but draw them at random ('rand_to_use' in what follows).
-      if(!is.null(constraints) | !is.null(same_means) | !is.null(structural_pars) | length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) {
+      if(!is.null(constraints) | !is.null(same_means) | !is.null(structural_pars) |
+         length(which_redundant) <= length(which_redundant_alt) | runif(1) > 0.5) {
         # The first option for smart mutations: smart mutate to 'alt_ind' which is the best fitting individual
         # with the least redundant regimes.
         # Note that best_ind == alt_ind when length(which_redundant) <= length(which_redundant_alt).
@@ -611,23 +636,27 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
 
         # Pick the nonredundant regimes of best_ind and alt_ind
         non_red_regs_best <- vapply((1:M)[-which_redundant], function(i2) pick_regime(p=p, M=M_orig, d=d, params=best_ind,
-                                                                                      model=model, m=i2, with_df=FALSE), numeric(p*d^2 + d + d*(d+1)/2))
+                                                                                      model=model, m=i2, with_df=FALSE),
+                                    numeric(p*d^2 + d + d*(d+1)/2))
         if(length(which_redundant_alt) == 0) { # Special case for technical reasons
           non_red_regs_alt <- vapply(1:M, function(i2) pick_regime(p=p, M=M_orig, d=d, params=alt_ind,
                                                                    model=model, m=i2, with_df=FALSE), numeric(p*d^2 + d + d*(d+1)/2))
         } else {
           non_red_regs_alt <- vapply((1:M)[-which_redundant_alt], function(i2) pick_regime(p=p, M=M_orig, d=d, params=alt_ind,
-                                                                                           model=model, m=i2, with_df=FALSE), numeric(p*d^2 + d + d*(d+1)/2))
+                                                                                           model=model, m=i2, with_df=FALSE),
+                                     numeric(p*d^2 + d + d*(d+1)/2))
         }
 
         # Calculate the "distances" between the nonredundant regimes
-        dist_to_regime <- matrix(nrow=ncol(non_red_regs_best), ncol=ncol(non_red_regs_alt)) # Row for each non-red-reg-best and column for each non-red-reg-alt.
+        # Row for each non-red-reg-best and column for each non-red-reg-alt:
+        dist_to_regime <- matrix(nrow=ncol(non_red_regs_best), ncol=ncol(non_red_regs_alt))
         for(i2 in 1:nrow(dist_to_regime)) {
           dist_to_regime[i2,] <- vapply(1:ncol(non_red_regs_alt), function(i3) regime_distance(regime_pars1=non_red_regs_best[,i2],
                                                                                                regime_pars2=non_red_regs_alt[,i3]), numeric(1))
         }
 
-        # Which alt_ind regime, i.e. column should be used? Choose the one that with largest distance to the closest regime avoid duplicating similar regimes
+        # Which alt_ind regime, i.e. column should be used? Choose the one that with largest distance to the closest regime
+        # to avoid duplicating similar regimes
         which_reg_to_use <- which(apply(dist_to_regime, 2, min) == max(apply(dist_to_regime, 2, min)))[1]
 
         # The obtain the regime of alt_ind that is used to replace a redundant regime in best_ind
@@ -660,6 +689,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
                                                                                  model=model,
                                                                                  constraints=constraints,
                                                                                  same_means=same_means,
+                                                                                 weigth_constraints=weight_constraints,
                                                                                  structural_pars=structural_pars,
                                                                                  accuracy=accuracy[i2],
                                                                                  which_random=rand_to_use,
@@ -680,8 +710,10 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
     }
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
-    if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
-      H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M_orig, d=d, params=H2[,i2], model=model, structural_pars=structural_pars), numeric(npars))
+    if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
+       is.null(same_means) && is.nulL(weight_constraints)) {
+      H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M_orig, d=d, params=H2[,i2], model=model,
+                                                           structural_pars=structural_pars), numeric(npars))
     }
 
     # Save the results and set up new generation
@@ -696,7 +728,9 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
   if(parametrization == "mean") { # This is always the case with same_means
     return(ret)
   } else {
-    return(change_parametrization(p=p, M=M_orig, d=d, params=ret, model=model, constraints=constraints, structural_pars=structural_pars, change_to="intercept"))
+    return(change_parametrization(p=p, M=M_orig, d=d, params=ret, model=model, constraints=constraints,
+                                  weigth_constraints=weight_constraints, structural_pars=structural_pars,
+                                  change_to="intercept"))
   }
 }
 
