@@ -58,7 +58,8 @@ predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi
   check_gsmvar(gsmvar)
   check_null_data(gsmvar)
   if(is.null(gsmvar$data)) {
-    stop("The model needs to contain data as forecasting requires initial values. Data can be added to the model with the function 'add_data'.")
+    stop(paste("The model needs to contain data as forecasting requires initial values.",
+               "Data can be added to the model with the function 'add_data'."))
   }
   data <- gsmvar$data
   if(missing(n_ahead)) {
@@ -89,6 +90,7 @@ predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi
     model <- gsmvar$model$model
     constraints <- gsmvar$model$constraints
     same_means <- gsmvar$model$same_means
+    weight_constraints <- gsmvar$model$weight_constraints
     structural_pars <- gsmvar$model$structural_pars
 
     params <- gsmvar$params
@@ -99,6 +101,7 @@ predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi
                             parametrization=gsmvar$model$parametrization,
                             constraints=constraints,
                             same_means=same_means,
+                            weight_constraints=weight_constraints,
                             structural_pars=structural_pars,
                             to_return="mw_tplus1",
                             stat_tol=gsmvar$num_tols$stat_tol,
@@ -110,18 +113,21 @@ predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi
                                       params=params, model=model,
                                       constraints=constraints,
                                       same_means=same_means,
+                                      weight_constraints=weight_constraints,
                                       structural_pars=structural_pars)
     structural_pars <- get_unconstrained_structural_pars(structural_pars)
     if(gsmvar$model$parametrization == "mean") {
       params <- change_parametrization(p=p, M=M, d=d, params=params, model=model, constraints=NULL,
-                                       structural_pars=structural_pars, change_to="intercept")
+                                       weight_constraints=NULL, structural_pars=structural_pars,
+                                       change_to="intercept")
     }
     all_phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
     all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
 
     # Calculate the conditional mean
-    pred <- rowSums(vapply(1:sum(M), function(m) mw[m]*(all_phi0[, m] + rowSums(vapply(1:p, function(i1) all_A[, , i1, m]%*%data[n_obs + 1 - i1,],
-                                                                                  numeric(d)))), numeric(d)))
+    pred <- rowSums(vapply(1:sum(M),
+                           function(m) mw[m]*(all_phi0[, m] + rowSums(vapply(1:p, function(i1) all_A[, , i1, m]%*%data[n_obs + 1 - i1,],
+                                                                             numeric(d)))), numeric(d)))
     pi <- NULL
     pi_type <- "none"
     pred_ints <- NULL
@@ -173,8 +179,10 @@ predict.gsmvar <- function(object, ..., n_ahead, nsim=2000, pi=c(0.95, 0.80), pi
 
     if(pi_type != "none") {
       if(length(q_tocalc) == 1) {
-        pred_ints <- array(pred_ints, dim=c(n_ahead, ncol(data), length(q_tocalc)), dimnames=list(NULL, colnames(sample), q_tocalc)) # Make it an array with length(q_tocalc) slices
-        mix_pred_ints <- array(mix_pred_ints, dim=c(n_ahead, gsmvar$model$M, length(q_tocalc)), dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
+        pred_ints <- array(pred_ints, dim=c(n_ahead, ncol(data), length(q_tocalc)),
+                           dimnames=list(NULL, colnames(sample), q_tocalc)) # Make it an array with length(q_tocalc) slices
+        mix_pred_ints <- array(mix_pred_ints, dim=c(n_ahead, gsmvar$model$M, length(q_tocalc)),
+                               dimnames=list(NULL, colnames(alpha_mt), q_tocalc))
         pred_ints <- aperm(pred_ints, perm=c(1, 3, 2))
         mix_pred_ints <- aperm(mix_pred_ints, perm=c(1, 3, 2))
       } else {
