@@ -10,6 +10,7 @@ random_ind2(
   d,
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   mu_scale,
   mu_scale2,

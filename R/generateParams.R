@@ -229,7 +229,8 @@ smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), c
 #'  }
 #'  @keywords internal
 
-random_ind2 <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), same_means=NULL, structural_pars=NULL,
+random_ind2 <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), same_means=NULL,
+                        weight_constraints=NULL, structural_pars=NULL,
                         mu_scale, mu_scale2, omega_scale, ar_scale=1, W_scale, lambda_scale) {
   model <- match.arg(model)
   M_orig <- M
@@ -248,9 +249,10 @@ random_ind2 <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), same_me
                     random_covmat(d=d, M=M, omega_scale=omega_scale, W_scale=W_scale,
                                   lambda_scale=lambda_scale, structural_pars=structural_pars)))
   }
-  if(M > 1) {
+  if(M > 1 && is.null(weight_constraints)) {
     alphas <- runif(n=M)
     alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=NULL, same_means=same_means,
+                                          weight_constraints=weight_constraints,
                                           structural_pars=structural_pars)
     ret <- c(x, alphas[-M])
   } else {
