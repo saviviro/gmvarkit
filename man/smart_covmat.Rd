@@ -73,8 +73,9 @@ a time-varying diagonal matrix with positive diagonal entries).}
     \item{For \strong{structural models}:}{Returns a length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
       \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}
       contains the eigenvalue parameters of the \eqn{m}th regime \eqn{(m>1)} and \eqn{n_zeros} is the number of zero constraints
-      in \eqn{W}. If lambdas are constrained, replacce \eqn{d*(M - 1)} in the length with \eqn{r} and
-      \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}. The operator \eqn{Wvec()} vectorizes a matrix and removes zeros.}
+      in \eqn{W}. If lambdas are \code{C_lambda} constrained, replace \eqn{d*(M - 1)} in the length with \eqn{r} and
+      \eqn{\lambda_2,...,\lambda_M)} with \strong{\eqn{\gamma}}. If \code{fixed_lambdas} are used, the \eqn{\lambda_{mi}} parameters
+       are not included. The operator \eqn{Wvec()} vectorizes a matrix and removes zeros.}
   }
 }
 \description{
