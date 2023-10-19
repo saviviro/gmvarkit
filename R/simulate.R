@@ -126,11 +126,13 @@ simulate.gsmvar <- function(object, nsim=1, seed=NULL, ..., init_values=NULL, in
   params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model,
                                     constraints=gsmvar$model$constraints,
                                     same_means=gsmvar$model$same_means,
+                                    weight_constraints=gsmvar$model$weight_constraints,
                                     structural_pars=structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
   if(gsmvar$model$parametrization == "mean") {
     params <- change_parametrization(p=p, M=M, d=d, params=params, constraints=NULL,
-                                     structural_pars=structural_pars, change_to="intercept")
+                                     weight_constraints=NULL, structural_pars=structural_pars,
+                                     change_to="intercept")
   }
 
   all_mu <- get_regime_means(gsmvar)

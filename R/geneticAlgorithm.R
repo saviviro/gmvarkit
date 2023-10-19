@@ -313,7 +313,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       if(is.null(constraints)) {
         inds <- replicate(popsize, random_ind2(p=p, M=M_orig, d=d, model=model,
                                                same_means=same_means,
-                                               weigth_constraints=weight_constraints,
+                                               weight_constraints=weight_constraints,
                                                structural_pars=structural_pars,
                                                mu_scale=mu_scale,
                                                mu_scale2=mu_scale2,
@@ -325,7 +325,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         inds <- replicate(popsize, random_ind(p=p, M=M_orig, d=d, model=model,
                                               constraints=constraints,
                                               same_means=same_means,
-                                              weigth_constraints=weight_constraints,
+                                              weight_constraints=weight_constraints,
                                               structural_pars=structural_pars,
                                               mu_scale=mu_scale,
                                               mu_scale2=mu_scale2,
@@ -337,7 +337,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       ind_loks <- vapply(1:popsize, function(i2) loglikelihood_int(data=data, p=p, M=M_orig, params=inds[,i2], model=model,
                                                                    conditional=conditional, parametrization="mean",
                                                                    constraints=constraints, same_means=same_means,
-                                                                   weigth_constraints=weight_constraints,
+                                                                   weight_constraints=weight_constraints,
                                                                    structural_pars=structural_pars,
                                                                    check_params=TRUE, to_return="loglik",
                                                                    minval=minval), numeric(1))
@@ -363,11 +363,11 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
       ind <- initpop[[i1]]
       tryCatch(check_parameters(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
                                 parametrization=parametrization, same_means=same_means,
-                                weigth_constraints=weight_constraints, structural_pars=structural_pars),
+                                weight_constraints=weight_constraints, structural_pars=structural_pars),
                error=function(e) stop(paste("Problem with individual", i1, "in the initial population: "), e))
       if(parametrization == "intercept") { # This is never the case when !is.null(same_means)
         ind <- change_parametrization(p=p, M=M_orig, d=d, params=ind, model=model, constraints=constraints,
-                                      weigth_constraints=weight_constraints, structural_pars=structural_pars,
+                                      weight_constraints=weight_constraints, structural_pars=structural_pars,
                                       change_to="mean")
       }
       if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
@@ -411,7 +411,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         loks_and_mw <- loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                          conditional=conditional, parametrization="mean",
                                          constraints=constraints, same_means=same_means,
-                                         weigth_constraints=weight_constraints,
+                                         weight_constraints=weight_constraints,
                                          structural_pars=structural_pars,
                                          to_return="loglik_and_mw",
                                          check_params=TRUE, minval=minval)
@@ -451,7 +451,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
               loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                                         conditional=conditional, parametrization="mean",
                                                         constraints=constraints, same_means=same_means,
-                                                        weigth_constraints=weight_constraints,
+                                                        weight_constraints=weight_constraints,
                                                         structural_pars=structural_pars,
                                                         to_return="loglik_and_mw",
                                                         check_params=FALSE, minval=minval),
@@ -460,7 +460,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
               loks_and_mw <- tryCatch(loglikelihood_int(data=data, p=p, M=M_orig, params=G[,i2], model=model,
                                                         conditional=conditional, parametrization="mean",
                                                         constraints=constraints, same_means=same_means,
-                                                        weigth_constraints=weight_constraints,
+                                                        weight_constraints=weight_constraints,
                                                         structural_pars=structural_pars,
                                                         to_return="loglik_and_mw",
                                                         check_params=TRUE, minval=minval),
@@ -529,7 +529,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
     best_mw <- loglikelihood_int(data=data, p=p, M=M_orig, params=best_ind, model=model,
                                  conditional=conditional, parametrization="mean",
                                  constraints=constraints, same_means=same_means,
-                                 weigth_constraints=weight_constraints,
+                                 weight_constraints=weight_constraints,
                                  structural_pars=structural_pars,
                                  to_return="mw",
                                  check_params=FALSE, minval=minval)
@@ -563,7 +563,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind(p=p, M=M_orig, d=d, model=model,
                                                                                    constraints=constraints,
                                                                                    same_means=same_means,
-                                                                                   weigth_constraints=weight_constraints,
+                                                                                   weight_constraints=weight_constraints,
                                                                                    structural_pars=structural_pars,
                                                                                    mu_scale=mu_scale,
                                                                                    mu_scale2=mu_scale2,
@@ -575,7 +575,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
         stat_mu <- TRUE
         H2[,which_mutate] <- vapply(1:length(which_mutate), function(x) random_ind2(p=p, M=M_orig, d=d, model=model,
                                                                                     same_means=same_means,
-                                                                                    weigth_constraints=weight_constraints,
+                                                                                    weight_constraints=weight_constraints,
                                                                                     structural_pars=structural_pars,
                                                                                     mu_scale=mu_scale,
                                                                                     mu_scale2=mu_scale2,
@@ -689,7 +689,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
                                                                                  model=model,
                                                                                  constraints=constraints,
                                                                                  same_means=same_means,
-                                                                                 weigth_constraints=weight_constraints,
+                                                                                 weight_constraints=weight_constraints,
                                                                                  structural_pars=structural_pars,
                                                                                  accuracy=accuracy[i2],
                                                                                  which_random=rand_to_use,
@@ -711,7 +711,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
 
     # Sort components according to the mixing weight parameters. No sorting if constraints are employed.
     if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
-       is.null(same_means) && is.nulL(weight_constraints)) {
+       is.null(same_means) && is.null(weight_constraints)) {
       H2 <- vapply(1:popsize, function(i2) sort_components(p=p, M=M_orig, d=d, params=H2[,i2], model=model,
                                                            structural_pars=structural_pars), numeric(npars))
     }
@@ -729,7 +729,7 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
     return(ret)
   } else {
     return(change_parametrization(p=p, M=M_orig, d=d, params=ret, model=model, constraints=constraints,
-                                  weigth_constraints=weight_constraints, structural_pars=structural_pars,
+                                  weight_constraints=weight_constraints, structural_pars=structural_pars,
                                   change_to="intercept"))
   }
 }

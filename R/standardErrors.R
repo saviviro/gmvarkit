@@ -25,7 +25,7 @@ standard_errors <- function(data, p, M, params, model=c("GMVAR", "StMVAR", "G-St
   loglik_fn <- function(params) {
     tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, model=model, conditional=conditional,
                                parametrization=parametrization, constraints=constraints, same_means=same_means,
-                               weigth_constraints=weight_constraints, structural_pars=structural_pars,
+                               weight_constraints=weight_constraints, structural_pars=structural_pars,
                                check_params=TRUE, to_return="loglik", minval=minval,
                                stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
              error=function(e) NA)
@@ -87,7 +87,7 @@ print_std_errors <- function(gsmvar, digits=3) {
   parametrization <- gsmvar$model$parametrization
   weight_constraints <- gsmvar$model$weight_constraints
   pars <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$std_errors, model=model, constraints=constraints,
-                                  same_means=gsmvar$model$same_means, weigth_constraints=weight_constraints,
+                                  same_means=gsmvar$model$same_means, weight_constraints=weight_constraints,
                                   structural_pars=gsmvar$model$structural_pars, change_na=TRUE)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_phi0_or_mu <- pick_phi0(p=p, M=M, d=d, params=pars, structural_pars=structural_pars)

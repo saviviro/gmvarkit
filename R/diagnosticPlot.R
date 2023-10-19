@@ -263,7 +263,8 @@ profile_logliks <- function(gsmvar, which_pars, scale=0.02, nrows, ncols, precis
   for(i1 in which_pars) { # Go though the parameters
     pars <- params
     range <- abs(scale*pars[i1])
-    vals <- seq(from=pars[i1] - range, to=pars[i1] + range, length.out=precision) # Loglik to be evaluated at these values of the parameter considered
+    # Loglik to be evaluated at these values of the parameter considered
+    vals <- seq(from=pars[i1] - range, to=pars[i1] + range, length.out=precision)
     logliks <- vapply(vals, function(val) {
       new_pars <- pars
       new_pars[i1] <- val # Change the single parameter value
@@ -359,7 +360,8 @@ profile_logliks <- function(gsmvar, which_pars, scale=0.02, nrows, ncols, precis
         } else { # Structural models: W and lambdas
           if(i1 <= M*d - less_pars + q + d^2 - n_zeros) { # W parameters
             n_zeros_in_each_column <- vapply(1:d, function(i2) sum(W_const[,i2] == 0, na.rm=TRUE), numeric(1))
-            zero_positions <- lapply(1:d, function(i2) (1:d)[W_const[,i2] == 0 & !is.na(W_const[,i2])]) # Zero constraint positions in each column
+            # Zero constraint positions in each column:
+            zero_positions <- lapply(1:d, function(i2) (1:d)[W_const[,i2] == 0 & !is.na(W_const[,i2])])
             cum_wc <- c(0, cumsum(d - n_zeros_in_each_column)) # Index in W parameters after which a new column in W starts
             posw <- i1 - (M*d - less_pars + q) # Index in W parameters
             col_ind <- sum(posw > cum_wc)

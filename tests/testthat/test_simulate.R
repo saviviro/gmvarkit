@@ -46,13 +46,20 @@ mod_222c <- GSMVAR(gdpdef, p=2, M=2, d=2, params=theta_222c, constraints=C_222c)
 
 mod_222tc <- GSMVAR(gdpdef, p=2, M=2, d=2, params=c(theta_222c, 20, 25), model="StMVAR", constraints=C_222c)
 
-
 # p=2, M=2, d=2, parametrization="mean", constraints=C_mat, same_means=list(1:2)
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 params_222cm <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
                   0.235827, 0.013962, 0.053267, 0.262703, 1.06105, -0.013519,
                   0.114109, 0.229542, 0.003092, 0.027266, 0.424341)
 mod_222cm <- GSMVAR(gdpdef, p=2, M=2, params=params_222cm, parametrization="mean", constraints=C_mat, same_means=list(1:2))
+
+# p=2, M=2, d=2, model="GMVAR", parametrization="mean", constraints=C_mat, same_means=list(1:2),
+# weight_constraints=0.4, structural_pars=list(W=W_222, fixed_lambdas=c(7, 4))
+params_222cmwsF <- c(0.811034, 0.578587, 0.212084, 0.020444, -0.193005, 0.624671,
+                     0.235827, 0.013962, 0.053267, 0.262703, Wvec(W_222))
+mod_222cmwsF <- GSMVAR(gdpdef, p=2, M=2, params=params_222cmwsF,  model="GMVAR", parametrization="mean",
+                       constraints=C_mat, same_means=list(1:2), weight_constraints=0.4,
+                       structural_pars=list(W=W_222, fixed_lambdas=c(7, 4)))
 
 sim_112 <- simulate.gsmvar(mod_112, nsim=1, seed=1)
 sim_112t <- simulate.gsmvar(mod_112t, nsim=2, seed=1)
@@ -63,6 +70,7 @@ sim_112_2 <- simulate.gsmvar(mod_112, nsim=3, seed=4, ntimes=3)
 sim_222_2 <- simulate.gsmvar(mod_222c, nsim=1, seed=5, ntimes=2)
 sim_222tc <- simulate.gsmvar(mod_222tc, nsim=2, seed=5, ntimes=2)
 sim_222cm <- simulate.gsmvar(mod_222cm, nsim=2, seed=6, ntimes=2)
+sim_222cmwsF <- simulate.gsmvar(mod_222cmwsF, nsim=2, seed=6, ntimes=2, init_values=gdpdef)
 
 test_that("simulate.gsmvar works correctly", {
   expect_equal(sim_112$sample[1,], c(1.571209, 1.040196), tolerance=1e-5)
@@ -92,4 +100,10 @@ test_that("simulate.gsmvar works correctly", {
   expect_equal(sim_222cm$component[1:4], c(1, 1, 1, 1))
   expect_equal(sim_222cm$mixing_weights[1:8], c(9.998214e-01, 9.999746e-01, 1.786218e-04, 2.543522e-05,
                                                 9.998214e-01, 9.999999e-01, 1.786218e-04, 6.528877e-08), tolerance=1e-5)
+
+  expect_equal(sim_222cmwsF$sample[1:8], c(0.1033549, -1.4098509, 0.5003297, 0.6083894, 0.2050738, 0.7318845,
+                                           0.5346906, 0.6693941), tolerance=1e-5)
+  expect_equal(sim_222cmwsF$component[1:4], c(1, 2, 1, 1))
+  expect_equal(sim_222cmwsF$mixing_weights[1:8], c(0.91561446, 0.84410853, 0.08438554, 0.15589147, 0.91561446,
+                                                   0.86236485, 0.08438554, 0.13763515), tolerance=1e-5)
 })
