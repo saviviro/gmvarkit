@@ -157,8 +157,8 @@
 #' @export
 
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
-                      constraints=NULL, same_means=NULL, structural_pars=NULL, ncalls=(M + 1)^5, ncores=2, maxit=1000,
-                      seeds=NULL, print_res=TRUE, ...) {
+                      constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
+                      ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, ...) {
 
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -170,8 +170,10 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   d <- ncol(data)
   n_obs <- nrow(data)
   check_same_means(parametrization=parametrization, same_means=same_means)
-  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
-  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means, structural_pars=structural_pars)
+  check_constraints(p=p, M=M, d=d, constraints=constraints, same_means=same_means,
+                    weigth_constraints=weight_constraints, structural_pars=structural_pars)
+  npars <- n_params(p=p, M=M, d=d, model=model, constraints=constraints, same_means=same_means,
+                    weigth_constraints=weight_constraints, structural_pars=structural_pars)
   if(npars >= d*nrow(data)) stop("There are at least as many parameters in the model as there are observations in the data")
   dot_params <- list(...)
   minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
@@ -196,12 +198,14 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   cat("Optimizing with a genetic algorithm...\n")
   GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, model=model, conditional=conditional,
                                                               parametrization=parametrization, constraints=constraints,
-                                                              same_means=same_means, structural_pars=structural_pars,
+                                                              same_means=same_means, weigth_constraints=weight_constraints,
+                                                              structural_pars=structural_pars,
                                                               seed=seeds[i1], ...), cl=cl)
 
   loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=GAresults[[i1]], model=model,
                                                           conditional=conditional, parametrization=parametrization,
                                                           constraints=constraints, same_means=same_means,
+                                                          weigth_constraints=weight_constraints,
                                                           structural_pars=structural_pars, check_params=TRUE,
                                                           to_return="loglik", minval=minval), numeric(1))
 
@@ -239,6 +243,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
     tryCatch(loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                conditional=conditional, parametrization=parametrization,
                                constraints=constraints, same_means=same_means,
+                               weigth_constraints=weight_constraints,
                                structural_pars=structural_pars, check_params=TRUE,
                                to_return="loglik", minval=minval), error=function(e) minval)
   }
@@ -271,16 +276,20 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   which_best_fit <- which(loks == max(loks))[1]
   best_fit <- all_estimates[[which_best_fit]]
   params <- best_fit
-  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(same_means)) {
+  if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
+     is.null(same_means) && is.null(weight_constaints)) {
     params <- sort_components(p=p, M=M, d=d, params=params, model=model, structural_pars=structural_pars)
-    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, model=model, structural_pars=structural_pars))
+    all_estimates <- lapply(all_estimates, function(pars) sort_components(p=p, M=M, d=d, params=pars, model=model,
+                                                                          structural_pars=structural_pars))
   }
   if(NEWTONresults[[which_best_fit]]$convergence == 1) {
-    message("Iteration limit was reached when estimating the best fitting individual! Consider further estimation with the function 'iterate_more'")
+    message(paste("Iteration limit was reached when estimating the best fitting individual!",
+                  "Consider further estimation with the function 'iterate_more'"))
   }
   mixing_weights <- loglikelihood_int(data=data, p=p, M=M, params=params, model=model,
                                       conditional=conditional, parametrization=parametrization,
                                       constraints=constraints, same_means=same_means,
+                                      weigth_constraints=weight_constraints,
                                       structural_pars=structural_pars, to_return="mw",
                                       check_params=TRUE, minval=NULL)
   if(any(vapply(1:sum(M), function(i1) sum(mixing_weights[,i1] > red_criteria[1]) < red_criteria[2]*n_obs, logical(1)))) {
@@ -293,6 +302,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params, model=model,
                 conditional=conditional, parametrization=parametrization,
                 constraints=constraints, same_means=same_means,
+                weigth_constraints=weight_constraints,
                 structural_pars=structural_pars, calc_std_errors=TRUE)
   ret$all_estimates <- all_estimates
   ret$all_logliks <- loks
