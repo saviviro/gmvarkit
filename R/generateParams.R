@@ -46,12 +46,12 @@ random_ind <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), constrai
       x <- c(all_phi0, psi, random_covmat(d=d, M=M, W_scale=W_scale, lambda_scale=lambda_scale, structural_pars=structural_pars))
     }
   }
-  if(M > 1) {
+  if(M > 1 && is.null(weight_constraints)) {
     alphas <- runif(n=M)
     alphas <- sort_and_standardize_alphas(alphas=alphas, constraints=constraints, same_means=same_means,
                                           structural_pars=structural_pars)
     ret <- c(x, alphas[-M])
-  } else {
+  } else { # No alpha params
     ret <- x
   }
   c(ret, random_df(M=M_orig, model=model))
