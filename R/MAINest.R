@@ -365,9 +365,9 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
     tryCatch(loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=params, model=gsmvar$model$model,
                                conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                                constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                               weight_constraints=gsmvar$model$weight_constraints,
                                structural_pars=gsmvar$model$structural_pars, check_params=TRUE,
-                               to_return="loglik", minval=minval,
-                               stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
+                               to_return="loglik", minval=minval, stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol),
              error=function(e) minval)
   }
   gr <- function(params) {
@@ -380,6 +380,7 @@ iterate_more <- function(gsmvar, maxit=100, calc_std_errors=TRUE, custom_h=NULL,
   ret <- GSMVAR(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=res$par, model=gsmvar$model$model,
                 conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
                 constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                weight_constraints=gsmvar$model$weight_constraints,
                 structural_pars=gsmvar$model$structural_pars, calc_std_errors=calc_std_errors,
                 stat_tol=stat_tol, posdef_tol=posdef_tol, df_tol=df_tol)
 
