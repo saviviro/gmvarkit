@@ -13,6 +13,7 @@ pick_regime(
   model = c("GMVAR", "StMVAR", "G-StMVAR"),
   constraints = NULL,
   same_means = NULL,
+  weight_constraints = NULL,
   structural_pars = NULL,
   with_df = TRUE
 )
@@ -130,6 +131,10 @@ the same but the first regime has freely estimated (unconditional) mean. Ignore 
 should not be restricted to be the same among any regimes. \strong{This constraint is available only for mean parametrized models;
 that is, when \code{parametrization="mean"}.}}
 
+\item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
+\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+be strictly less than one.}
+
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
 identified structural models. For a structural model identified by conditional heteroskedasticity, should be a list containing
 at least the first one of the following elements:
@@ -175,6 +180,7 @@ a time-varying diagonal matrix with positive diagonal entries).}
     \item{When AR constraints are employed:}{As above, but without \strong{\eqn{\phi_{m}}}.}
     \item{When mean constaints are employed:}{As above, but without \eqn{\phi_{m,0}} (which are \eqn{\mu_m} in this case).}
     \item{When lambda constraints are employed:}{As above. Note that lambda parameters are not returned in any specification.}
+    \item{When weight constraints are employed:}{As above. Note that alpha parameters are not returned in any specification.}
   }
 Note that if both, AR and mean constraints are employed, a lenght zero numeric vector is returned for
 structural GMVAR type regimes (or structural StMVAR type regimes if \code{with_df=FALSE}).

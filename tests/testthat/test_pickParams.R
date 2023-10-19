@@ -209,6 +209,9 @@ theta_123csLAR_int <- c(phi10_123, vec(A11_123), vec(W_123), 1, 2, alpha1_123) #
 theta_123tcsLAR_int <- c(theta_123csLAR_int, 10, 20) # SStMVAR
 
 
+# p=1, M=2, d=2, model="StMVAR", weight_constraints=0.6, structural_pars=list(W=W_122, fixed_lambdas=c(7, 4))
+theta_122twsF <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), Wvec(W_122), 11, 12)
+
 
 test_that("pick_Ami works correctly", {
   expect_equal(pick_Ami(p=1, M=1, d=2, params=theta_112, m=1, i=1, unvec=TRUE), A11_112)
@@ -604,7 +607,13 @@ theta_112sWC <- c(phi10_112, vec(A11_112), Wvec(W_112)) # SGMVAR
 theta_213tsWC <- c(theta_213sWC, 10) # StMVAR
 theta_112tsWC <- c(theta_112sWC, 15) # StMVAR
 
+
 test_that("pick_regime works correctly", {
+  expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122twsF, m=1, weight_constraints=0.6, model="StMVAR",
+                           structural_pars=list(W=W_122, fixed_lambdas=c(7, 4))), c(phi10_122, vec(A11_122), 11))
+  expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122twsF, m=2, weight_constraints=0.6, model="StMVAR",
+                           structural_pars=list(W=W_122, fixed_lambdas=c(7, 4))), c(phi20_122, vec(A21_122), 12))
+
   expect_equal(pick_regime(p=1, M=1, d=2, params=theta_112, m=1), upsilon1_112)
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122, m=1), upsilon1_122)
   expect_equal(pick_regime(p=1, M=2, d=2, params=theta_122, m=2), upsilon2_122)
@@ -784,6 +793,12 @@ mod222gscsLAR <- GSMVAR(p=2, M=c(1, 1), d=2, params=c(theta_222csLAR, 20), model
                         structural_pars=list(W=W_222, C_lambda=C_lambda_222)) # SG-StMVAR
 
 
+# p=1, M=2, d=2, model="StMVAR", weight_constraints=0.6, structural_pars=list(W=W_122, fixed_lambdas=c(7, 4))
+theta_122twsF_2 <- c(phi10_122, phi20_122, 0.3*vec(A11_122), 0.12*vec(A21_122), Wvec(W_122), 11, 12)
+mod_122twsF <- GSMVAR(p=1, M=2, d=2, params=theta_122twsF_2, model="StMVAR", weight_constraints=0.6,
+                      structural_pars=list(W=W_122, fixed_lambdas=c(7, 4)))
+
+
 test_that("get_boldA_eigens works correctly", {
   expect_equal(get_boldA_eigens(mod222)[,1], c(0.9917467, 0.9112338, 0.4566127, 0.2464068), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222t)[2,], c(0.9112338, 0.9285837), tolerance=1e-5)
@@ -795,6 +810,8 @@ test_that("get_boldA_eigens works correctly", {
   expect_equal(get_boldA_eigens(mod112tcsWAR)[,1], c(0.3615207, 0.2284793), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222csLAR)[,2], c(0.9819784, 0.9215689, 0.4260533, 0.2603994), tolerance=1e-5)
   expect_equal(get_boldA_eigens(mod222gscsLAR)[4,], c(.2603994, 0.2603994), tolerance=1e-5)
+
+  expect_equal(c(get_boldA_eigens(mod_122twsF)), c(0.3146969, 0.2853031, 0.1258788, 0.1141212), tolerance=1e-5)
 })
 
 test_that("get_omega_eigens works correctly", {
@@ -808,6 +825,8 @@ test_that("get_omega_eigens works correctly", {
   expect_equal(get_omega_eigens(mod112tcsWAR)[,1], c(5.2052628, 0.9247372), tolerance=1e-5)
   expect_equal(get_omega_eigens(mod222csLAR)[,2], c(2.0610439, 0.1882761), tolerance=1e-5)
   expect_equal(get_omega_eigens(mod222gscsLAR)[,1], c(5.3657061, 0.9039939), tolerance=1e-5)
+
+  expect_equal(c(get_omega_eigens(mod_122twsF)), c(4.9179538, 0.9178462, 21.2972299, 5.9345701), tolerance=1e-5)
 })
 
 

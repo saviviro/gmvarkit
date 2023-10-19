@@ -304,6 +304,7 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #'     \item{When AR constraints are employed:}{As above, but without \strong{\eqn{\phi_{m}}}.}
 #'     \item{When mean constaints are employed:}{As above, but without \eqn{\phi_{m,0}} (which are \eqn{\mu_m} in this case).}
 #'     \item{When lambda constraints are employed:}{As above. Note that lambda parameters are not returned in any specification.}
+#'     \item{When weight constraints are employed:}{As above. Note that alpha parameters are not returned in any specification.}
 #'   }
 #' Note that if both, AR and mean constraints are employed, a lenght zero numeric vector is returned for
 #' structural GMVAR type regimes (or structural StMVAR type regimes if \code{with_df=FALSE}).
@@ -312,11 +313,12 @@ pick_lambdas <- function(p, M, d, params, structural_pars=NULL) {
 #' @keywords internal
 
 pick_regime <- function(p, M, d, params, m, model=c("GMVAR", "StMVAR", "G-StMVAR"), constraints=NULL,
-                        same_means=NULL, structural_pars=NULL, with_df=TRUE) {
+                        same_means=NULL, weight_constraints=NULL, structural_pars=NULL, with_df=TRUE) {
   model <- match.arg(model)
   if(!is.null(constraints) || !is.null(same_means) || !is.null(structural_pars)) {
     params <- reform_constrained_pars(p=p, M=M, d=d, params=params, model=model,
                                       constraints=constraints, same_means=same_means,
+                                      weight_constraints=weight_constraints,
                                       structural_pars=structural_pars)
     structural_pars <- get_unconstrained_structural_pars(structural_pars=structural_pars)
     phi0 <- pick_phi0(p=p, M=M, d=d, params=params, structural_pars=structural_pars)[,m]
@@ -387,6 +389,7 @@ get_boldA_eigens <- function(gsmvar) {
   params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
                                     constraints=gsmvar$model$constraints,
                                     same_means=gsmvar$model$same_means,
+                                    weight_constraints=gsmvar$model$weight_constraints,
                                     structural_pars=gsmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_A <- pick_allA(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
@@ -425,6 +428,7 @@ get_omega_eigens <- function(gsmvar) {
   params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
                                     constraints=gsmvar$model$constraints,
                                     same_means=gsmvar$model$same_means,
+                                    weight_constraints=gsmvar$model$weight_constraints,
                                     structural_pars=gsmvar$model$structural_pars)
   structural_pars <- get_unconstrained_structural_pars(structural_pars=gsmvar$model$structural_pars)
   all_Omega <- pick_Omegas(p=p, M=M, d=d, params=params, structural_pars=structural_pars)
