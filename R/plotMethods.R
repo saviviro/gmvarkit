@@ -326,7 +326,11 @@ plot.gsmvar <- function(x, ..., type=c("both", "series", "density")) {
   M <- gsmvar$model$M
   d <- ncol(data)
   model <- gsmvar$model$model
-  params <- gsmvar$params
+  params <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$params, model=model,
+                                    constraints=gsmvar$model$constraints,
+                                    same_means=gsmvar$model$same_means,
+                                    weight_constraints=gsmvar$model$weight_constraints,
+                                    structural_pars=gsmvar$model$structural_pars)
   all_df <- pick_df(M=M, params=params, model=model)
   alphas <- pick_alphas(p=p, M=M, d=d, params=params, model=model)
   if(model == "GMVAR") {
