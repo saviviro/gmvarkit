@@ -143,7 +143,7 @@ should not be restricted to be the same among any regimes. \strong{This constrai
 that is, when \code{parametrization="mean"}.}}
 
 \item{weight_constraints}{a numeric vector of length \eqn{M-1} specifying fixed parameter values for the mixing weight parameters
-\eqn{\alpha_m, \ m=1,...,M-1}. Each elements should be strictly between zero and one, and the sum of all the elements should
+\eqn{\alpha_m, \ m=1,...,M-1}. Each element should be strictly between zero and one, and the sum of all the elements should
 be strictly less than one.}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively
