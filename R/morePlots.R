@@ -13,8 +13,9 @@
 #' @details The conditional mean plot works best if the data contains positive values only.
 #'  \code{acf} from the package \code{stats} and the plot method for class \code{'acf'} objects is employed.
 #' @inherit simulate.gsmvar references
-#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
-#'  \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{diagnostic_plot}}
+#' @seealso \code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+#'  \code{\link{quantile_residual_tests}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
+#'  \code{\link{diagnostic_plot}}
 #' @examples
 #' # GMVAR(2, 2), d=2 model;
 #' params22 <- c(0.36, 0.121, 0.223, 0.059, -0.151, 0.395, 0.406, -0.005,
@@ -60,15 +61,20 @@ cond_moment_plot <- function(gsmvar, which_moment=c("mean", "variance"), grid=FA
     mw_x_reg <- lapply(1:d, function(d1) gsmvar$mixing_weights*gsmvar$regime_cmeans[, d1, ]) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]]), data[,d1]))
   } else { # which_moment == "variance"
-    total_moments <- t(vapply(1:dim(gsmvar$total_ccovs)[3], function(i1) diag(gsmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
+    total_moments <- t(vapply(1:dim(gsmvar$total_ccovs)[3],
+                              function(i1) diag(gsmvar$total_ccovs[, ,i1, drop=TRUE]), numeric(d))) # [t, d]
     regime_moments <- array(vapply(1:M,
                              function(m) t(vapply(1:(nrow(data) - p),
                                                      function(t) diag(gsmvar$regime_ccovs[, , t, m, drop=TRUE]), numeric(d))),
                                                 numeric(d*(nrow(data) - p))),
                             dim=c(nrow(data) - p, d, M)) # [t, d, m]
-    params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=gsmvar$params, constraints=gsmvar$model$constraints, model=model,
-                                      same_means=gsmvar$model$same_means, structural_pars=gsmvar$model$structural_pars)
-    omegas <- pick_Omegas(p=p, M=M_orig, d=d, params=params, structural_pars=get_unconstrained_structural_pars(gsmvar$model$structural_pars))
+    params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=gsmvar$params, model=model,
+                                      constraints=gsmvar$model$constraints,
+                                      same_means=gsmvar$model$same_means,
+                                      weight_constraints=gsmvar$model$weight_constraints,
+                                      structural_pars=gsmvar$model$structural_pars)
+    omegas <- pick_Omegas(p=p, M=M_orig, d=d, params=params,
+                          structural_pars=get_unconstrained_structural_pars(gsmvar$model$structural_pars))
     mw_x_reg <- lapply(1:d, function(i1) gsmvar$mixing_weights*regime_moments[, i1, ]) # [[d]][t, m]
     vals <- lapply(1:d, function(d1) c(total_moments[,d1], vec(mw_x_reg[[d1]])))
   }

@@ -71,6 +71,7 @@ cond_moment_plot(mod41t, which_moment="variance")
  }
 }
 \seealso{
-\code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residual_tests}},
- \code{\link{LR_test}}, \code{\link{Wald_test}}, \code{\link{diagnostic_plot}}
+\code{\link{profile_logliks}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
+ \code{\link{quantile_residual_tests}}, \code{\link{LR_test}}, \code{\link{Wald_test}},
+ \code{\link{diagnostic_plot}}
 }
