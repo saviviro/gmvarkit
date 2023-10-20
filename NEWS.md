@@ -218,4 +218,3 @@
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
 * Fixed a bug that occurred when using swap_W_signs with C_lambda constraints.
 * Fixed a bug in Rao test when using G-StMVAR model
-* Fixed a bug with print_std_errors when using same_means. 

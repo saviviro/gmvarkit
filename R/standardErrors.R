@@ -83,8 +83,11 @@ print_std_errors <- function(gsmvar, digits=3) {
   M <- gsmvar$model$M
   d <- gsmvar$model$d
   model <- gsmvar$model$model
+  npars <- length(gsmvar$params)
+  T_obs <- ifelse(is.null(gsmvar$data), NA, nrow(gsmvar$data))
   constraints <- gsmvar$model$constraints
   parametrization <- gsmvar$model$parametrization
+  same_means <- gsmvar$model$same_means
   weight_constraints <- gsmvar$model$weight_constraints
   pars <- reform_constrained_pars(p=p, M=M, d=d, params=gsmvar$std_errors, model=model, constraints=constraints,
                                   same_means=gsmvar$model$same_means, weight_constraints=weight_constraints,
@@ -103,6 +106,10 @@ print_std_errors <- function(gsmvar, digits=3) {
   M_orig <- M
   M <- sum(M)
   alphas[M] <- NA # No standard error for the last alpha (it is not displayed anyway, though)
+  if(!is.null(weight_constraints)) {
+    alphas <- rep(NA, times=M)
+  }
+
   if(parametrization == "mean") {
     all_mu <- all_phi0_or_mu
     all_phi0 <- matrix(" ", nrow=d, ncol=M)
@@ -125,12 +132,20 @@ print_std_errors <- function(gsmvar, digits=3) {
     sep_AR <- FALSE # No constraints imposed
   }
 
-  cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), "model:\n")
-  cat(paste0("p = ", p, ", M = ", M, ","),
-      ifelse(gsmvar$model$conditional, "conditional", "exact"),
-      "log-likelihood,",
-      ifelse(parametrization == "mean", "mean parametrization,", "intercept parametrization,"),
-      ifelse(is.null(constraints), "no AR parameter constraints", "linear constraints imposed on AR parameters"), "\n")
+  cat(ifelse(is.null(structural_pars), "Reduced form", "Structural"), model, "model:\n")
+  cat(paste0(" p = ", p, ", "))
+  if(model == "G-StMVAR") {
+    cat(paste0("M1 = ", M[1], ", M2 = ", M[2], ", "))
+  } else { # model == "GMVAR" or "StMVAR"
+    cat(paste0("M = ", M, ", "))
+  }
+  cat(paste0("d = ", d, ", #parameters = " , npars, ","),
+      ifelse(is.na(T_obs), "\n", paste0("#observations = ", T_obs, " x ", d, ",\n")),
+      ifelse(gsmvar$model$conditional, "conditional", "exact"), "log-likelihood,",
+      paste0(ifelse(gsmvar$model$parametrization == "mean", "mean parametrization", "intercept parametrization"),
+             ifelse(is.null(same_means), "", ", mean parameters constrained"),
+             ifelse(is.null(constraints), "", ", AR matrices constrained"),
+             ifelse(is.null(weight_constraints), "", ", alphas constrained")), "\n")
   cat("\n")
   cat("APPROXIMATE STANDARD ERRORS\n\n")
 
@@ -186,7 +201,8 @@ print_std_errors <- function(gsmvar, digits=3) {
     df[, tmp_names[p*(d + 2) + d + 1]] <- right_brackets
     df[, "1/2"] <- rep(" ", d)
     df[, tmp_names[p*(d + 2) + d + 2]] <- paste0("eps", 1:d)
-    names_to_omit <- unlist(lapply(c("plus", "eq", "arch_scalar", "round_lbrackets", "round_rbrackets", tmp_names), function(nam) grep(nam, colnames(df))))
+    names_to_omit <- unlist(lapply(c("plus", "eq", "arch_scalar", "round_lbrackets", "round_rbrackets", tmp_names),
+                                   function(nam) grep(nam, colnames(df))))
     colnames(df)[names_to_omit] <- " "
     print(df)
     cat("\n")
@@ -218,6 +234,9 @@ print_std_errors <- function(gsmvar, digits=3) {
         sep_lambda <- FALSE
       }
     }
+    if(!is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
+      sep_lambda <- TRUE
+    }
 
     tmp <- c(rep(" ", times=d - 1), ",")
     df2 <- data.frame(left_brackets, W=W[,1])
@@ -246,7 +265,9 @@ print_std_errors <- function(gsmvar, digits=3) {
     n_zero <- sum(W_orig == 0, na.rm=TRUE)
     n_free <- sum(is.na(W_orig))
     n_sign <- d^2 - n_zero - n_free
-    if(sep_lambda) cat(paste0("lambda parameters: ", paste0(format_value(lambda_stds), collapse=", ")), "\n\n")
+    if(sep_lambda && is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
+      cat(paste0("lambda parameters: ", paste0(format_value(lambda_stds), collapse=", ")), "\n\n")
+    }
     cat("The B-matrix (or equally W) is subject to", n_zero, "zero constraints and", n_sign, "sign constraints.\n")
     cat("The eigenvalues lambda_{mi} are", ifelse(is.null(gsmvar$model$structural_pars$C_lambda), "not subject to linear constraints.",
                                                   "subject to linear constraints."))
