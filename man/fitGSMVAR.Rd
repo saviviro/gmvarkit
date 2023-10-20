@@ -215,6 +215,23 @@ C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fit22c <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
 fit22c
 
+fit22cw <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, weight_constraints=0.6, ncalls=8, ncores=8, seeds=1:8)
+fit22w <- fitGSMVAR(gdpdef, p=2, M=2, weight_constraints=0.6, ncalls=8, ncores=8, seeds=1:8)
+fit22cmw <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+  parametrization="mean", ncalls=8, ncores=8, seeds=1:8)
+fit22cmwF <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+  parametrization="mean", structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+fit22cmwFW <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+  parametrization="mean", structural_pars=list(W=matrix(c(1, 0, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+fit22cmFW <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2),
+  parametrization="mean", structural_pars=list(W=matrix(c(1, 0, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+fit22F <- fitGSMVAR(gdpdef, p=2, M=2, parametrization="mean",
+ structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+fit22twF <- fitGSMVAR(gdpdef, p=2, M=2, parametrization="mean", weight_constraints=0.8, model="StMVAR",
+ structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+
+# G-StMVAR(2, 1, 1) model with autoregressive parameters and unconditional means restricted
+# to be the same for both regimes:
 fit22gscm <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", constraints=C_mat,
    parametrization="mean", same_means=list(1:2), ncalls=1, seeds=1)
 

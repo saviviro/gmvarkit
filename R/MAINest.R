@@ -141,6 +141,23 @@
 #' fit22c <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=1, seeds=1)
 #' fit22c
 #'
+#' fit22cw <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, weight_constraints=0.6, ncalls=8, ncores=8, seeds=1:8)
+#' fit22w <- fitGSMVAR(gdpdef, p=2, M=2, weight_constraints=0.6, ncalls=8, ncores=8, seeds=1:8)
+#' fit22cmw <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+#'   parametrization="mean", ncalls=8, ncores=8, seeds=1:8)
+#' fit22cmwF <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+#'   parametrization="mean", structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+#' fit22cmwFW <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2), weight_constraints=0.6,
+#'   parametrization="mean", structural_pars=list(W=matrix(c(1, 0, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+#' fit22cmFW <- fitGSMVAR(gdpdef, p=2, M=2, constraints=C_mat, same_means=list(1:2),
+#'   parametrization="mean", structural_pars=list(W=matrix(c(1, 0, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+#' fit22F <- fitGSMVAR(gdpdef, p=2, M=2, parametrization="mean",
+#'  structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+#' fit22twF <- fitGSMVAR(gdpdef, p=2, M=2, parametrization="mean", weight_constraints=0.8, model="StMVAR",
+#'  structural_pars=list(W=matrix(c(1, NA, NA, 1), nrow=2), fixed_lambdas=c(6, 2)), ncalls=8, ncores=8, seeds=1:8)
+#'
+#' # G-StMVAR(2, 1, 1) model with autoregressive parameters and unconditional means restricted
+#' # to be the same for both regimes:
 #' fit22gscm <- fitGSMVAR(gdpdef, p=2, M=c(1, 1), model="G-StMVAR", constraints=C_mat,
 #'    parametrization="mean", same_means=list(1:2), ncalls=1, seeds=1)
 #'
@@ -543,7 +560,6 @@ estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, see
                 then applying this function.\n"))
   }
 
-
   new_loglik <- loglikelihood_int(data=gsmvar$data, p=p, M=M, params=new_pars, model=model,
                                   conditional=gsmvar$model$conditional,
                                   parametrization=gsmvar$model$parametrization,
@@ -553,6 +569,18 @@ estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, see
                                   structural_pars=list(W=new_W,
                                                        C_lambda=gsmvar$model$structural_pars$C_lambda,
                                                        fixed_lambdas=gsmvar$model$structural_pars$fixed_lambdas))
+
+  if(is.null(new_loglik)) {
+    cat("Problem with the new parameter vector - try a different new_W?\n See:\n")
+    check_parameters(p=p, M=M, d=2, params=new_pars, model=model,
+                     parametrization=gsmvar$model$parametrization,
+                     constraints=gsmvar$model$constraints,
+                     same_means=gsmvar$model$same_means,
+                     weight_constraints=gsmvar$model$weight_constraints,
+                     structural_pars=list(W=new_W,
+                                          C_lambda=gsmvar$model$structural_pars$C_lambda,
+                                          fixed_lambdas=gsmvar$model$structural_pars$fixed_lambdas))
+  }
 
   cat("The log-likelihood of the supplied model:   ", round(c(gsmvar$loglik), 3),
       "\nConstrained log-likelihood prior estimation:", round(new_loglik, 3), "\n\n")

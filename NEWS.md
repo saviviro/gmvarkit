@@ -209,8 +209,12 @@
 # gmvarkit 2.1.0
 
 * Added support for recursively identified structural GSMVAR models.
+* Added function linear_IRF to calculate linear impulse response functions based on a single regime. 
+* Added a possibility to constrain the mixing weight parameters alphas to fixed constants.
+* Added a possibility to constrain the lambda parameters of structural models to fixed constant.
 * Fixed the .Rd files for random_df and smart_df.
 * Fixed a bug in the estimation of GIRF and GFEVD for StMVAR and G-StMVAR models 
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
 * Fixed a bug that occurred when using swap_W_signs with C_lambda constraints.
 * Fixed a bug in Rao test when using G-StMVAR model
+* Fixed a bug with print_std_errors when using same_means. 
