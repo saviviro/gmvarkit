@@ -212,6 +212,7 @@
 * Added function linear_IRF to calculate linear impulse response functions based on a single regime. 
 * Added a possibility to constrain the mixing weight parameters alphas to fixed constants.
 * Added a possibility to constrain the lambda parameters of structural models to fixed constant.
+* Updated the vignette. 
 * Fixed the .Rd files for random_df and smart_df.
 * Fixed a bug in the estimation of GIRF and GFEVD for StMVAR and G-StMVAR models 
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
