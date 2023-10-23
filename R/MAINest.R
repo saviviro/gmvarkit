@@ -67,11 +67,13 @@
 #'  definiteness conditions. The numerical tolerance of an existing model can be changed with the function
 #'  \code{update_numtols}.
 #'
-#'  \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the code will automatically filter
-#'  through estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
-#'  Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002})
-#'  or transition weights such that they are close to zero for almost all \eqn{t} for at least one regime.
-#'  You can also set \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
+#'  \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the function will automatically filter
+#'  out estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
+#'  Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002}),
+#'  mixing weights such that they are close to zero for almost all \eqn{t} for at least one regime, or mixing weight parameter
+#'  estimate close to zero (or one). It also filters out estimates with any modulus "bold A" eigenvalues larger than 0.9985,
+#' as the solution is near the boundary of the stationarity region and likely not a local maximum. You can also set
+#'  \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
 #'  function \code{alt_gsmvar}.
 #' @return Returns an object of class \code{'gsmvar'} defining the estimated (reduced form or structural) GMVAR, StMVAR, or G-StMVAR model.
 #'   Multivariate quantile residuals (Kalliovirta and Saikkonen 2010) are also computed and included in the returned object.
@@ -307,7 +309,8 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 
     # Go through estimates, take the estimate that yield the higher likelihood
     # among estimates that are do not include wasted regimes or near-singular
-    # error term covariance matrices.
+    # error term covariance matrices. Also checks near-the-boundary of the
+    # stationarity region.
     for(i1 in 1:length(all_estimates)) {
       which_round <- ord_by_loks[i1] # Est round with i1:th largest loglik
       pars <- all_estimates[[which_round]]
@@ -323,6 +326,10 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
       Omega_eigens <- get_omega_eigens(mod)
       Omegas_ok <- !any(Omega_eigens < 0.002)
 
+      # Checks stationarity
+      boldA_eigens <- get_boldA_eigens(mod)
+      stat_ok <- !any(boldA_eigens > 0.9985)
+
       # Check mixing weight params
       pars_std <- reform_constrained_pars(p=p, M=M, d=d, params=pars, model=model,
                                           constraints=constraints,
@@ -334,12 +341,11 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
       alphas_ok <- !any(alphas < 0.01)
 
       # Check mixing weights
-
       mixing_weights_ok <- tryCatch(!any(vapply(1:M,
                                           function(m) sum(mod$mixing_weights[,m] > red_criteria[1]) < red_criteria[2]*n_obs,
                                           logical(1))),
                               error=function(e) FALSE)
-      if(Omegas_ok && alphas_ok && mixing_weights_ok) {
+      if(Omegas_ok && alphas_ok && stat_ok && mixing_weights_ok) {
         which_best_fit <- which_round # The estimation round of the appropriate estimate with the largest loglik
         break
       }

@@ -171,11 +171,13 @@ If you wish to estimate a structural model without overidentifying constraints t
  definiteness conditions. The numerical tolerance of an existing model can be changed with the function
  \code{update_numtols}.
 
- \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the code will automatically filter
- through estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
- Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002})
- or transition weights such that they are close to zero for almost all \eqn{t} for at least one regime.
- You can also set \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
+ \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the function will automatically filter
+ out estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
+ Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002}),
+ mixing weights such that they are close to zero for almost all \eqn{t} for at least one regime, or mixing weight parameter
+ estimate close to zero (or one). It also filters out estimates with any modulus "bold A" eigenvalues larger than 0.9985,
+as the solution is near the boundary of the stationarity region and likely not a local maximum. You can also set
+ \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
  function \code{alt_gsmvar}.
 }
 \section{S3 methods}{
@@ -198,7 +200,8 @@ summary(fit12)
 print_std_errors(fit12)
 profile_logliks(fit12)
 
-fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=10, model="StMVAR", seeds=1:10, ncores=1, filter_estimates=TRUE)
+fit42t <- fitGSMVAR(gdpdef, p=4, M=2, ncalls=5, model="StMVAR", seeds=1:5, use_parallel=FALSE,
+ filter_estimates=TRUE, print_res=FALSE)
 
 # The rest of the examples only use a single estimation round with a given
 # seed that produces the MLE to reduce running time of the examples. When

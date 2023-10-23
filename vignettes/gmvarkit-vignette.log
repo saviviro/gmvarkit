@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  20 OCT 2023 16:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  23 OCT 2023 17:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -658,15 +658,28 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [16]
+! Undefined control sequence.
+l.534 ...nce matrix (any eigenvalue less than \eqn
+                                                  {0.002}), mixing weights s...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+! Undefined control sequence.
+l.534 ...hey are close to zero for almost all \eqn
+                                                  {t} for at least one regim...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
 <figures/seriesplot.png, id=461, 803.0pt x 451.6875pt>
 File: figures/seriesplot.png Graphic file (type png)
 <use figures/seriesplot.png>
-Package pdftex.def Info: figures/seriesplot.png  used on input line 548.
-(pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
-<figures/densityplot.png, id=464, 803.0pt x 451.6875pt>
-File: figures/densityplot.png Graphic file (type png)
-<use figures/densityplot.png>
-Package pdftex.def Info: figures/densityplot.png  used on input line 565.
+Package pdftex.def Info: figures/seriesplot.png  used on input line 549.
 (pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -674,32 +687,38 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [17]
+<figures/densityplot.png, id=469, 803.0pt x 451.6875pt>
+File: figures/densityplot.png Graphic file (type png)
+<use figures/densityplot.png>
+Package pdftex.def Info: figures/densityplot.png  used on input line 566.
+(pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 18 []
  []
 
-[18 <./figures/seriesplot.png> <./figures/densityplot.png>]
+[18]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 19
  []
 
-[19]
+[19 <./figures/seriesplot.png> <./figures/densityplot.png>]
 <figures/proflogliks.png, id=484, 803.0pt x 401.5pt>
 File: figures/proflogliks.png Graphic file (type png)
 <use figures/proflogliks.png>
-Package pdftex.def Info: figures/proflogliks.png  used on input line 627.
+Package pdftex.def Info: figures/proflogliks.png  used on input line 628.
 (pdftex.def)             Requested size: 354.12434pt x 177.06488pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 20 []
  []
 
-[20 <./figures/proflogliks.png>]
+[20]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 21
  []
 
-[21]
+[21 <./figures/proflogliks.png>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 22 []
  []
@@ -771,20 +790,20 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 <figures/predplot.png, id=646, 803.0pt x 451.6875pt>
 File: figures/predplot.png Graphic file (type png)
 <use figures/predplot.png>
-Package pdftex.def Info: figures/predplot.png  used on input line 1051.
+Package pdftex.def Info: figures/predplot.png  used on input line 1052.
 (pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
 
-Underfull \hbox (badness 1331) in paragraph at lines 1068--1069
+Underfull \hbox (badness 1331) in paragraph at lines 1069--1070
 []\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 1069--1070
+Underfull \hbox (badness 3449) in paragraph at lines 1070--1071
 \T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
  []
 
 
-Underfull \hbox (badness 1527) in paragraph at lines 1080--1081
+Underfull \hbox (badness 1527) in paragraph at lines 1081--1082
 []\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
  []
 
@@ -827,14 +846,14 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [39]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1102.
+(hyperref)                removing `math shift' on input line 1103.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1102.
+(hyperref)                removing `math shift' on input line 1103.
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 1102.
+(Font)              <14.4> on input line 1103.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 40 []
@@ -846,12 +865,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [41]
-Overfull \hbox (16.39037pt too wide) detected at line 1190
+Overfull \hbox (16.39037pt too wide) detected at line 1191
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
 
-Overfull \hbox (16.39037pt too wide) detected at line 1194
+Overfull \hbox (16.39037pt too wide) detected at line 1195
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
@@ -884,7 +903,7 @@ Here is how much of TeX's memory you used:
  30111 multiletter control sequences out of 15000+600000
  543478 words of font info for 116 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,25n,77p,1768b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 75i,25n,77p,1768b,514s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/lo
 cal/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/20
 21/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/usr/local/texlive/2021/texmf-dist/
@@ -915,7 +934,7 @@ usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/t
 exlive/2021/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/202
 1/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></usr/local/texlive/2021/texmf-d
 ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on gmvarkit-vignette.pdf (44 pages, 879354 bytes).
+Output written on gmvarkit-vignette.pdf (44 pages, 879956 bytes).
 PDF statistics:
  1003 PDF objects out of 1200 (max. 8388607)
  878 compressed objects within 9 object streams
