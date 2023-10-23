@@ -12,6 +12,7 @@
 #' @param seeds a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
 #' @param print_res should summaries of estimation results be printed?
+#' @param use_parallel employ parallel computing? If \code{FALSE}, no progression bar etc will be generated.
 #' @param filter_estimates should the likely inappropriate estimates be filtered? See details.
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
@@ -119,6 +120,9 @@
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
 #'
+#' fit42t <- fitGSMVAR(gdpdef, p=4, M=2, ncalls=5, model="StMVAR", seeds=1:5, use_parallel=FALSE,
+#'  filter_estimates=TRUE, print_res=FALSE)
+#'
 #' # The rest of the examples only use a single estimation round with a given
 #' # seed that produces the MLE to reduce running time of the examples. When
 #' # estimating models for empirical applications, a large number of estimation
@@ -168,7 +172,8 @@
 
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                       constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
-                      ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, filter_estimates=FALSE, ...) {
+                      ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, use_parallel=TRUE,
+                      filter_estimates=FALSE, ...) {
 
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -189,28 +194,35 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   minval <- ifelse(is.null(dot_params$minval), get_minval(data), dot_params$minval)
   red_criteria <- ifelse(rep(is.null(dot_params$red_criteria), 2), c(0.05, 0.01), dot_params$red_criteria)
 
-  if(ncores > parallel::detectCores()) {
-    ncores <- parallel::detectCores()
-    message("ncores was set to be larger than the number of cores detected")
-  }
-  if(ncores > ncalls) {
-    ncores <- ncalls
-    message("ncores was set to be larger than the number of estimation rounds")
-  }
-  cat(paste("Using", ncores, "cores for", ncalls, "estimations rounds..."), "\n")
+  if(use_parallel) {
+    if(ncores > parallel::detectCores()) {
+      ncores <- parallel::detectCores()
+      message("ncores was set to be larger than the number of cores detected")
+    }
+    if(ncores > ncalls) {
+      ncores <- ncalls
+      message("ncores was set to be larger than the number of estimation rounds")
+    }
+    cat(paste("Using", ncores, "cores for", ncalls, "estimations rounds..."), "\n")
 
-  ### Optimization with the genetic algorithm ###
-  cl <- parallel::makeCluster(ncores)
-  on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
-  parallel::clusterExport(cl, ls(environment(fitGSMVAR)), envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
-  parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
+    ### Optimization with the genetic algorithm ###
+    cl <- parallel::makeCluster(ncores)
+    on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
+    parallel::clusterExport(cl, ls(environment(fitGSMVAR)), envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
+    parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
 
-  cat("Optimizing with a genetic algorithm...\n")
-  GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, model=model, conditional=conditional,
-                                                              parametrization=parametrization, constraints=constraints,
-                                                              same_means=same_means, weight_constraints=weight_constraints,
-                                                              structural_pars=structural_pars,
-                                                              seed=seeds[i1], ...), cl=cl)
+    cat("Optimizing with a genetic algorithm...\n")
+    GAresults <- pbapply::pblapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, model=model, conditional=conditional,
+                                                                parametrization=parametrization, constraints=constraints,
+                                                                same_means=same_means, weight_constraints=weight_constraints,
+                                                                structural_pars=structural_pars,
+                                                                seed=seeds[i1], ...), cl=cl)
+  } else {
+    GAresults <- lapply(1:ncalls, function(i1) GAfit(data=data, p=p, M=M, model=model, conditional=conditional,
+                                                     parametrization=parametrization, constraints=constraints,
+                                                     same_means=same_means, weight_constraints=weight_constraints,
+                                                     structural_pars=structural_pars, seed=seeds[i1], ...))
+  }
 
   loks <- vapply(1:ncalls, function(i1) loglikelihood_int(data=data, p=p, M=M, params=GAresults[[i1]], model=model,
                                                           conditional=conditional, parametrization=parametrization,
@@ -264,10 +276,16 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
     vapply(1:npars, function(i1) (loglik_fn(params + I[i1,]*h) - loglik_fn(params - I[i1,]*h))/(2*h), numeric(1))
   }
 
-  cat("Optimizing with a variable metric algorithm...\n")
-  NEWTONresults <- pbapply::pblapply(1:ncalls, function(i1) optim(par=GAresults[[i1]], fn=loglik_fn, gr=loglik_grad, method="BFGS",
-                                                                  control=list(fnscale=-1, maxit=maxit)), cl=cl)
-  parallel::stopCluster(cl=cl)
+  if(use_parallel) {
+    cat("Optimizing with a variable metric algorithm...\n")
+    NEWTONresults <- pbapply::pblapply(1:ncalls, function(i1) optim(par=GAresults[[i1]], fn=loglik_fn, gr=loglik_grad, method="BFGS",
+                                                                    control=list(fnscale=-1, maxit=maxit)), cl=cl)
+    parallel::stopCluster(cl=cl)
+  } else {
+    NEWTONresults <- lapply(1:ncalls, function(i1) optim(par=GAresults[[i1]], fn=loglik_fn, gr=loglik_grad, method="BFGS",
+                                                         control=list(fnscale=-1, maxit=maxit)))
+  }
+
 
   loks <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$value, numeric(1)) # Log-likelihoods
   converged <- vapply(1:ncalls, function(i1) NEWTONresults[[i1]]$convergence == 0, logical(1)) # Which coverged
@@ -284,7 +302,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   }
 
   if(filter_estimates) {
-    cat("Filtering inappropriate estimates...\n")
+    if(use_parallel) cat("Filtering inappropriate estimates...\n")
     ord_by_loks <- order(loks, decreasing=TRUE) # Ordering from largest loglik to smaller
 
     # Go through estimates, take the estimate that yield the higher likelihood
@@ -365,7 +383,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 
 
   ### Wrap up ###
-  cat("Calculating approximate standard errors...\n")
+  if(use_parallel) cat("Calculating approximate standard errors...\n")
   ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params, model=model,
                 conditional=conditional, parametrization=parametrization,
                 constraints=constraints, same_means=same_means,
@@ -376,7 +394,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
   ret$which_converged <- converged
   ret$which_round <- which_best_fit # Which estimation round induced the largest log-likelihood?
   warn_eigens(ret)
-  cat("Finished!\n")
+  if(use_parallel) cat("Finished!\n")
   ret
 }
 

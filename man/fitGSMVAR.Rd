@@ -20,6 +20,7 @@ fitGSMVAR(
   maxit = 1000,
   seeds = NULL,
   print_res = TRUE,
+  use_parallel = TRUE,
   filter_estimates = FALSE,
   ...
 )
@@ -95,6 +96,8 @@ a time-varying diagonal matrix with positive diagonal entries).}
 or \code{NULL} for not initializing the seed. Exists for creating reproducible results.}
 
 \item{print_res}{should summaries of estimation results be printed?}
+
+\item{use_parallel}{employ parallel computing? If \code{FALSE}, no progression bar etc will be generated.}
 
 \item{filter_estimates}{should the likely inappropriate estimates be filtered? See details.}
 
@@ -194,6 +197,8 @@ plot(fit12)
 summary(fit12)
 print_std_errors(fit12)
 profile_logliks(fit12)
+
+fit32 <- fitGSMVAR(gdpdef, p=3, M=2, ncalls=10, model="StMVAR", seeds=1:10, ncores=1, filter_estimates=TRUE)
 
 # The rest of the examples only use a single estimation round with a given
 # seed that produces the MLE to reduce running time of the examples. When
