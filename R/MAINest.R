@@ -12,6 +12,7 @@
 #' @param seeds a length \code{ncalls} vector containing the random number generator seed for each call to the genetic algorithm,
 #'  or \code{NULL} for not initializing the seed. Exists for creating reproducible results.
 #' @param print_res should summaries of estimation results be printed?
+#' @param filter_estimates should the likely inappropriate estimates be filtered? See details.
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
 #'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,
@@ -64,6 +65,13 @@
 #'  of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
 #'  definiteness conditions. The numerical tolerance of an existing model can be changed with the function
 #'  \code{update_numtols}.
+#'
+#'  \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the code will automatically filter
+#'  through estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
+#'  Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002})
+#'  or transition weights such that they are close to zero for almost all \eqn{t} for at least one regime.
+#'  You can also set \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
+#'  function \code{alt_gsmvar}.
 #' @return Returns an object of class \code{'gsmvar'} defining the estimated (reduced form or structural) GMVAR, StMVAR, or G-StMVAR model.
 #'   Multivariate quantile residuals (Kalliovirta and Saikkonen 2010) are also computed and included in the returned object.
 #'   In addition, the returned object contains the estimates and log-likelihood values from all the estimation rounds performed.
@@ -160,7 +168,7 @@
 
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                       constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
-                      ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, ...) {
+                      ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, filter_estimates=FALSE, ...) {
 
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -269,15 +277,72 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
     print_loks()
   }
 
-
-  ### Obtain estimates and standard errors, calculate IC ###
+  ### Obtain estimates and filter the inapproriate estimates
   all_estimates <- lapply(NEWTONresults, function(x) x$par)
   if(model == "StMVAR" || model == "G-StMVAR") { # Unlogarithmize degrees of freedom parameter values
     all_estimates <- lapply(1:ncalls, function(i1) manipulateDFS(M=M, params=all_estimates[[i1]], model=model, FUN=exp))
   }
-  which_best_fit <- which(loks == max(loks))[1]
-  best_fit <- all_estimates[[which_best_fit]]
-  params <- best_fit
+
+  if(filter_estimates) {
+    cat("Filtering inappropriate estimates...\n")
+    ord_by_loks <- order(loks, decreasing=TRUE) # Ordering from largest loglik to smaller
+
+    # Go through estimates, take the estimate that yield the higher likelihood
+    # among estimates that are do not include wasted regimes or near-singular
+    # error term covariance matrices.
+    for(i1 in 1:length(all_estimates)) {
+      which_round <- ord_by_loks[i1] # Est round with i1:th largest loglik
+      pars <- all_estimates[[which_round]]
+      mod <- suppressWarnings(GSMVAR(data=data, p=p, M=M, d=d, params=pars,
+                                     conditional=conditional, model=model,
+                                     parametrization=parametrization,
+                                     constraints=constraints,
+                                     same_means=same_means,
+                                     weight_constraints=weight_constraints,
+                                     structural_pars=structural_pars, calc_std_errors=FALSE))
+
+      # Check Omegas
+      Omega_eigens <- get_omega_eigens(mod)
+      Omegas_ok <- !any(Omega_eigens < 0.002)
+
+      # Check mixing weight params
+      pars_std <- reform_constrained_pars(p=p, M=M, d=d, params=pars, model=model,
+                                          constraints=constraints,
+                                          same_means=same_means,
+                                          weight_constraints=weight_constraints,
+                                          structural_pars=structural_pars,
+                                          change_na=FALSE) # Pars in standard form for pick pars fns
+      alphas <- pick_alphas(p=p, M=M, d=d, params=pars_std, model=model)
+      alphas_ok <- !any(alphas < 0.01)
+
+      # Check mixing weights
+
+      mixing_weights_ok <- tryCatch(!any(vapply(1:M,
+                                          function(m) sum(mod$mixing_weights[,m] > red_criteria[1]) < red_criteria[2]*n_obs,
+                                          logical(1))),
+                              error=function(e) FALSE)
+      if(Omegas_ok && alphas_ok && mixing_weights_ok) {
+        which_best_fit <- which_round # The estimation round of the appropriate estimate with the largest loglik
+        break
+      }
+      if(i1 == length(all_estimates)) {
+        message("No 'appropriate' estimates were found!
+                 Check that all the variables are scaled to vary in similar magninutes, also not very small or large magnitudes.
+                 Consider running more estimation rounds or study the obtained estimates one-by-one with the function alt_gsmvar.")
+        if(M > 2) {
+          message("Consider also using smaller M. Too large M leads to identification problems.")
+        }
+        which_best_fit <- which(loks == max(loks))[1]
+      }
+    }
+  } else {
+    which_best_fit <- which(loks == max(loks))[1]
+  }
+  params <- all_estimates[[which_best_fit]] # The params to return
+
+
+
+  ### Obtain estimates and standard errors, calculate IC ###
   if(is.null(constraints) && is.null(structural_pars$C_lambda) && is.null(structural_pars$fixed_lambdas) &&
      is.null(same_means) && is.null(weight_constraints)) {
     params <- sort_components(p=p, M=M, d=d, params=params, model=model, structural_pars=structural_pars)

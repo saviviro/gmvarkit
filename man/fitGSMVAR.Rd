@@ -20,6 +20,7 @@ fitGSMVAR(
   maxit = 1000,
   seeds = NULL,
   print_res = TRUE,
+  filter_estimates = FALSE,
   ...
 )
 }
@@ -95,6 +96,8 @@ or \code{NULL} for not initializing the seed. Exists for creating reproducible r
 
 \item{print_res}{should summaries of estimation results be printed?}
 
+\item{filter_estimates}{should the likely inappropriate estimates be filtered? See details.}
+
 \item{...}{additional settings passed to the function \code{GAfit} employing the genetic algorithm.}
 }
 \value{
@@ -164,6 +167,13 @@ If you wish to estimate a structural model without overidentifying constraints t
  of the parameter space, it might help to use smaller numerical tolerance for the stationarity and positive
  definiteness conditions. The numerical tolerance of an existing model can be changed with the function
  \code{update_numtols}.
+
+ \strong{Filtering inappropriate estimates:} If \code{filter_estimates == TRUE}, the code will automatically filter
+ through estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest.
+ Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than \eqn{0.002})
+ or transition weights such that they are close to zero for almost all \eqn{t} for at least one regime.
+ You can also set \code{filter_estimates=FALSE} and find the solutions of interest yourself by using the
+ function \code{alt_gsmvar}.
 }
 \section{S3 methods}{
 
