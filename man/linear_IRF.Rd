@@ -12,8 +12,9 @@ linear_IRF(
   which_cumulative = numeric(0),
   scale = NULL,
   ci = NULL,
-  bootstrap_reps = NULL,
+  bootstrap_reps = 50,
   ncores = 2,
+  ncalls = 1,
   seeds = NULL,
   ...
 )
@@ -49,7 +50,11 @@ Available only for models that impose linear autoregressive dynamics
 
 \item{bootstrap_reps}{the number of bootstrap repetitions for estimating confidence bounds.}
 
-\item{ncores}{the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds}
+\item{ncores}{the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds.}
+
+\item{ncalls}{based on how many estimation rounds should each bootstrap estimation be based on?
+Does not have to be very large since initial estimates are used based on already fitted model.
+Larger number of rounds gives more reliable results but is computationally more demanding.}
 
 \item{seeds}{a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
 generator for each bootstrap replication.}
@@ -58,7 +63,19 @@ generator for each bootstrap replication.}
 the results.}
 }
 \value{
-Returns a class \code{'irf'} list with the linear IRFs in ... FILL IN!
+Returns a class \code{'irf'} list with the following elements:
+  \describe{
+    \item{\code{$point_est}:}{a 3D array \code{[variables, shock, horizon]} containing the point estimates of the IRFs.
+       Note that the first slice is for the impact responses and the slice i+1 for the period i. The response of the
+       variable 'i1' to the shock 'i2' is subsetted as \code{$point_est[i1, i2, ]}.}
+    \item{\code{$conf_ints}:}{bootstrapped confidence intervals for the IRFs in a \code{[variables, shock, horizon, bound]}
+       4D array. The lower bound is obtained as \code{$conf_ints[, , , 1]}, and similarly the upper bound as
+        \code{$conf_ints[, , , 2]}. The subsetted 3D array is then the bound in a form similar to \code{$point_est}.}
+    \item{\code{$all_bootstrap_reps}:}{IRFs from all of the bootstrap replications in a \code{[variables, shock, horizon, rep]}.
+       4D array. The IRF from replication i1 is obtained as \code{$all_bootstrap_reps[, , , i1]}, and the subsetted 3D array
+       is then the in a form similar to \code{$point_est}.}
+    \item{Other elements:}{contains some of the arguments the \code{linear_IRF} was called with.}
+  }
 }
 \description{
 \code{linear_IRF} estimates linear impulse response function based on a single regime
@@ -71,13 +88,19 @@ The model DOES NOT need to be structural in order for this function to be
   is used. When a reduced form model is provided in the argument \code{gsmvar},
   lower triangular Cholesky identification is used to identify the shocks.
 
-  FILL IN DETAILS ABOUT CONFIDENCE INTERVALS
+  If the autoregressive dynamics of the model are linear (i.e., either M == 1 or mean and AR parameters
+  are constrained identical across the regimes), confidence bounds can be calculated based on a fixed-design
+  wild residual bootstrap method. We employ the method described in Herwartz and Lütkepohl (2014); see also
+  the relevant chapters in Kilian and Lütkepohl (2017).
 }
 \examples{
  # FILL IN
 }
 \references{
 \itemize{
+   \item Herwartz H. and Lütkepohl H. 2014. Structural vector autoregressions with Markov switching:
+     Combining conventional with statistical identification of shocks. \emph{Journal of Econometrics},
+     183, pp. 104-116.
    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
          \emph{Cambridge University Press}, Cambridge.
  }

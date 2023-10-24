@@ -27,7 +27,10 @@
 #'   Available only for models that impose linear autoregressive dynamics
 #'   (excluding changes in the volatility regime).
 #' @param bootstrap_reps the number of bootstrap repetitions for estimating confidence bounds.
-#' @param ncores the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds
+#' @param ncores the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds.
+#' @param ncalls based on how many estimation rounds should each bootstrap estimation be based on?
+#'   Does not have to be very large since initial estimates are used based on already fitted model.
+#'   Larger number of rounds gives more reliable results but is computationally more demanding.
 #' @param seeds a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
 #'   generator for each bootstrap replication.
 #' @param ... parameters passed to the plot method \code{plot.irf} that plots
@@ -38,12 +41,30 @@
 #'   is used. When a reduced form model is provided in the argument \code{gsmvar},
 #'   lower triangular Cholesky identification is used to identify the shocks.
 #'
-#'   FILL IN DETAILS ABOUT CONFIDENCE INTERVALS
-#' @return Returns a class \code{'irf'} list with the linear IRFs in ... FILL IN!
+#'   If the autoregressive dynamics of the model are linear (i.e., either M == 1 or mean and AR parameters
+#'   are constrained identical across the regimes), confidence bounds can be calculated based on a fixed-design
+#'   wild residual bootstrap method. We employ the method described in Herwartz and Lütkepohl (2014); see also
+#'   the relevant chapters in Kilian and Lütkepohl (2017).
+#' @return Returns a class \code{'irf'} list with the following elements:
+#'   \describe{
+#'     \item{\code{$point_est}:}{a 3D array \code{[variables, shock, horizon]} containing the point estimates of the IRFs.
+#'        Note that the first slice is for the impact responses and the slice i+1 for the period i. The response of the
+#'        variable 'i1' to the shock 'i2' is subsetted as \code{$point_est[i1, i2, ]}.}
+#'     \item{\code{$conf_ints}:}{bootstrapped confidence intervals for the IRFs in a \code{[variables, shock, horizon, bound]}
+#'        4D array. The lower bound is obtained as \code{$conf_ints[, , , 1]}, and similarly the upper bound as
+#'         \code{$conf_ints[, , , 2]}. The subsetted 3D array is then the bound in a form similar to \code{$point_est}.}
+#'     \item{\code{$all_bootstrap_reps}:}{IRFs from all of the bootstrap replications in a \code{[variables, shock, horizon, rep]}.
+#'        4D array. The IRF from replication i1 is obtained as \code{$all_bootstrap_reps[, , , i1]}, and the subsetted 3D array
+#'        is then the in a form similar to \code{$point_est}.}
+#'     \item{Other elements:}{contains some of the arguments the \code{linear_IRF} was called with.}
+#'   }
 #' @seealso \code{\link{GIRF}}, \code{\link{GFEVD}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}},
 #'   \code{\link{gsmvar_to_sgsmvar}}, \code{\link{reorder_W_columns}}, \code{\link{swap_W_signs}}
 #' @references
 #'  \itemize{
+#'    \item Herwartz H. and Lütkepohl H. 2014. Structural vector autoregressions with Markov switching:
+#'      Combining conventional with statistical identification of shocks. \emph{Journal of Econometrics},
+#'      183, pp. 104-116.
 #'    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
 #'          \emph{Cambridge University Press}, Cambridge.
 #'  }
@@ -52,10 +73,9 @@
 #' @export
 
 linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
-                       scale=NULL, ci=NULL, bootstrap_reps=NULL, ncores=2, seeds=NULL, ...) {
+                       scale=NULL, ci=NULL, bootstrap_reps=50, ncores=2, ncalls=1, seeds=NULL, ...) {
   # Get the parameter values etc
-  stopifnot(all_pos_ints(c(N, regime, ncores)))
-  if(!is.null(bootstrap_reps)) stopifnot(all_pos_ints(bootstrap_reps))
+  stopifnot(all_pos_ints(c(N, regime, ncores, bootstrap_reps, ncalls)))
   p <- gsmvar$model$p
   M_orig <- gsmvar$model$M
   M <- sum(M_orig)
@@ -69,6 +89,43 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
   data <- gsmvar$data
   n_obs <- nrow(data)
   T_obs <- n_obs - p
+
+  # Check the argument scale and which_cumulative
+  if(is.null(gsmvar$model$structural_pars)) { # Reduced form model
+    B_constrs <- matrix(NA, nrow=d, ncol=d)
+    B_constrs[upper.tri(B_constrs)] <- 0
+    diag(B_constrs) <- 1 # Lower triangular Cholesky constraints
+  } else {
+    B_constrs <- gsmvar$model$structural_pars$W
+  }
+  if(!is.null(scale)) {
+    scale <- as.matrix(scale)
+    stopifnot(all(scale[1,] %in% 1:d)) # All shocks in 1,...,d
+    stopifnot(length(unique(scale[1,])) == length(scale[1,])) # No duplicate scales for the same shock
+    stopifnot(all(scale[2,] %in% 1:d)) # All variables in 1,...,d
+    stopifnot(all(scale[3,] != 0)) # No zero initial magnitudes
+
+    # For the considered shocks, check that there are not zero-constraints for the variable
+    # whose initial response is scaled.
+    for(i1 in 1:ncol(scale)) {
+      if(!is.na(B_constrs[scale[2, i1], scale[1, i1]]) && B_constrs[scale[2, i1], scale[1, i1]] == 0) {
+        if(is.null(is.null(gsmvar$model$structural_pars))) {
+          stop(paste("Instantaneous response of the variable that has a zero constraint for",
+                     "the considered shock cannot be scaled"))
+        } else { # Reduced form
+          stop(paste("Instantaneous response of the variable that has a zero constraint for the considered",
+                     "shock cannot be scaled",
+                     "(lower triangular recursive identification is assumed for reduced form models)"))
+        }
+      }
+    }
+  }
+  if(length(which_cumulative) > 0) {
+    which_cumulative <- unique(which_cumulative)
+    stopifnot(all(which_cumulative %in% 1:d))
+  }
+
+  # Pick params etc
   params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=gsmvar$params, model=model,
                                     constraints=constraints, same_means=same_means,
                                     weight_constraints=weight_constraints,
@@ -106,22 +163,22 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
   get_IRF <- function(p, d, N, boldA, B_matrix) {
     J_matrix <- create_J_matrix(d=d, p=p)
     all_boldA_powers <- array(NA, dim=c(d*p, d*p, N+1)) # The first [, , i1] is for the impact period, i1+1 for period i1
-    all_phi_i <- array(NA, dim=c(d, d, N+1)) # JA^iJ' matrices; [, , 1] is for the impact period, i1+1 for period i1
-    all_Phi_i <- array(NA, dim=c(d*p, d*p, N+1)) # IR-matrices [, , 1] is for the impact period, i1+1 for period i1
+    all_Phi_i <- array(NA, dim=c(d, d, N+1)) # JA^iJ' matrices; [, , 1] is for the impact period, i1+1 for period i1
+    all_Theta_i <- array(NA, dim=c(d, d, N+1)) # IR-matrices [, , 1] is for the impact period, i1+1 for period i1
     for(i1 in 1:(N + 1)) { # Go through the periods, i1=1 for the impact period, i1+1 for the period i1 after the impact
       if(i1 == 1) {
         all_boldA_powers[, , i1] <- diag(d*p) # Diagonal matrix for the power 0
       } else {
         all_boldA_powers[, , i1] <- all_boldA_powers[, , i1 - 1]%*%boldA # boldA^{i1-1} because i1=1 is for the zero period
       }
-      all_phi_i[, , i1] <- J_matrix%*%all_boldA_powers[, , i1]%*%t(J_matrix)
-      all_Phi_i[, , i1] <- all_phi_i[, , i1]%*%B_matrix
+      all_Phi_i[, , i1] <- J_matrix%*%all_boldA_powers[, , i1]%*%t(J_matrix)
+      all_Theta_i[, , i1] <- all_Phi_i[, , i1]%*%B_matrix
     }
-    all_Phi_i # all_Phi_i[variable, shock, horizon] -> all_Phi_i[variable, shock, ] subsets the IRF!
+    all_Theta_i # all_Theta_i[variable, shock, horizon] -> all_Theta_i[variable, shock, ] subsets the IRF!
   }
 
   ## Calculate the impulse response functions:
-  point_est_IRF <- get_IRF(p=p, d=d, N=N,
+  point_est <- get_IRF(p=p, d=d, N=N,
                            boldA=all_boldA[, , regime], # boldA= Companion form AR matrix of the selected regime
                            B_matrix=B_matrix)
 
@@ -162,10 +219,6 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
         }
       }
       new_structural_pars <- list(W=new_W, fixed_lambdas=new_fixed_lambdas)
-      #if(is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
-      #  # Remove lambda parameters from the parameter vector (note: alphas already removed)
-      #  new_params <- c(new_params[1:(length(new_params) - d*(M - 1) - length(all_df))], all_df)
-      #} # Redundant since new_params re-defined later anyway
 
       # Finally, we need to make sure that the W params in new_params are in line with the constraints new_W.
       # This amounts checking the strict sign constraints and swapping the signs of the columns that don't
@@ -210,7 +263,6 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     ## Functions that performs one bootstrap replication and return the IRF
     get_one_bootstrap_IRF <- function(seed) { # Take rest of the arguments from parent environment
       set.seed(seed) # Set seed for data generation
-      ncalls <- 1 # The number of estimation rounds in each bootstrap replication
       estim_seeds <- sample.int(n=1e+6, size=ncalls) # Seeds for estimation
 
       ## Create new data
@@ -219,19 +271,19 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       new_data <- rbind(data[1:p,], # Fixed initial values
                         mu_mt + new_resid) # Bootstrapped data
 
-      ## Estimate the model to the new data ADD SUPPRESS WARNIGNS HERE AFTER TESTING!!!! warn_dfs pointless here
-      new_mod <- suppressMessages(fitGSMVAR(data=new_data, p=gsmvar$model$p, M=gsmvar$model$M,
-                                            model=gsmvar$model$model,
-                                            conditional=gsmvar$model$conditional,
-                                            parametrization=gsmvar$model$parametrization,
-                                            constraints=gsmvar$model$constraints,
-                                            same_means=gsmvar$model$same_means,
-                                            weight_constraints=new_weight_constraints, # Condition on alphas
-                                            structural_pars=new_structural_pars, # Condition on lambdas
-                                            ncalls=ncalls, seeds=estim_seeds,
-                                            print_res=FALSE, use_parallel=FALSE,
-                                            filter_estimates=TRUE, calc_std_errors=FALSE,
-                                            initpop=list(new_params))) # Initial values
+      ## Estimate the model to the new data
+      new_mod <- suppressWarnings(suppressMessages(fitGSMVAR(data=new_data, p=gsmvar$model$p, M=gsmvar$model$M,
+                                                             model=gsmvar$model$model,
+                                                             conditional=gsmvar$model$conditional,
+                                                             parametrization=gsmvar$model$parametrization,
+                                                             constraints=gsmvar$model$constraints,
+                                                             same_means=gsmvar$model$same_means,
+                                                             weight_constraints=new_weight_constraints, # Condition on alphas
+                                                             structural_pars=new_structural_pars, # Condition on lambdas
+                                                             ncalls=ncalls, seeds=estim_seeds,
+                                                             print_res=FALSE, use_parallel=FALSE,
+                                                             filter_estimates=TRUE, calc_std_errors=FALSE,
+                                                             initpop=list(new_params)))) # Initial values
 
       ## Get the IRF from the bootstrap replication
       tmp_params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=new_mod$params, model=model,
@@ -262,6 +314,8 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       get_IRF(p=p, d=d, N=N, boldA=tmp_all_boldA[, , regime], B_matrix=tmp_B_matrix)
     }
 
+    # all_bootstrap_IRF <- lapply(1:bootstrap_reps, function(i1) get_one_bootstrap_IRF(seed=seeds[i1]))
+
     ## Calculate the bootstrap replications using parallel computing
     if(ncores > parallel::detectCores()) {
       ncores <- parallel::detectCores()
@@ -270,7 +324,8 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     cat(paste("Using", ncores, "cores for", bootstrap_reps, "bootstrap replication..."), "\n")
     cl <- parallel::makeCluster(ncores)
     on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
-    parallel::clusterExport(cl, ls(environment(fitGSMVAR)), envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
+    parallel::clusterExport(cl, ls(environment(fitGSMVAR)),
+                            envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
     parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
     all_bootstrap_IRF <- pbapply::pblapply(1:bootstrap_reps, function(i1) get_one_bootstrap_IRF(seed=seeds[i1]), cl=cl)
     parallel::stopCluster(cl=cl)
@@ -279,15 +334,65 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     all_bootstrap_IRF <- NULL
   }
 
-  # NOTE which cumulative does not do anything yet! Maybe original + cumulative for all?
-  # Depends on how the confidence bounds are created!
-  # ALSO SCALING IS NOT IMPLEMENTED YET: scaling based in initial response
+  ## Accumulate IRF based on which_cumulative
+  if(length(which_cumulative) > 0) {
+    for(which_var in which_cumulative) {
+      # Accumulate the impulse responses of the variables in which_cumulative
+      point_est[which_var, , ] <- t(apply(point_est[which_var, , , drop=FALSE], MARGIN=2, FUN=cumsum))
+      if(!is.null(all_bootstrap_IRF)) { # Do the same accumulation for each bootstrap replication:
+        for(i2 in 1:length(all_bootstrap_IRF)) {
+          all_bootstrap_IRF[[i2]][which_var, , ] <- t(apply(all_bootstrap_IRF[[i2]][which_var, , , drop=FALSE],
+                                                            MARGIN=2, FUN=cumsum))
+        }
+      }
+    }
+  }
+
+  ## Scale the IRFs
+  #all_Theta_i[variable, shock, horizon] -> all_Theta_i[variable, shock, ] subsets the IRF!
+  if(!is.null(scale)) {
+    for(i1 in 1:ncol(scale)) {
+      which_shock <- scale[1, i1]
+      which_var <- scale[2, i1]
+      scale_size <- scale[3, i1]
+      # Scale the IRFs of which_shock to correspond scale_size impact response of the variable which_var:
+      multiplier <- scale_size/point_est[which_var, which_shock, 1]
+      point_est[, which_shock, ] <- multiplier*point_est[, which_shock, ] # Impact response to scale_size
+      if(!is.null(all_bootstrap_IRF)) { # Do the same scaling for each bootstrap replication:
+        for(i2 in 1:length(all_bootstrap_IRF)) {
+          multiplier <- scale_size/all_bootstrap_IRF[[i2]][which_var, which_shock, 1]
+          all_bootstrap_IRF[[i2]][, which_shock, ] <- multiplier*all_bootstrap_IRF[[i2]][, which_shock, ]
+        }
+      }
+    }
+  }
+  #point_est ## [variable, shock, horizon] - toisen shokin responssit nyt jotain outoja tokassa bootstrap replassa
+  # mahdollisesti ei-järkevä estimaatti! Ei kun tokan variables impact response on tosi pieni, niin siksi skaalautuu
+  # oudoksi kun sen skaalaa ykköseen.
+
+  ## Calculate the confidence bounds
+  if(!is.null(all_bootstrap_IRF)) {
+    # First we convert the list into a 4D array in order to use apply to calculate empirical qunatiles
+    all_bootstrap_IRF_4Darray <- array(NA, dim = c(dim(all_bootstrap_IRF[[1]]), length(all_bootstrap_IRF)))
+    for (i1 in 1:length(all_bootstrap_IRF)) { # Fill the arrays
+      all_bootstrap_IRF_4Darray[, , , i1] <- all_bootstrap_IRF[[i1]]
+    }
+
+    # Calculate empirical quantiles to obtain ci
+    quantile_fun <- function(x) quantile(x, probs=c((1 - ci)/2, 1 - (1 - ci)/2), na.rm=TRUE)
+    conf_ints <- apply(all_bootstrap_IRF_4Darray, MARGIN=1:3, FUN=quantile_fun)
+    conf_ints <- aperm(conf_ints, perm=c(2, 3, 4, 1))
+  } else {
+    conf_ints <- NULL
+  }
 
   # Return the results
-  structure(list(all_irfs=point_est_IRF,
-                 all_bootstrap_IRF=all_bootstrap_IRF,
+  structure(list(point_est=point_est,
+                 conf_ints=conf_ints,
+                 all_bootstrap_reps=all_bootstrap_IRF_4Darray,
                  N=N,
                  ci=ci,
+                 scale=scale,
                  which_cumulative=which_cumulative,
                  seeds=seeds,
                  gsmvar=gsmvar),
