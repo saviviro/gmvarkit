@@ -22,6 +22,7 @@ fitGSMVAR(
   print_res = TRUE,
   use_parallel = TRUE,
   filter_estimates = FALSE,
+  calc_std_errors = TRUE,
   ...
 )
 }
@@ -102,6 +103,8 @@ or \code{NULL} for not initializing the seed. Exists for creating reproducible r
 \item{filter_estimates}{should the likely inappropriate estimates be filtered? See details.}
 
 \item{...}{additional settings passed to the function \code{GAfit} employing the genetic algorithm.}
+
+\item{calc_std_erros}{calculate approximate standard errors for the estimates?}
 }
 \value{
 Returns an object of class \code{'gsmvar'} defining the estimated (reduced form or structural) GMVAR, StMVAR, or G-StMVAR model.

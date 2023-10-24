@@ -15,7 +15,8 @@ linear_IRF(
   scale_type = c("instant", "peak"),
   scale_horizon = N,
   ci = NULL,
-  seed = NULL,
+  bootstrap_reps = NULL,
+  seeds = NULL,
   ...
 )
 }
@@ -57,15 +58,18 @@ of peak response in absolute value. Ignored if \code{scale} is not specified.}
 \item{scale_horizon}{If \code{scale_type == "peak"} what the maximum horizon up
 to which peak response is expected? Scaling won't based on values after this.}
 
-\item{ci}{a numeric vector with elements in \eqn{(0, 1)} specifying the
-confidence levels of the confidence intervals calculated via a bootstrap
-method, see the details section. Available only for models that impose linear
-autoregressive dynamics (excluding changes in the volatility regime).}
+\item{ci}{a real number in \eqn{(0, 1)} specifying the confidence level of the
+confidence intervals calculated via a fixed-design wild residual bootstrap method.
+Available only for models that impose linear autoregressive dynamics
+(excluding changes in the volatility regime).}
 
-\item{seed}{a length one numeric vector initializing the seed for the random generator.}
+\item{bootstrap_reps}{the number of bootstrap repetitions for estimating confidence bounds.}
 
 \item{...}{parameters passed to the plot method \code{plot.irf} that plots
 the results.}
+
+\item{seed}{a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
+generator for each bootstrap replication.}
 }
 \value{
 Returns a class \code{'irf'} list with the linear IRFs in ... FILL IN!

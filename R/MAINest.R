@@ -14,6 +14,7 @@
 #' @param print_res should summaries of estimation results be printed?
 #' @param use_parallel employ parallel computing? If \code{FALSE}, no progression bar etc will be generated.
 #' @param filter_estimates should the likely inappropriate estimates be filtered? See details.
+#' @param calc_std_erros calculate approximate standard errors for the estimates?
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
 #'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,
@@ -175,7 +176,7 @@
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                       constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                       ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, use_parallel=TRUE,
-                      filter_estimates=FALSE, ...) {
+                      filter_estimates=FALSE, calc_std_errors=TRUE, ...) {
 
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)
@@ -389,12 +390,12 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
 
 
   ### Wrap up ###
-  if(use_parallel) cat("Calculating approximate standard errors...\n")
+  if(use_parallel && calc_std_errors) cat("Calculating approximate standard errors...\n")
   ret <- GSMVAR(data=data, p=p, M=M, d=d, params=params, model=model,
                 conditional=conditional, parametrization=parametrization,
                 constraints=constraints, same_means=same_means,
                 weight_constraints=weight_constraints,
-                structural_pars=structural_pars, calc_std_errors=TRUE)
+                structural_pars=structural_pars, calc_std_errors=calc_std_errors)
   ret$all_estimates <- all_estimates
   ret$all_logliks <- loks
   ret$which_converged <- converged

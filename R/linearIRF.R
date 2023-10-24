@@ -33,11 +33,13 @@
 #'   of peak response in absolute value. Ignored if \code{scale} is not specified.
 #' @param scale_horizon If \code{scale_type == "peak"} what the maximum horizon up
 #'   to which peak response is expected? Scaling won't based on values after this.
-#' @param ci a numeric vector with elements in \eqn{(0, 1)} specifying the
-#'   confidence levels of the confidence intervals calculated via a bootstrap
-#'   method, see the details section. Available only for models that impose linear
-#'   autoregressive dynamics (excluding changes in the volatility regime).
-#' @param seed a length one numeric vector initializing the seed for the random generator.
+#' @param ci a real number in \eqn{(0, 1)} specifying the confidence level of the
+#'   confidence intervals calculated via a fixed-design wild residual bootstrap method.
+#'   Available only for models that impose linear autoregressive dynamics
+#'   (excluding changes in the volatility regime).
+#' @param bootstrap_reps the number of bootstrap repetitions for estimating confidence bounds.
+#' @param seed a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
+#'   generator for each bootstrap replication.
 #' @param ... parameters passed to the plot method \code{plot.irf} that plots
 #'   the results.
 #' @details The model DOES NOT need to be structural in order for this function to be
@@ -61,9 +63,9 @@
 
 linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=numeric(0),
                        scale=NULL, scale_type=c("instant", "peak"), scale_horizon=N,
-                       ci=NULL, seed=NULL, ...) {
+                       ci=NULL, bootstrap_reps=NULL, seeds=NULL, ...) {
   # Get the parameter values etc
-  stopifnot(all_pos_ints(c(N, regime)))
+  stopifnot(all_pos_ints(c(N, regime, bootstrap_reps)))
   p <- gsmvar$model$p
   M_orig <- gsmvar$model$M
   M <- sum(M_orig)
@@ -73,6 +75,9 @@ linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=nu
   constraints <- gsmvar$model$constraints
   same_means <- gsmvar$model$same_means
   structural_pars <- gsmvar$model$structural_pars
+  data <- gsmvar$data
+  n_obs <- nrow(data)
+  T_obs <- n_obs - p
   params <- gsmvar$params
   params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=params, model=model,
                                     constraints=gsmvar$model$constraints,
@@ -124,6 +129,49 @@ linear_IRF <- function(gsmvar, which_shocks, N=30, regime=1, which_cumulative=nu
 
   # NOTE which cumulative does not do anything yet! Maybe original + cumulative for all?
   # Depends on how the confidence bounds are created!
+
+  AR_mats_identical <- all(apply(all_boldA, MARGIN=3, FUN=function(x) identical(x, all_boldA[,,1])))
+  ci_possible <- (same_means == list(1:M) && AR_mats_identical) || M == 1
+
+  # Standard error by fixed design wild residual bootstrap
+  if(!is.null(ci) && !ci_possible) {
+    warning("Confidence bounds are not available as the autoregressive dynamics are not linear")
+  } else if(!is.null(ci) && ci_possible) { # Bootstrap confidence bounds
+    # Each y_t fixed, so the initial values y_{-p+1},...,y_0 are fixed in any case.
+    # For y_1,...,y_T, new residuals are drawn at each bootstrap rep
+    # First, obtain the residuals:
+    mu_mt <- loglikelihood_int(data=data, p=gsmvar$model$p, M=gsmvar$model$M,
+                               params=gsmvar$params, model=gsmvar$model$model,
+                               conditional=gsmvar$model$conditional,
+                               parametrization=gsmvar$model$parametrization,
+                               constraints=gsmvar$model$constraints,
+                               same_means=gsmvar$model$same_means,
+                               weight_constraints=gsmvar$model$weight_constraints,
+                               structural_pars=gsmvar$model$structural_pars,
+                               to_reutn="total_cmeans")
+    u_t <- data[(p+1):nrow(data),] - mu_mt # Residuals [T_obs, d]
+
+    # Tämä funktioksi ja parallel computingin sisään kun toimivuus on testattu!
+    for(i1 in 1:bootstrap_reps) {
+      set.seed(seeds[i1]) # Set seed for data generation
+
+      # Create new data
+      eta_t <- sample(c(-1, 1), size=nrow(u_t), replace=TRUE, prob=c(0.5, 0.5))
+      new_resid <- eta_t*u_t # each row of u_t multiplied by -1 or 1 based on eta_t
+      new_data <- rbind(data[1:p,], # Fixed initial values
+                        mu_mt + new_resid) # Bootstrapped data
+
+      # Create initial values for the two-phase estimation
+
+
+      # huom: recursiiviselle alpha constrainit mutta ei lambdaconstraineja
+    }
+
+    # HUOM! Parallel computing seed to GA + seed before data gen.
+  } else { # is.null(ci), no bounds
+
+  }
+
 
   # Maybe also remove "which_shocks"? IRF calculated for all anyway - are there implications to the ci?
   # All the IRFs are calculate for UNIT SHOCKS i.e., one standard error struct shocks
