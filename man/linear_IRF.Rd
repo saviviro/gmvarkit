@@ -7,15 +7,13 @@
 \usage{
 linear_IRF(
   gsmvar,
-  which_shocks,
   N = 30,
   regime = 1,
   which_cumulative = numeric(0),
   scale = NULL,
-  scale_type = c("instant", "peak"),
-  scale_horizon = N,
   ci = NULL,
   bootstrap_reps = NULL,
+  ncores = 2,
   seeds = NULL,
   ...
 )
@@ -24,10 +22,6 @@ linear_IRF(
 \item{gsmvar}{an object of class \code{'gsmvar'} defining a structural or reduced form
 GSMVAR model. For a reduced form model, the shocks are automatically identified by
 the lower triangular Cholesky decomposition.}
-
-\item{which_shocks}{a numeric vector of length at most \eqn{d}
-(\code{=ncol(data)}) and elements in \eqn{1,...,d} specifying the
-structural shocks for which the IRF should be estimated.}
 
 \item{N}{a positive integer specifying the horizon how far ahead should the
 linear impulse responses be calculated.}
@@ -40,23 +34,13 @@ An integer in \eqn{1,...,M}.}
 responses should be cumulative. Default is none.}
 
 \item{scale}{should the linear IRFs to some of the shocks be scaled so that they
-correspond to a specific magnitude of instantaneous or peak response
-of some specific variable (see the argument \code{scale_type})?
-Provide a length three vector where the shock of interest
+correspond to a specific magnitude of instantaneous response of some specific
+variable? Provide a length three vector where the shock of interest
 is given in the first element (an integer in \eqn{1,...,d}), the variable of
 interest is given in the second element (an integer in \eqn{1,...,d}), and
-the magnitude of its instantaneous or peak response in the third element
-(a non-zero real number). If the linear IRFs of multiple shocks should be scaled,
-provide a matrix which has one column for each of the shocks with the columns being
-the length three vectors described above.}
-
-\item{scale_type}{If argument \code{scale} is specified, should the linear IRFs be
-scaled to match an instantaneous response (\code{"instant"}) or peak response
-(\code{"peak"}). If \code{"peak"}, the scale is based on the largest magnitude
-of peak response in absolute value. Ignored if \code{scale} is not specified.}
-
-\item{scale_horizon}{If \code{scale_type == "peak"} what the maximum horizon up
-to which peak response is expected? Scaling won't based on values after this.}
+the magnitude of its instantaneous response in the third element (a non-zero real number).
+If the linear IRFs of multiple shocks should be scaled, provide a matrix which has one
+column for each of the shocks with the columns being the length three vectors described above.}
 
 \item{ci}{a real number in \eqn{(0, 1)} specifying the confidence level of the
 confidence intervals calculated via a fixed-design wild residual bootstrap method.
@@ -65,11 +49,13 @@ Available only for models that impose linear autoregressive dynamics
 
 \item{bootstrap_reps}{the number of bootstrap repetitions for estimating confidence bounds.}
 
+\item{ncores}{the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds}
+
+\item{seeds}{a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
+generator for each bootstrap replication.}
+
 \item{...}{parameters passed to the plot method \code{plot.irf} that plots
 the results.}
-
-\item{seed}{a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
-generator for each bootstrap replication.}
 }
 \value{
 Returns a class \code{'irf'} list with the linear IRFs in ... FILL IN!

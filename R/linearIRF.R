@@ -27,6 +27,7 @@
 #'   Available only for models that impose linear autoregressive dynamics
 #'   (excluding changes in the volatility regime).
 #' @param bootstrap_reps the number of bootstrap repetitions for estimating confidence bounds.
+#' @param ncores the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds
 #' @param seeds a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
 #'   generator for each bootstrap replication.
 #' @param ... parameters passed to the plot method \code{plot.irf} that plots
@@ -51,9 +52,10 @@
 #' @export
 
 linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
-                       scale=NULL, ci=NULL, bootstrap_reps=NULL, seeds=NULL, ...) {
+                       scale=NULL, ci=NULL, bootstrap_reps=NULL, ncores=2, seeds=NULL, ...) {
   # Get the parameter values etc
-  stopifnot(all_pos_ints(c(N, regime, bootstrap_reps)))
+  stopifnot(all_pos_ints(c(N, regime, ncores)))
+  if(!is.null(bootstrap_reps)) stopifnot(all_pos_ints(bootstrap_reps))
   p <- gsmvar$model$p
   M_orig <- gsmvar$model$M
   M <- sum(M_orig)
@@ -138,8 +140,10 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     # For all models, bootstrapping conditions on the estimated mw parameters, so they need to be removed:
     if(is.null(weight_constraints) && M > 1) {
       new_params <- c(new_params[1:(length(new_params) - (M - 1) - length(all_df))], all_df) # Removes alphas
-      weight_constraints <- alphas[-M]
-    } # If weight constraints used or M == 1, no modifications are required
+      new_weight_constraints <- alphas[-M]
+    } else { # If weight constraints used or M == 1, no modifications are required
+      new_weight_constraints <- weight_constraints
+    }
 
     # For structural models, bootstrapping also conditions on the estimated lambda parameters to
     # keep the shocks in a fixed ordering (which is given for recursively identified models).
@@ -158,21 +162,40 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
         }
       }
       new_structural_pars <- list(W=new_W, fixed_lambdas=new_fixed_lambdas)
-      if(is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
-        # Remove lambda parameters from the parameter vector (note: alphas already removed)
-        new_params <- c(new_params[1:(length(new_params) - d*(M - 1) - length(all_df))], all_df)
+      #if(is.null(gsmvar$model$structural_pars$fixed_lambdas)) {
+      #  # Remove lambda parameters from the parameter vector (note: alphas already removed)
+      #  new_params <- c(new_params[1:(length(new_params) - d*(M - 1) - length(all_df))], all_df)
+      #} # Redundant since new_params re-defined later anyway
+
+      # Finally, we need to make sure that the W params in new_params are in line with the constraints new_W.
+      # This amounts checking the strict sign constraints and swapping the signs of the columns that don't
+      # match the sign constraints.
+      if(sum(W == 0, na.rm=TRUE) != sum(gsmvar$model$structural_pars$W == 0, na.rm=TRUE)) {
+        # Throws an error since Wvec wont work properly if W contains exact zeros that are not constrained to zeros.
+        stop(paste("A parameter value in W exactly zero but not constrained to zero.",
+                   "Please adjust gsmvar$model$structural_pars$W so that the exact zeros match the constraints"))
       }
-    } else {
+      # Determine which columns to swap: compare the first non-NA and non-zero element of the column of new_W to the
+      # corresponding element of the corresponding column of W, and swap the signs of the column if the signs don't match.
+      for(i1 in 1:ncol(new_W)) { # Loop through the columns
+        col_new_W <- new_W[,i1]
+        col_old_W <- W[,i1]
+        which_to_compare <- which(!is.na(col_new_W) & col_new_W != 0)[1] # The first element that imposes a sign constraint
+        if(sign(col_new_W[which_to_compare]) != sign(col_old_W[which_to_compare])) { # Different sign than the constrained one
+          W[,i1] <- -W[,i1] # Swap the signs of the column
+        }
+      }
+      # New params with the new W that corresponds to new_W constraints. Note that AR parameters are assumed
+      # identical across the regimes here.
+      new_params <- c(gsmvar$params[1:(d + p*d^2)], Wvec(W), all_df) # No lambdas or alphas
+    } else { # is.null(structural_pars), i.e., recursive identification
       new_structural_pars <- NULL
     }
 
-    # TARVITAAN SWAP_W_SIGNSIA SITEN ETTÄ UUSISSA PARAMETREISSA W:N MERKIT VASTAA W:N RAJOITTEITA!
-    # TEE SE SEURAAVAKSI!!
-
     ## Obtain residuals
     # Each y_t fixed, so the initial values y_{-p+1},...,y_0 are fixed in any case.
-    # For y_1,...,y_T, new residuals are drawn at each bootstrap rep
-    # First, obtain the residuals:
+    # For y_1,...,y_T, new residuals are drawn at each bootstrap rep.
+    # First, obtain the original residuals:
     mu_mt <- loglikelihood_int(data=data, p=gsmvar$model$p, M=gsmvar$model$M,
                                params=gsmvar$params, model=gsmvar$model$model,
                                conditional=gsmvar$model$conditional,
@@ -184,10 +207,9 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
                                to_return="total_cmeans")
     u_t <- data[(p+1):nrow(data),] - mu_mt # Residuals [T_obs, d]
 
-    # Tämä funktioksi ja parallel computingin sisään kun toimivuus on testattu!
-    all_new_IRF <- list()
-    for(i1 in 1:bootstrap_reps) {
-      set.seed(seeds[i1]) # Set seed for data generation
+    ## Functions that performs one bootstrap replication and return the IRF
+    get_one_bootstrap_IRF <- function(seed) { # Take rest of the arguments from parent environment
+      set.seed(seed) # Set seed for data generation
       ncalls <- 1 # The number of estimation rounds in each bootstrap replication
       estim_seeds <- sample.int(n=1e+6, size=ncalls) # Seeds for estimation
 
@@ -206,7 +228,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
                                             same_means=gsmvar$model$same_means,
                                             weight_constraints=new_weight_constraints, # Condition on alphas
                                             structural_pars=new_structural_pars, # Condition on lambdas
-                                            ncalls=ncalls, seeds=estim_seems,
+                                            ncalls=ncalls, seeds=estim_seeds,
                                             print_res=FALSE, use_parallel=FALSE,
                                             filter_estimates=TRUE, calc_std_errors=FALSE,
                                             initpop=list(new_params))) # Initial values
@@ -236,47 +258,26 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       } else { # Shocks identified by lower-triangular Cholesky decomposition
         tmp_B_matrix <- t(chol(tmp_all_Omega[, , regime]))
       }
-
-      new_IRF <- get_IRF(p=p, d=d, N=N, boldA=tmp_all_boldA[, , regime], B_matrix=tmp_B_matrix)
-      all_new_IRF[i1] <- new_IRF
+      # Calculate and return the IRF
+      get_IRF(p=p, d=d, N=N, boldA=tmp_all_boldA[, , regime], B_matrix=tmp_B_matrix)
     }
 
-    # HUOM! Parallel computing seed to GA + seed before data gen.
+    ## Calculate the bootstrap replications using parallel computing
+    if(ncores > parallel::detectCores()) {
+      ncores <- parallel::detectCores()
+      message("ncores was set to be larger than the number of cores detected")
+    }
+    cat(paste("Using", ncores, "cores for", bootstrap_reps, "bootstrap replication..."), "\n")
+    cl <- parallel::makeCluster(ncores)
+    on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
+    parallel::clusterExport(cl, ls(environment(fitGSMVAR)), envir = environment(fitGSMVAR)) # assign all variables from package:gmvarkit
+    parallel::clusterEvalQ(cl, c(library(Brobdingnag), library(mvnfast), library(pbapply)))
+    all_bootstrap_IRF <- pbapply::pblapply(1:bootstrap_reps, function(i1) get_one_bootstrap_IRF(seed=seeds[i1]), cl=cl)
+    parallel::stopCluster(cl=cl)
+
   } else { # is.null(ci), no bounds
-
+    all_bootstrap_IRF <- NULL
   }
-
-
-  # Maybe also remove "which_shocks"? IRF calculated for all anyway - are there implications to the ci?
-  # All the IRFs are calculate for UNIT SHOCKS i.e., one standard error struct shocks
-  # -> responses can be scaled without loss of generality as the IRFs are symmetric w.r.t the size of the shock
-
-  # Tuleeko CI samaan funktioon? Sitä varten olisi varmaan syytä ensin tarkistaa, että onko AR-parametrit rajoitettu lineaarisiksi!
-
-  # HUOM wild bootstrapissa käytetään forecast erroreita eikä virhetermien empiirisiä vastineita.
-  # IDEA (omaan paperiinsa??): arvo eta_i:n sijasta s_{m,t} uudestaan ja sen perusteella virhe käyttäen sekoitussuhteita
-  # (ehkä tyhmä idea mutta tuli mieleen)
-
-  # HUOM! Entä sokkien järjestys ja merkki bootstrapatessa? Herwards and Lutkepohl (2014) käyttää samoja Lambda-parametreja kuin
-  # alkuperäisessä estimoinnissa! Eli pitää ehkä implentoida rajoite, jossa lambda-parametrit on rajoitettu tietyiksi luvuiksi?
-  # Senhän voi määritellä kokonaan erikseen C_lambda rajoitteesta, jolloin vanhoja yksikkötestejä jne ei tarvitse muuttaa.
-  # Samoin ne käyttää alkuperäisiä transition-probabiliteja! alpha-parametrit asettamalla tietyiksi luvuiksi päästään vähän
-  # saman tyyppiseen.
-  # Lutkepohl and Netsunajev (2014) käytti samaa kuin Herwards and Lutkepohl (2014). Meillähän tuo nyt eroaa niin, että koska
-  # transition probabilityt riippuu AR-matriiseista ja kov.matriiseista, niin ihan samoihin transition probiliteihin ei voida
-  # ehdollistaa by construction.
-  # Netsunajev (2013) ei ehdollista samoihin Lambdoihin, mutta taitaa näyttää yli-identifoivia rajoitteita siten ettei
-  # sokkien järjestys muutu.
-  # Simukokeessahan sokin vain uudelleenjärjesteltiin niin että ne oli mahdollisimman lähellä todellisia parametriarvoja
-  # HUOM! Merkkien kääntyminen pitää huomioida bootstrappauksessa jotenkin; joko rajoittamalla merkit alunperinkin tietynlaisiksi
-  # estimointia tehdessä tai kääntämällä merkit sitten että joku etäisyys alkuperäisistä estimaateista olisi mahdollisimman pieni tms?
-  # Netsunajev (2013) tekee jotain tämän tyyppistä; mieti miten implementoit yleiseen tapaukseen bootstrappauksessa! Kiinnostuksen kohteena
-  # olevan sokin merkki nyt ainakin pitää olla tietty, joten sehän käytännössä määrää sen miten päin ne merkit tulee. Esim rajoittamalla
-  # diagonaalit W:ssä positiivisiksi jos muuta merkkirajoitetta ei kyseisellä sarakkeella jo valmiiksi ole (ja jos on niin sitä saraketta
-  # ei muuteta merkin suhteen).
-
-  # Rekursiivisella identifoinnilla tietysti sokkien järjestys on aina oikein.
-
 
   # NOTE which cumulative does not do anything yet! Maybe original + cumulative for all?
   # Depends on how the confidence bounds are created!
@@ -284,10 +285,11 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
 
   # Return the results
   structure(list(all_irfs=point_est_IRF,
+                 all_bootstrap_IRF=all_bootstrap_IRF,
                  N=N,
                  ci=ci,
                  which_cumulative=which_cumulative,
-                 seed=seed,
+                 seeds=seeds,
                  gsmvar=gsmvar),
             class="irf")
 }
