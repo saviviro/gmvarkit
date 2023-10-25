@@ -520,7 +520,7 @@ plot.irf <- function(x, shocks_to_plot, ...) {
 
   # Loop through the shocks
   for(i1 in shocks_to_plot) {
-    if(!is.null(conf_ints) && i1 != shocks_to_plot[1]) {
+    if(i1 != shocks_to_plot[1]) {
       grDevices::devAskNewPage(TRUE)
     }
 
