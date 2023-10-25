@@ -181,6 +181,8 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
   point_est <- get_IRF(p=p, d=d, N=N,
                            boldA=all_boldA[, , regime], # boldA= Companion form AR matrix of the selected regime
                            B_matrix=B_matrix)
+  dimnames(point_est)[[1]] <- colnames(gsmvar$data)
+  dimnames(point_est)[[2]] <- paste("Shock", 1:gsmvar$model$d)
 
   ## Confidence bounds by fixed design wild residual bootstrap
   AR_mats_identical <- all(apply(all_boldA, MARGIN=3, FUN=function(x) identical(x, all_boldA[,,1])))
@@ -321,7 +323,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       ncores <- parallel::detectCores()
       message("ncores was set to be larger than the number of cores detected")
     }
-    cat(paste("Using", ncores, "cores for", bootstrap_reps, "bootstrap replication..."), "\n")
+    cat(paste("Using", ncores, "cores for", bootstrap_reps, "bootstrap replications..."), "\n")
     cl <- parallel::makeCluster(ncores)
     on.exit(try(parallel::stopCluster(cl), silent=TRUE)) # Close the cluster on exit, if not already closed.
     parallel::clusterExport(cl, ls(environment(fitGSMVAR)),
@@ -382,6 +384,8 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     quantile_fun <- function(x) quantile(x, probs=c((1 - ci)/2, 1 - (1 - ci)/2), na.rm=TRUE)
     conf_ints <- apply(all_bootstrap_IRF_4Darray, MARGIN=1:3, FUN=quantile_fun)
     conf_ints <- aperm(conf_ints, perm=c(2, 3, 4, 1))
+    dimnames(conf_ints)[[1]] <- colnames(gsmvar$data)
+    dimnames(conf_ints)[[2]] <- paste("Shock", 1:gsmvar$model$d)
   } else {
     conf_ints <- NULL
   }
