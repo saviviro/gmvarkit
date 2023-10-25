@@ -425,6 +425,7 @@ print.hypotest <- function(x, ..., digits=4) {
 #' @param shocks_to_print the responses to which should should be printed?
 #'   A numeric vector with elements in \code{1,...,d}. The default is that responses to
 #'   all the shocks are printed.
+#' @param ... currently not used.
 #' @export
 
 print.irf <- function(x, ..., digits=2, N_to_print, shocks_to_print) {

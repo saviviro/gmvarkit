@@ -388,6 +388,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
     dimnames(conf_ints)[[2]] <- paste("Shock", 1:gsmvar$model$d)
   } else {
     conf_ints <- NULL
+    all_bootstrap_IRF_4Darray <- NULL
   }
 
   # Return the results
