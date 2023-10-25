@@ -14,7 +14,7 @@ linear_IRF(
   which_cumulative = numeric(0),
   scale = NULL,
   ci = NULL,
-  bootstrap_reps = 50,
+  bootstrap_reps = 100,
   ncores = 2,
   ncalls = 1,
   seeds = NULL,
@@ -120,7 +120,28 @@ The model DOES NOT need to be structural in order for this function to be
 
 }}
 \examples{
- # FILL IN
+  \donttest{
+ # These are long running examples that take a few minutes to run
+
+ ## GMVAR, p=5, M=2, d=2 model with linear AR dynamics.
+ # recursive identification, IRF based on the first regime:
+ params52cm <- c(0.788, 0.559, 0.277, 0.038, -0.061, 0.463, 0.286, 0,
+               0.035, 0.161, -0.112, 0.031, -0.313, 0.183, 0.103, 0.014,
+               0.002, 0.143, -0.089, -0.013, 0.182, -0.04, 1.3, 0.008,
+               0.139, 0.277, -0.005, 0.032, 0.118)
+ mod52cm <- GSMVAR(data=gdpdef, p=5, M=2, params=params52cm,
+                   constraints=rbind(diag(5*2^2), diag(5*2^2)),
+                   same_means=list(1:2), parametrization="mean")
+ irf1 <- linear_IRF(mod52cm, regime=1, N=20)
+ print(irf1, digits=3)
+ plot(irf1)
+
+ # Identification by heteroskedasticity, bootstrapped confidence intervals.
+ # In empirical application larger number of bootstrap reps should be used.
+ mod52cms <- gsmvar_to_sgsmvar(mod52cm)
+ irf2 <- linear_IRF(mod52cms, regime=1, N=20, ci=0.95, bootstrap_reps=10,
+                    ncalls=1, seeds=1:10, ncores=1)
+ }
 }
 \references{
 \itemize{
