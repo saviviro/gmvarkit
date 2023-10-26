@@ -966,6 +966,8 @@ In \pkg{gmvarkit}, the GFEVD can be estimated with the function \code{GFEVD}. As
 \end{enumerate}
 The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument \code{shock_size}. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument \code{which_cumulative}. Finally, note that the GFEVD objects have their own plot and print methods.
 
+\subsection{Linear impulse response functions}
+It is also possible to calculate linear impulse response functions (IRF) based on a specific regime of the estimated model by using the function \code{linear_IRF}. If the autoregressive dynamics of the model are linear (i.e., either $M=1$ or mean and AR parameters are constrained identical across the regimes), confidence bounds can be estimated based on a type of a fixed-design wild residual bootstrap method. \code{gmvarkit} implements the method proposed \cite{Herwartz+Lutkepohl:2014}.
 
 \section{Building a GSMVAR model with specific parameter values}\label{sec:GSMVAR}
 The function \code{GSMVAR} facilitates building GSMVAR models without estimation, for instance, in order to simulate observations from a GSMVAR process with specific parameter values. The parameter vector (of length $M(d + d^2p + d(d+1)/2 + 2) - M_1 - 1$ for unconstrained reduced form models) has the form $\boldsymbol{\theta} = (\boldsymbol{\vartheta}_1,...,\boldsymbol{\vartheta}_M,\alpha_1,...,\alpha_{M-1},\boldsymbol{\nu})$ where
@@ -1060,9 +1062,10 @@ The resulting plot is presented in Figure~\ref{fig:predplot}.
 \begin{tabular}{llp{6.4cm}}
 \hline
 Related to     & Name                      & Description \\ \hline
-Estimation     & \code{fitGSMVAR}           & Estimate a GSMVAR model.\\
-               & \code{alt_gsmvar}          & Build a GSMVAR model based on results from any estimation round.\\
-               & \code{stmvar_to_gstmvar}    & Estimate a G-StMVAR model based on a StMVAR (or G-StMVAR) model with large degrees of freedom parameters.\\
+Estimation     & \code{fitGSMVAR}          & Estimate a GSMVAR model.\\
+               & \code{alt_gsmvar}         & Build a GSMVAR model based on results from any estimation round.\\
+               & \code{stmvar_to_gstmvar}  & Estimate a G-StMVAR model based on a StMVAR (or G-StMVAR) model with large degrees of freedom parameters.\\
+               & \code{gsmvar_to_sgsmvar}  & Obtain a structural GSMVAR model identified by heteroskedasticity based on a reduced form model.\\
                & \code{iterate_more}       & Run more iterations of the variable metric algorithm for a preliminary estimated GSMVAR model.\\
 Estimates      & \code{summary} (method)   & Detailed printout of the estimates.\\
                & \code{plot} (method)      & Plot the series with the estimated mixing weights and a kernel density estimates of the (marginal) series with the (marginal) stationary densities of the model.\\
@@ -1074,9 +1077,13 @@ Diagnostics    & \code{quantile_residual_tests} & Calculate quantile residual te
                & \code{diagnostic_plot}    & Plot quantile residual diagnostics.\\
 Forecasting    & \code{predict} (method)   & Forecast future observations and mixing weights of the process.\\
 Simulation     & \code{simulate} (method)  & Simulate from a GSMVAR process.\\
-Create model   & \code{GSMVAR}              & Construct a GSMVAR model based on specific parameter values.\\
+Create model   & \code{GSMVAR}             & Construct a GSMVAR model based on specific parameter values.\\
 Hypothesis testing & \code{LR_test}        & Calculate likelihood ratio test.\\
                & \code{Wald_test}          & Calculate Wald test.\\
+               & \code{Rao_test}           & Calculate Rao's test.\\
+Impulse response analysis & \code{GIRF}    & Estimate generalized impulse response functions.\\
+               & \code{GFEVD}              & Estimate generalized forecast error variance decomposition.\\
+               & \code{linear_IRF}         & Estimate linear impulse response functions.\\
 Other          & \code{add_data}           & Add data to a GSMVAR model \\
                & \code{swap_parametrization} & Swap between mean and intercept parametrizations \\
 \hline

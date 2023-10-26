@@ -108,7 +108,7 @@ The model DOES NOT need to be structural in order for this function to be
   lower triangular Cholesky identification is used to identify the shocks.
 
   If the autoregressive dynamics of the model are linear (i.e., either M == 1 or mean and AR parameters
-  are constrained identical across the regimes), confidence bounds can be calculated based on a fixed-design
+  are constrained identical across the regimes), confidence bounds can be calculated based on a type of fixed-design
   wild residual bootstrap method. We employ the method described in Herwartz and Lütkepohl (2014); see also
   the relevant chapters in Kilian and Lütkepohl (2017).
 }
@@ -132,15 +132,17 @@ The model DOES NOT need to be structural in order for this function to be
  mod52cm <- GSMVAR(data=gdpdef, p=5, M=2, params=params52cm,
                    constraints=rbind(diag(5*2^2), diag(5*2^2)),
                    same_means=list(1:2), parametrization="mean")
- irf1 <- linear_IRF(mod52cm, regime=1, N=20)
+ irf1 <- linear_IRF(mod52cm, regime=1, N=20, scale=cbind(c(1, 1, 1), c(2, 2, 1)))
  print(irf1, digits=3)
  plot(irf1)
 
- # Identification by heteroskedasticity, bootstrapped confidence intervals.
- # In empirical application larger number of bootstrap reps should be used.
+ # Identification by heteroskedasticity, bootstrapped confidence intervals and
+ # and scaled instantaneous effects of the shocks. Note that in actual
+ # empirical application, a larger number of bootstrap reps should be used.
  mod52cms <- gsmvar_to_sgsmvar(mod52cm)
- irf2 <- linear_IRF(mod52cms, regime=1, N=20, ci=0.95, bootstrap_reps=10,
+ irf2 <- linear_IRF(mod52cms, regime=1, N=20, ci=0.68, bootstrap_reps=10,
                     ncalls=1, seeds=1:10, ncores=1)
+ plot(irf2)
  }
 }
 \references{

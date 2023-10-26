@@ -51,14 +51,14 @@
 calc_gradient <- function(x, fn, h=6e-06, varying_h=NULL, ...) {
   fn <- match.fun(fn)
   n <- length(x)
-  I <- diag(1, nrow=n, ncol=n)
+  I_n <- diag(1, nrow=n, ncol=n)
   if(is.null(varying_h)) { # The same difference h for all parameters
     h <- rep(h, times=n)
   } else { # Varying h
     stopifnot(length(varying_h) == length(x))
     h <- varying_h
   }
-  vapply(1:n, function(i1) (fn(x + h[i1]*I[i1,], ...) - fn(x - h[i1]*I[i1,], ...))/(2*h[i1]), numeric(1))
+  vapply(1:n, function(i1) (fn(x + h[i1]*I_n[i1,], ...) - fn(x - h[i1]*I_n[i1,], ...))/(2*h[i1]), numeric(1))
 }
 
 

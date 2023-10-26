@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  23 OCT 2023 17:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  26 OCT 2023 16:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -676,7 +676,7 @@ misspelled it (e.g., `\hobx'), type `I' and the correct
 spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
-<figures/seriesplot.png, id=461, 803.0pt x 451.6875pt>
+<figures/seriesplot.png, id=465, 803.0pt x 451.6875pt>
 File: figures/seriesplot.png Graphic file (type png)
 <use figures/seriesplot.png>
 Package pdftex.def Info: figures/seriesplot.png  used on input line 549.
@@ -687,7 +687,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [17]
-<figures/densityplot.png, id=469, 803.0pt x 451.6875pt>
+<figures/densityplot.png, id=473, 803.0pt x 451.6875pt>
 File: figures/densityplot.png Graphic file (type png)
 <use figures/densityplot.png>
 Package pdftex.def Info: figures/densityplot.png  used on input line 566.
@@ -703,7 +703,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [19 <./figures/seriesplot.png> <./figures/densityplot.png>]
-<figures/proflogliks.png, id=484, 803.0pt x 401.5pt>
+<figures/proflogliks.png, id=488, 803.0pt x 401.5pt>
 File: figures/proflogliks.png Graphic file (type png)
 <use figures/proflogliks.png>
 Package pdftex.def Info: figures/proflogliks.png  used on input line 628.
@@ -787,32 +787,48 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [34]
-<figures/predplot.png, id=646, 803.0pt x 451.6875pt>
+<figures/predplot.png, id=655, 803.0pt x 451.6875pt>
 File: figures/predplot.png Graphic file (type png)
 <use figures/predplot.png>
-Package pdftex.def Info: figures/predplot.png  used on input line 1052.
+Package pdftex.def Info: figures/predplot.png  used on input line 1054.
 (pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
 
-Underfull \hbox (badness 1331) in paragraph at lines 1069--1070
+Underfull \hbox (badness 1331) in paragraph at lines 1072--1073
 []\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
  []
 
 
-Underfull \hbox (badness 3449) in paragraph at lines 1070--1071
+Underfull \hbox (badness 3449) in paragraph at lines 1073--1074
 \T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
  []
 
 
-Underfull \hbox (badness 1527) in paragraph at lines 1081--1082
+Underfull \hbox (badness 2173) in paragraph at lines 1085--1086
+[]\T1/lmr/m/n/10.95 Estimate gen-er-al-ized fore-cast er-ror
+ []
+
+
+Underfull \hbox (badness 1527) in paragraph at lines 1088--1089
 []\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
  []
+
+
+Overfull \hbox (30.57797pt too wide) in paragraph at lines 1062--1091
+ [][] 
+ []
+
+
+LaTeX Warning: Float too large for page by 93.1917pt on input line 1093.
+
+
+Underfull \vbox (badness 3229) has occurred while \output is active []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 35
  []
 
-[35 <./figures/predplot.png>]
+[35]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 36 []
  []
@@ -825,7 +841,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 37
  []
 
-[37] (./gmvarkit-vignette.bbl
+[37 <./figures/predplot.png>] (./gmvarkit-vignette.bbl
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
 (Font)              Font shape `T1/lmss/m/sl' tried instead on input line 44.
 
@@ -836,7 +852,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [38]
 
 LaTeX Font Warning: Font shape `T1/lmr/b/it' in size <10.95> not available
-(Font)              Font shape `T1/lmr/b/sl' tried instead on input line 174.
+(Font)              Font shape `T1/lmr/b/sl' tried instead on input line 181.
 
 )
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -846,14 +862,14 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [39]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1103.
+(hyperref)                removing `math shift' on input line 1110.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1103.
+(hyperref)                removing `math shift' on input line 1110.
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 1103.
+(Font)              <14.4> on input line 1110.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 40 []
@@ -865,12 +881,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [41]
-Overfull \hbox (16.39037pt too wide) detected at line 1191
+Overfull \hbox (16.39037pt too wide) detected at line 1198
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
 
-Overfull \hbox (16.39037pt too wide) detected at line 1195
+Overfull \hbox (16.39037pt too wide) detected at line 1202
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
@@ -894,13 +910,13 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
-(rerunfilecheck)             Checksum: 9A2B8281BB819B16CE4171281EC2FA99;10702.
+(rerunfilecheck)             Checksum: BFAD7E3610683C0AB71DDEA87D7BFB88;10998.
  ) 
 Here is how much of TeX's memory you used:
- 12455 strings out of 478353
- 196444 string characters out of 5848086
- 507885 words of memory out of 5000000
- 30111 multiletter control sequences out of 15000+600000
+ 12463 strings out of 478353
+ 196716 string characters out of 5848086
+ 507930 words of memory out of 5000000
+ 30116 multiletter control sequences out of 15000+600000
  543478 words of font info for 116 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,25n,77p,1768b,514s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -934,10 +950,10 @@ usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/t
 exlive/2021/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/202
 1/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></usr/local/texlive/2021/texmf-d
 ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on gmvarkit-vignette.pdf (44 pages, 879956 bytes).
+Output written on gmvarkit-vignette.pdf (44 pages, 881136 bytes).
 PDF statistics:
- 1003 PDF objects out of 1200 (max. 8388607)
- 878 compressed objects within 9 object streams
- 242 named destinations out of 1000 (max. 500000)
- 285 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1013 PDF objects out of 1200 (max. 8388607)
+ 888 compressed objects within 9 object streams
+ 245 named destinations out of 1000 (max. 500000)
+ 293 words of extra memory for PDF output out of 10000 (max. 10000000)
 

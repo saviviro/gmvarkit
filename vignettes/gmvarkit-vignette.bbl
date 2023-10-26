@@ -1,4 +1,4 @@
-\begin{thebibliography}{27}
+\begin{thebibliography}{28}
 \newcommand{\enquote}[1]{``#1''}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
@@ -42,6 +42,13 @@ Hankin R, Clausen A, Murdoch D (2006).
 \newblock \enquote{Special functions in \proglang{R}: introducing the gsl
   package.}
 \newblock \emph{\proglang{R} News}, \textbf{6}(4).
+
+\bibitem[{Herwartz and L{\"u}tkepohl(2014)}]{Herwartz+Lutkepohl:2014}
+Herwartz H, L{\"u}tkepohl H (2014).
+\newblock \enquote{Structural vector autoregressions with Markov switching:
+  Combining conventional with statistical identification of shocks.}
+\newblock \emph{Journal of Econometrics}, \textbf{183}(1), 104--116.
+\newblock \doi{doi.org/10.1016/j.jeconom.2014.06.012}.
 
 \bibitem[{Kalliovirta(2012)}]{Kalliovirta:2012}
 Kalliovirta L (2012).

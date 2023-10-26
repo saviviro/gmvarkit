@@ -42,7 +42,7 @@
 #'   lower triangular Cholesky identification is used to identify the shocks.
 #'
 #'   If the autoregressive dynamics of the model are linear (i.e., either M == 1 or mean and AR parameters
-#'   are constrained identical across the regimes), confidence bounds can be calculated based on a fixed-design
+#'   are constrained identical across the regimes), confidence bounds can be calculated based on a type of fixed-design
 #'   wild residual bootstrap method. We employ the method described in Herwartz and Lütkepohl (2014); see also
 #'   the relevant chapters in Kilian and Lütkepohl (2017).
 #' @return Returns a class \code{'irf'} list with the following elements:
@@ -81,15 +81,17 @@
 #'  mod52cm <- GSMVAR(data=gdpdef, p=5, M=2, params=params52cm,
 #'                    constraints=rbind(diag(5*2^2), diag(5*2^2)),
 #'                    same_means=list(1:2), parametrization="mean")
-#'  irf1 <- linear_IRF(mod52cm, regime=1, N=20)
+#'  irf1 <- linear_IRF(mod52cm, regime=1, N=20, scale=cbind(c(1, 1, 1), c(2, 2, 1)))
 #'  print(irf1, digits=3)
 #'  plot(irf1)
 #'
-#'  # Identification by heteroskedasticity, bootstrapped confidence intervals.
-#'  # In empirical application larger number of bootstrap reps should be used.
+#'  # Identification by heteroskedasticity, bootstrapped confidence intervals and
+#'  # and scaled instantaneous effects of the shocks. Note that in actual
+#'  # empirical application, a larger number of bootstrap reps should be used.
 #'  mod52cms <- gsmvar_to_sgsmvar(mod52cm)
-#'  irf2 <- linear_IRF(mod52cms, regime=1, N=20, ci=0.95, bootstrap_reps=10,
+#'  irf2 <- linear_IRF(mod52cms, regime=1, N=20, ci=0.68, bootstrap_reps=10,
 #'                     ncalls=1, seeds=1:10, ncores=1)
+#'  plot(irf2)
 #'  }
 #' @export
 
@@ -97,6 +99,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
                        scale=NULL, ci=NULL, bootstrap_reps=100, ncores=2, ncalls=1, seeds=NULL, ...) {
   # Get the parameter values etc
   stopifnot(all_pos_ints(c(N, regime, ncores, bootstrap_reps, ncalls)))
+  if(!is.null(seeds)) stopifnot(length(seeds) == bootstrap_reps)
   p <- gsmvar$model$p
   M_orig <- gsmvar$model$M
   M <- sum(M_orig)
@@ -289,13 +292,13 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       estim_seeds <- sample.int(n=1e+6, size=ncalls) # Seeds for estimation
 
       ## Create new data
-      eta_t <- sample(c(-1, 1), size=nrow(u_t), replace=TRUE, prob=c(0.5, 0.5))
-      new_resid <- eta_t*u_t # each row of u_t multiplied by -1 or 1 based on eta_t
-      new_data <- rbind(data[1:p,], # Fixed initial values
-                        mu_mt + new_resid) # Bootstrapped data
+     eta_t <- sample(c(-1, 1), size=nrow(u_t), replace=TRUE, prob=c(0.5, 0.5))
+     new_resid <- eta_t*u_t # each row of u_t multiplied by -1 or 1 based on eta_t
+     new_data <- rbind(data[1:p,], # Fixed initial values
+                       mu_mt + new_resid) # Bootstrapped data
 
       ## Estimate the model to the new data
-      new_mod <- suppressWarnings(suppressMessages(fitGSMVAR(data=new_data, p=gsmvar$model$p, M=gsmvar$model$M,
+      new_mod <- suppressMessages(fitGSMVAR(data=new_data, p=gsmvar$model$p, M=gsmvar$model$M,
                                                              model=gsmvar$model$model,
                                                              conditional=gsmvar$model$conditional,
                                                              parametrization=gsmvar$model$parametrization,
@@ -306,7 +309,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
                                                              ncalls=ncalls, seeds=estim_seeds,
                                                              print_res=FALSE, use_parallel=FALSE,
                                                              filter_estimates=TRUE, calc_std_errors=FALSE,
-                                                             initpop=list(new_params)))) # Initial values
+                                                             initpop=list(new_params))) # Initial values
 
       ## Get the IRF from the bootstrap replication
       tmp_params <- reform_constrained_pars(p=p, M=M_orig, d=d, params=new_mod$params, model=model,
@@ -336,8 +339,6 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       # Calculate and return the IRF
       get_IRF(p=p, d=d, N=N, boldA=tmp_all_boldA[, , regime], B_matrix=tmp_B_matrix)
     }
-
-    # all_bootstrap_IRF <- lapply(1:bootstrap_reps, function(i1) get_one_bootstrap_IRF(seed=seeds[i1]))
 
     ## Calculate the bootstrap replications using parallel computing
     if(ncores > parallel::detectCores()) {
@@ -372,7 +373,6 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
   }
 
   ## Scale the IRFs
-  #all_Theta_i[variable, shock, horizon] -> all_Theta_i[variable, shock, ] subsets the IRF!
   if(!is.null(scale)) {
     for(i1 in 1:ncol(scale)) {
       which_shock <- scale[1, i1]
@@ -389,9 +389,6 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
       }
     }
   }
-  #point_est ## [variable, shock, horizon] - toisen shokin responssit nyt jotain outoja tokassa bootstrap replassa
-  # mahdollisesti ei-järkevä estimaatti! Ei kun tokan variables impact response on tosi pieni, niin siksi skaalautuu
-  # oudoksi kun sen skaalaa ykköseen.
 
   ## Calculate the confidence bounds
   if(!is.null(all_bootstrap_IRF)) {
