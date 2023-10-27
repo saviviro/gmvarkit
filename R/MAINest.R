@@ -6,6 +6,7 @@
 #'   Parallel computing is utilized to perform multiple rounds of estimations in parallel.
 #'
 #' @inheritParams GAfit
+#' @inheritParams GSMVAR
 #' @param ncalls the number of estimation rounds that should be performed.
 #' @param ncores the number CPU cores to be used in parallel computing.
 #' @param maxit the maximum number of iterations in the variable metric algorithm.

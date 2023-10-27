@@ -102,6 +102,8 @@ or \code{NULL} for not initializing the seed. Exists for creating reproducible r
 
 \item{filter_estimates}{should the likely inappropriate estimates be filtered? See details.}
 
+\item{calc_std_errors}{should approximate standard errors be calculated?}
+
 \item{...}{additional settings passed to the function \code{GAfit} employing the genetic algorithm.}
 
 \item{calc_std_erros}{calculate approximate standard errors for the estimates?}
