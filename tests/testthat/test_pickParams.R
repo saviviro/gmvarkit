@@ -212,8 +212,26 @@ theta_123tcsLAR_int <- c(theta_123csLAR_int, 10, 20) # SStMVAR
 # p=1, M=2, d=2, model="StMVAR", weight_constraints=0.6, structural_pars=list(W=W_122, fixed_lambdas=c(7, 4))
 theta_122twsF <- c(phi10_122, phi20_122, vec(A11_122), vec(A21_122), Wvec(W_122), 11, 12)
 
+# p=1, M=2, d=2, model="GMVAR", constraints=C_122, same_means=list(1:2), parametrization="mean"
+C_122 <- rbind(diag(1*2^2), diag(1*2^2))
+theta_122cm <- c(0.804831, 0.54569, 0.303675, 0.023641, -0.132479, 0.852206, 0.287346, 0.004983,
+                 0.025076, 1.119671, -0.017208, 0.142676, 0.647105)
+theta_122cm_expanded <- c(0.804831, 0.54569, # mu
+                          0.303675, 0.023641, -0.132479, 0.852206, # A
+                          0.287346, 0.004983, 0.025076, # Omega 1
+                          0.804831, 0.54569, # mu
+                          0.303675, 0.023641, -0.132479, 0.852206, # A
+                          1.119671, -0.017208, 0.142676,  # Omega 2
+                          0.647105) # Alpha
+
+
 
 test_that("pick_Ami works correctly", {
+  expect_equal(pick_Ami(p=1, M=2, d=2, params=theta_122cm_expanded, m=1, i=1, unvec=FALSE),
+               c(0.303675, 0.023641, -0.132479, 0.852206))
+  expect_equal(pick_Ami(p=1, M=2, d=2, params=theta_122cm_expanded, m=2, i=1, unvec=FALSE),
+               c(0.303675, 0.023641, -0.132479, 0.852206))
+
   expect_equal(pick_Ami(p=1, M=1, d=2, params=theta_112, m=1, i=1, unvec=TRUE), A11_112)
 
   expect_equal(pick_Ami(p=1, M=2, d=2, params=theta_122, m=1, i=1, unvec=TRUE), A11_122)
@@ -374,8 +392,10 @@ test_that("pick_allA works correctly", {
   expect_equal(pick_allA(p=2, M=1, d=3, params=theta_213s, structural_pars=list(W=W_213))[, , 2, 1], A12_213)
 })
 
-
 test_that("pick_phi0 works correctly", {
+  expect_equal(pick_phi0(p=1, M=2, d=2, params=theta_122cm_expanded)[, 1], c(0.804831, 0.54569))
+  expect_equal(pick_phi0(p=1, M=2, d=2, params=theta_122cm_expanded)[, 2], c(0.804831, 0.54569))
+
   expect_equal(pick_phi0(p=1, M=1, d=2, params=theta_112)[, 1], phi10_112)
 
   expect_equal(pick_phi0(p=1, M=2, d=2, params=theta_122)[, 1], phi10_122)
@@ -471,6 +491,9 @@ test_that("pick_all_phi0_A works correctly", {
 
 
 test_that("pick_Omegas works correctly", {
+  expect_equal(pick_Omegas(p=1, M=2, d=2, params=theta_122cm_expanded)[, , 1], unvech(d=2, a=c(0.287346, 0.004983, 0.025076)))
+  expect_equal(vech(pick_Omegas(p=1, M=2, d=2, params=theta_122cm_expanded)[, , 2]), c(1.119671, -0.017208, 0.142676))
+
   expect_equal(pick_Omegas(p=1, M=1, d=2, params=theta_112)[, , 1], Omega1_112)
 
   expect_equal(pick_Omegas(p=1, M=2, d=2, params=theta_122)[, , 1], Omega1_122)

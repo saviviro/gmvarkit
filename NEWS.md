@@ -220,3 +220,4 @@
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
 * Fixed a bug that occurred when using swap_W_signs with C_lambda constraints.
 * Fixed a bug in Rao test when using G-StMVAR model
+* Fixed a bug in get_foc, get_gradient, get_soc, and get_hessian that returned only NAs for models with same_means.

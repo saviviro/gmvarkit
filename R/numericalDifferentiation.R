@@ -102,9 +102,10 @@ get_gradient <- function(gsmvar, custom_h=NULL) {
   foo <- function(x) {
     loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-                      structural_pars=gsmvar$model$structural_pars, constraints=gsmvar$model$constraints,
-                      weight_constraints=gsmvar$model$weight_constraints, to_return="loglik", check_params=TRUE, minval=NA,
-                      stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
+                      constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                      weight_constraints=gsmvar$model$weight_constraints, structural_pars=gsmvar$model$structural_pars,
+                      to_return="loglik", check_params=TRUE, minval=NA, stat_tol=gsmvar$num_tols$stat_tol,
+                      posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
   }
   calc_gradient(x=gsmvar$params, fn=foo, varying_h=varying_h)
 }
@@ -125,9 +126,10 @@ get_hessian <- function(gsmvar, custom_h=NULL) {
   foo <- function(x) {
     loglikelihood_int(data=gsmvar$data, p=gsmvar$model$p, M=gsmvar$model$M, params=x, model=gsmvar$model$model,
                       conditional=gsmvar$model$conditional, parametrization=gsmvar$model$parametrization,
-                      constraints=gsmvar$model$constraints, weight_constraints=gsmvar$model$weight_constraints,
-                      structural_pars=gsmvar$model$structural_pars, to_return="loglik", check_params=TRUE, minval=NA,
-                      stat_tol=gsmvar$num_tols$stat_tol, posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
+                      constraints=gsmvar$model$constraints, same_means=gsmvar$model$same_means,
+                      weight_constraints=gsmvar$model$weight_constraints, structural_pars=gsmvar$model$structural_pars,
+                      to_return="loglik", check_params=TRUE, minval=NA, stat_tol=gsmvar$num_tols$stat_tol,
+                      posdef_tol=gsmvar$num_tols$posdef_tol, df_tol=gsmvar$num_tols$df_tol)
   }
   calc_hessian(x=gsmvar$params, fn=foo, varying_h=varying_h)
 }
