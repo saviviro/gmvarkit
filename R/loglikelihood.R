@@ -573,3 +573,86 @@ get_IC <- function(loglik, npars, obs) {
   data.frame(AIC=AIC, HQIC=HQIC, BIC=BIC)
 }
 
+
+
+
+#' @title Calculate multivariate Pearson residuals of a GMVAR, StMVAR, or G-StMVAR model
+#'
+#' @description \code{Pearson_residuals} calculates multivariate Pearson residuals for a GMVAR, StMVAR, or G-StMVAR model.
+#'
+#' @inheritParams quantile_residual_tests
+#' @return Returns \eqn{((n_obs-p) x d)} matrix containing the residuals,
+#'   \eqn{j}:th column corresponds to the time series in the \eqn{j}:th column of the data.
+#' @inherit GSMVAR references
+#' @seealso \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{quantile_residuals}},
+#'   \code{\link{diagnostic_plot}}
+#' @examples
+#' # GMVAR(1,2), d=2 model:
+#' params12 <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005, 0.03,
+#'  0.619, 0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136, 0.674)
+#' mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12)
+#' Pearson_residuals(mod12, standardize=FALSE) # Raw residuals
+#' Pearson_residuals(mod12, standardize=TRUE) # Standardized to identity cov.matrix.
+#'
+#' # Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+#' params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
+#'  0.406, -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+#'  0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+#' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+#' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
+#' Pearson_residuals(mod22s, standardize=FALSE) # Raw residuals
+#' Pearson_residuals(mod2s, standardize=TRUE) # Standardized to identity cov.matrix.
+#' @export
+
+Pearson_residuals <- function(gsmvar, standardize=TRUE) {
+  # Checks, etc
+  gsmvar <- gmvar_to_gsmvar(gsmvar) # Backward compatibility
+  check_gsmvar(gsmvar)
+  p <- gsmvar$model$p
+  M <- gsmvar$model$M
+  d <- gsmvar$model$d
+  data <- gsmvar$data
+  n_obs <- nrow(data)
+  T_obs <- n_obs - p
+
+  # Conditional means
+  mu_t <- loglikelihood_int(data=data, p=gsmvar$model$p, M=gsmvar$model$M, params=gsmvar$params,
+                            model=gsmvar$model$model, conditional=gsmvar$model$conditional,
+                            parametrization=gsmvar$model$parametrization,
+                            constraints=gsmvar$model$constraints,
+                            same_means=gsmvar$model$same_means,
+                            weight_constraints=gsmvar$model$weight_constraints,
+                            structural_pars=gsmvar$model$structural_pars,
+                            to_return="total_cmeans", check_params=TRUE,
+                            stat_tol=gsmvar$num_tols$stat_tol,
+                            posdef_tol=gsmvar$num_tols$posdef_tol,
+                            df_tol=gsmvar$num_tols$df_tol)
+
+  # Nonstandardized residuals
+  y_minus_mu <- data[(p + 1):nrow(data),] - mu_t # [T_obs, d]
+  if(!standardize) {
+    return(y_minus_mu)
+  }
+
+  # Conditional covariance matrices
+  Omega_t <- loglikelihood_int(data=data, p=gsmvar$model$p, M=gsmvar$model$M, params=gsmvar$params,
+                               model=gsmvar$model$model, conditional=gsmvar$model$conditional,
+                               parametrization=gsmvar$model$parametrization,
+                               constraints=gsmvar$model$constraints,
+                               same_means=gsmvar$model$same_means,
+                               weight_constraints=gsmvar$model$weight_constraints,
+                               structural_pars=gsmvar$model$structural_pars,
+                               to_return="total_ccovs", check_params=TRUE,
+                               stat_tol=gsmvar$num_tols$stat_tol,
+                               posdef_tol=gsmvar$num_tols$posdef_tol,
+                               df_tol=gsmvar$num_tols$df_tol)
+
+  all_residuals <- matrix(nrow=T_obs, ncol=d)
+
+  # Calculate the Pearson residuals
+  for(i1 in 1:T_obs) {
+    all_residuals[i1,] <- solve(unvec(d=d, a=get_symmetric_sqrt(Omega_t[, , i1])), y_minus_mu[i1,])
+  }
+  all_residuals
+
+}
