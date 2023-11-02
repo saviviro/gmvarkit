@@ -911,4 +911,26 @@ test_that("cond_moments works correctly", {
                c(1, 1), tolerance=1e-4)
 })
 
+# GMVAR(1,2), d=2 model:
+params12_res <- c(0.55, 0.112, 0.344, 0.055, -0.009, 0.718, 0.319, 0.005, 0.03, 0.619,
+                  0.173, 0.255, 0.017, -0.136, 0.858, 1.185, -0.012, 0.136, 0.674)
+mod12 <- GSMVAR(gdpdef, p=1, M=2, params=params12_res)
 
+# Structural GMVAR(2, 2), d=2 model identified with sign-constraints:
+params22s_res <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395, 0.406,
+                   -0.005, 0.083, 0.299, 0.218, 0.02, -0.119, 0.722, 0.093, 0.032,
+                   0.044, 0.191, 0.057, 0.172, -0.46, 0.016, 3.518, 5.154, 0.58)
+W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
+mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s_res, structural_pars=list(W=W_22))
+
+
+test_that("Pearson_residuals works correctly", {
+  expect_equal(c(Pearson_residuals(mod12, standardize=FALSE)[c(1, 4, 243),]),
+               c(1.07489241, 1.60369335, -0.31199389, -0.23634526, -0.01831502, 0.02202414), tolerance=1e-3)
+  expect_equal(c(Pearson_residuals(mod12, standardize=TRUE)[c(1, 4, 243),]),
+               c(1.5124979, 2.6220673, -0.5171295, -1.0369499, -0.1597798, 0.1296506), tolerance=1e-3)
+  expect_equal(c(Pearson_residuals(mod22s, standardize=FALSE)[c(1, 113, 242),]),
+               c(-1.26731455, 0.01990527, -0.35979556, 0.03551300, 0.10803703, -0.04732589), tolerance=1e-3)
+  expect_equal(c(Pearson_residuals(mod22s, standardize=TRUE)[c(1, 113, 242),]),
+               c(-1.40499180, 0.03696637, -0.72910091, 0.14427742, 0.60062820, -0.25027977), tolerance=1e-3)
+})

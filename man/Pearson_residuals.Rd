@@ -10,7 +10,7 @@ Pearson_residuals(gsmvar, standardize = TRUE)
 \item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
 }
 \value{
-Returns \eqn{((n_obs-p) x d)} matrix containing the multivariate Pearson residuals,
+Returns \eqn{((n_obs-p) x d)} matrix containing the residuals,
   \eqn{j}:th column corresponds to the time series in the \eqn{j}:th column of the data.
 }
 \description{
@@ -31,7 +31,7 @@ params22s <- c(0.36, 0.121, 0.484, 0.072, 0.223, 0.059, -0.151, 0.395,
 W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 Pearson_residuals(mod22s, standardize=FALSE) # Raw residuals
-Pearson_residuals(mod2s, standardize=TRUE) # Standardized to identity cov.matrix.
+Pearson_residuals(mod22s, standardize=TRUE) # Standardized to identity cov.matrix.
 }
 \references{
 \itemize{

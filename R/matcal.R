@@ -277,3 +277,21 @@ create_J_matrix <- function(d, p) {
   diag(J[ , 1:d]) <- 1 # Fill the first d x d block with the identity matrix
   J
 }
+
+
+#' @title Calculate symmetric square root matrix of a positive definite covariance
+#'   matrix
+#'
+#' @description \code{get_symmetric_sqrt} calculates symmetric square root matrix
+#'  of a positive definite covariance matrix
+#'
+#' @param Omega a positive definite covariance matrix
+#' @return a vectorized symmetric square root matrix of the matrix \code{Omega}.
+#' @section Warning:
+#'  No argument checks!
+#' @keywords internal
+
+get_symmetric_sqrt <- function(Omega) {
+  diag_Omegas(Omega1=Omega)
+}
+

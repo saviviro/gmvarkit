@@ -264,3 +264,13 @@ test_that("create_J_matrix works", {
   # Check remaining blocks are zeros
   expect_equal(J[ , 6:45], matrix(0, nrow = 5, ncol = 40))
 })
+
+test_that("get_symmetric_sqrt works correctly", {
+  x2 <- get_symmetric_sqrt(Omega1_2)
+  W2 <- make_W(x2, d=2)
+  expect_equal(tcrossprod(W2), Omega1_2, tol=1e-6)
+
+  x3 <- get_symmetric_sqrt(Omega1_3)
+  W3 <- make_W(x3, d=3)
+  expect_equal(tcrossprod(W3), Omega1_3, tol=1e-6)
+})

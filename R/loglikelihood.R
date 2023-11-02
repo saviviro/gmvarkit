@@ -601,7 +601,7 @@ get_IC <- function(loglik, npars, obs) {
 #' W_22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
 #' mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W_22))
 #' Pearson_residuals(mod22s, standardize=FALSE) # Raw residuals
-#' Pearson_residuals(mod2s, standardize=TRUE) # Standardized to identity cov.matrix.
+#' Pearson_residuals(mod22s, standardize=TRUE) # Standardized to identity cov.matrix.
 #' @export
 
 Pearson_residuals <- function(gsmvar, standardize=TRUE) {
@@ -654,5 +654,4 @@ Pearson_residuals <- function(gsmvar, standardize=TRUE) {
     all_residuals[i1,] <- solve(unvec(d=d, a=get_symmetric_sqrt(Omega_t[, , i1])), y_minus_mu[i1,])
   }
   all_residuals
-
 }
