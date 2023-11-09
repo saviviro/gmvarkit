@@ -6,16 +6,41 @@
 #'
 #' @format A numeric matrix of class \code{'ts'} with 244 rows and 2 columns with one time series in each column:
 #' \describe{
-#'   \item{First column (GDP):}{The quarterly percent change of real U.S. GDP, from 1959Q1 to 2019Q4, \url{https://fred.stlouisfed.org/series/GDPC1}.}
-#'   \item{Second column (GDPDEF):}{The quarterly percent change of U.S. GDP implicit price deflator, from 1959Q1 to 2019Q4, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
+#'   \item{First column (GDP):}{The quarterly percent change of real U.S. GDP, from 1959Q1 to 2019Q4,
+#'                              \url{https://fred.stlouisfed.org/series/GDPC1}.}
+#'   \item{Second column (GDPDEF):}{The quarterly percent change of U.S. GDP implicit price deflator, from 1959Q1 to 2019Q4,
+#'                                  \url{https://fred.stlouisfed.org/series/GDPDEF}.}
 #' }
 #'
 #' @source The Federal Reserve Bank of St. Louis database
 "gdpdef"
 
+#' A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
+#' the log-difference of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
+#' price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
+#' rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
+#' bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP, GDP deflator,
+#' and producer price index are multiplied by hundred.
+#'
+#' @format A numeric matrix of class \code{'ts'} with 270 rows and 4 columns with one time series in each column:
+#' \describe{
+#'   \item{First column (GDP):}{The log-difference of real GDP, \url{https://fred.stlouisfed.org/series/GDPC1}.}
+#'   \item{Second column (GDPDEF):}{The log-difference of GDP implicit price deflator, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
+#'   \item{Third column (PPI):}{The log-difference of producer price index (all commodities), \url{https://fred.stlouisfed.org/series/PPIACO}.}
+#'   \item{Third column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
+#'    \url{https://fred.stlouisfed.org/series/FEDFUNDS}, \url{https://www.atlantafed.org/cqer/research/wu-xia-shadow-federal-funds-rate}.}
+#' }
+#'
+#' @source The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of Atlanta's website
+#' @references
+#'  \itemize{
+#'    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
+#'      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
+#'  }
+"usamon"
 
 #' A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
-#' cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-diffence of producer
+#' cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
 #' price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 #' rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 #' bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP deflator and producer price

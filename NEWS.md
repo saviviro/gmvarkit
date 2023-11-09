@@ -213,6 +213,7 @@
 * Added a possibility to constrain the mixing weight parameters alphas to fixed constants.
 * Added a possibility to constrain the lambda parameters of structural models to fixed constant.
 * Added the function Pearson_residuals to calculate the standardized Pearson residuals or the raw residuals. 
+* Added the dataset 'usamon'.
 * fitGSMVAR can now filter out (many of the) inappropriate estimates by setting filter_estimates=TRUE. 
 * fitGSMVAR can now estimate without parallel computing and printout by specifying use_parallel=FALSE.
 * Updated the vignette (e.g., added a description of the Monte Carlo algorithm implemented to estimate GIRFs). 

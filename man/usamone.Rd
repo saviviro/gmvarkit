@@ -4,7 +4,7 @@
 \name{usamone}
 \alias{usamone}
 \title{A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
-cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-diffence of producer
+cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
 price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP deflator and producer price

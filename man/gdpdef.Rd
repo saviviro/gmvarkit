@@ -7,8 +7,10 @@
 \format{
 A numeric matrix of class \code{'ts'} with 244 rows and 2 columns with one time series in each column:
 \describe{
-  \item{First column (GDP):}{The quarterly percent change of real U.S. GDP, from 1959Q1 to 2019Q4, \url{https://fred.stlouisfed.org/series/GDPC1}.}
-  \item{Second column (GDPDEF):}{The quarterly percent change of U.S. GDP implicit price deflator, from 1959Q1 to 2019Q4, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
+  \item{First column (GDP):}{The quarterly percent change of real U.S. GDP, from 1959Q1 to 2019Q4,
+                             \url{https://fred.stlouisfed.org/series/GDPC1}.}
+  \item{Second column (GDPDEF):}{The quarterly percent change of U.S. GDP implicit price deflator, from 1959Q1 to 2019Q4,
+                                 \url{https://fred.stlouisfed.org/series/GDPDEF}.}
 }
 }
 \source{
