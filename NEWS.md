@@ -215,7 +215,7 @@
 * Added the function Pearson_residuals to calculate the standardized Pearson residuals or the raw residuals. 
 * fitGSMVAR can now filter out (many of the) inappropriate estimates by setting filter_estimates=TRUE. 
 * fitGSMVAR can now estimate without parallel computing and printout by specifying use_parallel=FALSE.
-* Updated the vignette. 
+* Updated the vignette (e.g., added a description of the Monte Carlo algorithm implemented to estimate GIRFs). 
 * Fixed the .Rd files for random_df and smart_df.
 * Fixed a bug in the estimation of GIRF and GFEVD for StMVAR and G-StMVAR models 
 * Fixed a bug that occurred using stmvar_to_gstmvar for structural models.
