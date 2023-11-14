@@ -8,6 +8,8 @@ Pearson_residuals(gsmvar, standardize = TRUE)
 }
 \arguments{
 \item{gsmvar}{an object of class \code{'gsmvar'}, typically created with \code{fitGSMVAR} or \code{GSMVAR}.}
+
+\item{standardize}{Should the residuals be standardized? Use \code{FALSE} to obtain raw residuals.}
 }
 \value{
 Returns \eqn{((n_obs-p) x d)} matrix containing the residuals,

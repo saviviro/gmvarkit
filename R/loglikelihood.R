@@ -581,6 +581,7 @@ get_IC <- function(loglik, npars, obs) {
 #' @description \code{Pearson_residuals} calculates multivariate Pearson residuals for a GMVAR, StMVAR, or G-StMVAR model.
 #'
 #' @inheritParams quantile_residual_tests
+#' @param standardize Should the residuals be standardized? Use \code{FALSE} to obtain raw residuals.
 #' @return Returns \eqn{((n_obs-p) x d)} matrix containing the residuals,
 #'   \eqn{j}:th column corresponds to the time series in the \eqn{j}:th column of the data.
 #' @inherit GSMVAR references
