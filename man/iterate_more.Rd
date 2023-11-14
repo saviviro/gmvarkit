@@ -19,7 +19,7 @@ iterate_more(
 
 \item{maxit}{the maximum number of iterations in the variable metric algorithm.}
 
-\item{calc_std_errors}{should approximate standard errors be calculated?}
+\item{calc_std_errors}{calculate approximate standard errors for the estimates?}
 
 \item{custom_h}{A numeric vector with same the length as the parameter vector: i:th element of custom_h is the difference
 used in central difference approximation for partial differentials of the log-likelihood function for the i:th parameter.

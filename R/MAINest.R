@@ -15,7 +15,7 @@
 #' @param print_res should summaries of estimation results be printed?
 #' @param use_parallel employ parallel computing? If \code{FALSE}, no progression bar etc will be generated.
 #' @param filter_estimates should the likely inappropriate estimates be filtered? See details.
-#' @param calc_std_erros calculate approximate standard errors for the estimates?
+#' @param calc_std_errors calculate approximate standard errors for the estimates?
 #' @param ... additional settings passed to the function \code{GAfit} employing the genetic algorithm.
 #' @details
 #'  If you wish to estimate a structural model without overidentifying constraints that is identified statistically,
