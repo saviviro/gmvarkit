@@ -223,3 +223,7 @@
 * Fixed a bug that occurred when using swap_W_signs with C_lambda constraints.
 * Fixed a bug in Rao test when using G-StMVAR model
 * Fixed a bug in get_foc, get_gradient, get_soc, and get_hessian that returned only NAs for models with same_means.
+
+# gmvarkit 2.1.1
+
+* Bug fix for estimate_sgmvar for the case when relaxing a zero constraints
