@@ -613,10 +613,10 @@ estimate_sgsmvar <- function(gsmvar, new_W, ncalls=16, ncores=2, maxit=1000, see
       } else if(sn == 0) { # Zero constraint in new W
         newWpars[i1, i2] <- 0 # Insert zero (which will be removed as it is not parametrized)
       } else if(so > sn) { # sn must be negative, so could be zero or positive
-        newWpars[i1, i2] <- -0.01 # Insert small negative number
+        newWpars[i1, i2] <- -0.05 # Insert small negative number
         n_sign_changes <- n_sign_changes + 1
       } else { # It must be that so < sn, which implies sn > 0, while so could be zero or negative
-        newWpars[i1, i2] <- 0.01 # Insert s mall positive number
+        newWpars[i1, i2] <- 0.05 # Insert s mall positive number
         n_sign_changes <- n_sign_changes + 1
       }
     }

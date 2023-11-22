@@ -227,3 +227,4 @@
 # gmvarkit 2.1.1
 
 * Bug fix for estimate_sgmvar for the case when relaxing a zero constraints
+* Slightly adjusted the setting ings estimate_sgmvar
