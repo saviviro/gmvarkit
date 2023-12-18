@@ -305,12 +305,11 @@ GAfit <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditiona
   if(length(ar_scale) != 1 | ar_scale <= 0 | ar_scale > 1) {
     stop("ar_scale must be strictly positive, at most one, and have length one")
   }
-  stopifnot(upper_ar_scale <= 1)
   if(upper_ar_scale > 1) {
     stop("upper_ar_scale should be at most one")
   } else if(p*d > 40) {
     if(upper_ar_scale > 1 - p*d/150) {
-      upper_ar_scale <- 1 - p*d/150
+      upper_ar_scale <- max(1 - p*d/150, 0.05)
     }
   }
   if(length(ar_scale2) != 1 | ar_scale2 <= 0) {
