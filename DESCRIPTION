@@ -1,0 +1,28 @@
+Package: gmvarkit
+Title: Estimate Gaussian and Student's t Mixture Vector Autoregressive Models
+Version: 2.1.1
+Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi", role = c("aut", "cre"))
+Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
+    Gaussian mixture vector autoregressive, Student's t mixture vector autoregressive, and Gaussian and Student's t
+    mixture vector autoregressive models, quantile residual tests, graphical diagnostics,
+    simulations, forecasting, and estimation of generalized impulse response function and generalized 
+    forecast error variance decomposition.
+    Leena Kalliovirta, Mika Meitz, Pentti Saikkonen (2016) <doi:10.1016/j.jeconom.2016.02.012>,
+    Savi Virolainen (2022) <arXiv:2007.04713>,
+    Savi Virolainen (2022) <arXiv:2109.13648>.
+Depends: R (>= 3.6.0)
+BugReports: https://github.com/saviviro/gmvarkit/issues
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports: Brobdingnag (>= 1.2-4), mvnfast (>= 0.2.5), parallel (>= 3.0.0), stats (>= 3.0.0),
+         pbapply (>= 1.4-2), graphics (>= 3.0.0), grDevices (>= 3.0.0), gsl (>= 2.1-6), methods (>= 3.0.0)
+Suggests: testthat, knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2018-09-22 10:42:32 UTC; savi
+Author: Savi Virolainen [aut, cre]
+Maintainer: Savi Virolainen <savi.virolainen@helsinki.fi>
+Repository: CRAN
+Date/Publication: 2018-09-22 11:10:03 UTC
