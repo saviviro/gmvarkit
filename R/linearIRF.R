@@ -215,6 +215,7 @@ linear_IRF <- function(gsmvar, N=30, regime=1, which_cumulative=numeric(0),
 
   if(!is.null(ci) && !ci_possible) {
     warning("Confidence bounds are not available as the autoregressive dynamics are not linear")
+    all_bootstrap_IRF <- NULL
   } else if(!is.null(ci) && ci_possible) { # Bootstrap confidence bounds
 
     ## Create initial values for the two-phase estimation algorithm: does not vary across the bootstrap reps
