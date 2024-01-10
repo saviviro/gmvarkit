@@ -15,11 +15,11 @@
 #'   (\code{d=ncol(data)}) specifying which the variables for which the linear impulse
 #'   responses should be cumulative. Default is none.
 #' @param scale should the linear IRFs to some of the shocks be scaled so that they
-#'   correspond to a specific magnitude of instantaneous response of some specific
+#'   correspond to a specific instantaneous response of some specific
 #'   variable? Provide a length three vector where the shock of interest
 #'   is given in the first element (an integer in \eqn{1,...,d}), the variable of
 #'   interest is given in the second element (an integer in \eqn{1,...,d}), and
-#'   the magnitude of its instantaneous response in the third element (a non-zero real number).
+#'   its instantaneous response in the third element (a non-zero real number).
 #'   If the linear IRFs of multiple shocks should be scaled, provide a matrix which has one
 #'   column for each of the shocks with the columns being the length three vectors described above.
 #' @param ci a real number in \eqn{(0, 1)} specifying the confidence level of the
@@ -28,8 +28,8 @@
 #'   (excluding changes in the volatility regime).
 #' @param bootstrap_reps the number of bootstrap repetitions for estimating confidence bounds.
 #' @param ncores the number of CPU cores to be used in parallel computing when bootstrapping confidence bounds.
-#' @param ncalls based on how many estimation rounds should each bootstrap estimation be based on?
-#'   Does not have to be very large since initial estimates are used based on already fitted model.
+#' @param ncalls on how many estimation rounds should each bootstrap estimation be based on?
+#'   Does not have to be very large since initial estimates used are based on the initially fitted model.
 #'   Larger number of rounds gives more reliable results but is computationally more demanding.
 #' @param seeds a numeric vector of length \code{bootstrap_reps} initializing the seed for the random
 #'   generator for each bootstrap replication.
