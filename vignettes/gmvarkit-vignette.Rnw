@@ -826,7 +826,7 @@ R> C2
 \end{CodeOutput}
 \end{CodeChunk}
 %
-The command \code{fitGSMVAR(gdpdef, p=2, M=2, model="GMVAR", constraints=C2)} would then estimate a GMVAR($2,2$) model with the AR matrices constrained to be the same in both regimes and the off-diagonal elements constrained to zero (again, you may want to adjust the arguments \code{ncalls}, \code{ncored}, and \code{seeds}).
+The command \code{fitGSMVAR(gdpdef, p=2, M=2, model="GMVAR", constraints=C2)} would then estimate a GMVAR($2,2$) model with the AR matrices constrained to be the same in both regimes and the off-diagonal elements constrained to zero (again, you may want to adjust the arguments \code{ncalls}, \code{ncores}, and \code{seeds}).
 
 
 \subsubsection{Constraining the unconditional means of some regimes to be the same}
