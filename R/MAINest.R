@@ -177,7 +177,7 @@
 fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), conditional=TRUE, parametrization=c("intercept", "mean"),
                       constraints=NULL, same_means=NULL, weight_constraints=NULL, structural_pars=NULL,
                       ncalls=(M + 1)^5, ncores=2, maxit=1000, seeds=NULL, print_res=TRUE, use_parallel=TRUE,
-                      filter_estimates=FALSE, calc_std_errors=TRUE, ...) {
+                      filter_estimates=TRUE, calc_std_errors=TRUE, ...) {
 
   model <- match.arg(model)
   parametrization <- match.arg(parametrization)

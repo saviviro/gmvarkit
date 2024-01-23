@@ -21,7 +21,7 @@ fitGSMVAR(
   seeds = NULL,
   print_res = TRUE,
   use_parallel = TRUE,
-  filter_estimates = FALSE,
+  filter_estimates = TRUE,
   calc_std_errors = TRUE,
   ...
 )

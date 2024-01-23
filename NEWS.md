@@ -234,3 +234,4 @@
 # gmvarkit 2.1.2
 
 * Fixed typos in the vignette. 
+* fitGSMVAR now automatically filters out inappropriate estimates by defauls. 
