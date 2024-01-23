@@ -991,7 +991,7 @@ For constrained structural models (including constraints on the structural param
 
 In addition to the parameter vector, \code{GSMVAR} should be supplied with arguments \code{p} and \code{M} specifying the order of the model similarly to the estimation function \code{fitGSMVAR} discussed in Section \ref{sec:example_estim}. If one wishes to parametrize the model with the regimewise unconditional means ($\mu_m$) instead of the intercepts ($\varphi_{m,0}$), the argument \code{parametrization} should be set to \code{"mean"} in which case the intercept parameters $\varphi_{m,0}$ are replaced with $\mu_m$ in the parameter vector. By default, \pkg{gmvarkit} uses intercept parametrization.
 
-To exemplify, we build a reduced form StMVAR $p=1$, $M=1$, $d=2$ model. The model has intercept parametrization and parameter values $\varphi_{1,0}=(0, 1)$ $\text{vec}(A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\text{vech}(\Omega_2) = (1, 0.1, 1)$, and $\nu_1 = 3$. After building the model, we use the \code{print} method to examine it:
+To exemplify, we build a reduced form StMVAR $p=1$, $M=1$, $d=2$ model. The model has intercept parametrization and parameter values $\varphi_{1,0}=(0, 1)$ $\text{vec}(A_{1,1}) = (0.2, 0.2, 0.2, -0.2)$, $\text{vech}(\Omega_1) = (1, 0.1, 1)$, and $\nu_1 = 3$. After building the model, we use the \code{print} method to examine it:
 %
 \begin{CodeChunk}
 \begin{CodeInput}
