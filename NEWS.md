@@ -235,3 +235,4 @@
 
 * Fixed a lot of typos etc in the vignette. 
 * fitGSMVAR now automatically filters out inappropriate estimates by default. 
+* Updates to readme. 
