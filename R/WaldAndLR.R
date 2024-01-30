@@ -24,7 +24,11 @@
 #' @return A list with class "hypotest" containing the test results and arguments used to calculate the test.
 #' @seealso \code{\link{LR_test}}, \code{\link{Rao_test}}, \code{\link{fitGSMVAR}}, \code{\link{GSMVAR}}, \code{\link{diagnostic_plot}},
 #'  \code{\link{profile_logliks}}, \code{\link{quantile_residual_tests}}, \code{\link{cond_moment_plot}}
-#' @inherit in_paramspace_int references
+#' @references
+#'  \itemize{
+#'    \item Buse A. (1982). The Likelihood Ratio, Wald, and Lagrange Multiplier Tests: An Expository Note.
+#'      \emph{The American Statistician}, 36(3a), 153-157.
+#'  }
 #' @examples
 #' \donttest{
 #'  # Structural GMVAR(2, 2), d=2 model with recursive identification
