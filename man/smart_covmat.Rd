@@ -63,7 +63,7 @@ at least the first one of the following elements:
     parameters \eqn{\lambda_{mi}} should be constrained to. This constraint is alternative \code{C_lambda}.
     Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
 }
-See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (forthcoming) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{

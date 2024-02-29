@@ -233,6 +233,7 @@
 
 # gmvarkit 2.1.2
 
-* Fixed a lot of typos etc in the vignette. 
 * fitGSMVAR now automatically filters out inappropriate estimates by default. 
+* Updated the reference structural models identified by heterokedasticity.
+* Fixed a lot of typos etc in the vignette. 
 * Updates to readme. 

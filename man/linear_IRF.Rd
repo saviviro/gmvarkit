@@ -109,8 +109,8 @@ The model DOES NOT need to be structural in order for this function to be
 
   If the autoregressive dynamics of the model are linear (i.e., either M == 1 or mean and AR parameters
   are constrained identical across the regimes), confidence bounds can be calculated based on a type of fixed-design
-  wild residual bootstrap method. We employ the method described in Herwartz and Lütkepohl (2014); see also
-  the relevant chapters in Kilian and Lütkepohl (2017).
+  wild residual bootstrap method. See Virolainen (forthcoming) for a related discussion. We employ the method described
+  in Herwartz and Lütkepohl (2014); see also the relevant chapters in Kilian and Lütkepohl (2017).
 }
 \section{Functions}{
 \itemize{
@@ -152,6 +152,8 @@ The model DOES NOT need to be structural in order for this function to be
      183, pp. 104-116.
    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
          \emph{Cambridge University Press}, Cambridge.
+   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
+          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
  }
 }
 \seealso{

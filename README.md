@@ -53,17 +53,17 @@ data(gdpdef, package="gmvarkit")
 # Estimate a GMVAR(2, 2) model: 20 estimation rounds and seeds for reproducible results
 # (note: many empirical applications require more estimation rounds, e.g., hundreds
 # or thousands).
-fit <- fitGMVAR(gdpdef, p=2, M=2, ncalls=20, seeds=1:20, ncores=2)
+fit <- fitGSMVAR(gdpdef, p=2, M=2, ncalls=20, seeds=1:20, ncores=2)
 fit
 
-# Estimate a GMVAR(2, 2) model with autoregressive parameters restricted to be the same for all regimes
+# Estimate a GSMVAR(2, 2) model with autoregressive parameters restricted to be the same for all regimes
 C_mat <- rbind(diag(2*2^2), diag(2*2^2))
 fitc <- fitGMVAR(gdpdef, p=2, M=2, constraints=C_mat, ncalls=20, seeds=1:20, ncores=2)
 fitc
 
 # Estimate a GMVAR(2, 2) model with autoregressive parameters and the unconditional means
 # restricted to be the same in both regimes (only the covariance matrix varies)
-fitcm <- fitGMVAR(gdpdef, p=2, M=2, parametrization="mean", constraints=C_mat, same_means=list(1:2),
+fitcm <- fitGSMVAR(gdpdef, p=2, M=2, parametrization="mean", constraints=C_mat, same_means=list(1:2),
                   ncalls=20, seeds=1:20, ncores=2)
 fitcm 
 
@@ -83,10 +83,10 @@ profile_logliks(fit) # Profile log-likelihood functions
 
 # Quantile residual diagnostics
 diagnostic_plot(fit) # type=c("all", "series", "ac", "ch", "norm")
-qrt <- quantile_residual_tests(fit, nsimu=10000)
+qrt <- quantile_residual_tests(fit, nsim=10000)
 
 # Simulate a sample path from the estimated process
-sim <- simulateGMVAR(fit, nsimu=100)
+sim <- simulate(fit, nsim=100)
 plot.ts(sim$sample)
 
 # Forecast future values of the process
@@ -95,10 +95,15 @@ predict(fit, n_ahead=12)
 
 ## Structural GMVAR model ##
 
+# gmvarkit implements two identification methods: recursive identification and
+# identification by heteroskedasticity. Reduced form models can be directly used
+# as recursively identified structural models. The below examples consider
+# identification by heteroskedasticity. 
+
 # Estimate structural GMVAR(2,2) model identified with sign constraints:
 W22 <- matrix(c(1, 1, -1, 1), nrow=2, byrow=FALSE)
-fit22s <- fitGMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
-                   ncalls=20, seeds=1:20, ncores=2)
+fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W22),
+                    ncalls=20, seeds=1:20, ncores=2)
 fit22s
 
 # Alternatively, if there are two regimes (M=2), a stuctural model can 
@@ -154,6 +159,9 @@ gfevd3 <- GFEVD(fit22s, N=48, R1=250, initval_type="fixed",
                 init_values=myvals, ncores=2)
 plot(gfevd3)
 
+# Check also the function linear_IRF for estimating linear impulse response 
+# functions based on a specific regime.
+
 # Test with Wald test whether the diagonal elements of the first AR coefficient
 # matrix of the second regime are identical:
 # fit22s has parameter vector of length 27 with the diagonal elements  of the
@@ -190,16 +198,16 @@ fit22gss
 
 ## References
 
--   Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture
-    vector autoregression. *Journal of Econometrics*, **192**, 485-498.
--   Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
-    Multivariate Nonlinear Time Series Models. *Unpublished Revision of
-    HECER Discussion Paper No. 247*.
--   Virolainen S. 2022. Structural Gaussian mixture vector
-    autoregressive model with application to the asymmetric effects of
-    monetary policy shocks. Unpublished working paper, available as
-    arXiv:2007.04713.
--   Virolainen S. 2022. Gaussian and Student’s t mixture vector
-    autoregressive model with application to the assymetric effects of
-    monetary policy shocks in the Euro area. Unpublished working paper,
-    available as arXiv:2109.13648.
+- Kalliovirta L., Meitz M. and Saikkonen P. (2016) Gaussian mixture
+  vector autoregression. *Journal of Econometrics*, **192**, 485-498.
+- Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
+  Multivariate Nonlinear Time Series Models. *Unpublished Revision of
+  HECER Discussion Paper No. 247*.
+- Virolainen S. (forthcoming). A statistically identified structural
+  vector autoregression with endogenously switching volatility regime.
+  *Journal of Business & Economic Statistics*,
+  <doi:10.1080/07350015.2024.2322090>.
+- Virolainen S. (2022). Gaussian and Student’s t mixture vector
+  autoregressive model with application to the assymetric effects of
+  monetary policy shocks in the Euro area. Unpublished working paper,
+  available as arXiv:2109.13648.

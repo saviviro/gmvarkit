@@ -200,8 +200,8 @@
 #'          \emph{Transactions on Systems, Man and Cybernetics} \strong{24}, 656-667.
 #'    \item Smith R.E., Dike B.A., Stegmann S.A. 1995. Fitness inheritance in genetic algorithms.
 #'          \emph{Proceedings of the 1995 ACM Symposium on Applied Computing}, 345-350.
-#'    \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
-#'      effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+#'    \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
+#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}.
 #'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
 #'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
 #'      paper, available as arXiv:2109.13648.

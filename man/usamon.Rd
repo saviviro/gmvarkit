@@ -8,7 +8,7 @@ the log-difference of real GDP, the log-difference of GDP implicit price deflato
 price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP, GDP deflator,
-and producer price index are multiplied by hundred.}
+and producer price index are multiplied by hundred. This data is used in Virolainen (forthcoming).}
 \format{
 A numeric matrix of class \code{'ts'} with 270 rows and 4 columns with one time series in each column:
 \describe{
@@ -31,10 +31,12 @@ the log-difference of real GDP, the log-difference of GDP implicit price deflato
 price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP, GDP deflator,
-and producer price index are multiplied by hundred.
+and producer price index are multiplied by hundred. This data is used in Virolainen (forthcoming).
 }
 \references{
 \itemize{
+   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
+          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
  }

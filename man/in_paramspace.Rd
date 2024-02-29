@@ -151,7 +151,7 @@ at least the first one of the following elements:
     parameters \eqn{\lambda_{mi}} should be constrained to. This constraint is alternative \code{C_lambda}.
     Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}} should not be constrained.
 }
-See Virolainen (2022) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
+See Virolainen (forthcoming) for the conditions required to identify the shocks and for the B-matrix as well (it is \eqn{W} times
 a time-varying diagonal matrix with positive diagonal entries).}
 
 \item{stat_tol}{numerical tolerance for stationarity of the AR parameters: if the "bold A" matrix of any regime
@@ -207,8 +207,8 @@ in_paramspace(p=2, M=2, d=2, params=params22s,
 \itemize{
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2022. Structural Gaussian mixture vector autoregressive model with application to the asymmetric
-     effects of monetary policy shocks. Unpublished working paper, available as arXiv:2007.04713.
+   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
+          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
      paper, available as arXiv:2109.13648.
