@@ -124,9 +124,6 @@
 #' print_std_errors(fit12)
 #' profile_logliks(fit12)
 #'
-#' fit42t <- fitGSMVAR(gdpdef, p=4, M=2, ncalls=5, model="StMVAR", seeds=1:5, use_parallel=FALSE,
-#'  filter_estimates=TRUE, print_res=FALSE)
-#'
 #' # The rest of the examples only use a single estimation round with a given
 #' # seed that produces the MLE to reduce running time of the examples. When
 #' # estimating models for empirical applications, a large number of estimation
@@ -343,7 +340,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
       alphas_ok <- !any(alphas < 0.01)
 
       # Check mixing weights
-      mixing_weights_ok <- tryCatch(!any(vapply(1:M,
+      mixing_weights_ok <- tryCatch(!any(vapply(1:sum(M),
                                           function(m) sum(mod$mixing_weights[,m] > red_criteria[1]) < red_criteria[2]*n_obs,
                                           logical(1))),
                               error=function(e) FALSE)
@@ -355,7 +352,7 @@ fitGSMVAR <- function(data, p, M, model=c("GMVAR", "StMVAR", "G-StMVAR"), condit
         message("No 'appropriate' estimates were found!
                  Check that all the variables are scaled to vary in similar magninutes, also not very small or large magnitudes.
                  Consider running more estimation rounds or study the obtained estimates one-by-one with the function alt_gsmvar.")
-        if(M > 2) {
+        if(sum(M) > 2) {
           message("Consider also using smaller M. Too large M leads to identification problems.")
         }
         which_best_fit <- which(loks == max(loks))[1]

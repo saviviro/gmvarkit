@@ -203,9 +203,6 @@ summary(fit12)
 print_std_errors(fit12)
 profile_logliks(fit12)
 
-fit42t <- fitGSMVAR(gdpdef, p=4, M=2, ncalls=5, model="StMVAR", seeds=1:5, use_parallel=FALSE,
- filter_estimates=TRUE, print_res=FALSE)
-
 # The rest of the examples only use a single estimation round with a given
 # seed that produces the MLE to reduce running time of the examples. When
 # estimating models for empirical applications, a large number of estimation

@@ -51,7 +51,7 @@ var1pars <- c(0.649528, 0.066507, 0.288525, 0.021766, -0.144026, 0.897103, 0.601
 var1 <- GSMVAR(gdpdef, p=1, M=1, d=2, params=var1pars, model="GMVAR")
 new_W2 <- matrix(c(1, NA, 0, 1), nrow=2)
 
-test_that("estimate_ works correctly", {
+test_that("estimate_sgmvar works correctly", {
   new_fit12gss <- estimate_sgsmvar(sg_stmvar12, new_W=new_W1, ncalls=1, ncores=1, seeds=1)
   expect_equal(new_fit12gss$params, c(1.68044468, 0.50581789, 0.53848797, 0.11334361, 0.11786532,
                                       -0.03078259, -0.65462904, 0.71336338, 0.33229816, 0.05399712,
