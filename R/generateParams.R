@@ -317,7 +317,7 @@ random_coefmats <- function(d, how_many, scale) {
 random_coefmats2 <- function(p, d, ar_scale=1) {
   # First generate matrices P_1,..,P_p with singular values less than one
   stopifnot(ar_scale > 0 && ar_scale <= 1)
-  Id <- diag(nrow=d)
+  Id <- diag(x=1, nrow=d)
   all_P <- array(dim=c(d, d, p))
   for(i1 in 1:p) {
     A <- matrix(rnorm(d*d, sd=ar_scale), nrow=d)

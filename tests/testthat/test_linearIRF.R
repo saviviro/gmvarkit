@@ -18,7 +18,9 @@ test_that("linear_IRF works correctly", {
   irf1 <- linear_IRF(mod12cm, regime=1, N=3, scale=cbind(c(1, 1, 1), c(2, 2, 1)),
                      which_cumulative=2)
   irf2 <- linear_IRF(mod12cms, regime=1, N=3, ci=0.68, bootstrap_reps=2,
-                     ncalls=1, seeds=1:2, ncores=1)
+                     ncalls=1, seeds=1:2, ncores=1) # ncores=2 gives weird errors that indicate the default values of certain functions are not
+  # found, etc. These errors do not exist when ncores=1 is used NOR with ncores>2 when the package is installed from CRAN, but somehow occur when
+  # developing the package.
 
   expect_equal(c(irf1$point_est[1:2, 1:2, 4]), c(0.02099899, 0.13304379, -0.14178912, 3.18684486), tolerance=1e-3)
   expect_equal(c(irf2$point_est[1:2, 1:2, 1]), c(0.11472142, -0.15217808, 0.52329628, 0.04291658), tolerance=1e-3)

@@ -228,7 +228,7 @@ get_unconstrained_structural_pars <- function(structural_pars=NULL) {
 
 form_boldA <- function(p, M, d, all_A) {
   M <- sum(M)
-  I_all <- diag(nrow=d*(p - 1))
+  I_all <- diag(x=1, nrow=d*(p - 1))
   ZER_all <- matrix(0, nrow=d*(p - 1), ncol=d)
   array(vapply(1:M, function(m) rbind(matrix(all_A[, , 1:p, m], nrow=d, byrow=FALSE),
                                       cbind(I_all, ZER_all)), numeric((d*p)^2)), dim=c(d*p, d*p, M))

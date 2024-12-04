@@ -1,4 +1,4 @@
-context("Parameter reforms")
+context("ParameterReforms")
 library(gmvarkit)
 
 data0 <- t(t(gdpdef))
