@@ -8,6 +8,9 @@
 %% Sweave("gmvarkit-vignette.Rnw")
 %% tools::texi2pdf("gmvarkit.tex")
 
+% Margin setup
+\usepackage[margin=1in]{geometry}
+
 %% recommended packages
 \usepackage{thumbpdf, lmodern}
 
@@ -16,11 +19,22 @@
 \usepackage{amssymb} % \mathbb, etc.
 \usepackage{mathtools} % matrix*: [c] centered, [l] left-aligned, [r] right-aligned
 
+% Adjustwidth environment
+\usepackage{changepage}
+
 %% new custom commands
 \newcommand{\class}[1]{`\code{#1}'}
 \newcommand{\fct}[1]{\code{#1()}}
 \newtheorem{condition}{Condition}
 \newtheorem{proposition}{Proposition}
+
+%% TOC:
+\makeatletter
+\def\tableofcontents{%
+  \section*{\contentsname}%
+  \@starttoc{toc}%
+}
+\makeatother
 
 %% For Sweave-based articles about R packages:
 %% need no \usepackage{Sweave}
@@ -48,7 +62,7 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 %% - \Abstract{} almost as usual
 \Abstract{
-  We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator. This manuscript is intended as a fancy vignette only.
+  We describe the \proglang{R} package \pkg{gmvarkit}, which provides tools for estimating and analyzing the reduced form and structural Gaussian mixture vector autoregressive model, the Student's $t$ mixture vector autoregressive model, and the Gaussian and Student's $t$ mixture vector autoregressive model. These three models constitute an appealing family of mixture autoregressive models that we call the GSMVAR models. The model parameters are estimated with the method of maximum likelihood by running multiple rounds of a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method. For evaluating the adequacy of the estimated models, \pkg{gmvarkit} utilizes so-called quantile residuals and provides functions for graphical diagnostics and for calculating formal diagnostic tests. \pkg{gmvarkit} also enables to simulate from the GSMVAR processes, to estimate generalized impulse response functions and generalized forecast error variance decompositions, and to forecast future values of the process, for example. We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
@@ -73,8 +87,18 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 \begin{document}
 
+% Table of contents
+\pagenumbering{gobble}
+\pagebreak
+\tableofcontents
+\vfill
+\pagebreak
+\pagenumbering{arabic}
+
 \section{Introduction}
-\textbf{If you came to read this vignette because you have trouble with the estimation (and don't want to read through the whole thing), see Sections \ref{sec:example_estim} and \ref{sec:examestim}. If you have in particular trouble with the estimation of structural models, see also Section~\ref{sec:estim_structural}.}
+\addcontentsline{toc}{section}{Introduction}
+
+%\textbf{If you came to read this vignette because you have trouble with the estimation (and don't want to read through the whole thing), see Sections \ref{sec:example_estim} and \ref{sec:examestim}. If you have in particular trouble with the estimation of structural models, see also Section~\ref{sec:estim_structural}.}
 
 Linear vector autoregressive (VAR) model is a standard tool in time series econometrics. It can be employed to answer questions about the statistical relationships of different variables or to forecast future values of the process, for example. Structural VAR model allows to trace out the effects of economic shocks that have been identified by the researcher. With an appropriate choice of the autoregressive order $p$, a linear VAR is often able to filter out autocorrelation from the series very well. If the errors are assumed to follow an autoregressive conditional heteroskedasticity (ARCH) process, the model is also often able to adequately filter out conditional heteroskedasticity from the series.
 
@@ -88,14 +112,20 @@ This paper describes the \proglang{R} package \pkg{gmvarkit} providing a compreh
 
 The model parameters are estimated by running multiple rounds of a two-phase estimation procedure in which a modified genetic algorithm is used to find starting values for a gradient based variable metric algorithm. Because of the multimodality of the log-likelihood function, some of the estimation rounds may end up in different local maximum points, thereby enabling the researcher to build models not only based on the global maximum point but also on the local ones. The estimated models can be conveniently examined with the \code{summary} and \code{plot} methods. For evaluating their adequacy, \pkg{gmvarkit} utilizes multivariate quantile residual diagnostics in the framework presented in \cite{Kalliovirta+Saikkonen:2010}, including graphical diagnostics as well as diagnostic tests that take into account uncertainty about the true parameter value. Forecasting is based on a Monte Carlo simulation method. For univariate modeling, we suggest using the CRAN distributed R package \pkg{uGMAR} \citep{uGMAR}.
 
-The remainder of this paper is organized as follows. Section~\ref{sec:models} introduces the GSMVAR models and discusses some of their properties. For structural models, identification of the shocks is also covered. Section~\ref{sec:estimation} discusses estimation of the model parameters. In particular, we discuss many important practical aspects of the estimation that might not be obvious to researchers unfamiliar with (S)GSMVAR modeling. We also illustrates how the GSMVAR models can be estimated and examined with \pkg{gmvarkit} and how parameter constraints can be tested.  In Section~\ref{sec:qres}, we describe quantile residuals and demonstrate how they can be utilized to evaluate model adequacy in \pkg{gmvarkit}. Section~\ref{sec:impulseresponse} discusses impulse response analysis based on generalized impulse response functions and generalized forecast error variance decompositions. Section~\ref{sec:GSMVAR} shows how the GSMVAR models can be built with given parameter values. In Section~\ref{sec:simufore}, we first show how to simulate observations from a GSMVAR process, and then we illustrate how to forecast future values of a GSMVAR process with a simulation-based Monte Carlo method. Section~\ref{sec:summary} concludes and collects some useful functions in \pkg{gmvarkit} to a single table for convenience. Appendix~\ref{ap:propt} provides density functions and some properties of multivariate Gaussian and Student's $t$ distributions, and Appendix~\ref{ap:qresexpr} derives closed form expressions for the multivariate quantile residuals of the GSMVAR models. Finally, Appendix~\ref{sec:montecarlo} presents the implemented Monte Carlo algorithm for estimating the generalized impulse response functions and their distributional properties.
+The remainder of this paper is organized as follows. Section~\ref{sec:models} introduces the GSMVAR models and discusses some of their properties. For structural models, identification of the shocks is also covered. Section~\ref{sec:estimation} discusses estimation of the model parameters. In particular, we discuss many important practical aspects of the estimation that might not be obvious to researchers unfamiliar with (S)GSMVAR modeling. We also illustrates how the GSMVAR models can be estimated and examined with \pkg{gmvarkit} and how parameter constraints can be tested.  In Section~\ref{sec:qres}, we describe quantile residuals and demonstrate how they can be utilized to evaluate model adequacy in \pkg{gmvarkit}. Section~\ref{sec:impulseresponse} discusses impulse response analysis based on generalized impulse response functions and generalized forecast error variance decompositions. Section~\ref{sec:GSMVAR} shows how the GSMVAR models can be built with given parameter values. In Section~\ref{sec:simufore}, we first show how to simulate observations from a GSMVAR process, and then we illustrate how to forecast future values of a GSMVAR process with a simulation-based Monte Carlo method. Section~\ref{sec:summary} concludes, and some useful functions in \pkg{gmvarkit} are collected to a single table in Section~\ref{sec:table}. Appendix~\ref{ap:propt} provides density functions and some properties of multivariate Gaussian and Student's $t$ distributions, and Appendix~\ref{ap:qresexpr} derives closed form expressions for the multivariate quantile residuals of the GSMVAR models. Finally, Appendix~\ref{sec:montecarlo} presents the implemented Monte Carlo algorithm for estimating the generalized impulse response functions and their distributional properties.
 
 Throughout this paper, we illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. We deploy the notation $n_d(\boldsymbol{\mu},\boldsymbol{\Gamma})$ for the $d$-dimensional normal distribution with mean $\boldsymbol{\mu}$ and (positive definite) covariance matrix $\boldsymbol{\Gamma}$, and $t_d(\boldsymbol{\mu},\boldsymbol{\Gamma},\nu)$ for the $d$-dimensional $t$-distribution with mean $\boldsymbol{\mu}$, (positive definite) covariance matrix $\boldsymbol{\Gamma}$, and $\nu>2$ degrees of freedom. The corresponding density functions are denoted as $n_d(\cdot;\boldsymbol{\mu},\boldsymbol{\Gamma})$ and $t_d(\cdot;\boldsymbol{\mu},\boldsymbol{\Gamma},\nu)$, respectively. By $\boldsymbol{1}_p=(1,...,1)$ ($p \times 1$), we denote $p$-dimensional vector of ones. Finally, $\otimes$ denotes Kronecker product.
 
+
 \section{Models}\label{sec:models}
+\addcontentsline{toc}{section}{Models}
+
+
 This section introduces the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021}, a family of mixture vector autoregressive models that we call the GSMVAR models. First, we define the component processes of the GSMVAR models - linear VARs based on either Gaussian or Student's $t$ distribution. Then, we introduce the reduced form GSMVAR models. For brevity, we only give the definition of the more general G-StMVAR model but explain how the GMVAR and StMVAR models are obtained as special cases of it, namely, by taking all the component models to be of either Gaussian or Student's $t$ type. After defining the reduced form GSMVAR model, we introduce structural version of the models incorporating statistically identified structural shocks. Identification of the shocks is also briefly discussed.
 
-\subsection{Linear Gaussian and Student's $t$ vector autoregressions}\label{sec:linvar}
+\subsection{Linear Gaussian and Student's t vector autoregressions}\label{sec:linvar}
+\addcontentsline{toc}{subsection}{Linear Gaussian and Student's t vector autoregressions}
+
 To develop theory and notation, consider first the component processes of the Gaussian and Student's $t$ mixture vector autoregressive models. For a $p$th order linear Gaussian or Student's $t$ vector autoregression $z_t$, we have
 \begin{equation}\label{eq:gaussianvar}
 z_t = \phi_{0} + \sum_{i=1}^pA_iz_{t-1} + \Omega_t^{1/2}\varepsilon_t, \quad \varepsilon\sim IID(0,I_d),
@@ -177,7 +207,9 @@ The conditional variance (\ref{eq:convarlinear}) consists of a constant covarian
 
 We refer often to the linear Gaussian VARs as GMVAR type, because they are similar to the component processes of the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}. Likewise, we often refer to the linear Student's $t$ VARs as StMVAR type, because they are similar to the component processes of the StMVAR model \citep{Virolainen2:2021}. The G-StMVAR model \citep{Virolainen2:2021} incorporates both types of component processes. Because the GMVAR are StMVAR models are obtained as special cases of the G-StMVAR model by assuming that all the component processes are either GMVAR or StMVAR type, we will only give the definition of the more general G-StMVAR model.
 
-\subsection{The Gaussian and Student's $t$ mixture vector autoregressive model}
+\subsection{The Gaussian and Student's t mixture vector autoregressive model}
+\addcontentsline{toc}{subsection}{The Gaussian and Student's t mixture vector autoregressive model}
+
 Let $y_t$ $(t=1,2,...)$ be the real valued $d$-dimensional time series of interest, and let $\mathcal{F}_{t-1}$ denote $\sigma$-algebra generated by the random vectors $\lbrace y_s, s<t \rbrace$. In a G-StMVAR model \citep{Virolainen2:2021} with autoregressive order $p$ and $M$ mixture components (or regimes),  the observations $y_t$ are assumed to be generated by
 \begin{align}
 y_t = & \sum_{m=1}^Ms_{m,t}(\mu_{m,t} + \Omega_{m,t}^{1/2}\varepsilon_{m,t}),\label{eq:def} \\
@@ -226,6 +258,8 @@ f(\boldsymbol{y}) = \sum_{m=1}^M\alpha_m n_{dp}(\boldsymbol{y};\boldsymbol{1}_p\
 
 
 \subsection{Structural G-StMVAR model}\label{sec:structural_model}
+\addcontentsline{toc}{subsection}{Structural G-StMVAR model}
+
 \pkg{gmvarkit} currently supports two types of structural models: structural models identified recursively by the lower-triangular Cholesky decomposition and structural models identified by conditional heteroskedasticity. Recursive identification of the structural shocks $e_t$ is automatically assumed for reduced form models. In that case, the (time-varying) impact matrix $B_t$ is simply the lower-triangular Cholesky decomposition of the conditional covariance matrix of the reduced form error $u_t=B_te_t=\sum_{m=1}^Ms_{m,t}\Omega_{m,t}^{1/2}\varepsilon_{m,t}$, that is, of $\sum_{m=1}^M\alpha_{m,t}\Omega_{m,t}$. The rest of this section discusses structural models identified by conditional heteroskedasticity as in \cite{Virolainen:2024}; see also \cite{Virolainen2:2021}.
 
 We write the structural G-StMVAR model identified by conditional heteroskedasticity \citep{Virolainen2:2021} as
@@ -270,6 +304,8 @@ Since $B_t^{-1}\Omega_mB_t'^{-1}=\Lambda_m(\sum_{n=1}^{M_1}\alpha_{n,t}\Lambda_n
 
 
 \subsection{Identification of the structural shocks}
+\addcontentsline{toc}{subsection}{Identification of the structural shocks}
+
 With the decomposition (\ref{eq:omega_decomp}) of $\Omega_1,...,\Omega_M$ and the B-matrix (\ref{eq:B-matrix}),  a statistical identification of the shocks is achieved as long as each pair of the eigenvalues is distinct for some $m$.  In order to identify structural shocks with economic interpretations,  they need to be uniquely related to the economic shocks through the constraints on the B-matrix (or equally $W$) that only the shock of interest satisfies. \citet[Proposition 1]{Virolainen:2024} gives formal conditions for global identification of any subset of the shocks when the relevant pairs eigenvalues are distinct in some regime.  He also derives conditions for globally identifying some of the shocks when one of the relevant pairs of the eigenvalues is identical in all regimes.  For convenience,  we repeat the conditions in the former case below,  but in the latter case,  we refer to \citet[where also the following Proposition is proven]{Virolainen:2024}.
 \begin{proposition}\label{prop:ident1}
 Suppose $\Omega_m = W\Lambda_mW'$,  $m=1,...,M$, where the diagonal of $\Lambda = \text{diag}(\lambda_{m1},...,\lambda_{md})$,  $\lambda_{mi}>0$ $(i=1,...,d)$,  contains the eigenvalues of the matrix $\Omega_m\Omega_1^{-1}$ and the columns of the nonsingular $W$ are the related eigenvectors.  Then,  the last $d_1$ structural shocks are uniquely identified if
@@ -307,8 +343,11 @@ If condition~\ref{cond:lambdadif} of Proposition~\ref{prop:ident1} is strengthen
 
 
 \section{Estimation}\label{sec:estimation}
+\addcontentsline{toc}{section}{Estimation}
 
 \subsection{Log-likelihood function}\label{sec:loglik}
+\addcontentsline{toc}{subsection}{Log-likelihood function}
+
 \pkg{gmvarkit} employs the method of maximum likelihood (ML) for estimating the parameters of the G-StMVAR model. Even the exact log-likelihood function is available, as the stationary distribution $p$ consecutive observations in known. Suppose the observed time series is $y_{-p+1},...,y_0,y_1,...,y_T$ and that the initial values are stationary.  Then, the log-likelihood function of the G-StMVAR model takes the form
 \begin{equation}\label{eq:loglik1}
 L(\boldsymbol{\theta})=\log\left(\sum_{m=1}^M\alpha_m d_{m,dp}(\boldsymbol{y}_0;\boldsymbol{1}_p\otimes\mu_m,\Sigma_{m,p},\nu_m) \right) + \sum_{m=1}^M l_t(\boldsymbol{\theta}),
@@ -325,11 +364,15 @@ Structural models identified by the lower-triangular Cholesky decomposition use 
 
 
 \subsection{Two-phase estimation procedure}\label{sec:estimscheme}
+\addcontentsline{toc}{subsection}{Two-phase estimation procedure}
+
 Finding the ML estimate amounts maximizing the log-likelihood function (\ref{eq:loglik1}) (and (\ref{eq:loglik2})) over a high dimensional parameter space satisfying the constraints summarized in \citet[Assumption 1]{Virolainen2:2021}.  Due to the complexity of the log-likelihood function, numerical optimization methods are required.  The maximization problem can, however, be challenging in practice.  This is particularly due to the mixing weights' complex dependence on the preceding observations,  which induces a large number of modes to the surface of the log-likelihood function, and large areas to the parameter space where it is flat in multiple directions.  Also, the popular EM algorithm \citep{Redner+Walker:1984} is virtually useless here,  as at each maximization step one faces a new optimization problem that is not much simpler than the original one.  Following \cite{Meitz+Preve+Saikkonen2:2018}, \cite{Meitz+Preve+Saikkonen:2021}, and \cite{Virolainen:2021, uGMAR}, we therefore employ a two-phase estimation procedure in which a genetic algorithm is used to find starting values for a gradient based method.
 
 The genetic algorithm in \pkg{gmvarkit} is, at core, mostly based on the description by \cite{Dorsey+Mayer:1995} but several modifications have been deployed to improve its performance. The modifications include the ones proposed by \cite{Patnaik+Srinivas:1994} and \cite{Smith+Dike+Stegmann:1995} as well as further adjustments that take into account model specific issues related to the mixing weights' dependence on the preceding observations. For a more detailed description of the genetic algorithm and its modifications, see \citet[Appendix A]{Virolainen:2021}, where the genetic algorithm is discussed in the univariate context. After running the genetic algorithm, the estimation is finalized with a variable metric algorithm \cite[algorithm 21, implemented by \citealp{R}]{Nash:1990} using central difference approximation for the gradient of the log-likelihood function (see Section~\ref{sec:examestim}).
 
 \subsection{Examples of unconstrained estimation}\label{sec:example_estim}
+\addcontentsline{toc}{subsection}{Examples of unconstrained estimation}
+
 In this section, we demonstrate how to estimate GSMVAR models with \pkg{gmvarkit} and provide several examples in order to illustrate various frequently occurring situations. In addition to the ordinary estimation, we particularly show how a GSMVAR model can be built based on a local-only maximum point when the ML estimate seems unreasonable. We also consider the estimation of the appropriate G-StMVAR model when the estimated StMVAR model contains overly large degrees of freedom estimates \citep[see the related discussion in][]{Virolainen2:2021}. In the examples, we only consider $p=1$ models for simplicity and because then the code outputs fit in the margins better, estimation times are shorter, etc. This order may not be best in the modeling perspective, however.
 
 In \pkg{gmvarkit}, the GSMVAR models are defined as class \code{gsmvar} S3 objects, which can be created with given parameter values using the constructor function \code{GSMVAR} (see Section~\ref{sec:GSMVAR}) or by using the estimation function \code{fitGSMVAR}, which estimates the parameters and then builds the model. For estimation, \code{fitGSMVAR} needs to be supplied with a multivariate time series and the arguments specifying the model. The necessary arguments for specifying the model include the autoregressive order \code{p}, the number of mixture components \code{M}, and \code{model}, which should be either \code{"GMVAR"}, \code{"StMVAR"}, or \code{"G-StMVAR"}. For GMVAR and StMVAR models, the argument \code{M} is a positive integer, whereas for the G-StMVAR model it is a length two numeric vector specifying the number of GMVAR type regimes in the first element and the number of StMVAR type regimes in the second.
@@ -537,6 +580,8 @@ This is possible in \pkg{gmvarkit}, because the estimation function \code{fitGSM
 It is also possible to automatically filter out inappropriate estimates by setting the argument \code{filter_estimates=TRUE} in \code{fitSGMVAR}. Then, the function will automatically filter out estimates that it deems "inappropriate". That is, estimates that are not likely solutions of interest. Specifically, solutions that incorporate a near-singular error term covariance matrix (any eigenvalue less than $0.002$), mixing weights such that they are close to zero for almost all $t$ for at least one regime, or mixing weight parameter estimate close to zero (or one). It also filters out estimates with any modulus "bold A" eigenvalues larger than 0.9985, as the solution is near the boundary of the stationarity region and likely not a local maximum. \code{fitSGMVAR} then returns the solution based on the largest log-likelihood that is not filtered out. Other solutions can be studied by using the function \code{alt_gsmvar} as usual.
 
 \subsection{Further examination of the estimates}\label{sec:examestim}
+\addcontentsline{toc}{subsection}{Further examination of the estimates}
+
 In addition to examining the summary printout, it is often useful to visualize the model by plotting the mixing weights together with the time series and the model's (marginal) stationary density together with a kernel density estimate of the time series. That is exactly what the plot method for GSMVAR models does. The following command creates the time series plot along with estimated mixing weights:
 %
 \begin{CodeChunk}
@@ -641,6 +686,9 @@ If the model is very large, a very large number of estimation rounds may be requ
 
 
 \subsection{Estimation of the structural GSMVAR model}\label{sec:estim_structural}
+\addcontentsline{toc}{subsection}{Estimation of the structural GSMVAR model}
+
+
 As explained, \pkg{gmvarkit} currently supports two types of structural models: structural models identified recursively by the lower triangular Cholesky decomposition and structural models identified by conditional heteroskedasticity. Recursive identification is assumed for reduced form models, and thus do not require any further estimation.  Generalized impulse response functions and generalized forecast error variance decompositions can be estimated for recursively identified models by using the reduced form models directly in the functions \code{GIRF} and \code{GFEVD}. The rest of this section discusses estimation of structural models identified by conditional heteroskedasticity as in \cite{Virolainen:2024} and \cite{Virolainen2:2021}, which employ a parametrization different to the reduced form models.
 
 The structural GSMVAR models are estimated similarly to the reduced form version, expect that the model is parametrized with $W$ and $\lambda_{mi}$, $m=2,...,M$, $i=1,...,d$ instead of the covariance matrices $\Omega_{m}$, $m=1,...,M$. The estimation is can be done with the function \code{fitGSMVAR} but now the argument \code{structural_pars} needs to be supplied with a list providing the constraints on $W$ (which equally imposes the constraints on the B-matrix), and optionally, linear constraints on the $\lambda_{mi}$ parameters or constraints restricting $\lambda_{mi}$ to fixed values.
@@ -654,6 +702,8 @@ If \code{fixed_lambdas} is specified, it should be a $d(M-1)$ length numeric vec
 \textbf{Reliable estimation of structural GSMVAR models typically requires much more estimation rounds than the estimation of the reduced form models. However, when $M=2$, every reduced form model has an implied statistically identified structural model, which can be built without any additional estimation (this will be discussed next). We recommend considering this implied model first. Then, if overidentifying constraints are to be imposed on the B-matrix (or equally $W$), we recommend using the unrestricted estimate to create an initial guess for the constrained parameter vector and pass this to the genetic algorithm as an initial population}. See the help page \code{?GAfit} for the arguments that can be passed by \code{fitGSMVAR} to the genetic algorithm. Create the initial guess for the parameter vector by using the form given in documentation of the argument \code{initpop}. If $M\neq 2$, the structural model needs to be estimated in the normal way with \code{fitGSMVAR}, however.
 
 \subsubsection{Building structural model based on a reduced form model}
+\addcontentsline{toc}{subsubsection}{Building structural model based on a reduced form model}
+
 If the number of regimes is two ($M=2$), a structural model can be built based on a reduced form model, because the matrix decomposition used in the simultaneous diagonalization of the error term covariance matrices always exists. This can be done with function \code{gsmvar_to_sgsmvar} which should be supplied with the reduced form model, and it then returns a corresponding structural model. After creating the structural model, the columns of $W$ can be reordered with the function \code{reorder_W_columns} which also reorders all $\lambda_{mi}$ accordingly (and hence the resulting model will coincide with the original reduced form model). Also, all signs any column of $W$ can be swapped with the function \code{swap_W_signs}.
 
 The exemplify, the following code creates statistically identified structural model based on the reduced form model \code{fit12gs} and then prints the estimates.
@@ -701,6 +751,8 @@ Estimates for the structural parameters, $W$ and the eigenvalues, are printed la
 If there is only one mixture component, i.e., \code{M == 1}, \code{gsmvar_to_sgsmvar} returns a symmetric and pos. def. square root matrix of the error term covariance matrix by default. But one may also employ lower triangular Cholesky identification by setting \code{cholesky = TRUE} in the arguments.
 
 \subsubsection{Estimating overidentified structural GSMVAR models}
+\addcontentsline{toc}{subsubsection}{Estimating overidentified structural GSMVAR models}
+
 Sometimes is appropriate to impose overidentifying constraints on $W$ (or equally the B-matrix). With preliminary estimates from the just-identified model in the case $M>1$ or any model in the case $M=1$, it is convenient to use the function \code{estimate_sgsmvar}. It takes in a reduced form or structural GSMVAR model as a class 'gsmvar' object and new constraints in the argument \code{new_W} as a matrix expressing the sign or zero constraints. Strictly positive or negative elements signify strict sign constraints, zeros zero constraints, and \code{NA} values that the element is unconstrained.
 
 \code{estimate_sgsmvar} then creates preliminary estimate based on the supplied model and the constraints, and then runs the two-phase estimation with settings of the genetic algorithm such that the search is focused on the neighbourhood of the preliminary estimate. Thus, it will lead to the correct ML estimate only if the unconstrained estimate is close to the constrained one in the first place. It is therefore useful for imposing zero constraints for elements that are close to zero in the unrestricted estimate, for instance.
@@ -710,8 +762,11 @@ Sometimes is appropriate to impose overidentifying constraints on $W$ (or equall
 \code{estimate_sgsmvar} can also be used to estimate models that are not identified, i.e., one regime models. If it supplied with a reduced form model, it will first apply the function \code{gsmvar_to_sgsmvar}, then impose the constraints and finally estimate the model.
 
 \subsection{Constrained estimation}\label{sec:examp_const}
+\addcontentsline{toc}{subsection}{Constrained estimation}
 
 \subsubsection{Linear constraints on the autoregressive parameters}
+\addcontentsline{toc}{subsubsection}{Linear constraints on the autoregressive parameters}
+
 Imposing linear constraints on the autoregressive parameters of GMVAR model is straightforward in \pkg{gmvarkit}. The constraints are expressed in a somewhat general form which allows to impose a wide class of constraints but one needs to take the time to construct the constraint matrix carefully for each particular case.
 
 We consider constraints of form
@@ -728,9 +783,13 @@ The parameter vector for constrained model has the size $((M(d+d(d+1)/2+1)+q-1)x
 where $\boldsymbol{\psi}$ is the $(qx1)$ parameter vector containing constrained autoregressive parameters. As in the case of regular models, instead of the intercept parametrization that takes use of intercept terms $\phi_{m,0}$, one may use the mean parametrization with regimewise means $\mu_m$ instead $(m=1,...,M)$.
 
 \subsubsection{Examples of linear constraints}
+\addcontentsline{toc}{subsubsection}{Examples of linear constraints}
+
 Consider the following two common uses of linear constraints: restricting the autoregressive matrices to be the same for all regimes and constraining some AR parameters to zero. Of course also some other constraints may be useful, but we chose to show illustrative examples of these two, as they are taken use of in \cite{Kalliovirta+Meitz+Saikkonen:2016}.
 
 \subsubsection{Restricting AR matrices to be the same for all regimes}
+\addcontentsline{toc}{subsubsection}{Restricting AR matrices to be the same for all regimes}
+
 To restrict the AR matrices to be the same for all regimes, we want $\boldsymbol{\phi}_m$ to be the same for all $m=1,...,M$. The parameter vector $\boldsymbol{\psi}$ $(qx1)$ then corresponds to any $\boldsymbol{\phi}_m=\boldsymbol{\phi}$, and therefore $q=pd^2$. For the constraint matrix we choose
 \begin{equation}
 \boldsymbol{C} = [I_{pd^2}:\cdots:I_{pd^2}]' \enspace (Mpd^2xpd^2),
@@ -764,6 +823,8 @@ R> (C1 <- rbind(I_pd2, I_pd2)) # Stack them on top of each other
 The command \code{fitGSMVAR(gdpdef, p=1, M=2, model="GMVAR", constraints=C1)} would then estimate a GMVAR($1,2$) model with the AR matrices constrained to be the same in both regimes. In practice, you might want to adjust the number of CPU cores used, the of estimation rounds, and set seeds. Notably, with the dimension of the time series being only two and $p=1$ with two regimes, almost all of the estimation rounds end up in the MLE. Also, because model has the AR matrices constrained to be the same for all regimes, the estimation is much easier than with freely estimated models.
 
 \subsubsection{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}
+\addcontentsline{toc}{subsubsection}{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}
+
 The previous example shows how to restrict the AR parameters to be the same for all regimes, but say we also want to constrain the non-diagonal elements of coefficient matrices $A_{m,i}$ $(m=1,...,M, i=1,...,p)$ to be zero. We have the constrained parameter $\boldsymbol{\psi}$ $(qx1)$ representing the unconstrained parameters $(\boldsymbol{\phi}_1,...,\boldsymbol{\phi}_M)$, where the restrictions imply $\boldsymbol{\phi}_m=\boldsymbol{\phi}=(vec(A_1),...,vec(A_p))$ $(pd^2x1)$ and the elements of $vec(A_i)$ $(i=1,...,p)$ corresponding to the diagonal are zero.
 
 For illustrative purposes, let's consider a GMVAR model with autoregressive degree $p=2$, number of mixture components $M=2$ and number of time series in the system $d=2$. Then we have
@@ -830,6 +891,8 @@ The command \code{fitGSMVAR(gdpdef, p=2, M=2, model="GMVAR", constraints=C2)} wo
 
 
 \subsubsection{Constraining the unconditional means of some regimes to be the same}
+\addcontentsline{toc}{subsubsection}{Constraining the unconditional means of some regimes to be the same}
+
 In addition to constraining the autoregressive parameters, \pkg{gmvarkit} allows to constrain the unconditional means of some regimes to be the same. This feature is, however, only available for models that are parametrized with the unconditional means instead of intercepts (because some of the estimation is always done with mean-parametrization and one cannot generally swap the parametrization when constraints are imposed on means/intercepts). With the mean-parametrization employed (by setting \code{parametrization="mean"}), one may define groups of regimes that have the same mean parameters using the argument \code{same_means}. For instance, with three regime model $(M=3)$ the argument \code{same_means=list(c(1, 3), 2)} sets the unconditional means of the first and third regimes to be the same while allows the second regime to have different mean.
 
 One can also combine linear constraints on the AR parameters with constraining some of the means to be the same. This allows, for instance, to estimate a model in which only the covariance matrix varies in time. To exemplify, the following code (which is not executed in this vignette) estimates a GMVAR($p=4, M=2$) model such that the unconditional means and autoregression matrices are constrained be the same in both regimes. The resulting model thereby has time-varying covariance matrix but otherwise it is linear.
@@ -862,9 +925,13 @@ Finished!
 %
 
 \subsubsection{Constraining the mixing weight parameters alphas to fixed values}
+\addcontentsline{toc}{subsubsection}{Constraining the mixing weight parameters alphas to fixed values}
+
 It is also possible to constrain the mixing weight parameters $\alpha_1,...,\alpha_{M-1}$ to some fixed values. To do so, specify the fixed values in the argument \code{weight_constraints} as a $(M-1\times 1)$ vector $(\alpha_1,...,\alpha_{M-1})$. Each element should be strictly between zero and one, and the sum of all of them should be strictly less than one. For instance, when $M=2$, specifying \code{weight_constraints=0.6} constraints the mixing weights parameters of the first regime as $\alpha_1=0.6$ (and hence $\alpha_2=0.4$).
 
 \subsection{Testing parameter constraints}\label{sec:testconst}
+\addcontentsline{toc}{subsection}{Testing parameter constraints}
+
 One way to asses the validity of the imposed constraints is to compare the values of information criteria of the constrained and unconstrained models. \pkg{gmvarkit}, however, also provides functions for testing the constraints with the likelihood ratio test, Wald test, and Rao's test, which are applicable as the ML estimator of a GSMVAR model has the conventional asymptotic distribution \cite[as long as the model is correctly specified and one is willing to assume the validity of the required unverified assumptions; see][Theorem 3, and \cite{Kalliovirta+Meitz+Saikkonen:2016}, Theorem 3]{Virolainen2:2021}. For a discussion on the tests, see \citet{Buse:1982} and the references therein, for example.
 
 The likelihood ratio test considers the null hypothesis that the true parameter value $\boldsymbol{\theta}_0$ satisfies some constraints imposed on these parameters \cite[such that the constrained parameter space is a subset of the parameter space, which is presented in][Assumption 2 for the GSMVAR models]{Virolainen2:2021}. Denoting by $\hat{L}_U$ and $\hat{L}_C$ the (maximized) log-likelihoods based on the unconstrained and constrained ML estimates, respectively, the test statistic takes the form
@@ -889,6 +956,9 @@ Note that the standard tests are not applicable if the number of GMVAR or StMVAR
 
 
 \section{Quantile residual based model diagnostics}\label{sec:qres}
+\addcontentsline{toc}{section}{Quantile residual based model diagnostics}
+
+
 In the GSMVAR models, the empirical counterparts of the error terms $\varepsilon_{m,t}$ in (\ref{eq:def}) cannot be calculated, because the regime that generated each observation is unknown, making the conventional residual based diagnostics unavailable. Therefore, \pkg{gmvarkit} utilizes so called quantile residuals, which are suitable for evaluating adequacy of the GSMAR models.
 
 Denote by $y_t$, $t=1,2,...$,  the time series of interest and $\mathcal{F}_{t-1}$ the $\sigma$-algebra generated by the random variables or vectors $\lbrace y_{t-j}, j > 0 \rbrace$.  Moreover, let $\boldsymbol{\theta}$ denote the relevant parameter vector. \cite{Kalliovirta:2012} defines univariate quantile residuals as
@@ -934,8 +1004,11 @@ For a correctly specified GSMVAR model employing the ML estimator, the empirical
 
 
 \section{Impulse response analysis}\label{sec:impulseresponse}
+\addcontentsline{toc}{section}{Impulse response analysis}
 
 \subsection{Generalized impulse response function}
+\addcontentsline{toc}{subsection}{Generalized impulse response function}
+
 We consider the generalized impulse response function (GIRF) \citep{Koop+Pesaran+Potter:1996} defined as
 \begin{equation}\label{eq:girf}
 \text{GIRF}(n,\delta_j,\mathcal{F}_{t-1}) = \text{E}[y_{t+n}|\delta_j,\mathcal{F}_{t-1}] - \text{E}[y_{t+n}|\mathcal{F}_{t-1}],
@@ -955,6 +1028,8 @@ Due to the nonlinear nature of the model, GIRFs estimated from different startin
 Because estimating the GIRF and their confidence intervals is computationally demanding, parallel computing is taken use of to shorten the estimation time. The number of CPU cores used can be set with the argument \code{ncores}. The objects returned by the \code{GIRF} function have their own \code{plot} and \code{print} methods. Also, cumulative impulse responses of the specified variables can be obtained directly by specifying the argument \code{which_cumulative}.
 
 \subsection{Generalized forecast error variance decomposition}
+\addcontentsline{toc}{subsection}{Generalized forecast error variance decomposition}
+
 We consider the generalized forecast error variance decomposition (GFEVD) \citep{Lanne+Nyberg:2016}  that is defined for variable $i$, shock $j$, and horizon $n$ as
 \begin{equation}
 \text{GFEVD}(n,y_{it}, \delta_j,\mathcal{F}_{t-1}) = \frac{\sum_{l=0}^n\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i^2}{\sum_{k=1}^d\sum_{l=0}^n\text{GIRF}(l,\delta_k,\mathcal{F}_{t-1})_i^2},
@@ -970,6 +1045,8 @@ In \pkg{gmvarkit}, the GFEVD can be estimated with the function \code{GFEVD}. As
 The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument \code{shock_size}. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument \code{which_cumulative}. Finally, note that the GFEVD objects have their own plot and print methods.
 
 \subsection{Linear impulse response functions}
+\addcontentsline{toc}{subsection}{Linear impulse response functions}
+
 It is also possible to calculate linear impulse response functions (IRF) based on a specific regime of the estimated model by using the function \code{linear_IRF}. If the autoregressive dynamics of the model are linear (i.e., either $M=1$ or mean and AR parameters are constrained identical across the regimes), confidence bounds can be estimated based on a type of a fixed-design wild residual bootstrap method. \code{gmvarkit} implements the method proposed \cite{Herwartz+Lutkepohl:2014}.
 
 \section{Building a GSMVAR model with specific parameter values}\label{sec:GSMVAR}
@@ -1019,9 +1096,13 @@ Df parameter:  3.00
 
 It is possible to include data in the models built with \code{GSMVAR} by either providing the data in the argument \code{data} when creating the model or by adding the data afterwards with the function \code{add_data}. When the model is supplied with data, the mixing weights, one-step conditional means and variances, and quantile residuals can be calculated and included in the model. The function \code{add_data} can also be used to update data to an estimated GSMVAR model without re-estimating the model.
 
+
 \section{Simulation and forecasting}\label{sec:simufore}
+\addcontentsline{toc}{section}{Simulation and forecasting}
 
 \subsection{Simulation}\label{sec:simu}
+\addcontentsline{toc}{subsection}{Simulation}
+
 \pkg{gmvarkit} implements the S3 method \code{simulate} for simulating observations from GSMVAR processes (see \code{?simulate.gsmvar}). The method requires the process to be given as a class \code{gsmvar} object, which are typically created either by estimating a model with the function \code{fitGSMVAR} or by specifying the parameter values by hand and building the model with the constructor function \code{GSMVAR}. The initial values required to simulate the first $p$ observations can be either set by hand (with the argument \code{init_values}) or drawn from the stationary distribution of the process (by default) or from a (mixture of) stationary distribution(s) of given regime(s). The argument \code{nsim} sets the length of the sample path to be simulated.
 
 To give an example, the following code sets the random number generator seed to one and simulates $500$ observations long sample from the StMVAR process built in Section~\ref{sec:GSMVAR}:
@@ -1035,6 +1116,8 @@ R> mysim <- simulate(mod112, nsim=500, seed=1)
 Our implementation of \code{simulate} returns a list containing the simulated sample path in \code{\$sample}, the mixture component that generated each observation in \code{\$component}, and the mixing weights in \code{\$mixing_weights}.
 
 \subsection{Simulation based forecasting}
+\addcontentsline{toc}{subsection}{Simulation based forecasting}
+
 Deriving multiple-steps-ahead point predictions and prediction intervals analytically for the GSMVAR models is very complicated, so \pkg{gmvarkit} employs the following simulation-based method. By using the last $p$ observations of the data up to the date of forecasting as initial values, a large number of sample paths for the future values of the process are simulated. Then, sample quantiles from the simulated sample paths are calculated to obtain prediction intervals, and the median or mean is used for point predictions. A similar procedure is also applied to forecast future values of the mixing weights, which might be of interest because the researcher can often associate statistical characteristics or economic interpretations to the regimes.
 
 Forecasting is most conveniently done with the \code{predict} method (see \code{?predict.gsmvar}). The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsim}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
@@ -1060,9 +1143,27 @@ The resulting plot is presented in Figure~\ref{fig:predplot}.
 \end{figure}
 
 
-\begin{table}
+\section{Summary}\label{sec:summary}
+\addcontentsline{toc}{section}{Summary}
+
+Mixture vector autoregressive models are a valuable tool in modeling multivariate time series in which the data generating dynamics vary in time. We described the \proglang{R} package \pkg{gmvarkit}, which accommodates the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021} - an appealing family of mixture vector autoregressive models that call the GSMVAR models. We discussed several features provided by \pkg{gmvarkit} for GSMVAR modeling: unconstrained and constrained maximum likelihood estimation of the model parameters, hypothesis testing, quantile residual based model diagnostics, estimation of generalized impulse response function and generalized forecast error variance decomposition, simulation, forecasting, and more. For convenience, we have collected some useful functions in \pkg{gmvarkit} to Table~\ref{tab:functions}. For all the exported functions and their usage, see the reference manual.
+
+
+\section*{Computational details}
+\addcontentsline{toc}{section}{Computational details}
+
+The results in this paper were obtained using MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system. Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
+
+
+\cleardoublepage
+\section*{A table of some useful functions}\label{sec:table}
+\addcontentsline{toc}{section}{A table of some useful functions}
+
+\begin{table}[!h]
+\begin{adjustwidth}{-1cm}{} % Shifts the table to the left
+\small
 \centering
-\begin{tabular}{llp{6.4cm}}
+\begin{tabular}{llp{8.0cm}}
 \hline
 Related to     & Name                      & Description \\ \hline
 Estimation     & \code{fitGSMVAR}          & Estimate a GSMVAR model.\\
@@ -1093,14 +1194,8 @@ Other          & \code{add_data}           & Add data to a GSMVAR model \\
 \end{tabular}
 \caption{Some useful functions in \pkg{gmvarkit} sorted according to their usage. The note "method" in parentheses after the name of a function signifies that it is an S3 method for a class \code{gsmvar} object (often generated by the function \code{fitGSMVAR} or \code{GSMVAR}).}
 \label{tab:functions}
+\end{adjustwidth}
 \end{table}
-
-\section{Summary}\label{sec:summary}
-Mixture vector autoregressive models are a valuable tool in modeling multivariate time series in which the data generating dynamics vary in time. We described the \proglang{R} package \pkg{gmvarkit}, which accommodates the GMVAR model \citep{Kalliovirta+Meitz+Saikkonen:2016}, the StMVAR model \citep{Virolainen2:2021}, and the G-StMVAR model \citep{Virolainen2:2021} - an appealing family of mixture vector autoregressive models that call the GSMVAR models. We discussed several features provided by \pkg{gmvarkit} for GSMVAR modeling: unconstrained and constrained maximum likelihood estimation of the model parameters, hypothesis testing, quantile residual based model diagnostics, estimation of generalized impulse response function and generalized forecast error variance decomposition, simulation, forecasting, and more. For convenience, we have collected some useful functions in \pkg{gmvarkit} to Table~\ref{tab:functions}. For all the exported functions and their usage, see the reference manual.
-
-
-\section*{Computational details}
-The results in this paper were obtained using MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system. Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
 
 \pagebreak
 \bibliography{refs}
@@ -1108,7 +1203,9 @@ The results in this paper were obtained using MacBook Pro 14", 2021, with Apple 
 \newpage
 
 \begin{appendix}
-\section{Properties of multivariate Gaussian and Student's $t$ distribution}\label{ap:propt}
+\section{Properties of multivariate Gaussian and Student's t distribution}\label{ap:propt}
+\addcontentsline{toc}{section}{Appendix A: Properties of multivariate Gaussian and Student's t distribution}
+
 Denote a $d$-dimensional real valued vector by $y$.  It is well known that the density function of a $d$-dimensional Gaussian distribution with mean $\mu$ and covariance matrix $\Sigma$ is
 \begin{equation}
 n_d(y;\mu,\Sigma) = (2\pi)^{-d/2}\text{det}(\Sigma)^{-1/2}\exp\left\lbrace -\frac{1}{2}(y -\mu)'\Sigma^{-1}(y - \mu) \right\rbrace .
@@ -1159,8 +1256,9 @@ t_d(x;\mu,\Sigma,\nu) &= t_{d_1}(x_1;\mu_{1|2}(x_2),\Sigma_{1|2}(x_2),\nu+d_2)t_
 \end{align}
 
 
-
 \section{Quantile residuals of the G-StMVAR model}\label{ap:qresexpr}
+\addcontentsline{toc}{section}{Appendix B: Quantile residuals of the G-StMVAR model}
+
 The conditional density function of the $d$-dimensional G-StMVAR process $y_t$ conditional on  $\mathcal{F}_{t-1}$ is
 \begin{equation}\label{eq:gstmvarconddens}
 f_{t-1}(y_t;\boldsymbol{\theta})=\sum_{m=1}^{M_1}\alpha_{m,t}n_d(y_t;\mu_{m,t},\Omega_{m}) + \sum_{m=M_1+1}^{M}\alpha_{m,t}t_d(y_t;\mu_{m,t},\Omega_{m,t},\nu_m + dp),
@@ -1194,11 +1292,11 @@ t_j(y_{t}^{(j)};\mu_{m,t}^{(j)},\Omega_{m,t}^{(j)},\nu_m + dp) =& t_1(y_{j,t};\m
 where $\mu_{m,t,j|j-1}$ and $\Omega_{m,t,j|j-1}$ are the conditional mean and covariance matrix of $y_{j,t}$ conditional on $\sigma(\mathcal{A}_{j-1},\mathcal{F}_{t-1})$.
 
 By denoting
-\begin{equation}\label{eq:beta_mtj_t}
+\begin{equation}\label{eq:beta_mtj_t1}
 \beta_{m,t,j} \equiv \frac{\alpha_{m,t}n_{j-1}(y_{t}^{(j-1)};\mu_{m,t}^{(j-1)},\Omega_{m}^{(j-1)})}{\sum_{n=1}^{M_1}\alpha_{n,t} n_{j-1}(y_{t}^{(j-1)};\mu_{n,t}^{(j-1)},\Omega_{n}^{(j-1)}) +\sum_{n=M_1+1}^{M}\alpha_{n,t} t_{j-1}(y_{t}^{(j-1)};\mu_{n,t}^{(j-1)},\Omega_{n,t}^{(j-1)},\nu_n + dp)}
 \end{equation}
 for $m=1,..,M_1$,  $j=2,...,d$,  and
-\begin{equation}\label{eq:beta_mtj_t}
+\begin{equation}\label{eq:beta_mtj_t2}
 \beta_{m,t,j} \equiv \frac{\alpha_{m,t}t_{j-1}(y_{t}^{(j-1)};\mu_{m,t}^{(j-1)},\Omega_{m,t}^{(j-1)},\nu_m + dp)}{\sum_{n=1}^{M_1}\alpha_{n,t} n_{j-1}(y_{t}^{(j-1)};\mu_{n,t}^{(j-1)},\Omega_{n}^{(j-1)}) +\sum_{n=M_1+1}^{M}\alpha_{n,t} t_{j-1}(y_{t}^{(j-1)};\mu_{n,t}^{(j-1)},\Omega_{n,t}^{(j-1)},\nu_n + dp)}
 \end{equation}
 for $m=M_1+1,...,M$,  $j=2,...,d$, and using the expressions (\ref{eq:n1_nj-1}) and (\ref{eq:t1_tj-1}),  we can express the conditional density function (\ref{eq:conddens_gstmvar}) as
@@ -1260,7 +1358,7 @@ f_{j-1,t-1}(y_{j,t}\boldsymbol{\theta}) =& \sum_{m=1}^{M_1}\beta_{m,t,j}n_1(y_{j
 &+ \sum_{m=M_1 + 1}^{M}\beta_{m,t,j}t_1(y_{j,t};\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)
 \end{aligned}
 \end{align}
-for all $j=1,...,d$ by defining $\beta_{m,t,1}\equiv \alpha_{m,t}$,  $\mu_{m,t,1|0}\equiv \mu_{m,t}^{(1)}$,  $\Omega_{m,1|0}\equiv \Omega_{m}^{(1)}$, and $\Omega_{m,t,1|0}\equiv \Omega_{m,t}^{(1)}$.  For $j=2,...,d$,  these quantities are defined in (\ref{eq:beta_mtj_t}), (\ref{eq:cond_mu_mtj_n}), (\ref{eq:cond_omega_mj_n}), (\ref{eq:cond_mu_mtj}), and (\ref{eq:cond_omega_mtj}). Then,
+for all $j=1,...,d$ by defining $\beta_{m,t,1}\equiv \alpha_{m,t}$,  $\mu_{m,t,1|0}\equiv \mu_{m,t}^{(1)}$,  $\Omega_{m,1|0}\equiv \Omega_{m}^{(1)}$, and $\Omega_{m,t,1|0}\equiv \Omega_{m,t}^{(1)}$.  For $j=2,...,d$,  these quantities are defined in (\ref{eq:beta_mtj_t1}), (\ref{eq:beta_mtj_t2}), (\ref{eq:cond_mu_mtj_n}), (\ref{eq:cond_omega_mj_n}), (\ref{eq:cond_mu_mtj}), and (\ref{eq:cond_omega_mtj}). Then,
 \begin{align}
 \begin{aligned}
 F_{j-1,t-1}(y_{j,t};\boldsymbol{\theta})=&\sum_{m=1}^{M_1}\beta_{m,t,j}\int_{-\infty}^{y_{j,t}}n_1(u;\mu_{m,t,j|j-1},\Omega_{m,j|j-1})du \\
@@ -1315,7 +1413,9 @@ whenever $\left|-\frac{\tilde{y}_{m,t,j}^2}{a_{m,t,j}}\right|<1$.  That is,  the
 If this condition does not hold, the quantile residual are obtained by numerically integrating the conditional density function $t_1(u;\mu_{m,t,j|j-1},\Omega_{m,t,j|j-1},\nu_m + dp + j - 1)$. For the hypergeometric function, \pkg{gmvarkit} uses the package \pkg{gsl} \citep{gsl}.
 
 
-\section{Monte Carlo algorithm}\label{sec:montecarlo}
+\section{Monte Carlo algorithm for estimating the GIRF}\label{sec:montecarlo}
+\addcontentsline{toc}{section}{Appendix C: Monte Carlo algorithm for estimating the GIRF}
+
 We present a Monte Carlo algorithm that produces point estimates and with random initial value $\boldsymbol{y}_{t-1}=(y_{t-1},...,y_{t-p})$ confidence intervals for the generalized impulse response function defined in (\ref{eq:girf}). Our algorithm is adapted from \citet[pp. 135-136]{Koop+Pesaran+Potter:1996} and \citet[pp. 601-602]{Kilian+Lutkepohl:2017}. We assume that the history $\boldsymbol{y}_{t-1}$ follows a known distribution $G$, which may be such that it produces a single outcome with probability one (corresponding to a fixed $\boldsymbol{y}_{t-1}$), or it can be the stationary distribution of the process or of a specific regime. In the following, $y_{t+h}^{(i)}(\delta_j,\boldsymbol{y}_{t-1})$ denotes a realization of the process at time $t+h$ conditional on the structural shock of magnitude $\delta_j$ in the $j$th element of $e_t$ hitting the system at time $t$ and on the $p$ observations $\boldsymbol{y}_{t-1}=(y_{t-1},...,y_{t-p})$ preceding the time $t$, whereas $y_{t+h}^{(i)}(\boldsymbol{y}_{t-1})$ denotes an alternative realization conditional on the history $\boldsymbol{y}_{t-1}$ only.
 
 The algorithm proceeds with the following steps.

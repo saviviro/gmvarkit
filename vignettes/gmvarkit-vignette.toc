@@ -1,0 +1,36 @@
+\contentsline {section}{Introduction}{1}{section.1}%
+\contentsline {section}{Models}{2}{section.2}%
+\contentsline {subsection}{Linear Gaussian and Student's t vector autoregressions}{2}{subsection.2.1}%
+\contentsline {subsection}{The Gaussian and Student's t mixture vector autoregressive model}{4}{subsection.2.2}%
+\contentsline {subsection}{Structural G-StMVAR model}{6}{subsection.2.3}%
+\contentsline {subsection}{Identification of the structural shocks}{7}{subsection.2.4}%
+\contentsline {section}{Estimation}{8}{section.3}%
+\contentsline {subsection}{Log-likelihood function}{8}{subsection.3.1}%
+\contentsline {subsection}{Two-phase estimation procedure}{9}{subsection.3.2}%
+\contentsline {subsection}{Examples of unconstrained estimation}{9}{subsection.3.3}%
+\contentsline {subsection}{Further examination of the estimates}{15}{subsection.3.4}%
+\contentsline {subsection}{Estimation of the structural GSMVAR model}{19}{subsection.3.5}%
+\contentsline {subsubsection}{Building structural model based on a reduced form model}{19}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{Estimating overidentified structural GSMVAR models}{20}{subsubsection.3.5.2}%
+\contentsline {subsection}{Constrained estimation}{21}{subsection.3.6}%
+\contentsline {subsubsection}{Linear constraints on the autoregressive parameters}{21}{subsubsection.3.6.1}%
+\contentsline {subsubsection}{Examples of linear constraints}{21}{subsubsection.3.6.2}%
+\contentsline {subsubsection}{Restricting AR matrices to be the same for all regimes}{22}{subsubsection.3.6.3}%
+\contentsline {subsubsection}{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}{22}{subsubsection.3.6.4}%
+\contentsline {subsubsection}{Constraining the unconditional means of some regimes to be the same}{23}{subsubsection.3.6.5}%
+\contentsline {subsubsection}{Constraining the mixing weight parameters alphas to fixed values}{24}{subsubsection.3.6.6}%
+\contentsline {subsection}{Testing parameter constraints}{24}{subsection.3.7}%
+\contentsline {section}{Quantile residual based model diagnostics}{25}{section.4}%
+\contentsline {section}{Impulse response analysis}{27}{section.5}%
+\contentsline {subsection}{Generalized impulse response function}{27}{subsection.5.1}%
+\contentsline {subsection}{Generalized forecast error variance decomposition}{28}{subsection.5.2}%
+\contentsline {subsection}{Linear impulse response functions}{29}{subsection.5.3}%
+\contentsline {section}{Simulation and forecasting}{30}{section.7}%
+\contentsline {subsection}{Simulation}{30}{subsection.7.1}%
+\contentsline {subsection}{Simulation based forecasting}{30}{subsection.7.2}%
+\contentsline {section}{Summary}{31}{section.8}%
+\contentsline {section}{Computational details}{32}{section.8}%
+\contentsline {section}{A table of some useful functions}{33}{section.8}%
+\contentsline {section}{Appendix A: Properties of multivariate Gaussian and Student's t distribution}{36}{appendix.A}%
+\contentsline {section}{Appendix B: Quantile residuals of the G-StMVAR model}{37}{appendix.B}%
+\contentsline {section}{Appendix C: Monte Carlo algorithm for estimating the GIRF}{40}{appendix.C}%

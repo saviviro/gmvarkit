@@ -184,8 +184,8 @@ Smith R, Dike B, Stegmann S (1995).
 
 \bibitem[{Solymos and Zawadzki(2020)}]{Solymos+Zawadzki:2020}
 Solymos P, Zawadzki Z (2020).
-\newblock \emph{\pkg{pbapply}: Adding Progress Bar to '*apply' Functions}.
-\newblock \proglang{R} package version 1.4-3,
+\newblock \emph{pbapply: Adding Progress Bar to '*apply' Functions}.
+\newblock R package version 1.4-3,
   \urlprefix\url{https://CRAN.R-project.org/package=pbapply}.
 
 \bibitem[{Virolainen(2018)}]{uGMAR}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  6 MAR 2024 14:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  4 DEC 2024 14:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -272,7 +272,26 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 Package hyperref Info: Option `colorlinks' set `true' on input line 447.
 Package hyperref Info: Option `linktocpage' set `true' on input line 447.
 Package hyperref Info: Option `plainpages' set `false' on input line 447.
-) (/usr/local/texlive/2021/texmf-dist/tex/generic/thumbpdf/thumbpdf.sty
+) (/usr/local/texlive/2021/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(/usr/local/texlive/2021/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+)
+\Gm@cnth=\count271
+\Gm@cntv=\count272
+\c@Gm@tempcnt=\count273
+\Gm@bindingoffset=\dimen145
+\Gm@wd@mp=\dimen146
+\Gm@odd@mp=\dimen147
+\Gm@even@mp=\dimen148
+\Gm@layoutwidth=\dimen149
+\Gm@layoutheight=\dimen150
+\Gm@layouthoffset=\dimen151
+\Gm@layoutvoffset=\dimen152
+\Gm@dimlist=\toks17
+)
+(/usr/local/texlive/2021/texmf-dist/tex/generic/thumbpdf/thumbpdf.sty
 Package: thumbpdf 2018/09/07 v3.17 Inclusion of thumbnails (HO)
 THUMBPDF: Compressed PDF objects of PDF 1.5 are not supported
 )
@@ -286,51 +305,51 @@ Package: amstext 2021/08/26 v2.01 AMS text
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks17
-\ex@=\dimen145
+\@emptytoks=\toks18
+\ex@=\dimen153
 ))
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen146
+\pmbraise@=\dimen154
 )
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2021/08/26 v2.02 operator names
 )
-\inf@bad=\count271
+\inf@bad=\count274
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count272
-\leftroot@=\count273
+\uproot@=\count275
+\leftroot@=\count276
 LaTeX Info: Redefining \overline on input line 399.
-\classnum@=\count274
-\DOTSCASE@=\count275
+\classnum@=\count277
+\DOTSCASE@=\count278
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
 \Mathstrutbox@=\box51
 \strutbox@=\box52
-\big@size=\dimen147
+\big@size=\dimen155
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count276
-\c@MaxMatrixCols=\count277
+\macc@depth=\count279
+\c@MaxMatrixCols=\count280
 \dotsspace@=\muskip17
-\c@parentequation=\count278
-\dspbrk@lvl=\count279
-\tag@help=\toks18
-\row@=\count280
-\column@=\count281
-\maxfields@=\count282
-\andhelp@=\toks19
-\eqnshift@=\dimen148
-\alignsep@=\dimen149
-\tagshift@=\dimen150
-\tagwidth@=\dimen151
-\totwidth@=\dimen152
-\lineht@=\dimen153
-\@envbody=\toks20
+\c@parentequation=\count281
+\dspbrk@lvl=\count282
+\tag@help=\toks19
+\row@=\count283
+\column@=\count284
+\maxfields@=\count285
+\andhelp@=\toks20
+\eqnshift@=\dimen156
+\alignsep@=\dimen157
+\tagshift@=\dimen158
+\tagwidth@=\dimen159
+\totwidth@=\dimen160
+\lineht@=\dimen161
+\@envbody=\toks21
 \multlinegap=\skip60
 \multlinetaggap=\skip61
-\mathdisplay@stack=\toks21
+\mathdisplay@stack=\toks22
 LaTeX Info: Redefining \[ on input line 2938.
 LaTeX Info: Redefining \] on input line 2939.
 )
@@ -350,15 +369,15 @@ Package: mathtools 2021/04/12 v1.27 mathematical typesetting tools
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count283
-\calc@Bcount=\count284
-\calc@Adimen=\dimen154
-\calc@Bdimen=\dimen155
+\calc@Acount=\count286
+\calc@Bcount=\count287
+\calc@Adimen=\dimen162
+\calc@Bdimen=\dimen163
 \calc@Askip=\skip62
 \calc@Bskip=\skip63
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count285
+\calc@Ccount=\count288
 \calc@Cskip=\skip64
 )
 (/usr/local/texlive/2021/texmf-dist/tex/latex/mathtools/mhsetup.sty
@@ -368,21 +387,26 @@ LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 130.
-\g_MT_multlinerow_int=\count286
-\l_MT_multwidth_dim=\dimen156
+\g_MT_multlinerow_int=\count289
+\l_MT_multwidth_dim=\dimen164
 \origjot=\skip65
-\l_MT_shortvdotswithinadjustabove_dim=\dimen157
-\l_MT_shortvdotswithinadjustbelow_dim=\dimen158
-\l_MT_above_intertext_sep=\dimen159
-\l_MT_below_intertext_sep=\dimen160
-\l_MT_above_shortintertext_sep=\dimen161
-\l_MT_below_shortintertext_sep=\dimen162
+\l_MT_shortvdotswithinadjustabove_dim=\dimen165
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen166
+\l_MT_above_intertext_sep=\dimen167
+\l_MT_below_intertext_sep=\dimen168
+\l_MT_above_shortintertext_sep=\dimen169
+\l_MT_below_shortintertext_sep=\dimen170
 \xmathstrut@box=\box53
-\xmathstrut@dim=\dimen163
+\xmathstrut@dim=\dimen171
 )
-\c@condition=\count287
-\c@proposition=\count288
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 71
+(/usr/local/texlive/2021/texmf-dist/tex/latex/changepage/changepage.sty
+Package: changepage 2009/10/20 v1.0c check page and change page layout
+\c@cp@cntr=\count290
+\cp@tempcnt=\count291
+)
+\c@condition=\count292
+\c@proposition=\count293
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 85
 .
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/t1lmr.fd
@@ -390,47 +414,44 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 (/usr/local/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2021-12-14 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count289
+\l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box54
 )
-(./gmvarkit-vignette.aux
-
-LaTeX Warning: Label `eq:beta_mtj_t' multiply defined.
-
-)
+(./gmvarkit-vignette.aux)
 \openout1 = `gmvarkit-vignette.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
- (/usr/local/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 85.
+LaTeX Font Info:    ... okay on input line 85.
+
+(/usr/local/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count290
-\scratchdimen=\dimen164
+\scratchcounter=\count295
+\scratchdimen=\dimen172
 \scratchbox=\box55
-\nofMPsegments=\count291
-\nofMParguments=\count292
-\everyMPshowfont=\toks22
-\MPscratchCnt=\count293
-\MPscratchDim=\dimen165
-\MPnumerator=\count294
-\makeMPintoPDFobject=\count295
-\everyMPtoPDFconversion=\toks23
+\nofMPsegments=\count296
+\nofMParguments=\count297
+\everyMPshowfont=\toks23
+\MPscratchCnt=\count298
+\MPscratchDim=\dimen173
+\MPnumerator=\count299
+\makeMPintoPDFobject=\count300
+\everyMPtoPDFconversion=\toks24
 ) (/usr/local/texlive/2021/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -440,7 +461,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring ON on input line 71.
+Package hyperref Info: Link coloring ON on input line 85.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
@@ -452,94 +473,144 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count296
+\c@section@level=\count301
 )
-LaTeX Info: Redefining \ref on input line 71.
-LaTeX Info: Redefining \pageref on input line 71.
-LaTeX Info: Redefining \nameref on input line 71.
+LaTeX Info: Redefining \ref on input line 85.
+LaTeX Info: Redefining \pageref on input line 85.
+LaTeX Info: Redefining \nameref on input line 85.
  (./gmvarkit-vignette.out) (./gmvarkit-vignette.out)
 \@outlinefile=\write4
 \openout4 = `gmvarkit-vignette.out'.
 
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 7
-1.
+LaTeX Font Info:    Trying to load font information for T1+lmss on input line 8
+5.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
-1.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 8
+5.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
-1.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 8
+5.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-71.
+85.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-71.
+85.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 71.
+(Font)              <10.95> on input line 85.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 71.
+(Font)              <8> on input line 85.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 71.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 71.
+(Font)              <6> on input line 85.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 85.
 
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 71.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 85.
 
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 71.
+(Font)              <10> on input line 85.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 71.
+(Font)              <7> on input line 85.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 71.
+(Font)              <5> on input line 85.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(72.26999pt, 452.9679pt, 72.26999pt)
+* v-part:(T,H,B)=(72.26999pt, 700.50687pt, 72.26999pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=452.9679pt
+* \textheight=700.50687pt
+* \oddsidemargin=0.0pt
+* \evensidemargin=0.0pt
+* \topmargin=-37.0pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=54.2025pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [1
 
 {/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 8
-6.
+(./gmvarkit-vignette.tocpdfTeX warning (ext4): destination with the same identi
+fier (name{page.}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.36 ...m for estimating the GIRF}{40}{appendix.C}
+                                                  % [2])
+\tf@toc=\write5
+\openout5 = `gmvarkit-vignette.toc'.
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.}) has b
+een already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.93 \pagenumbering
+                   {arabic} [3]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
+10.
 
 (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+Underfull \vbox (badness 4556) has occurred while \output is active []
+
+
+Overfull \hbox (5.47499pt too wide) has occurred while \output is active
+[] \T1/lmr/m/n/10.95 1
+ []
+
+[1]
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 2 []
  []
 
 [2]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 95.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 95.
-
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 95.
-
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 3
  []
@@ -550,26 +621,14 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [4]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 177.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 177.
-
-
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 5
  []
 
 [5]
-Overfull \hbox (3.31956pt too wide) in paragraph at lines 214--216
-\T1/lmr/m/n/10.95 where $\OML/lmm/m/it/10.95 [] \OMS/lmsy/m/n/10.95 2 \OT1/lmr
-/m/n/10.95 (0\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 1)$\T1/lmr/m/n/10.95 , $\
-OML/lmm/m/it/10.95 m \OT1/lmr/m/n/10.95 = 1\OML/lmm/m/it/10.95 ; :::; M$\T1/lmr
-/m/n/10.95 , are mix-ing weights pa-ram-e-ters as-sumed to sat-isfy $[][] \OML/
-lmm/m/it/10.95 [] \OT1/lmr/m/n/10.95 =
+Overfull \hbox (6.2654pt too wide) detected at line 277
+[][][]\OML/lmm/m/it/10.95 u[] \OMS/lmsy/m/n/10.95 ^^Q \OML/lmm/m/it/10.95 B[]e[
+] \OT1/lmr/m/n/10.95 = []
  []
 
 
@@ -578,13 +637,14 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [6]
-Overfull \hbox (16.57954pt too wide) detected at line 243
-[][][]\OML/lmm/m/it/10.95 u[] \OMS/lmsy/m/n/10.95 ^^Q \OML/lmm/m/it/10.95 B[]e[
-] \OT1/lmr/m/n/10.95 = []
+Overfull \hbox (24.38496pt too wide) in paragraph at lines 308--309
+[]\T1/lmr/m/it/10.95 Suppose $\OT1/lmr/m/n/10.95 
+[] = \OML/lmm/m/it/10.95 W\OT1/lmr/m/n/10.95 ^^C[]\OML/lmm/m/it/10.95 W[]$\T1/l
+mr/m/it/10.95 , $\OML/lmm/m/it/10.95 m \OT1/lmr/m/n/10.95 = 1\OML/lmm/m/it/10.9
+5 ; :::; M$\T1/lmr/m/it/10.95 , where the di-ag-o-nal of $\OT1/lmr/m/n/10.95 ^^
+C = [](\OML/lmm/m/it/10.95 ^^U[]; :::; ^^U[]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/it/1
+0.95 ,
  []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
@@ -597,29 +657,24 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [8]
-Overfull \hbox (34.69911pt too wide) in paragraph at lines 272--273
-[]\T1/lmr/m/it/10.95 Suppose $\OT1/lmr/m/n/10.95 
-[] = \OML/lmm/m/it/10.95 W\OT1/lmr/m/n/10.95 ^^C[]\OML/lmm/m/it/10.95 W[]$\T1/l
-mr/m/it/10.95 , $\OML/lmm/m/it/10.95 m \OT1/lmr/m/n/10.95 = 1\OML/lmm/m/it/10.9
-5 ; :::; M$\T1/lmr/m/it/10.95 , where the di-ag-o-nal of $\OT1/lmr/m/n/10.95 ^^
-C = [](\OML/lmm/m/it/10.95 ^^U[]; :::; ^^U[]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/it/1
-0.95 ,
- []
-
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 360.
 
 Overfull \hbox (5.47499pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 9
  []
 
 [9]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 321.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 10 []
  []
 
 [10]
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
+412.
+ (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/ts1lmtt.fd
+File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 11
  []
@@ -630,11 +685,6 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [12]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-369.
- (/usr/local/texlive/2021/texmf-dist/tex/latex/lm/ts1lmtt.fd
-File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 13
  []
@@ -645,6 +695,17 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [14]
+<figures/seriesplot.png, id=630, 803.0pt x 451.6875pt>
+File: figures/seriesplot.png Graphic file (type png)
+<use figures/seriesplot.png>
+Package pdftex.def Info: figures/seriesplot.png  used on input line 594.
+(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
+<figures/densityplot.png, id=633, 803.0pt x 451.6875pt>
+File: figures/densityplot.png Graphic file (type png)
+<use figures/densityplot.png>
+Package pdftex.def Info: figures/densityplot.png  used on input line 611.
+(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 15
  []
@@ -654,55 +715,81 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 16 []
  []
 
-[16]
-<figures/seriesplot.png, id=474, 803.0pt x 451.6875pt>
-File: figures/seriesplot.png Graphic file (type png)
-<use figures/seriesplot.png>
-Package pdftex.def Info: figures/seriesplot.png  used on input line 549.
-(pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
+[16 <./figures/seriesplot.png> <./figures/densityplot.png>]
+<figures/proflogliks.png, id=648, 803.0pt x 401.5pt>
+File: figures/proflogliks.png Graphic file (type png)
+<use figures/proflogliks.png>
+Package pdftex.def Info: figures/proflogliks.png  used on input line 673.
+(pdftex.def)             Requested size: 362.37569pt x 181.19406pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 17
  []
 
 [17]
-<figures/densityplot.png, id=481, 803.0pt x 451.6875pt>
-File: figures/densityplot.png Graphic file (type png)
-<use figures/densityplot.png>
-Package pdftex.def Info: figures/densityplot.png  used on input line 566.
-(pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 18 []
  []
 
-[18]
+[18 <./figures/proflogliks.png>]
+Overfull \hbox (3.07883pt too wide) in paragraph at lines 695--696
+[]\T1/lmr/m/n/10.95 If \T1/lmtt/m/n/10.95 C_lambda \T1/lmr/m/n/10.95 is spec-i-
+fied, it should be a $\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 d\OT1/lmr/m/n/10.
+95 (\OML/lmm/m/it/10.95 M \OMS/lmsy/m/n/10.95 ^^@ \OT1/lmr/m/n/10.95 1) \OMS/lm
+sy/m/n/10.95 ^^B \OML/lmm/m/it/10.95 r\OT1/lmr/m/n/10.95 )$ \T1/lmr/m/n/10.95 c
+on-straint ma-trix that sat-is-fies ($\OML/lmm/m/it/10.95 ^^U[]; :::; ^^U[]\OT1
+/lmr/m/n/10.95 ) =
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 19
  []
 
-[19 <./figures/seriesplot.png> <./figures/densityplot.png>]
-<figures/proflogliks.png, id=497, 803.0pt x 401.5pt>
-File: figures/proflogliks.png Graphic file (type png)
-<use figures/proflogliks.png>
-Package pdftex.def Info: figures/proflogliks.png  used on input line 628.
-(pdftex.def)             Requested size: 354.12434pt x 177.06488pt.
-
+[19]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 20 []
  []
 
 [20]
+Overfull \hbox (19.29904pt too wide) in paragraph at lines 759--760
+\T1/lmr/m/n/10.95 mod-els. If it sup-plied with a re-duced form model, it will 
+first ap-ply the func-tion \T1/lmtt/m/n/10.95 gsmvar_to_sgsmvar\T1/lmr/m/n/10.9
+5 ,
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 21
  []
 
-[21 <./figures/proflogliks.png>]
+[21]
+Overfull \hbox (4.86122pt too wide) in paragraph at lines 820--821
+\T1/lmr/m/n/10.95 The com-mand \T1/lmtt/m/n/10.95 fitGSMVAR(gdpdef, p=1, M=2, m
+odel="GMVAR", constraints=C1) \T1/lmr/m/n/10.95 would then
+ []
+
+
+Overfull \hbox (10.14369pt too wide) in paragraph at lines 825--826
+\T1/lmr/m/n/10.95 con-strained pa-ram-e-ters $\OT1/lmr/m/n/10.95 ([][]\OML/lmm/
+m/it/10.95 ; :::; [][]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/n/10.95 , where the re-str
+ic-tions im-ply $[][] \OT1/lmr/m/n/10.95 = [] = (\OML/lmm/m/it/10.95 vec\OT1/lm
+r/m/n/10.95 (\OML/lmm/m/it/10.95 A[]\OT1/lmr/m/n/10.95 )\OML/lmm/m/it/10.95 ; :
+::; vec\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 A[]\OT1/lmr/m/n/10.95 ))$
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 22 []
  []
 
 [22]
+Overfull \hbox (4.86122pt too wide) in paragraph at lines 887--888
+\T1/lmr/m/n/10.95 The com-mand \T1/lmtt/m/n/10.95 fitGSMVAR(gdpdef, p=2, M=2, m
+odel="GMVAR", constraints=C2) \T1/lmr/m/n/10.95 would then
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 23
  []
@@ -743,63 +830,45 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [30]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
+<figures/predplot.png, id=796, 803.0pt x 451.6875pt>
+File: figures/predplot.png Graphic file (type png)
+<use figures/predplot.png>
+Package pdftex.def Info: figures/predplot.png  used on input line 1137.
+(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 31
  []
 
-[31]
+[31 <./figures/predplot.png>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 32 []
  []
 
 [32]
+Overfull \hbox (15.20087pt too wide) in paragraph at lines 1163--1192
+ [] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 33
  []
 
-[33]
+[33
+
+] (./gmvarkit-vignette.bbl
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 44.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 34 []
  []
 
-[34]
-<figures/predplot.png, id=664, 803.0pt x 451.6875pt>
-File: figures/predplot.png Graphic file (type png)
-<use figures/predplot.png>
-Package pdftex.def Info: figures/predplot.png  used on input line 1054.
-(pdftex.def)             Requested size: 354.12434pt x 199.19798pt.
-
-Underfull \hbox (badness 1331) in paragraph at lines 1072--1073
-[]\T1/lmr/m/n/10.95 Calculate nu-mer-i-cally ap-prox-i-mated
- []
-
-
-Underfull \hbox (badness 3449) in paragraph at lines 1073--1074
-\T1/lmr/m/n/10.95 ap-prox-i-mated Hes-sian of the log-
- []
-
-
-Underfull \hbox (badness 2173) in paragraph at lines 1085--1086
-[]\T1/lmr/m/n/10.95 Estimate gen-er-al-ized fore-cast er-ror
- []
-
-
-Underfull \hbox (badness 1527) in paragraph at lines 1088--1089
-[]\T1/lmr/m/n/10.95 Swap be-tween mean and in-ter-cept
- []
-
-
-Overfull \hbox (30.57797pt too wide) in paragraph at lines 1062--1091
- [][] 
- []
-
-
-LaTeX Warning: Float too large for page by 93.1917pt on input line 1093.
-
-
+[34])
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 35
  []
@@ -810,140 +879,84 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [36]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Overfull \hbox (6.07622pt too wide) detected at line 1294
+[][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
+ []
+
+
+Overfull \hbox (6.07622pt too wide) detected at line 1298
+[][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
+ []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 37
  []
 
-[37 <./figures/predplot.png>] (./gmvarkit-vignette.bbl
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 44.
-
+[37]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 38 []
  []
 
 [38]
-
-LaTeX Font Warning: Font shape `T1/lmr/b/it' in size <10.95> not available
-(Font)              Font shape `T1/lmr/b/sl' tried instead on input line 187.
-
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 39
  []
 
-[39])
+[39]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 40 []
  []
 
 [40]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1108.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 1108.
-
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 1108.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 41
  []
 
-[41]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 42 []
- []
-
-[42]
-Overfull \hbox (16.39037pt too wide) detected at line 1196
-[][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
- []
-
-
-Overfull \hbox (16.39037pt too wide) detected at line 1200
-[][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
- []
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 43
- []
-
-[43]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 44 []
- []
-
-[44]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 45
- []
-
-[45]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 46 []
- []
-
-[46]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 47
- []
-
-[47] (./gmvarkit-vignette.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
+[41] (./gmvarkit-vignette.aux)
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
-(rerunfilecheck)             Checksum: 84188A6DD67D9D72BA80D4C3C16286CF;11177.
+(rerunfilecheck)             Checksum: 86BFC7D5E3B5EB08BCC189E87C0A2527;20395.
  ) 
 Here is how much of TeX's memory you used:
- 12488 strings out of 478353
- 197065 string characters out of 5848086
- 507068 words of memory out of 5000000
- 30127 multiletter control sequences out of 15000+600000
- 543478 words of font info for 116 fonts, out of 8000000 for 9000
+ 13054 strings out of 478353
+ 206368 string characters out of 5848086
+ 521791 words of memory out of 5000000
+ 30689 multiletter control sequences out of 15000+600000
+ 529785 words of font info for 105 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,25n,77p,1815b,504s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 75i,25n,77p,1832b,504s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/lo
 cal/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/20
 21/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local/texlive/2021/texmf-dist
 /fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2021/texmf-dist/fonts/enc
 /dvips/lm/lm-rm.enc}{/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-m
 athex.enc}</usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmb10.pfb><
-/usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmbo10.pfb></usr/local
-/texlive/2021/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2
-021/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2021/texmf-
-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2021/texmf-dist/fonts
-/type1/public/lm/lmmi10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/pub
-lic/lm/lmmi12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmm
-i6.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></us
-r/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/tex
-live/2021/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2021
-/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2021/texmf-dist
-/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1
-/public/lm/lmr8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/l
-mr9.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmri10.pfb></
-usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmri12.pfb></usr/local/
-texlive/2021/texmf-dist/fonts/type1/public/lm/lmro10.pfb></usr/local/texlive/20
-21/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/local/texlive/2021/texmf-d
-ist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2021/texmf-dist/font
-s/type1/public/lm/lmsso10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/p
-ublic/lm/lmsy10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/l
-msy6.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></
-usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/
-texlive/2021/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></usr/local/texlive/2
-021/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on gmvarkit-vignette.pdf (47 pages, 874932 bytes).
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local
+/texlive/2021/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2
+021/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2021/texmf-
+dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2021/texmf-dist/fonts
+/type1/public/lm/lmmi6.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/publ
+ic/lm/lmmi8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmmi9
+.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></us
+r/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/tex
+live/2021/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2021/te
+xmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2021/texmf-dist/fon
+ts/type1/public/lm/lmr9.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/pub
+lic/lm/lmri10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmr
+i12.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmro10.pfb></
+usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmss10.pfb></usr/local/
+texlive/2021/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/
+2021/texmf-dist/fonts/type1/public/lm/lmsso10.pfb></usr/local/texlive/2021/texm
+f-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2021/texmf-dist/fon
+ts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/pu
+blic/lm/lmsy8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmt
+t10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtto10.pfb><
+/usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.p
+fb>
+Output written on gmvarkit-vignette.pdf (44 pages, 848639 bytes).
 PDF statistics:
- 1061 PDF objects out of 1200 (max. 8388607)
- 934 compressed objects within 10 object streams
- 259 named destinations out of 1000 (max. 500000)
- 301 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1173 PDF objects out of 1200 (max. 8388607)
+ 1052 compressed objects within 11 object streams
+ 254 named destinations out of 1000 (max. 500000)
+ 589 words of extra memory for PDF output out of 10000 (max. 10000000)
 
