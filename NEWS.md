@@ -242,3 +242,7 @@
 
 * Added table of contents to the vignette.
 * Fixed typos etc in the vignette.
+
+# gmvarkit 2.1.4
+
+
