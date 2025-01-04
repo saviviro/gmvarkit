@@ -630,8 +630,8 @@ warn_df <- function(gsmvar, p, M, params, model=c("GMVAR", "StMVAR", "G-StMVAR")
   if(model == "StMVAR" || model == "G-StMVAR") { # Check whether there is large df parameter value in some regime
     all_df <- pick_df(M=M, params=params, model=model)
     if(any(all_df > 100)) {
-      warning(paste0("The model contains overly large degrees of freedom parameters.",
-                     "Consider switching to the appropriate G-StMVAR model by setting",
+      warning(paste0("The model contains overly large degrees of freedom parameters. ",
+                     "Consider switching to the appropriate G-StMVAR model by setting ",
                      "the corresponding regimes to GMVAR type with the function 'stmvar_to_gstmvar'."))
     }
   }

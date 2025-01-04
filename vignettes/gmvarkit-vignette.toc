@@ -10,24 +10,24 @@
 \contentsline {subsection}{Examples of unconstrained estimation}{9}{subsection.3.3}%
 \contentsline {subsection}{Further examination of the estimates}{15}{subsection.3.4}%
 \contentsline {subsection}{Estimation of the structural GSMVAR model}{19}{subsection.3.5}%
-\contentsline {subsubsection}{Building structural model based on a reduced form model}{19}{subsubsection.3.5.1}%
-\contentsline {subsubsection}{Estimating overidentified structural GSMVAR models}{20}{subsubsection.3.5.2}%
+\contentsline {subsubsection}{Building structural model based on a reduced form model}{20}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{Estimating overidentified structural GSMVAR models}{21}{subsubsection.3.5.2}%
 \contentsline {subsection}{Constrained estimation}{21}{subsection.3.6}%
 \contentsline {subsubsection}{Linear constraints on the autoregressive parameters}{21}{subsubsection.3.6.1}%
-\contentsline {subsubsection}{Examples of linear constraints}{21}{subsubsection.3.6.2}%
+\contentsline {subsubsection}{Examples of linear constraints}{22}{subsubsection.3.6.2}%
 \contentsline {subsubsection}{Restricting AR matrices to be the same for all regimes}{22}{subsubsection.3.6.3}%
-\contentsline {subsubsection}{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}{22}{subsubsection.3.6.4}%
-\contentsline {subsubsection}{Constraining the unconditional means of some regimes to be the same}{23}{subsubsection.3.6.5}%
+\contentsline {subsubsection}{Restricting AR parameters to be the same for all regimes and constraining non-diagonal elements of coefficient matrices to be zero}{23}{subsubsection.3.6.4}%
+\contentsline {subsubsection}{Constraining the unconditional means of some regimes to be the same}{24}{subsubsection.3.6.5}%
 \contentsline {subsubsection}{Constraining the mixing weight parameters alphas to fixed values}{24}{subsubsection.3.6.6}%
-\contentsline {subsection}{Testing parameter constraints}{24}{subsection.3.7}%
-\contentsline {section}{Quantile residual based model diagnostics}{25}{section.4}%
+\contentsline {subsection}{Testing parameter constraints}{25}{subsection.3.7}%
+\contentsline {section}{Quantile residual based model diagnostics}{26}{section.4}%
 \contentsline {section}{Impulse response analysis}{27}{section.5}%
 \contentsline {subsection}{Generalized impulse response function}{27}{subsection.5.1}%
 \contentsline {subsection}{Generalized forecast error variance decomposition}{28}{subsection.5.2}%
 \contentsline {subsection}{Linear impulse response functions}{29}{subsection.5.3}%
 \contentsline {section}{Simulation and forecasting}{30}{section.7}%
 \contentsline {subsection}{Simulation}{30}{subsection.7.1}%
-\contentsline {subsection}{Simulation based forecasting}{30}{subsection.7.2}%
+\contentsline {subsection}{Simulation based forecasting}{31}{subsection.7.2}%
 \contentsline {section}{Summary}{31}{section.8}%
 \contentsline {section}{Computational details}{32}{section.8}%
 \contentsline {section}{A table of some useful functions}{33}{section.8}%

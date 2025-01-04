@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  4 JAN 2025 16:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  4 JAN 2025 17:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -695,16 +695,16 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [14]
-<figures/seriesplot.png, id=630, 803.0pt x 451.6875pt>
-File: figures/seriesplot.png Graphic file (type png)
-<use figures/seriesplot.png>
-Package pdftex.def Info: figures/seriesplot.png  used on input line 594.
-(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
-<figures/densityplot.png, id=633, 803.0pt x 451.6875pt>
-File: figures/densityplot.png Graphic file (type png)
-<use figures/densityplot.png>
-Package pdftex.def Info: figures/densityplot.png  used on input line 611.
-(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
+<figures/seriesplot.pdf, id=630, 484.81125pt x 403.5075pt>
+File: figures/seriesplot.pdf Graphic file (type pdf)
+<use figures/seriesplot.pdf>
+Package pdftex.def Info: figures/seriesplot.pdf  used on input line 594.
+(pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
+<figures/densityplot.pdf, id=632, 484.81125pt x 403.5075pt>
+File: figures/densityplot.pdf Graphic file (type pdf)
+<use figures/densityplot.pdf>
+Package pdftex.def Info: figures/densityplot.pdf  used on input line 611.
+(pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 15
@@ -715,23 +715,23 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 16 []
  []
 
-[16 <./figures/seriesplot.png> <./figures/densityplot.png>]
-<figures/proflogliks.png, id=648, 803.0pt x 401.5pt>
-File: figures/proflogliks.png Graphic file (type png)
-<use figures/proflogliks.png>
-Package pdftex.def Info: figures/proflogliks.png  used on input line 673.
-(pdftex.def)             Requested size: 362.37569pt x 181.19406pt.
-
+[16 <./figures/seriesplot.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 17
  []
 
-[17]
+[17 <./figures/densityplot.pdf>]
+<figures/proflogliks.pdf, id=661, 484.81125pt x 403.5075pt>
+File: figures/proflogliks.pdf Graphic file (type pdf)
+<use figures/proflogliks.pdf>
+Package pdftex.def Info: figures/proflogliks.pdf  used on input line 673.
+(pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 18 []
  []
 
-[18 <./figures/proflogliks.png>]
+[18 <./figures/proflogliks.pdf>]
 Overfull \hbox (3.07883pt too wide) in paragraph at lines 695--696
 []\T1/lmr/m/n/10.95 If \T1/lmtt/m/n/10.95 C_lambda \T1/lmr/m/n/10.95 is spec-i-
 fied, it should be a $\OT1/lmr/m/n/10.95 (\OML/lmm/m/it/10.95 d\OT1/lmr/m/n/10.
@@ -830,22 +830,25 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [30]
-<figures/predplot.png, id=796, 803.0pt x 451.6875pt>
-File: figures/predplot.png Graphic file (type png)
-<use figures/predplot.png>
-Package pdftex.def Info: figures/predplot.png  used on input line 1137.
-(pdftex.def)             Requested size: 362.37569pt x 203.84332pt.
+<figures/predplot.pdf, id=809, 484.81125pt x 403.5075pt>
+File: figures/predplot.pdf Graphic file (type pdf)
+<use figures/predplot.pdf>
+Package pdftex.def Info: figures/predplot.pdf  used on input line 1137.
+(pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
+
+Underfull \vbox (badness 1122) has occurred while \output is active []
+
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 31
  []
 
-[31 <./figures/predplot.png>]
+[31]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 32 []
  []
 
-[32]
+[32 <./figures/predplot.pdf>]
 Overfull \hbox (15.20087pt too wide) in paragraph at lines 1163--1192
  [] 
  []
@@ -918,8 +921,8 @@ Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
 (rerunfilecheck)             Checksum: 86BFC7D5E3B5EB08BCC189E87C0A2527;20395.
  ) 
 Here is how much of TeX's memory you used:
- 13054 strings out of 478353
- 206368 string characters out of 5848086
+ 13053 strings out of 478353
+ 206460 string characters out of 5848086
  521791 words of memory out of 5000000
  30689 multiletter control sequences out of 15000+600000
  529785 words of font info for 105 fonts, out of 8000000 for 9000
@@ -953,10 +956,10 @@ blic/lm/lmsy8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmt
 t10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtto10.pfb><
 /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.p
 fb>
-Output written on gmvarkit-vignette.pdf (44 pages, 848685 bytes).
+Output written on gmvarkit-vignette.pdf (44 pages, 719298 bytes).
 PDF statistics:
- 1172 PDF objects out of 1200 (max. 8388607)
- 1051 compressed objects within 11 object streams
+ 1194 PDF objects out of 1200 (max. 8388607)
+ 1073 compressed objects within 11 object streams
  254 named destinations out of 1000 (max. 500000)
  589 words of extra memory for PDF output out of 10000 (max. 10000000)
 

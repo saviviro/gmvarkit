@@ -373,7 +373,7 @@ The genetic algorithm in \pkg{gmvarkit} is, at core, mostly based on the descrip
 \subsection{Examples of unconstrained estimation}\label{sec:example_estim}
 \addcontentsline{toc}{subsection}{Examples of unconstrained estimation}
 
-In this section, we demonstrate how to estimate GSMVAR models with \pkg{gmvarkit} and provide several examples in order to illustrate various frequently occurring situations. In addition to the ordinary estimation, we particularly show how a GSMVAR model can be built based on a local-only maximum point when the ML estimate seems unreasonable. We also consider the estimation of the appropriate G-StMVAR model when the estimated StMVAR model contains overly large degrees of freedom estimates \citep[see the related discussion in][]{Virolainen2:2021}. In the examples, we only consider $p=1$ models for simplicity and because then the code outputs fit in the margins better, estimation times are shorter, etc. This order may not be best in the modeling perspective, however.
+In this section, we demonstrate how to estimate GSMVAR models with \pkg{gmvarkit} and provide several examples in order to illustrate various frequently occurring situations. In addition to the ordinary estimation, we particularly show how a GSMVAR model can be built based on a local-only maximum point when the ML estimate seems unreasonable. By default, \pkg{gmvarkit} filters inappropriate estimates automatically, but here we do not use this feature to demonstrate the issue of inappropriate local estimates. We also consider the estimation of the appropriate G-StMVAR model when the estimated StMVAR model contains overly large degrees of freedom estimates \citep[see the related discussion in][]{Virolainen2:2021}. In the examples, we only consider $p=1$ models for simplicity and because then the code outputs fit in the margins better, estimation times are shorter, etc. This order may not be best in the modeling perspective, however.
 
 In \pkg{gmvarkit}, the GSMVAR models are defined as class \code{gsmvar} S3 objects, which can be created with given parameter values using the constructor function \code{GSMVAR} (see Section~\ref{sec:GSMVAR}) or by using the estimation function \code{fitGSMVAR}, which estimates the parameters and then builds the model. For estimation, \code{fitGSMVAR} needs to be supplied with a multivariate time series and the arguments specifying the model. The necessary arguments for specifying the model include the autoregressive order \code{p}, the number of mixture components \code{M}, and \code{model}, which should be either \code{"GMVAR"}, \code{"StMVAR"}, or \code{"G-StMVAR"}. For GMVAR and StMVAR models, the argument \code{M} is a positive integer, whereas for the G-StMVAR model it is a length two numeric vector specifying the number of GMVAR type regimes in the first element and the number of StMVAR type regimes in the second.
 
@@ -383,25 +383,25 @@ Additional arguments may be supplied to \code{fitGSMVAR} in order to specify, fo
 
 We illustrate the use of \pkg{gmvarkit} with a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. The following code fits a StMVAR($p=1,M=2$) model to this series (\code{gdpdef}) using the conditional log-likelihood function and performing $16$ estimation rounds with $8$ CPU cores. \textbf{In practice, hundreds or even thousands of estimation rounds is often required to obtain reliable results. The larger the dimension of the series is and the larger the order of the model is, the more estimation rounds is required.} We use only $16$ estimation rounds in this simplistic example to shorten the estimation time, knowing beforehand that the given seeds produce the desired result (in this simplistic case, majority the estimation rounds end up in the MLE anyway, though).
 
-The argument \code{seeds} supplies the seeds that initialize the random number generator at the beginning of each call to the genetic algorithm, thereby yielding reproducible results.
+The argument \code{seeds} supplies the seeds that initialize the random number generator at the beginning of each call to the genetic algorithm, thereby yielding reproducible results. The argument \code{filter_estimates=FALSE} turns off automatic filtering of inappropriate estimates.
 %
 \begin{CodeChunk}
 \begin{CodeInput}
 R> library(gmvarkit)
 R> data("gdpdef", package="gmvarkit")
 R> fit12t <- fitGSMVAR(gdpdef, p=1, M=2, model="StMVAR", ncalls=16, ncores=8,
-+    seeds=1:16)
++    seeds=1:16, filter_estimates=FALSE)
 \end{CodeInput}
 \begin{CodeOutput}
 Using 8 cores for 16 estimations rounds...
 Optimizing with a genetic algorithm...
-  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=26s
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=16s
 Results from the genetic algorithm:
 The lowest loglik:  -277.038
 The mean loglik:    -258.416
 The largest loglik: -252.168
 Optimizing with a variable metric algorithm...
-  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=06s
+  |++++++++++++++++++++++++++++++++++++++++++++++++++| 100% elapsed=05s
 Results from the variable metric algorithm:
 The lowest loglik:  -276.974
 The mean loglik:    -252.439
@@ -411,12 +411,12 @@ Finished!
 Warning messages:
 1: In warn_df(p = p, M = M, params = params, model = model) :
   The model contains overly large degrees of freedom parameters. Consider
-  switching to the appropriate G-StMVAR model by setting the corresponding
+  switching to the appropriate G-StMVAR model by settingthe corresponding
   regimes to GMVAR type with the function 'stmvar_to_gstmvar'.
 2: In warn_eigens(ret) :
-  Regime 2 has near-singular error term covariance matrix! Consider
-  building a model from the next-largest local maximum with the function
-  'alt_gsmvar' by adjusting its argument 'which_largest'.
+  Regime 2 has near-singular error term covariance matrix! Consider building
+  a model from the next-largest local maximum with the function 'alt_gsmvar'
+  by adjusting its argument 'which_largest'.
 \end{CodeOutput}
 \end{CodeChunk}
 %
@@ -592,9 +592,9 @@ R> plot(fit12gs, type="series")
 %
 The resulting plot is presented in Figure~\ref{fig:seriesplot}.
 
-\begin{figure}[p]
+\begin{figure}[t]
   \centering
-  \includegraphics{figures/seriesplot.png}
+  \includegraphics{figures/seriesplot.pdf}
   \caption{The figure produced by the command \code{plot(fit12gs, type="series")}. On the top, a quarterly series consisting of two U.S. variables: the percentage change of real GDP and the percentage change of GDP implicit price deflator, covering the period from 1959Q1 to 2019Q4. On the bottom, the estimated mixing weights of the G-StMVAR model \code{fit12gs} fitted the series.}
 \label{fig:seriesplot}
 \end{figure}
@@ -609,9 +609,9 @@ R> plot(fit12gs, type="density")
 %
 The resulting plot is presented in Figure~\ref{fig:densityplot}. If the argument \code{type} is not specified, both of the figures will be plotted.
 
-\begin{figure}[p]
+\begin{figure}[t]
   \centering
-  \includegraphics{figures/densityplot.png}
+  \includegraphics{figures/densityplot.pdf}
   \caption{The figure produced by the command \code{plot(fit12gs, type="density")}. Kernel density estimates of the marginal series of the data the model was fitted to (black solid line), the stationary marginal density of the estimated G-StMVAR model (grey dashed line), and the marginal stationary densities of the component processes multiplied by the mixing weight parameter estimates (blue and red dashed lines).}
 \label{fig:densityplot}
 \end{figure}
@@ -671,9 +671,9 @@ R> profile_logliks(fit12gs, scale=0.02, precision=200)
 %
 The resulting plot is presented in Figure~\ref{fig:proflogliks}.
 
-\begin{figure}%[p]
+\begin{figure}[t]
   \centering
-  \includegraphics{figures/proflogliks.png}
+  \includegraphics{figures/proflogliks.pdf}
   \caption{The figure produced by the command \code{profile\_logliks(fit12gs, scale=0.02, precision=200)}. The graphs of the profile log-likelihood functions of the G-StMVAR model drawn about the estimate. The red vertical lines denote the estimate.}
 \label{fig:proflogliks}
 \end{figure}
@@ -1122,7 +1122,7 @@ Deriving multiple-steps-ahead point predictions and prediction intervals analyti
 
 Forecasting is most conveniently done with the \code{predict} method (see \code{?predict.gsmvar}). The available arguments include the number of steps ahead to be predicted (\code{n_ahead}), the number sample paths the forecast is based on (\code{nsim}), possibly multiple confidence levels for prediction intervals (\code{pi}), prediction type (\code{pred_type}), and prediction interval type (\code{pi_type}). The prediction type can be either \code{median}, \code{mean}, or for one-step-ahead forecasts also the exact conditional mean, \code{cond_mean}. The prediction interval type can be any of \code{"two-sided"}, \code{"upper"}, \code{"lower"}, or \code{"none"}.
 
-To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_estim}. The forecast is $10$ steps (quarters in this case) ahead, based on $10000$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default.
+To exemplify, the following code forecasts the two-dimensional time-series of U.S. GDP and GDP deflator growth using the G-StMVAR($1, 1, 1$) model \code{fit12gs} estimated in Section~\ref{sec:example_estim}. The forecast is $10$ steps (quarters in this case) ahead, based on $10000$ Monte Carlo repetitions with the point forecast based on the mean of those repetitions. The prediction intervals are two-sided with confidence levels $0.95$ and $0.90$. Finally, the argument \code{mix_weights} states that also future values of the the mixing weights should be forecasted. After completing the forecast, the function plots the results by default (to not plot the prediction, set \code{plot_res=FALSE} is the arguments).
 %
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -1135,9 +1135,9 @@ R> mypred <- predict(fit12gs, n_ahead=10, nsim=10000, pred_type="mean",
 The resulting plot is presented in Figure~\ref{fig:predplot}.
 
 
-\begin{figure}%[p]
+\begin{figure}[t]
   \centering
-  \includegraphics{figures/predplot.png}
+  \includegraphics{figures/predplot.pdf}
   \caption{The figure produced by the predict method applied to the model \code{fit12gs}. The first top figures show the point and interval predictions $10$ steps ahaed for the time series, and the bottom figure for the mixing weights. Two-sided prediction intervals with confidence levels $95\%$ and $90\%$, point forecast based on mean. Prediction based on $10000$ Monte Carlo repetitions.}
 \label{fig:predplot}
 \end{figure}

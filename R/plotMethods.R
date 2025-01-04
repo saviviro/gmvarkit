@@ -402,14 +402,14 @@ plot.gsmvar <- function(x, ..., type=c("both", "series", "density")) {
 
       # Plot the densities
       plot(x=data_dens$x, y=data_dens$y, xlim=c(x0, x1), ylim=c(y0, y1), main=paste("Density:", names_ts[d1]),
-           ylab="", xlab="", cex.axis=0.8, font.axis=2, type="l")
+           ylab="", xlab="", cex.axis=0.8, font.axis=2, lwd=1, type="l")
       lines(x=xpp, y=mod_dens, type="l", lty=2, lwd=2, col="darkgrey")
       for(m in 1:M) {
-        lines(x=xpp, y=reg_dens(d1=d1, m=m, xx=xpp), type="l", lty=3, col=colpal_mw[m])
+        lines(x=xpp, y=reg_dens(d1=d1, m=m, xx=xpp), type="l", lty=3, lwd=2, col=colpal_mw[m])
       }
       if(d1 == 1) {
         legend("topleft", legend=c("series", "model", names_mw), col=c("black", "darkgrey", colpal_mw),
-               bty="n", lty=c(1, 2, 2, 2), lwd=2, text.font=2, cex=0.6, x.intersp=0.5, y.intersp=1)#,
+               bty="n", lty=c(1, 2, rep(3, times=M)), lwd=2, text.font=2, cex=0.6, x.intersp=0.5, y.intersp=1)#,
                #seg.len=1, inset=c(-0.025, -0.01))
       }
     }

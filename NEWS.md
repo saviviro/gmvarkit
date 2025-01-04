@@ -285,4 +285,6 @@
 
 * GFEVDs are now calculated as the average over the GFEVDs based on the different initial values (previously calculated based on the average
   of the GIRFs based on the different initial values).
+* Refined the density plot.
 * Updated the references.
+* Other small adjustments prints, documentations, etc.
