@@ -152,8 +152,8 @@ The model DOES NOT need to be structural in order for this function to be
      183, pp. 104-116.
    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
          \emph{Cambridge University Press}, Cambridge.
-   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
-          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
+   \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
+         switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
  }
 }
 \seealso{

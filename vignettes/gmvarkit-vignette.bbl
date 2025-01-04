@@ -211,11 +211,12 @@ Virolainen S (2022).
 \newblock \emph{Unpublished working paper, available as arXiv:2109.13648}.
 \newblock \urlprefix\url{https://arXiv:2109.13648}.
 
-\bibitem[{Virolainen(2024)}]{Virolainen:2024}
-Virolainen S (2024).
+\bibitem[{Virolainen(2025)}]{Virolainen:2025}
+Virolainen S (2025).
 \newblock \enquote{A statistically identified structural vector autoregression
   with endogeneously switching volatility regime.}
-\newblock \emph{Journal of Business \& Economic Statistics}.
+\newblock \emph{Journal of Business \& Economic Statistics}, \textbf{43}(1),
+  44--54.
 \newblock \doi{10.1080/07350015.2024.2322090}.
 
 \end{thebibliography}

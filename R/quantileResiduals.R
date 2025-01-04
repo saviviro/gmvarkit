@@ -100,7 +100,8 @@ quantile_residuals <- function(gsmvar) {
   # applying them to the mixture components at each time point t.
 
   # Compute partitions and matrix products of partitioned covariance matrices Omega_m that will be used multiple times.
-  upleft_jjmat <-  function(mat, j) mat[1:j, 1:j , drop=FALSE] # function(arr, j) arr[1:j, 1:j, , drop=FALSE] # Returns upper-left (j x j) block matrix from each slice of the 3d array "arr"
+  upleft_jjmat <-  function(mat, j) mat[1:j, 1:j , drop=FALSE] # function(arr, j) arr[1:j, 1:j, , drop=FALSE]
+  # Above returns upper-left (j x j) block matrix from each slice of the 3d array "arr"
 
   # Storage for variances and conditional means
   # (obtained from properties of multinormal/multistudent for 1-dimensional conditional distribution)
@@ -128,8 +129,9 @@ quantile_residuals <- function(gsmvar) {
       low_right <- Omega_mj[j, j] # (1 x 1)
 
       chol_up_left <- chol(up_left)
-      all_inv_Omega_j_minus_1[1:(j-1), 1:(j-1), j-1, m] <- inv_Omega_j_minus_1 <- chol2inv(chol_up_left) # Inverse of upper left (j-1 x j-1) Omega_m block matrix
-      log_det_Omega_j_minus_1[j-1, m] <- 2*log(prod(diag(chol_up_left))) # Log of the determinant of inverse of upper left (j-1 x j-1) Omega_m block matrix
+      all_inv_Omega_j_minus_1[1:(j-1), 1:(j-1), j-1,
+                              m] <- inv_Omega_j_minus_1 <- chol2inv(chol_up_left) # Inv of upper left (j-1 x j-1) Omega_m block matrix
+      log_det_Omega_j_minus_1[j-1, m] <- 2*log(prod(diag(chol_up_left))) # Log of the det of inv of upper left (j-1 x j-1) Omega_m block matrix
       matprod <- crossprod(up_right, inv_Omega_j_minus_1) # (1 x j-1)
 
       # Common formula for GMVAR and StMVAR type regimes
@@ -139,7 +141,8 @@ quantile_residuals <- function(gsmvar) {
       if(m <= M1) { # Constant conditional variance for GMVAR type regimes Omega_mtj [t, j, m];
         Omega_mtj[, j, m] <- low_right - matprod%*%up_right
       } else { # Time-varying conditional variance for StMVAR type regimes
-        arch_scalars2 <- (all_df[m - M1] + d*p + rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
+        arch_scalars2 <- (all_df[m - M1] + d*p +
+                            rowSums(mu_dif_j_minus_1%*%inv_Omega_j_minus_1*mu_dif_j_minus_1)/arch_scalars[,m])/(all_df[m - M1] + d*p + j - 3)
         Omega_mtj[, j, m] <- arch_scalars2*arch_scalars[,m]*c(low_right - matprod%*%up_right)
       }
     }
@@ -223,9 +226,10 @@ quantile_residuals <- function(gsmvar) {
         # Calculate CDF values using hypergeometric function whenever it is defined
         if(length(which_def) > 0) {
           ydiff0 <- ydiff[which_def, j]
-          F_values_regime[which_def, j, m] <- 0.5 + C0/sqrt(Omega_mtj[which_def, j, m])*ydiff0*gsl::hyperg_2F1(a=0.5, b=0.5*(1 + df), c=1.5,
-                                                                                                              x=-(ydiff0^2)/(Omega_mtj[which_def, j, m]*(df - 2)),
-                                                                                                               give=FALSE, strict=TRUE)
+          F_values_regime[which_def, j, m] <- 0.5 +
+            C0/sqrt(Omega_mtj[which_def, j, m])*ydiff0*gsl::hyperg_2F1(a=0.5, b=0.5*(1 + df), c=1.5,
+                                                                       x=-(ydiff0^2)/(Omega_mtj[which_def, j, m]*(df - 2)),
+                                                                       give=FALSE, strict=TRUE)
         }
 
         # Calculate CDF values by numerically integrating the t-densities whenever hypergeometric function is not defined
