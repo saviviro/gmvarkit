@@ -1152,7 +1152,7 @@ Mixture vector autoregressive models are a valuable tool in modeling multivariat
 \section*{Computational details}
 \addcontentsline{toc}{section}{Computational details}
 
-The results in this paper were obtained using MacBook Pro 14", 2021, with Apple M1 Pro processor, 16 Gt of unified RAM, and macOS Monterey 12.1 operating system. Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
+Some of the estimation results (and thereby everything that is calculated based on the estimates) may vary slightly when running the code on different computers. This is likely due to the numerical error caused by the limited precision of the float point representation.
 
 
 \cleardoublepage
