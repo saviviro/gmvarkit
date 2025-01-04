@@ -1038,9 +1038,9 @@ where $n$ is the chosen and $\text{GIRF}(l,\delta_j,\mathcal{F}_{t-1})_i$ is the
 
 In \pkg{gmvarkit}, the GFEVD can be estimated with the function \code{GFEVD}. As with the GIRF, the GFEVD is dependent on the initial values. The type of the initial values is set with the argument \code{initval_type}, and there are three options:
 \begin{enumerate}
-\item \code{"data"} which estimates the GIRFs for all possible length $p$ histories in the data and then the GIRFs in the GFEVD are obtained as the sample mean over those GIRFs.
-\item \code{"random"} which generates the initial values from the stationary distribution of the process or from the mixture of the stationary distributions of some specific regime(s) with the relative mixing proportions given by the mixing weight parameters. The initial regimes can be set with the argument \code{init_regimes}. The GIRFs in the GFEVD are obtained as the sample mean over the GIRFs estimated for the different random initial values.
-\item \code{"fixed"} which estimates the GIRFs for a single fixed initial value that is set with the argument \code{init_values}.
+\item \code{"data"} which estimates the GFEVDs for all, or a subset of, possible length $p$ histories in the data, and then the final GFEVD is obtained as the sample mean over them.
+\item \code{"random"} which generates the initial values from the stationary distribution of the process or from the mixture of the stationary distributions of some specific regime(s) with the relative mixing proportions given by the mixing weight parameters. The initial regimes can be set with the argument \code{init_regimes}. The GFEVD is calculated for each initial value, and then the final GFEVD is obtained as the sample mean over them.
+\item \code{"fixed"} which estimates the GFEVD for a single fixed initial value that is set with the argument \code{init_values}.
 \end{enumerate}
 The shock size is the same for all scalar components of the structural shock and it can be adjusted with the argument \code{shock_size}. If the GIRFs for some variables should be cumulative before calculating the GFEVD, specify them with the argument \code{which_cumulative}. Finally, note that the GFEVD objects have their own plot and print methods.
 

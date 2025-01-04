@@ -149,10 +149,6 @@ The model DOES NOT need to be structural in order for this function to be
  mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s,
   structural_pars=list(W=W_22))
  mod22s
- # Alternatively, use:
- #fit22s <- fitGSMVAR(gdpdef, p=2, M=2, structural_pars=list(W=W_22),
- #                   ncalls=20, seeds=1:20)
- # To obtain an estimated version of the same model.
 
  # Estimating the GFEVD using all possible histories in the data as the
  # initial values:

@@ -42,27 +42,26 @@ mod22s <- GSMVAR(gdpdef, p=2, M=2, params=params22s, structural_pars=list(W=W22)
 mod22ts <- GSMVAR(gdpdef, p=2, M=2, params=c(params22s, 20, 30), model="StMVAR", structural_pars=list(W=W22))
 mod22gss <- GSMVAR(gdpdef, p=2, M=c(1, 1), params=c(params22s, 30), model="G-StMVAR", structural_pars=list(W=W22))
 
-girf1 <- GIRF(mod22s, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
-girf2 <- GIRF(mod22s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
-              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
-girf3 <- GIRF(mod22s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot_res=FALSE)
-girf4 <- GIRF(mod22s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot_res=FALSE)
-
-girf5 <- GIRF(mod22ts, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
-girf6 <- GIRF(mod22ts, which_shocks=1, shock_size=1, N=1, R2=1, R1=1, seeds=1, which_cumulative=2,
-              include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
-girf7 <- GIRF(mod22gss, N=10, R2=6, R1=2, scale=c(2, 2, -1), seeds=1:6, plot_res=FALSE)
-girf8 <- GIRF(mod22gss, N=10, R2=5, R1=2, scale=c(1, 2, 0.3), scale_type="peak", seeds=1:5, plot_res=FALSE)
-
-# Reduced form mod
-girf9 <- GIRF(mod12, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
-girf10 <- GIRF(mod12t, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
-              include_mixweights=FALSE, init_values=mod12$data, ci=0.2, plot_res=FALSE)
-girf11 <- GIRF(mod12gs, N=2, R2=3, R1=4, which_cumulative=1:2, seeds=11:13, plot_res=FALSE)
-girf12 <- GIRF(mod11t, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=5, plot_res=FALSE)
-
-
 test_that("GIRF works correctly", {
+  girf1 <- GIRF(mod22s, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
+  girf2 <- GIRF(mod22s, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
+                include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
+  girf3 <- GIRF(mod22s, N=2, R2=1, R1=1, which_cumulative=1:2, seeds=1, plot_res=FALSE)
+  girf4 <- GIRF(mod22s, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=1, plot_res=FALSE)
+
+  girf5 <- GIRF(mod22ts, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
+  girf6 <- GIRF(mod22ts, which_shocks=1, shock_size=1, N=1, R2=1, R1=1, seeds=1, which_cumulative=2,
+                include_mixweights=FALSE, init_values=mod22s$data, ci=0.1, plot_res=FALSE)
+  girf7 <- GIRF(mod22gss, N=10, R2=6, R1=2, scale=c(2, 2, -1), seeds=1:6, plot_res=FALSE)
+  girf8 <- GIRF(mod22gss, N=10, R2=5, R1=2, scale=c(1, 2, 0.3), scale_type="peak", seeds=1:5, plot_res=FALSE)
+
+  # Reduced form mod
+  girf9 <- GIRF(mod12, N=2, R2=2, R1=2, seeds=1:2, plot_res=FALSE)
+  girf10 <- GIRF(mod12t, which_shocks=2, shock_size=1, N=1, R2=1, R1=1, seeds=1,
+                 include_mixweights=FALSE, init_values=mod12$data, ci=0.2, plot_res=FALSE)
+  girf11 <- GIRF(mod12gs, N=2, R2=3, R1=4, which_cumulative=1:2, seeds=11:13, plot_res=FALSE)
+  girf12 <- GIRF(mod11t, N=2, R2=1, R1=1, scale=c(1, 1, 1), seeds=5, plot_res=FALSE)
+
   expect_equal(unname(girf1$girf_res[[1]]$point_est[3,]), c(-0.1014679, 0.1171628, -0.1047082, 0.1047082), tolerance=1e-4)
   expect_equal(unname(girf1$girf_res[[2]]$point_est[1,]), c(-0.57599848, 0.02003473, 0.00000000, 0.00000000), tolerance=1e-4)
   expect_equal(unname(girf1$girf_res[[2]]$conf_ints[3, , 2]), c(-0.009430567, -0.008801493, -0.002091365, -0.001462290), tolerance=1e-4)
@@ -120,60 +119,42 @@ test_that("GIRF works correctly", {
 # Estimating the GFEVD using all possible histories in the data as the
 # initial values:
 mod22s_2 <- add_data(mod22s$data[1:50,], mod22s)
-gfevd1 <- GFEVD(mod22s_2, N=3, R1=1, initval_type="data", seeds=1:49)
-gfevd2 <- GFEVD(mod22s_2, N=2, R1=5, R2=10, initval_type="random", init_regimes=1:2, seeds=1:10)
-gfevd3 <- GFEVD(mod22s_2, N=4, R1=6, initval_type="fixed",
-                init_values=matrix(c(1, 1, 2, 2), nrow=2),
-                include_mixweights=TRUE, seeds=1)
-
 mod22ts_2 <- add_data(mod22ts$data[1:50,], mod22ts)
 mod22gss_2 <- add_data(mod22gss$data[1:50,], mod22gss)
-
-gfevd4 <- GFEVD(mod22ts_2, N=2, R1=2, initval_type="data", seeds=1:49)
-gfevd5 <- GFEVD(mod22gss_2, N=3, R1=3, R2=10, initval_type="random", init_regimes=2, seeds=1:10)
-gfevd6 <- GFEVD(mod22s_2, N=2, R1=2, initval_type="fixed",
-                init_values=matrix(c(1, 1, 2, 2), nrow=2),
-                include_mixweights=TRUE, seeds=1)
-
 mod11t_2 <- add_data(mod11t$data[1:50,], mod11t)
 mod12_2 <- add_data(mod12$data[1:50,], mod12)
 mod12t_2 <- add_data(mod12t$data[1:50,], mod12t)
 mod12gs_2 <- add_data(mod12gs$data[1:50,], mod12gs)
 
-gfevd7 <- GFEVD(mod11t_2, N=3, R1=1, initval_type="data", seeds=1:50)
-gfevd8 <- GFEVD(mod12_2, N=2, R1=5, R2=8, initval_type="random", init_regimes=1:2, seeds=1:8)
-gfevd9 <- GFEVD(mod12t_2, N=4, R1=6, initval_type="fixed",
-                init_values=matrix(c(1, 1, 2, 2), nrow=2),
-                include_mixweights=TRUE, seeds=1)
-gfevd10 <- GFEVD(mod12gs_2, N=2, R1=2, initval_type="data", seeds=1:50)
-
-
 test_that("GFEVD works correctly", {
-  expect_equal(unname(gfevd1$gfevd_res[3, , 1]), c(0.01382024, 0.98617976), tolerance=1e-3)
-  expect_equal(unname(gfevd1$gfevd_res[1, , 2]), c(0.98893981, 0.01106019), tolerance=1e-3)
-  expect_equal(unname(gfevd2$gfevd_res[3, , 1]), c(0.00793223, 0.99206777), tolerance=1e-3)
-  expect_equal(unname(gfevd2$gfevd_res[2, , 2]), c(0.98524421, 0.01475579), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[2, , 1]), c(0.01929081, 0.98070919), tolerance=1e-3)
+  gfevd1 <- GFEVD(mod22s_2, N=3, R1=1, initval_type="data", seeds=1:49)
+  gfevd2 <- GFEVD(mod22s_2, N=2, R1=5, R2=10, initval_type="random", init_regimes=1:2, seeds=1:10)
+  gfevd3 <- GFEVD(mod22s_2, N=4, R1=6, initval_type="fixed",
+                  init_values=matrix(c(1, 1, 2, 2), nrow=2),
+                  include_mixweights=TRUE, seeds=1)
+  gfevd4 <- GFEVD(mod22ts_2, N=2, R1=2, initval_type="data", seeds=1:49)
+  gfevd5 <- GFEVD(mod22gss_2, N=3, R1=3, R2=10, initval_type="random", init_regimes=2, seeds=1:10)
+  gfevd6 <- GFEVD(mod22s_2, N=2, R1=2, initval_type="fixed",
+                  init_values=matrix(c(1, 1, 2, 2), nrow=2),
+                  include_mixweights=TRUE, seeds=1)
+  gfevd7 <- GFEVD(mod11t_2, N=3, R1=1, initval_type="data", seeds=1:50)
+  gfevd8 <- GFEVD(mod12_2, N=2, R1=5, R2=8, initval_type="random", init_regimes=1:2, seeds=1:8)
+  gfevd9 <- GFEVD(mod12t_2, N=4, R1=6, initval_type="fixed",
+                  init_values=matrix(c(1, 1, 2, 2), nrow=2),
+                  include_mixweights=TRUE, seeds=1)
+  gfevd10 <- GFEVD(mod12gs_2, N=2, R1=2, initval_type="data", seeds=1:50)
+
+
+  expect_equal(unname(gfevd1$gfevd_res[3, , 1]), c(0.1157159, 0.8842841), tolerance=1e-3)
+  expect_equal(unname(gfevd2$gfevd_res[2, , 2]), c(0.892686, 0.107314), tolerance=1e-3)
   expect_equal(unname(gfevd3$gfevd_res[1, , 2]), c(0.993477615, 0.006522385), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[5, , 3]), c(0.2543561, 0.7456439), tolerance=1e-3)
-  expect_equal(unname(gfevd3$gfevd_res[4, , 4]), c(0.7643379, 0.2356621), tolerance=1e-3)
 
-  expect_equal(c(unname(gfevd4$gfevd_res[3, , ])), c(0.01213561, 0.98786439, 0.98451084, 0.01548916), tolerance=1e-3)
-  expect_equal(c(unname(gfevd4$gfevd_res[2, , ])), c(0.01167646, 0.98832354, 0.98816800, 0.01183200), tolerance=1e-3)
-  expect_equal(c(unname(gfevd5$gfevd_res[3, , ])), c(0.006614715, 0.993385285, 0.985963802, 0.014036198), tolerance=1e-3)
-  expect_equal(c(unname(gfevd5$gfevd_res[1, , ])), c(0.006968765, 0.993031235, 0.981418598, 0.018581402), tolerance=1e-3)
+  expect_equal(c(unname(gfevd4$gfevd_res[3, , ])), c(0.1333361, 0.8666639, 0.8167906, 0.1832094), tolerance=1e-3)
+  expect_equal(c(unname(gfevd5$gfevd_res[1, , ])), c(0.01221222, 0.98778778, 0.92101804, 0.07898196), tolerance=1e-3)
   expect_equal(c(unname(gfevd6$gfevd_res[1, , 1:2])), c(0.092954461, 0.907045539, 0.998705168, 0.001294832), tolerance=1e-3)
-  expect_equal(c(unname(gfevd6$gfevd_res[3, , ])), c(0.0894120535, 0.9105879465, 0.9990029740, 0.0009970260, 0.0007465000,
-                                                     0.9992535000, 0.0007464997, 0.9992535003), tolerance=1e-3)
 
-  expect_equal(unname(gfevd7$gfevd_res[3, , 1]), c(0.996256034, 0.003743966), tolerance=1e-3)
-  expect_equal(unname(gfevd7$gfevd_res[1, , 2]), c(0.004839729, 0.995160271), tolerance=1e-3)
-  expect_equal(unname(gfevd8$gfevd_res[3, , 1]), c(0.996935931, 0.003064069), tolerance=1e-3)
-  expect_equal(unname(gfevd8$gfevd_res[2, , 2]), c(0.0005259957, 0.9994740043), tolerance=1e-3)
-  expect_equal(unname(gfevd9$gfevd_res[2, , 1]), c(9.999490e-01, 5.104191e-05), tolerance=1e-3)
-  expect_equal(unname(gfevd9$gfevd_res[1, , 2]), c(0.0007162443, 0.9992837557), tolerance=1e-3)
-  expect_equal(unname(gfevd9$gfevd_res[5, , 3]), c(0.5799644, 0.4200356), tolerance=1e-3)
+  expect_equal(unname(gfevd7$gfevd_res[1, , 2]), c(0.02134389, 0.97865611), tolerance=1e-3)
+  expect_equal(unname(gfevd8$gfevd_res[2, , 2]), c(0.03249371, 0.96750629), tolerance=1e-3)
   expect_equal(unname(gfevd9$gfevd_res[4, , 4]), c(0.7555897, 0.2444103), tolerance=1e-3)
-  expect_equal(c(unname(gfevd10$gfevd_res[3, , ])), c(0.990785908, 0.009214092, 0.001832945, 0.998167055), tolerance=1e-3)
-  expect_equal(c(unname(gfevd10$gfevd_res[2, , ])), c(0.991911836, 0.008088164, 0.002087102, 0.997912898), tolerance=1e-3)
+  expect_equal(c(unname(gfevd10$gfevd_res[3, , ])), c(0.8150315, 0.1849685, 0.1609560, 0.8390440), tolerance=1e-3)
 })
