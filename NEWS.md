@@ -289,8 +289,9 @@
 * Updated the references.
 * Other small adjustments prints, documentations, etc.
 
-# gmvarkit 2.1.5
+# gmvarkit 2.2.0
 
+* Removed the years ago deprecated old functions that were included for backward compatibility.
 * Fixed the labels for variables in GIRFs etc when they were calculated using a model either not containing any data or containing data without variable names.
 * The internally used argument 'girf_pars' previously appearing in the function simulate.gsmvar is now hidden. 
 * Improved data documentation.
