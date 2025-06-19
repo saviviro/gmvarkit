@@ -19,7 +19,7 @@ is_stationary(
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+  \item{For \strong{G-StMVAR} models:}{a size \eqn{(2\times 1)} integer vector specifying the number of \emph{GMVAR type} components \code{M1}
    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
    is \code{M=M1+M2}.}
 }}
@@ -29,7 +29,7 @@ is_stationary(
 \item{params}{a real valued vector specifying the parameter values.
   \describe{
     \item{\strong{For reduced form models:}}{
-      Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)x1)} and have the form
+      Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)\times 1)} and have the form
       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
       \itemize{
@@ -65,7 +65,7 @@ is_stationary(
 
   The notation is similar to the cited literature.}
 
-\item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
+\item{all_boldA}{3D array containing the \eqn{((dp)\times (dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
 
 \item{structural_pars}{If \code{NULL} a reduced form model is considered. Reduced models can be used directly as recursively

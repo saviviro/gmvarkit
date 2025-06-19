@@ -7,7 +7,7 @@
 #' @param params a real valued vector specifying the parameter values.
 #'   \describe{
 #'     \item{\strong{For reduced form models:}}{
-#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)x1)} and have the form
+#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)\times 1)} and have the form
 #'       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
 #'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
 #'       \itemize{
@@ -42,7 +42,7 @@
 #'   # should be strictly larger than two.
 #'
 #'   The notation is similar to the cited literature.
-#' @param all_boldA 3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
+#' @param all_boldA 3D array containing the \eqn{((dp)\times (dp))} "bold A" matrices related to each mixture component VAR-process,
 #'   obtained from \code{form_boldA}. Will be computed if not given.
 #' @param tolerance Returns \code{FALSE} if modulus of any eigenvalue is larger or equal to \code{1-tolerance}.
 #' @details If the model is constrained, remove the constraints first with the function \code{reform_constrained_pars}.
@@ -76,7 +76,7 @@ is_stationary <- function(p, M, d, params, all_boldA=NULL, structural_pars=NULL,
 #'
 #' @inheritParams loglikelihood_int
 #' @inheritParams is_stationary
-#' @param alphas (Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
+#' @param alphas \eqn{(M\times 1)} vector containing all mixing weight parameters, obtained from \code{pick_alphas}.
 #' @param all_Omega 3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.
 #' @param W_constraints set \code{NULL} for reduced form models. For structural models, this should be the
 #'   constraint matrix \eqn{W} from the list of structural parameters.

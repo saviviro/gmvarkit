@@ -30,6 +30,14 @@ mixture distribution specifed by the argument \code{init_regimes}.}
 \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.}
 
 \item{seed}{set seed for the random number generator?}
+
+\item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}).
+You should ignore it (specifying something else than null to it will change how the function behaves). Should be a list with the following elements:
+\describe{
+  \item{\code{shock_numb}}{an integer indicating which shock to impose in the GIRF estimation.}
+  \item{\code{shock_size}}{a numeric value indicating the size of the structural shock to impose in the GIRF estimation.}
+  \item{\code{include_mixweights}}{a logical value indicating whether the GIRF should be estimated for the mixing weights as well.}
+}}
 }
 \value{
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.

@@ -268,13 +268,13 @@ random_ind2 <- function(p, M, d, model=c("GMVAR", "StMVAR", "G-StMVAR"), same_me
 #' @description \code{random_coefmats} generates random VAR model coefficient matrices.
 #'
 #' @inheritParams is_stationary
-#' @param how_many how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?
+#' @param how_many how many \eqn{(d\times d)} coefficient matrices \eqn{A} should be drawn?
 #' @param scale non-diagonal elements will be drawn from mean zero normal distribution
 #'   with \code{sd=0.3/scale} and diagonal elements from one with \code{sd=0.6/scale}.
 #'   Larger scale will hence more likely result stationary coefficient matrices, but
 #'   will explore smaller area of the parameter space. Can be for example
 #'   \code{1 + log(2*mean(c((p-0.2)^(1.25), d)))}.
-#' @return Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
+#' @return Returns \eqn{((how_many*d^2)\times 1)} vector containing vectorized coefficient
 #'  matrices \eqn{(vec(A_{1}),...,vec(A_{how_many}))}. Note that if \code{how_many==p},
 #'  then the returned vector equals \strong{\eqn{\phi_{m}}}.
 #' @keywords internal
@@ -304,7 +304,7 @@ random_coefmats <- function(d, how_many, scale) {
 #'   inaccuracies caused by the imprecision of the float-point presentation may result in errors
 #'   or nonstationary AR-matrices. Using smaller \code{ar_scale} facilitates the usage of larger
 #'   \code{p} or \code{d}.
-#' @return Returns \eqn{((pd^2)x1)} vector containing stationary vectorized coefficient
+#' @return Returns \eqn{((pd^2)\times 1)} vector containing stationary vectorized coefficient
 #'  matrices \eqn{(vec(A_{1}),...,vec(A_{p})}.
 #' @references
 #'  \itemize{
@@ -361,7 +361,7 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 
 #' @title Create random VAR model error term covariance matrix
 #'
-#' @description \code{random_covmat} generates random VAR model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
+#' @description \code{random_covmat} generates random VAR model \eqn{(d\times d)} error term covariance matrix \eqn{\Omega}
 #'   from (scaled) Wishart distribution for reduced form models and the parameters \eqn{W},\eqn{\lambda_1,...,\lambda_M}
 #'   for structural models (from normal distributions).
 #'
@@ -372,7 +372,7 @@ random_coefmats2 <- function(p, d, ar_scale=1) {
 #'   error term covariance matrix.
 #' @return
 #'   \describe{
-#'     \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
+#'     \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2\times 1)} vector containing vech-vectorized covariance matrix
 #'       \eqn{\Omega}.}
 #'     \item{For \strong{structural models}:}{Returns a length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
 #'       \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}
@@ -409,7 +409,7 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
 }
 
 
-#' @title Create random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
+#' @title Create random VAR-model \eqn{(d\times d)} error term covariance matrix \eqn{\Omega}
 #'   fairly close to a given \strong{positive definite} covariance matrix using (scaled)
 #'   Wishart distribution
 #'
@@ -417,7 +417,7 @@ random_covmat <- function(d, M, omega_scale, W_scale, lambda_scale, structural_p
 #'   from (scaled) Wishart distribution that is fairly close to the given matrix.
 #'
 #' @inheritParams is_stationary
-#' @param Omega a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
+#' @param Omega a symmetric positive definite \eqn{(d \times d)} covariance matrix specifying
 #'   expected value of the matrix to be generated.
 #' @param W_and_lambdas the mean of the normal distribution the new parameters are generated
 #'   from.

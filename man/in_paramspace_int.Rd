@@ -24,7 +24,7 @@ in_paramspace_int(
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+  \item{For \strong{G-StMVAR} models:}{a size \eqn{(2\times 1)} integer vector specifying the number of \emph{GMVAR type} components \code{M1}
    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
    is \code{M=M1+M2}.}
 }}
@@ -114,10 +114,10 @@ in_paramspace_int(
 \item{model}{is "GMVAR", "StMVAR", or "G-StMVAR" model considered? In the G-StMVAR model, the first \code{M1} components
 are GMVAR type and the rest \code{M2} components are StMVAR type.}
 
-\item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
+\item{all_boldA}{3D array containing the \eqn{((dp)\times (dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
 
-\item{alphas}{(Mx1) vector containing all mixing weight parameters, obtained from \code{pick_alphas}.}
+\item{alphas}{\eqn{(M\times 1)} vector containing all mixing weight parameters, obtained from \code{pick_alphas}.}
 
 \item{all_Omega}{3D array containing all covariance matrices \eqn{\Omega_{m}}, obtained from \code{pick_Omegas}.}
 

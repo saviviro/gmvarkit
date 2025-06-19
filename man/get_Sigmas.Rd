@@ -12,7 +12,7 @@ get_Sigmas(p, M, d, all_A, all_boldA, all_Omega)
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+  \item{For \strong{G-StMVAR} models:}{a size \eqn{(2\times 1)} integer vector specifying the number of \emph{GMVAR type} components \code{M1}
    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
    is \code{M=M1+M2}.}
 }}
@@ -21,7 +21,7 @@ get_Sigmas(p, M, d, all_A, all_boldA, all_Omega)
 
 \item{all_A}{4D array containing all coefficient matrices \eqn{A_{m,i}}, obtained from \code{pick_allA}.}
 
-\item{all_boldA}{3D array containing the \eqn{((dp)x(dp))} "bold A" matrices related to each mixture component VAR-process,
+\item{all_boldA}{3D array containing the \eqn{((dp)\times (dp))} "bold A" matrices related to each mixture component VAR-process,
 obtained from \code{form_boldA}. Will be computed if not given.}
 
 \item{all_Omega}{a \code{[d, d, M]} array containing the covariance matrix Omegas}

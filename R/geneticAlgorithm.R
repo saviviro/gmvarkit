@@ -17,7 +17,7 @@
 #'   will be generated from. The parameter vectors should be...
 #'   \describe{
 #'     \item{\strong{For unconstrained models:}}{
-#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)x1)} and have the form
+#'       Should be size \eqn{((M(pd^2+d+d(d+1)/2+2)-M1-1)\times 1)} and have the form
 #'       \strong{\eqn{\theta}}\eqn{ = }(\strong{\eqn{\upsilon}}\eqn{_{1}},
 #'       ...,\strong{\eqn{\upsilon}}\eqn{_{M}}, \eqn{\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}\eqn{)}, where
 #'       \itemize{
@@ -29,12 +29,12 @@
 #'       }
 #'     }
 #'     \item{\strong{For constrained models:}}{
-#'       Should be size \eqn{((M(d+d(d+1)/2+2)+q-M1-1)x1)} and have the form
+#'       Should be size \eqn{((M(d+d(d+1)/2+2)+q-M1-1)\times 1)} and have the form
 #'       \strong{\eqn{\theta}}\eqn{ = (\phi_{1,0},...,\phi_{M,0},}\strong{\eqn{\psi},}
 #'       \eqn{\sigma_{1},...,\sigma_{M},\alpha_{1},...,\alpha_{M-1},}\strong{\eqn{\nu}}), where
 #'       \itemize{
 #'         \item \strong{\eqn{\psi}} \eqn{(qx1)} satisfies (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}
-#'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is a \eqn{(Mpd^2xq)}
+#'         \strong{\eqn{\phi}}\eqn{_{M}) =} \strong{\eqn{C \psi}} where \strong{\eqn{C}} is a \eqn{(Mpd^2 \times q)}
 #'         constraint matrix.
 #'       }
 #'     }

@@ -10,7 +10,7 @@
 #' @param p a positive integer specifying the autoregressive order of the model.
 #' @param M \describe{
 #'   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-#'   \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+#'   \item{For \strong{G-StMVAR} models:}{a size \eqn{(2\times 1)} integer vector specifying the number of \emph{GMVAR type} components \code{M1}
 #'    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
 #'    is \code{M=M1+M2}.}
 #' }
@@ -145,10 +145,10 @@
 #' @return
 #'  \describe{
 #'   \item{By default:}{log-likelihood value of the specified GMVAR, StMVAR, or G-StMVAR model,}
-#'   \item{If \code{to_return=="mw"}:}{a size ((n_obs-p)\times  M) matrix containing the mixing weights: for m:th component in m:th column.}
-#'   \item{If \code{to_return=="mw_tplus1"}:}{a size ((n_obs-p+1) \times  M) matrix containing the mixing weights: for m:th component in m:th column.
+#'   \item{If \code{to_return=="mw"}:}{a size \eqn{((n_obs-p)\times  M) }matrix containing the mixing weights: for m:th component in m:th column.}
+#'   \item{If \code{to_return=="mw_tplus1"}:}{a size \eqn{((n_obs-p+1) \times  M)} matrix containing the mixing weights: for m:th component in m:th column.
 #'     The last row is for \eqn{\alpha_{m,T+1}}.}
-#'   \item{If \code{to_return=="terms"}:}{a size ((n_obs-p) \times 1) numeric vector containing the terms \eqn{l_{t}}.}
+#'   \item{If \code{to_return=="terms"}:}{a size \eqn{((n_obs-p) \times 1)} numeric vector containing the terms \eqn{l_{t}}.}
 #'   \item{if \code{to_return=="loglik_and_mw"}:}{a list of two elements. The first element contains the log-likelihood value and the
 #'     second element contains the mixing weights.}
 #'   \item{If \code{to_return=="regime_cmeans"}:}{an \code{[T-p, d, M]} array containing the regimewise conditional means

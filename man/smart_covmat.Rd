@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateParams.R
 \name{smart_covmat}
 \alias{smart_covmat}
-\title{Create random VAR-model \eqn{(dxd)} error term covariance matrix \eqn{\Omega}
+\title{Create random VAR-model \eqn{(d\times d)} error term covariance matrix \eqn{\Omega}
   fairly close to a given \strong{positive definite} covariance matrix using (scaled)
   Wishart distribution}
 \usage{
@@ -13,12 +13,12 @@ smart_covmat(d, M, Omega, W_and_lambdas, accuracy, structural_pars = NULL)
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+  \item{For \strong{G-StMVAR} models:}{a size \eqn{(2\times 1)} integer vector specifying the number of \emph{GMVAR type} components \code{M1}
    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
    is \code{M=M1+M2}.}
 }}
 
-\item{Omega}{a symmetric positive definite \eqn{(dxd)} covariance matrix specifying
+\item{Omega}{a symmetric positive definite \eqn{(d \times d)} covariance matrix specifying
 expected value of the matrix to be generated.}
 
 \item{W_and_lambdas}{the mean of the normal distribution the new parameters are generated
@@ -68,7 +68,7 @@ a time-varying diagonal matrix with positive diagonal entries).}
 }
 \value{
 \describe{
-    \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2x1)} vector containing vech-vectorized covariance matrix
+    \item{For \strong{reduced form models}:}{Returns a \eqn{(d(d+1)/2\times 1)} vector containing vech-vectorized covariance matrix
       \eqn{\Omega}.}
     \item{For \strong{structural models}:}{Returns a length \eqn{d^2 - n_zeros - d*(M - 1)} vector of the form
       \eqn{(Wvec(W),\lambda_2,...,\lambda_M)} where \eqn{\lambda_m=(\lambda_{m1},...,\lambda_{md})}

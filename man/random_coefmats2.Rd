@@ -15,7 +15,7 @@ random_coefmats2(p, d, ar_scale = 1)
 larger AR coefficients.}
 }
 \value{
-Returns \eqn{((pd^2)x1)} vector containing stationary vectorized coefficient
+Returns \eqn{((pd^2)\times 1)} vector containing stationary vectorized coefficient
  matrices \eqn{(vec(A_{1}),...,vec(A_{p})}.
 }
 \description{

@@ -222,6 +222,7 @@ gmvar_to_sgmvar <- function(gmvar, calc_std_errors=TRUE) {
 #'
 #' @inheritParams simulate.gsmvar
 #' @inheritParams alt_gmvar
+#' @inheritParams simulate_gsmvar_int
 #' @param nsimu number of observations to be simulated.
 #' @seealso \code{\link{simulate.gsmvar}}
 #' @inherit simulate.gsmvar details return references

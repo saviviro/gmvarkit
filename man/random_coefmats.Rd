@@ -9,7 +9,7 @@ random_coefmats(d, how_many, scale)
 \arguments{
 \item{d}{the number of time series in the system.}
 
-\item{how_many}{how many \eqn{(dxd)} coefficient matrices \eqn{A} should be drawn?}
+\item{how_many}{how many \eqn{(d\times d)} coefficient matrices \eqn{A} should be drawn?}
 
 \item{scale}{non-diagonal elements will be drawn from mean zero normal distribution
 with \code{sd=0.3/scale} and diagonal elements from one with \code{sd=0.6/scale}.
@@ -18,7 +18,7 @@ will explore smaller area of the parameter space. Can be for example
 \code{1 + log(2*mean(c((p-0.2)^(1.25), d)))}.}
 }
 \value{
-Returns \eqn{((how_many*d^2)x1)} vector containing vectorized coefficient
+Returns \eqn{((how_many*d^2)\times 1)} vector containing vectorized coefficient
  matrices \eqn{(vec(A_{1}),...,vec(A_{how_many}))}. Note that if \code{how_many==p},
  then the returned vector equals \strong{\eqn{\phi_{m}}}.
 }
