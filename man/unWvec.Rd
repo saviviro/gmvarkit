@@ -19,8 +19,8 @@ at least the first one of the following elements:
   \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
     unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
     negative sign constraint, and zero indicating that the element is constrained to zero.
-  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+  \item \code{C_lambda} - a \eqn{(d(M-1) \times  r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r \times 1)}
     parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.

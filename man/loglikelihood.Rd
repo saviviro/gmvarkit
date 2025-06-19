@@ -30,7 +30,7 @@ a univariate time series. \code{NA} values are not supported.}
 
 \item{M}{\describe{
   \item{For \strong{GMVAR} and \strong{StMVAR} models:}{a positive integer specifying the number of mixture components.}
-  \item{For \strong{G-StMVAR} models:}{a size (2x1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
+  \item{For \strong{G-StMVAR} models:}{a size (2\times 1) integer vector specifying the number of \emph{GMVAR type} components \code{M1}
    in the first element and \emph{StMVAR type} components \code{M2} in the second element. The total number of mixture components
    is \code{M=M1+M2}.}
 }}
@@ -124,13 +124,13 @@ should be used.}
 \item{parametrization}{\code{"intercept"} or \code{"mean"} determining whether the model is parametrized with intercept
 parameters \eqn{\phi_{m,0}} or regime means \eqn{\mu_{m}}, m=1,...,M.}
 
-\item{constraints}{a size \eqn{(Mpd^2 x q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
+\item{constraints}{a size \eqn{(Mpd^2 \times  q)} constraint matrix \strong{\eqn{C}} specifying general linear constraints
 to the autoregressive parameters. We consider constraints of form
 (\strong{\eqn{\phi}}\eqn{_{1}}\eqn{,...,}\strong{\eqn{\phi}}\eqn{_{M}) = }\strong{\eqn{C \psi}},
 where \strong{\eqn{\phi}}\eqn{_{m}}\eqn{ = (vec(A_{m,1}),...,vec(A_{m,p}) (pd^2 x 1), m=1,...,M},
 contains the coefficient matrices and \strong{\eqn{\psi}} \eqn{(q x 1)} contains the related parameters.
 For example, to restrict the AR-parameters to be the same for all regimes, set \strong{\eqn{C}}=
-[\code{I:...:I}]\strong{'} \eqn{(Mpd^2 x pd^2)} where \code{I = diag(p*d^2)}.
+[\code{I:...:I}]\strong{'} \eqn{(Mpd^2 \times  pd^2)} where \code{I = diag(p*d^2)}.
 Ignore (or set to \code{NULL}) if linear constraints should \strong{not} be employed.}
 
 \item{same_means}{Restrict the mean parameters of some regimes to be the same? Provide a list of numeric vectors
@@ -151,8 +151,8 @@ at least the first one of the following elements:
   \item \code{W} - a \eqn{(dxd)} matrix with its entries imposing constraints on \eqn{W}: \code{NA} indicating that the element is
     unconstrained, a positive value indicating strict positive sign constraint, a negative value indicating strict
     negative sign constraint, and zero indicating that the element is constrained to zero.
-  \item \code{C_lambda} - a \eqn{(d(M-1) x r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
-    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r x 1)}
+  \item \code{C_lambda} - a \eqn{(d(M-1) \times  r)} constraint matrix that satisfies (\strong{\eqn{\lambda}}\eqn{_{2}}\eqn{,...,}
+    \strong{\eqn{\lambda}}\eqn{_{M}) =} \strong{\eqn{C_{\lambda} \gamma}} where \strong{\eqn{\gamma}} is the new \eqn{(r \times 1)}
     parameter subject to which the model is estimated (similarly to AR parameter constraints). The entries of \code{C_lambda}
     must be either \strong{positive} or \strong{zero}. Ignore (or set to \code{NULL}) if the eigenvalues \eqn{\lambda_{mi}}
     should not be constrained.
