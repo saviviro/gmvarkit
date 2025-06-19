@@ -5,7 +5,7 @@
 #'
 #' @inheritParams quantile_residual_tests
 #' @inheritParams calc_gradient
-#' @param A a size \eqn{(k x n_params)} matrix with full row rank specifying part of the null hypothesis
+#' @param A a size \eqn{(k \times n_params)} matrix with full row rank specifying part of the null hypothesis
 #'   where \eqn{n_params} is the number of parameters in the (unconstrained) model.
 #'   See details for more information.
 #' @param c a length \eqn{k} vector specifying part of the null hypothesis. See details for more information.

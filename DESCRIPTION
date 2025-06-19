@@ -1,8 +1,11 @@
 Package: gmvarkit
 Title: Estimate Gaussian and Student's t Mixture Vector Autoregressive Models
 Version: 2.2.0
-Authors@R: person("Savi", "Virolainen", email = "savi.virolainen@helsinki.fi",
-                  role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5075-6821"))
+Authors@R: person("Savi", "Virolainen",
+                  email = "savi.virolainen@helsinki.fi",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "https://orcid.org/0000-0002-5075-6821"))
+Author: Savi Virolainen [aut, cre] (<https://orcid.org/0000-0002-5075-6821>)
 Maintainer: Savi Virolainen <savi.virolainen@helsinki.fi>
 Description: Unconstrained and constrained maximum likelihood estimation of structural and reduced form 
     Gaussian mixture vector autoregressive, Student's t mixture vector autoregressive, and Gaussian and Student's t
