@@ -3,12 +3,7 @@
 \docType{data}
 \name{euromone}
 \alias{euromone}
-\title{A monthly Euro area data covering the period from January 1999 to December 2021 (276 observations) and consisting four variables:
-cyclical component of log industrial production index, the log-difference of harmonized consumer price index, the log-difference
-of Brent crude oil prices (Europe), and an interest rate variable. The interest rate variable is the Euro overnight index average
-rate (EONIA) from January 1999 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
-bound and also quantifies unconventional monetary policy measures. The log-difference of the harmonized consumer price index is
-multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (2022).}
+\title{Euro area macroeconomic data used in Virolainen (2022)}
 \format{
 A numeric matrix of class \code{'ts'} with 276 rows and 4 columns with one time series in each column:
 \describe{
@@ -30,6 +25,13 @@ The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of A
 euromone
 }
 \description{
+A monthly Euro area data covering the period from January 1999 to December 2021 (276 observations) and consisting four variables:
+cyclical component of log industrial production index, the log-difference of harmonized consumer price index, the log-difference
+of Brent crude oil prices (Europe), and an interest rate variable. The interest rate variable is the Euro overnight index average
+rate (EONIA) from January 1999 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
+bound and also quantifies unconventional monetary policy measures. The log-difference of the harmonized consumer price index is
+multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (2022).
+
 The cyclical component of the log of industrial production index was obtained by applying the linear projection filter proposed
 by Hamilton (2018) using the parameter values h=24 and p=12. In order to obtain as accurate estimates as possible, we applied the
 filter to the full available sample from January 1991 to December 2021 before extracting our sample period from it.

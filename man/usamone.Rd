@@ -3,19 +3,14 @@
 \docType{data}
 \name{usamone}
 \alias{usamone}
-\title{A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
-cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
-price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
-rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
-bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP deflator and producer price
-index are multiplied by hundred.}
+\title{U.S. macroeconomic data}
 \format{
 A numeric matrix of class \code{'ts'} with 270 rows and 4 columns with one time series in each column:
 \describe{
   \item{First column (GDP):}{The cyclical component of the log of real GDP, \url{https://fred.stlouisfed.org/series/GDPC1}.}
   \item{Second column (GDPDEF):}{The log-difference of GDP implicit price deflator, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
   \item{Third column (PPI):}{The log-difference of producer price index (all commodities), \url{https://fred.stlouisfed.org/series/PPIACO}.}
-  \item{Third column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
+  \item{Fourth column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
    \url{https://fred.stlouisfed.org/series/FEDFUNDS}, \url{https://www.atlantafed.org/cqer/research/wu-xia-shadow-federal-funds-rate}.}
 }
 }
@@ -26,6 +21,13 @@ The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of A
 usamone
 }
 \description{
+A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
+cyclical component of the log of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
+price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
+rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
+bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP deflator and producer price
+index are multiplied by hundred.
+
 The cyclical component of the log of real GDP was obtained by applying a one-sided Hodrick-Prescott (HP) filter with the
 standard smoothing parameter lambda=1600. The one-sided filter was obtained from the two-sided HP filter by applying the
 filter up to horizon t, taking the last observation, and repeating this procedure for the full sample t=1,...,T.

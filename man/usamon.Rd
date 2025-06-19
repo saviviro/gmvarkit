@@ -3,19 +3,14 @@
 \docType{data}
 \name{usamon}
 \alias{usamon}
-\title{A quarterly U.S. data covering the period from 1954Q3 to 2021Q4 (270 observations) and consisting four variables:
-the log-difference of real GDP, the log-difference of GDP implicit price deflator, the log-difference of producer
-price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
-rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
-bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP, GDP deflator,
-and producer price index are multiplied by hundred. This data is used in Virolainen (forthcoming).}
+\title{U.S. macroeconomic data used in Virolainen (2025)}
 \format{
 A numeric matrix of class \code{'ts'} with 270 rows and 4 columns with one time series in each column:
 \describe{
   \item{First column (GDP):}{The log-difference of real GDP, \url{https://fred.stlouisfed.org/series/GDPC1}.}
   \item{Second column (GDPDEF):}{The log-difference of GDP implicit price deflator, \url{https://fred.stlouisfed.org/series/GDPDEF}.}
   \item{Third column (PPI):}{The log-difference of producer price index (all commodities), \url{https://fred.stlouisfed.org/series/PPIACO}.}
-  \item{Third column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
+  \item{Fourth column (RATE):}{The Federal funds rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate,
    \url{https://fred.stlouisfed.org/series/FEDFUNDS}, \url{https://www.atlantafed.org/cqer/research/wu-xia-shadow-federal-funds-rate}.}
 }
 }
@@ -31,12 +26,12 @@ the log-difference of real GDP, the log-difference of GDP implicit price deflato
 price index (all commodities), and an interest rate variable. The interest rate variable is the effective federal funds
 rate from 1954Q3 to 2008Q2 and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-differences of the GDP, GDP deflator,
-and producer price index are multiplied by hundred. This data is used in Virolainen (forthcoming).
+and producer price index are multiplied by hundred. This data is used in Virolainen (2025).
 }
 \references{
 \itemize{
-   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
-          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
+   \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
+         switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
  }
