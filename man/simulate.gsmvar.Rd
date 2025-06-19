@@ -10,10 +10,9 @@
   seed = NULL,
   ...,
   init_values = NULL,
-  init_regimes = 1:sum(gsmvar$model$M),
+  init_regimes = 1:sum(object$model$M),
   ntimes = 1,
-  drop = TRUE,
-  girf_pars = NULL
+  drop = TRUE
 )
 }
 \arguments{
@@ -25,7 +24,7 @@
 
 \item{...}{currently not in use.}
 
-\item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values, where d is the number
+\item{init_values}{a size \eqn{(p\times d)} matrix specifying the initial values, where d is the number
 of time series in the system. The \strong{last} row will be used as initial values for the first lag,
 the second last row for second lag etc. If not specified, initial values will be drawn according to
 mixture distribution specifed by the argument \code{init_regimes}.}
@@ -45,20 +44,17 @@ initial value are generated from the stationary distribution of the
 
 \item{drop}{if \code{TRUE} (default) then the components of the returned list are coerced to lower dimension if \code{ntimes==1}, i.e.,
 \code{$sample} and \code{$mixing_weights} will be matrices, and \code{$component} will be vector.}
-
-\item{girf_pars}{This argument is used internally in the estimation of generalized impulse response functions (see \code{?GIRF}).
-You should ignore it (specifying something else than null to it will change how the function behaves).}
 }
 \value{
 If \code{drop==TRUE} and \code{ntimes==1} (default): \code{$sample}, \code{$component}, and \code{$mixing_weights} are matrices.
   Otherwise, returns a list with...
   \describe{
-    \item{\code{$sample}}{a size (\code{nsim}\eqn{ x d x }\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
+    \item{\code{$sample}}{a size (\code{nsim}\eqn{\times d \times}\code{ntimes}) array containing the samples: the dimension \code{[t, , ]} is
      the time index, the dimension \code{[, d, ]} indicates the marginal time series, and the dimension \code{[, , i]} indicates
      the i:th set of simulations.}
-    \item{\code{$component}}{a size (\code{nsim}\eqn{ x }\code{ntimes}) matrix containing the information from which mixture component
+    \item{\code{$component}}{a size (\code{nsim}\eqn{\times}\code{ntimes}) matrix containing the information from which mixture component
      each value was generated from.}
-    \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{ x M x }\code{ntimes}) array containing the mixing weights corresponding to
+    \item{\code{$mixing_weights}}{a size (\code{nsim}\eqn{\times M \times}\code{ntimes}) array containing the mixing weights corresponding to
      the sample: the dimension \code{[t, , ]} is the time index, the dimension \code{[, m, ]} indicates the regime, and the dimension
      \code{[, , i]} indicates the i:th set of simulations.}
   }

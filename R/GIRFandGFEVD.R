@@ -205,10 +205,10 @@ GIRF <- function(gsmvar, which_shocks, shock_size=1, N=30, R1=250, R2=250, init_
 
   # Function that estimates GIRF
   get_one_girf <- function(shock_numb, shock_size, seed) {
-    simulate.gsmvar(gsmvar, nsim=N + 1, seed=seed, init_values=init_values, init_regimes=init_regimes, ntimes=R1,
-                    girf_pars=list(shock_numb=shock_numb,
-                                   shock_size=shock_size,
-                                   include_mixweights=include_mixweights))
+    simulate_gsmvar_int(gsmvar, nsim=N + 1, seed=seed, init_values=init_values, init_regimes=init_regimes, ntimes=R1,
+                        girf_pars=list(shock_numb=shock_numb,
+                                       shock_size=shock_size,
+                                       include_mixweights=include_mixweights))
   }
 
   if(ncores > parallel::detectCores()) {
@@ -462,10 +462,10 @@ GFEVD <- function(gsmvar, shock_size=1, N=30, initval_type=c("data", "random", "
   # Function that estimates GIRF
   get_one_girf <- function(shock_numb, shock_size, seed, init_values_for_1girf) {
     if(initval_type == "random") init_values_for_1girf <- NULL
-    simulate.gsmvar(gsmvar, nsim=N + 1, init_values=init_values_for_1girf, ntimes=R1, seed=seed, init_regimes=init_regimes,
-                    girf_pars=list(shock_numb=shock_numb,
-                                   shock_size=shock_size,
-                                   include_mixweights=include_mixweights))
+    simulate_gsmvar_int(gsmvar, nsim=N + 1, init_values=init_values_for_1girf, ntimes=R1, seed=seed, init_regimes=init_regimes,
+                        girf_pars=list(shock_numb=shock_numb,
+                                       shock_size=shock_size,
+                                       include_mixweights=include_mixweights))
   }
 
   if(ncores > parallel::detectCores()) {

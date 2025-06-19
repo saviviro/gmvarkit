@@ -61,7 +61,7 @@ stationary distribution of the process and if \code{init_regimes=m}, the
 initial value are generated from the stationary distribution of the
 \eqn{m}th regime. Ignored if the argument \code{init_values} is specified.}
 
-\item{init_values}{a size \eqn{(pxd)} matrix specifying the initial values, where d is the number
+\item{init_values}{a size \eqn{(p\times d)} matrix specifying the initial values, where d is the number
 of time series in the system. The \strong{last} row will be used as initial values for the first lag,
 the second last row for second lag etc. If not specified, initial values will be drawn according to
 mixture distribution specifed by the argument \code{init_regimes}.}

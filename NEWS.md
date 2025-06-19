@@ -288,3 +288,7 @@
 * Refined the density plot.
 * Updated the references.
 * Other small adjustments prints, documentations, etc.
+
+# gmvarkit 2.1.5
+
+* The internally used argument 'girf_pars' previously appearing in the function simulate.gsmvar is now hidden. 
