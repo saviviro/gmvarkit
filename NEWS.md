@@ -291,7 +291,8 @@
 
 # gmvarkit 2.2.0
 
-* Removed the years ago deprecated old functions that were included for backward compatibility.
+* Removed the years ago deprecated old functions that were included for backward compatibility. If you still have old class 'gmvar' objects,
+  you can convert them to class 'gsmvar' with the function gmvar_to_sgmvar.
 * Fixed the labels for variables in GIRFs etc when they were calculated using a model either not containing any data or containing data without variable names.
 * The internally used argument 'girf_pars' previously appearing in the function simulate.gsmvar is now hidden. 
 * Improved data documentation.
