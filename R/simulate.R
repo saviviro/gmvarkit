@@ -402,9 +402,13 @@ simulate_gsmvar_int <- function(object, nsim=1, seed=NULL, ..., init_values=NULL
   if(!is.null(girf_pars)) {
     one_girf <- apply(X=sample2 - sample, MARGIN=1:2, FUN=mean)
     if(!is.null(gsmvar$data)) {
-      colnames(one_girf) <- colnames(gsmvar$data)
+      if(is.null(colnames(gsmvar$data))) {
+        colnames(one_girf) <- paste("Variable", 1:d)
+      } else {
+        colnames(one_girf) <- colnames(gsmvar$data)
+      }
     } else {
-      colnames(one_girf) <- paste("shock", 1:d)
+      colnames(one_girf) <- paste("Variable", 1:d)
     }
     if(girf_pars$include_mixweights) {
       mix_girf <- apply(X=mixing_weights2 - mixing_weights, MARGIN=1:2, FUN=mean)
