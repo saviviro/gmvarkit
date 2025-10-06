@@ -39,8 +39,8 @@ package lpirfs (Adämmer, 2021)
 \itemize{
    \item Adämmer P. 2021. lprfs: Local Projections Impulse Response Functions. R package version: 0.2.0,
      \url{https://CRAN.R-project.org/package=lpirfs}.
-   \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
-          switching volatility regime. \emph{Journal of Business & Economic Statistics}.
+   \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
+          switching volatility regime. \emph{Journal of Business & Economic Statistics}. \strong{43}:1, 44-54.
    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
  }

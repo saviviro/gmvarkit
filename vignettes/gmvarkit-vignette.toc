@@ -31,6 +31,7 @@
 \contentsline {section}{Summary}{31}{section.8}%
 \contentsline {section}{Computational details}{32}{section.8}%
 \contentsline {section}{A table of some useful functions}{33}{section.8}%
+\contentsline {section}{References}{34}{table.1}%
 \contentsline {section}{Appendix A: Properties of multivariate Gaussian and Student's t distribution}{36}{appendix.A}%
 \contentsline {section}{Appendix B: Quantile residuals of the G-StMVAR model}{37}{appendix.B}%
 \contentsline {section}{Appendix C: Monte Carlo algorithm for estimating the GIRF}{40}{appendix.C}%

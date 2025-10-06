@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  4 JAN 2025 17:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.1.10)  6 OCT 2025 17:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -581,7 +581,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 fier (name{page.}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.36 ...m for estimating the GIRF}{40}{appendix.C}
+l.36 ...als of the G-StMVAR model}{37}{appendix.B}
                                                   % [2])
 \tf@toc=\write5
 \openout5 = `gmvarkit-vignette.toc'.
@@ -665,6 +665,9 @@ Overfull \hbox (5.47499pt too wide) has occurred while \output is active
  []
 
 [9]
+Underfull \vbox (badness 2197) has occurred while \output is active []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 10 []
  []
@@ -695,12 +698,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [14]
-<figures/seriesplot.pdf, id=630, 484.81125pt x 403.5075pt>
+<figures/seriesplot.pdf, id=638, 484.81125pt x 403.5075pt>
 File: figures/seriesplot.pdf Graphic file (type pdf)
 <use figures/seriesplot.pdf>
 Package pdftex.def Info: figures/seriesplot.pdf  used on input line 594.
 (pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
-<figures/densityplot.pdf, id=632, 484.81125pt x 403.5075pt>
+<figures/densityplot.pdf, id=640, 484.81125pt x 403.5075pt>
 File: figures/densityplot.pdf Graphic file (type pdf)
 <use figures/densityplot.pdf>
 Package pdftex.def Info: figures/densityplot.pdf  used on input line 611.
@@ -721,7 +724,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [17 <./figures/densityplot.pdf>]
-<figures/proflogliks.pdf, id=661, 484.81125pt x 403.5075pt>
+<figures/proflogliks.pdf, id=669, 484.81125pt x 403.5075pt>
 File: figures/proflogliks.pdf Graphic file (type pdf)
 <use figures/proflogliks.pdf>
 Package pdftex.def Info: figures/proflogliks.pdf  used on input line 673.
@@ -770,6 +773,11 @@ odel="GMVAR", constraints=C1) \T1/lmr/m/n/10.95 would then
  []
 
 
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+\T1/lmr/m/n/10.95 22 []
+ []
+
+[22]
 Overfull \hbox (10.14369pt too wide) in paragraph at lines 825--826
 \T1/lmr/m/n/10.95 con-strained pa-ram-e-ters $\OT1/lmr/m/n/10.95 ([][]\OML/lmm/
 m/it/10.95 ; :::; [][]\OT1/lmr/m/n/10.95 )$\T1/lmr/m/n/10.95 , where the re-str
@@ -780,21 +788,16 @@ r/m/n/10.95 (\OML/lmm/m/it/10.95 A[]\OT1/lmr/m/n/10.95 )\OML/lmm/m/it/10.95 ; :
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 22 []
+[] \T1/lmr/m/n/10.95 23
  []
 
-[22]
+[23]
 Overfull \hbox (4.86122pt too wide) in paragraph at lines 887--888
 \T1/lmr/m/n/10.95 The com-mand \T1/lmtt/m/n/10.95 fitGSMVAR(gdpdef, p=2, M=2, m
 odel="GMVAR", constraints=C2) \T1/lmr/m/n/10.95 would then
  []
 
 
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 23
- []
-
-[23]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 24 []
  []
@@ -830,14 +833,11 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [30]
-<figures/predplot.pdf, id=809, 484.81125pt x 403.5075pt>
+<figures/predplot.pdf, id=817, 484.81125pt x 403.5075pt>
 File: figures/predplot.pdf Graphic file (type pdf)
 <use figures/predplot.pdf>
 Package pdftex.def Info: figures/predplot.pdf  used on input line 1137.
 (pdftex.def)             Requested size: 362.37569pt x 301.62013pt.
-
-Underfull \vbox (badness 1122) has occurred while \output is active []
-
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 31
@@ -882,12 +882,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [36]
-Overfull \hbox (6.07622pt too wide) detected at line 1294
+Overfull \hbox (6.07622pt too wide) detected at line 1295
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
 
-Overfull \hbox (6.07622pt too wide) detected at line 1298
+Overfull \hbox (6.07622pt too wide) detected at line 1299
 [][][]\OML/lmm/m/it/10.95 ^^L[] \OMS/lmsy/m/n/10.95 ^^Q []
  []
 
@@ -918,16 +918,16 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 
 [41] (./gmvarkit-vignette.aux)
 Package rerunfilecheck Info: File `gmvarkit-vignette.out' has not changed.
-(rerunfilecheck)             Checksum: 86BFC7D5E3B5EB08BCC189E87C0A2527;20395.
+(rerunfilecheck)             Checksum: 457D7A367CC10EC5AB19A22728007DC5;20487.
  ) 
 Here is how much of TeX's memory you used:
- 13053 strings out of 478353
- 206460 string characters out of 5848086
- 521791 words of memory out of 5000000
- 30689 multiletter control sequences out of 15000+600000
+ 13054 strings out of 478353
+ 206469 string characters out of 5848086
+ 521801 words of memory out of 5000000
+ 30690 multiletter control sequences out of 15000+600000
  529785 words of font info for 105 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,25n,77p,1832b,504s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 75i,25n,77p,1832b,508s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/lo
 cal/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/20
 21/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local/texlive/2021/texmf-dist
@@ -956,10 +956,10 @@ blic/lm/lmsy8.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmt
 t10.pfb></usr/local/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtto10.pfb><
 /usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.p
 fb>
-Output written on gmvarkit-vignette.pdf (44 pages, 719134 bytes).
+Output written on gmvarkit-vignette.pdf (44 pages, 718918 bytes).
 PDF statistics:
- 1194 PDF objects out of 1200 (max. 8388607)
- 1073 compressed objects within 11 object streams
+ 1202 PDF objects out of 1440 (max. 8388607)
+ 1081 compressed objects within 11 object streams
  254 named destinations out of 1000 (max. 500000)
- 589 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 597 words of extra memory for PDF output out of 10000 (max. 10000000)
 

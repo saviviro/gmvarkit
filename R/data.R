@@ -37,7 +37,7 @@
 #' @references
 #'  \itemize{
 #'    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
-#'          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
+#'          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}:1, 44-54.
 #'    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
 #'      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
 #'  }
@@ -73,21 +73,21 @@
 #'  \itemize{
 #'    \item Adämmer P. 2021. lprfs: Local Projections Impulse Response Functions. R package version: 0.2.0,
 #'      \url{https://CRAN.R-project.org/package=lpirfs}.
-#'    \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
-#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}.
+#'    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
+#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}. \strong{43}:1, 44-54.
 #'    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
 #'      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
 #'  }
 "usamone"
 
-#' @title Euro area macroeconomic data used in Virolainen (2022)
+#' @title Euro area macroeconomic data used in Virolainen (in press)
 #'
 #' @description A monthly Euro area data covering the period from January 1999 to December 2021 (276 observations) and consisting four variables:
 #' cyclical component of log industrial production index, the log-difference of harmonized consumer price index, the log-difference
 #' of Brent crude oil prices (Europe), and an interest rate variable. The interest rate variable is the Euro overnight index average
 #' rate (EONIA) from January 1999 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 #' bound and also quantifies unconventional monetary policy measures. The log-difference of the harmonized consumer price index is
-#' multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (2022).
+#' multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (in press).
 #'
 #' The cyclical component of the log of industrial production index was obtained by applying the linear projection filter proposed
 #' by Hamilton (2018) using the parameter values h=24 and p=12. In order to obtain as accurate estimates as possible, we applied the
@@ -110,9 +110,8 @@
 #' @source The Federal Reserve Bank of St. Louis database and the Federal Reserve Bank of Atlanta's website
 #' @references
 #'  \itemize{
-#'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
-#'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
-#'      paper, available as arXiv:2109.13648.
+#'    \item Virolainen S. in press. A Gaussian and Student’s mixture vector autoregressive model with an application
+#'     to monetary policy shocks. Econometrics and Statistics.
 #'    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
 #'      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
 #'  }

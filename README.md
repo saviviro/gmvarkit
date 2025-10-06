@@ -4,6 +4,7 @@
 # gmvarkit
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of gmvarkit is to provide tools to analyse structural and
@@ -203,11 +204,9 @@ fit22gss
 - Kalliovirta L. and Saikkonen P. (2010) Reliable Residuals for
   Multivariate Nonlinear Time Series Models. *Unpublished Revision of
   HECER Discussion Paper No. 247*.
-- Virolainen S. (forthcoming). A statistically identified structural
-  vector autoregression with endogenously switching volatility regime.
-  *Journal of Business & Economic Statistics*,
-  <doi:10.1080/07350015.2024.2322090>.
-- Virolainen S. (2022). Gaussian and Student’s t mixture vector
-  autoregressive model with application to the assymetric effects of
-  monetary policy shocks in the Euro area. Unpublished working paper,
-  available as arXiv:2109.13648.
+- Virolainen S. (2025). A statistically identified structural vector
+  autoregression with endogenously switching volatility regime. *Journal
+  of Business & Economic Statistics*, **192**, 1, 44-54.
+- Virolainen S. (in press). A Gaussian and Student’s t mixture vector
+  autoregressive model with an application to monetary policy shocks.
+  *Econometrics and Statistics*.

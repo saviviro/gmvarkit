@@ -188,35 +188,36 @@ Solymos P, Zawadzki Z (2020).
 \newblock R package version 1.4-3,
   \urlprefix\url{https://CRAN.R-project.org/package=pbapply}.
 
-\bibitem[{Virolainen(2018)}]{uGMAR}
-Virolainen S (2018).
-\newblock \emph{uGMAR: Estimate Univariate Gaussian and Student's $t$ Mixture
-  Autoregressive Models}.
-\newblock R package version 3.4.1 available at CRAN:
-  \url{https://CRAN.R-project.org/package=uGMAR},
-  \urlprefix\url{https://CRAN.R-project.org/package=uGMAR}.
-
-\bibitem[{Virolainen(2021)}]{Virolainen:2021}
-Virolainen S (2021).
-\newblock \enquote{A Mixture Autoregressive Model Based on Gaussian and
-  Student's $t$-distributions.}
-\newblock \emph{Studies in Nonlinear Dynamics \& Econometrics}.
+\bibitem[{Virolainen(2022)}]{Virolainen:2021}
+Virolainen S (2022).
+\newblock \enquote{A mixture autoregressive model based on {Gaussian} and
+  {Student's} $t$-distributions.}
+\newblock \emph{Studies in Nonlinear Dynamics \& Econometrics}, \textbf{26}(4),
+  559--580.
 \newblock \doi{10.1515/snde-2020-0060}.
 
-\bibitem[{Virolainen(2022)}]{Virolainen2:2021}
-Virolainen S (2022).
-\newblock \enquote{Gaussian and Student's t Mixture Vector Autoregressive Model
-  with Application to the Asymmetric effects of monetary policy shocks in the
-  Euro area.}
-\newblock \emph{Unpublished working paper, available as arXiv:2109.13648}.
-\newblock \urlprefix\url{https://arXiv:2109.13648}.
-
-\bibitem[{Virolainen(2025)}]{Virolainen:2025}
-Virolainen S (2025).
+\bibitem[{Virolainen(2025{\natexlab{a}})}]{Virolainen:2025}
+Virolainen S (2025{\natexlab{a}}).
 \newblock \enquote{A statistically identified structural vector autoregression
   with endogeneously switching volatility regime.}
 \newblock \emph{Journal of Business \& Economic Statistics}, \textbf{43}(1),
   44--54.
 \newblock \doi{10.1080/07350015.2024.2322090}.
+
+\bibitem[{Virolainen(2025{\natexlab{b}})}]{uGMAR}
+Virolainen S (2025{\natexlab{b}}).
+\newblock \emph{{uGMAR}: Estimate Univariate {Gaussian} and {Student's} $t$
+  Mixture Autoregressive Models}.
+\newblock \doi{10.32614/CRAN.package.uGMAR}.
+\newblock R package version 3.6.0 available at CRAN:
+  \url{https://CRAN.R-project.org/package=uGMAR},
+  \urlprefix\url{https://CRAN.R-project.org/package=uGMAR}.
+
+\bibitem[{Virolainen({in press})}]{Virolainen2:2021}
+Virolainen S ({in press}).
+\newblock \enquote{{Gaussian} and {Student's} $t$ mixture vector autoregressive
+  model with an application to monetary policy shocks.}
+\newblock \emph{Econometrics and Statistics}.
+\newblock \doi{10.1016/j.ecosta.2025.09.003}.
 
 \end{thebibliography}

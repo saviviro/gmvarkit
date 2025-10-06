@@ -3,7 +3,7 @@
 \docType{data}
 \name{euromone}
 \alias{euromone}
-\title{Euro area macroeconomic data used in Virolainen (2022)}
+\title{Euro area macroeconomic data used in Virolainen (in press)}
 \format{
 A numeric matrix of class \code{'ts'} with 276 rows and 4 columns with one time series in each column:
 \describe{
@@ -30,7 +30,7 @@ cyclical component of log industrial production index, the log-difference of har
 of Brent crude oil prices (Europe), and an interest rate variable. The interest rate variable is the Euro overnight index average
 rate (EONIA) from January 1999 to October 2008, and after that the Wu and Xia (2016) shadow rate, which is not constrained by the zero lower
 bound and also quantifies unconventional monetary policy measures. The log-difference of the harmonized consumer price index is
-multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (2022).
+multiplied by hundred and the log-difference of oil price by ten. This data is the one that was used in Virolainen (in press).
 
 The cyclical component of the log of industrial production index was obtained by applying the linear projection filter proposed
 by Hamilton (2018) using the parameter values h=24 and p=12. In order to obtain as accurate estimates as possible, we applied the
@@ -39,9 +39,8 @@ package lpirfs (Adämmer, 2021).
 }
 \references{
 \itemize{
-   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
-     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
-     paper, available as arXiv:2109.13648.
+   \item Virolainen S. in press. A Gaussian and Student’s mixture vector autoregressive model with an application
+    to monetary policy shocks. Econometrics and Statistics.
    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
  }

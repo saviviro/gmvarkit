@@ -31,7 +31,7 @@ and producer price index are multiplied by hundred. This data is used in Virolai
 \references{
 \itemize{
    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
-         switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
+         switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}:1, 44-54.
    \item Wu J. and Xia F. 2016. Measuring the macroeconomic impact of monetary policy at the zero lower bound.
      \emph{Journal of Money, Credit and Banking}, 48(2-3): 253-291.
  }

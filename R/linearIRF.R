@@ -68,7 +68,7 @@
 #'    \item Kilian L. and Lütkepohl H. 2017. Structural Vectors Autoregressive Analysis.
 #'          \emph{Cambridge University Press}, Cambridge.
 #'    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
-#'          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
+#'          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}:1, 44-54.
 #'  }
 #' @examples
 #'   \donttest{

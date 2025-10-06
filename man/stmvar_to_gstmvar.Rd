@@ -66,12 +66,10 @@ mod12gs
 \itemize{
    \item Muirhead R.J. 1982. Aspects of Multivariate Statistical Theory, \emph{Wiley}.
    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
-         \emph{Journal of Econometrics}, \strong{192}, 485-498.
-   \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
-     asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
-     paper, available as arXiv:2109.13648.
    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
-          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
+          switching volatility regime. \emph{Journal of Business & Economic Statistics}. \strong{43}:1, 44-54.
+   \item Virolainen S. in press. A Gaussian and Student’s mixture vector autoregressive model with an application
+    to monetary policy shocks. Econometrics and Statistics.
  }
 }
 \seealso{

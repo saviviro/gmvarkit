@@ -1198,6 +1198,7 @@ Other          & \code{add_data}           & Add data to a GSMVAR model \\
 \end{table}
 
 \pagebreak
+\addcontentsline{toc}{section}{References}
 \bibliography{refs}
 
 \newpage

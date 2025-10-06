@@ -221,11 +221,10 @@ smart_ind <- function(p, M, d, params, model=c("GMVAR", "StMVAR", "G-StMVAR"), c
 #'       \emph{Journal of statistical computation and simulation}, \strong{24}:2, 99-106.
 #'    \item Kalliovirta L., Meitz M. and Saikkonen P. 2016. Gaussian mixture vector autoregression.
 #'          \emph{Journal of Econometrics}, \strong{192}, 485-498.
-#'    \item Virolainen S. (forthcoming). A statistically identified structural vector autoregression with endogenously
-#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}.
-#'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
-#'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
-#'      paper, available as arXiv:2109.13648.
+#'    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
+#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}. \strong{43}:1, 44-54.
+#'    \item Virolainen S. in press. A Gaussian and Student’s mixture vector autoregressive model with an application
+#'     to monetary policy shocks. Econometrics and Statistics.
 #'  }
 #'  @keywords internal
 

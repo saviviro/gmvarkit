@@ -176,10 +176,9 @@
 #'    \item McElroy T. 2017. Computation of vector ARMA autocovariances.
 #'          \emph{Statistics and Probability Letters}, \strong{124}, 92-96.
 #'    \item Virolainen S. 2025. A statistically identified structural vector autoregression with endogenously
-#'          switching volatility regime. \emph{Journal of Business & Economic Statistics}, \strong{43}, 1, 44-54.
-#'    \item Virolainen S. 2022. Gaussian and Student's t mixture vector autoregressive model with application to the
-#'      asymmetric effects of monetary policy shocks in the Euro area. Unpublished working
-#'      paper, available as arXiv:2109.13648.
+#'           switching volatility regime. \emph{Journal of Business & Economic Statistics}. \strong{43}:1, 44-54.
+#'    \item Virolainen S. in press. A Gaussian and Student’s mixture vector autoregressive model with an application
+#'     to monetary policy shocks. Econometrics and Statistics.
 #'  }
 #' @keywords internal
 
