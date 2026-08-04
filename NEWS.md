@@ -301,3 +301,7 @@
 
 * Updated the references.
 
+# gmvarkit 2.2.2
+
+* Updated the maintainer information.
+

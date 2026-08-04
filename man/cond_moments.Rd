@@ -228,9 +228,9 @@ cond_moments(data=gdpdef, p=2, M=2, params=params22, to_return="total_ccovs")
  }
 }
 \seealso{
-Other moment functions: 
-\code{\link{get_regime_autocovs}()},
-\code{\link{get_regime_means}()},
-\code{\link{uncond_moments}()}
+Other moment functions:
+\code{\link[=get_regime_autocovs]{get_regime_autocovs()}},
+\code{\link[=get_regime_means]{get_regime_means()}},
+\code{\link[=uncond_moments]{uncond_moments()}}
 }
 \concept{moment functions}

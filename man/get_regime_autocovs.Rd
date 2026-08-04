@@ -49,9 +49,9 @@ get_regime_autocovs(mod22s)
  }
 }
 \seealso{
-Other moment functions: 
-\code{\link{cond_moments}()},
-\code{\link{get_regime_means}()},
-\code{\link{uncond_moments}()}
+Other moment functions:
+\code{\link[=cond_moments]{cond_moments()}},
+\code{\link[=get_regime_means]{get_regime_means()}},
+\code{\link[=uncond_moments]{uncond_moments()}}
 }
 \concept{moment functions}
